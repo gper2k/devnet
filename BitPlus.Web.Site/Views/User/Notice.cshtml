@@ -1,0 +1,69 @@
+@model UserPageModel
+
+@* 내 알림(/user/notice): 시스템이 보낸 일방 알림 목록(최신순, api/user/notice) — 따로 보기 화면 없이 목록에서 확인·삭제.
+   확인하지 않은 알림은 강조, 문구에 주소가 있으면 누를 때 확인 처리 후 이동. 위쪽 버튼은 모두 확인 / 확인한 알림 지우기. *@
+<div class="userNotice">
+    <partial name="_UserHead" model="Model" />
+    <article>
+        <nav>
+            <button type="button" class="sm" data-mode="readAll"><i class="fi fiCheckmark"></i> @this.Lang("NoticeReadAll")</button>
+            <button type="button" class="sm" data-mode="clear"><i class="fi fiDelete"></i> @this.Lang("NoticeClearRead")</button>
+        </nav>
+        <ul></ul>
+    </article>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('div.userNotice > article');
+        const list = root.querySelector(':scope > ul');
+        const scope = [...root.attributes].find(p => p.name.startsWith('b-'))?.name; // 격리 스타일 속성을 스크립트로 만든 요소에도 붙임
+        const mk = (tag, text) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (scope) el.setAttribute(scope, ''); return el; };
+        const icons = { comment: 'fiComment', like: 'fiThumbLike', moderation: 'fiShieldTask', error: 'fiErrorCircle' };
+        const text = { confirm: @this.Js(this.Lang("Confirm")), del: @this.Js(this.Lang("Delete")), empty: @this.Js(this.Lang("DataEmpty")) };
+        let page = 0;
+
+        const read = id => common.postSend(`/api/user/notice/read${id ? `/${id}` : ''}`, new FormData(), { useLoading: false, useInfo: false });
+        const remove = id => common.delSend(`/api/user/notice${id ? `/${id}` : ''}`, { useLoading: false, useInfo: false });
+
+        // 한 줄: 종류 아이콘·시각 / 문구(주소가 있으면 링크) / 확인·삭제 버튼. 확인하지 않은 알림은 data-unread
+        const itemOf = item => {
+            const li = mk('li'), head = mk('header'), icon = mk('i'), time = mk('time', common.ago(item.cDate)), body = mk(item.url ? 'a' : 'span', item.text), menu = mk('menu');
+            icon.className = `fi ${icons[item.type] ?? 'fiAlert'}`;
+            time.title = common.localTime(item.cDate, true);
+            head.append(icon, time);
+            if (item.url) body.href = item.url;
+            if (!item.rDate) {
+                li.dataset.unread = '';
+                const ok = mk('button', text.confirm);
+                ok.type = 'button';
+                ok.className = 'sm';
+                ok.onclick = async () => { await read(item.id); load(page); };
+                menu.append(ok);
+                if (item.url) body.onclick = async e => { e.preventDefault(); await read(item.id); location.href = item.url; };
+            }
+            const del = mk('button', text.del);
+            del.type = 'button';
+            del.className = 'sm danger';
+            del.onclick = async () => { await remove(item.id); load(page); };
+            menu.append(del);
+            li.append(head, body, menu);
+            return li;
+        };
+
+        const load = async p => {
+            page = p;
+            const res = await common.getSend(`/api/user/notice?page=${p}`, { useLoading: false });
+            if (!res || !res.success) return;
+            if (p > 0 && res.data.items.length === 0 && res.data.total > 0) return load(p - 1); // 마지막 페이지를 비웠으면 앞 페이지로
+            list.replaceChildren(...(res.data.items.length ? res.data.items.map(itemOf) : [mk('li', text.empty)]));
+            root.querySelector(':scope > ul.pager')?.remove();
+            if (res.data.total > res.data.pageSize) list.after(common.makePager(p, res.data.pageSize, res.data.total).then(load));
+            document.querySelectorAll('.userTabs a[href="/user/notice"] > b').forEach(b => res.data.unread ? b.textContent = res.data.unread : b.remove());
+        };
+
+        root.querySelector('[data-mode="readAll"]').onclick = async () => { await read(); load(page); };
+        root.querySelector('[data-mode="clear"]').onclick = async () => { await remove(); load(0); };
+        load(0);
+    });
+</script>

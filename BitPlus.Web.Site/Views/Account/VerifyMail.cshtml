@@ -1,0 +1,103 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    this.SetTitle(this.Lang("MailVerify"));
+    this.SetPageKey("VerifyMail");
+    // 상태: sent(가입 시 발송됨) / notSent(가입 시 발송 실패) / failed(링크 토큰이 틀리거나 만료) — 루트 클래스 수식어로 색상 구분
+    var state = ViewData["State"] as string ?? "sent";
+    var uid = ViewData["Uid"] as string;
+    var mail = ViewData["Mail"] as string;
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+@* 메일 인증 안내: 상태 아이콘, 제목, 설명 / 발송 주소, 인증 확인·재발송, 안내 팁 (실패 시 재발송·로그인 이동) *@
+<section class="verifyMail @state">
+    <b><i class="fi @(state == "failed" ? "fiDismissCircle" : state == "notSent" ? "fiWarning" : "fiMail")"></i></b>
+    <h2>@(state switch { "failed" => this.Lang("VerifyMailFailedTitle"), "notSent" => this.Lang("MailNotSentTitle"), _ => this.Lang("VerifyMailSentTitle") })</h2>
+    <p>@(state switch { "failed" => this.Lang("VerifyMailFailed"), "notSent" => this.Lang("MailNotSent"), _ => this.Lang("VerifyMailSentNotice") })</p>
+
+    @if (state != "failed")
+    {
+        <strong><i class="fi fiMail"></i> @mail</strong>
+        <small>@Html.Raw(this.Lang("VerifyMailCheckGuide"))</small>
+
+        <form method="post" action="/api/account/mail/check" novalidate>
+            <input type="hidden" name="uid" value="@uid" />
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="btn point"><i class="fi fiCheckmark"></i> <span>@this.Lang("CheckMailVerified")</span></button>
+        </form>
+        <form method="post" action="/api/account/mail/resend" novalidate>
+            <input type="hidden" name="uid" value="@uid" />
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit"><i class="fi fiArrowsRotate"></i> <span>@this.Lang("ResendMail")</span></button>
+        </form>
+
+        <aside>
+            <h4><i class="fi fiInfo"></i> @this.Lang("VerifyTipsTitle")</h4>
+            <ul>
+                <li>@this.Lang("VerifyTip1")</li>
+                <li>@this.Lang("VerifyTip2")</li>
+            </ul>
+        </aside>
+    }
+    else
+    {
+        <form method="post" action="/api/account/mail/resend" novalidate>
+            <input type="hidden" name="uid" value="@uid" />
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="btn point"><i class="fi fiArrowsRotate"></i> <span>@this.Lang("ResendMail")</span></button>
+        </form>
+        <a href="@(this.LoginUrl + (string.IsNullOrEmpty(returnUrl) ? null : "?ReturnUrl=" + Uri.EscapeDataString(returnUrl)))"><i class="fi fiArrowLeft"></i> @this.Lang("GoToSignIn")</a>
+    }
+</section>
+
+@section Scripts {
+    <script type="module">
+        const root = document.querySelector('section.verifyMail');
+        const checkForm = root.querySelector('form[action$="/mail/check"]');
+        const resendForm = root.querySelector('form[action$="/mail/resend"]');
+
+        // 인증 확인: 인증되었으면 로그인 페이지로 이동 (이 요청으로는 로그인하지 않는다). silent 는 창 복귀 시 자동 확인용(오류 안내 없음)
+        async function checkVerification(silent) {
+            const button = checkForm.querySelector('button');
+            button.disabled = true;
+            try {
+                const res = silent
+                    ? await fetch(checkForm.action, { method: 'POST', body: new FormData(checkForm), credentials: 'include' }).then(r => r.ok ? r.json() : null).catch(() => null)
+                    : await common.postSend(checkForm.action, new FormData(checkForm));
+                if (res?.success && res.data?.verified) location.href = res.data.redirect;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        if (checkForm) {
+            checkForm.addEventListener('submit', e => {
+                e.preventDefault();
+                checkVerification(false);
+            });
+            // 메일 앱/새 탭에서 링크를 누르고 이 창으로 돌아오면 자동 확인
+            window.addEventListener('focus', () => checkVerification(true));
+        }
+
+        // 재발송: 성공하면 재발송 간격(60초) 동안 버튼에 남은 시간 표시
+        resendForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const button = resendForm.querySelector('button');
+            const label = button.querySelector('span');
+            const text = label.textContent;
+            button.disabled = true;
+            const res = await common.postSend(resendForm.action, new FormData(resendForm));
+            if (!res?.success) {
+                button.disabled = false;
+                return;
+            }
+            let left = 60;
+            const timer = setInterval(() => {
+                label.textContent = --left > 0 ? `${left}s` : text;
+                if (left > 0) return;
+                clearInterval(timer);
+                button.disabled = false;
+            }, 1000);
+        });
+    </script>
+}

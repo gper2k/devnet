@@ -1,0 +1,150 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("ConfigInfoTitle"));
+}
+
+@* 계정 구성 — 입력을 보기 좋게 카드로 나눴을 뿐, 저장은 한 번에 AccountRule + Identity(비밀번호/잠금) 를 함께 저장한다. 가입 기본 그룹/역할은 기본 정보 카드의 버튼으로 여는 모달에서 고르고 저장은 같이 한다. SMTP 는 시스템 설정 > SMTP 구성. *@
+<div class="pageBox">
+    <div class="inform">
+        <header><i class="fi fiInfo fiFill"></i> @this.Lang("ConfigInfoTitle")</header>
+        <p>@this.Lang("ConfigInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <div class="cardGrid auto">
+            <ul class="form card line line">
+                <li><h4><i class="fi fiPerson"></i> @this.Lang("BasicInfo")</h4></li>
+                <li>
+                    <header>@this.Lang("DefaultPassword")</header>
+                    <input type="text" name="defaultPassword" maxlength="64" placeholder="{0}@@BitPlus.kr" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("UidMinSize")</header>
+                    <input type="number" name="uidMinSize" min="2" max="32" />
+                </li>
+                <li>
+                    <header>@this.Lang("MailVerify")</header>
+                    <select name="mailVerify">
+                        <option value="Off">@this.Lang("MailVerifyOff")</option>
+                        <option value="Warning">@this.Lang("MailVerifyWarning")</option>
+                        <option value="On">@this.Lang("MailVerifyOn")</option>
+                    </select>
+                </li>
+                <li class="col2">
+                    <button type="button" data-dialog="joinGroupModal"><i class="fi fiFolder"></i> @this.Lang("DefaultGroupConfig")</button>
+                    <button type="button" data-dialog="joinRoleModal"><i class="fi fiBadge"></i> @this.Lang("DefaultRoleConfig")</button>
+                </li>
+            </ul>
+
+            <ul class="form card line">
+                <li><h4><i class="fi fiShield"></i> @this.Lang("AccessConfig")</h4></li>
+                <li>
+                    <header>@this.Lang("AccessExpireMin")</header>
+                    <input type="number" name="accessExpireMin" min="1" max="1440" />
+                </li>
+                <li>
+                    <header>@this.Lang("AccessRefreshMin")</header>
+                    <input type="number" name="accessRefreshMin" min="0" max="1440" />
+                </li>
+                <li>
+                    <header>@this.Lang("RefreshExpireHour")</header>
+                    <input type="number" name="refreshExpireHour" min="1" max="8760" />
+                </li>
+                <li>
+                    <label class="check main"><input type="checkbox" name="membersOnly" /><span>@this.Lang("MembersOnly")</span></label>
+                </li>
+            </ul>
+
+            <ul class="form card line">
+                <li><h4><i class="fi fiPassword"></i> @this.Lang("PasswordRule")</h4></li>
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("RequiredLength")</header>
+                        <input type="number" name="requiredLength" min="1" max="128" />
+                    </div>
+                    <div>
+                        <header>@this.Lang("RequiredUniqueChars")</header>
+                        <input type="number" name="requiredUniqueChars" min="0" max="128" />
+                    </div>
+                </li>
+                <li>
+                    <label class="check main"><input type="checkbox" name="requireDigit" /><span>@this.Lang("RequireDigit")</span></label>
+                    <label class="check main"><input type="checkbox" name="requireLowercase" /><span>@this.Lang("RequireLowercase")</span></label>
+                    <label class="check main"><input type="checkbox" name="requireUppercase" /><span>@this.Lang("RequireUppercase")</span></label>
+                    <label class="check main"><input type="checkbox" name="requireNonAlphanumeric" /><span>@this.Lang("RequireNonAlphanumeric")</span></label>
+                </li>
+            </ul>
+
+            <ul class="form card line">
+                <li><h4><i class="fi fiLockClosed"></i> @this.Lang("LockoutRule")</h4></li>
+                <li>
+                    <header>@this.Lang("MaxFailedAccessAttempts")</header>
+                    <input type="number" name="maxFailedAccessAttempts" min="1" max="100" />
+                </li>
+                <li>
+                    <header>@this.Lang("LockoutMinutes")</header>
+                    <input type="number" name="lockoutMinutes" min="1" max="525600" />
+                </li>
+                <li>
+                    <label class="check main"><input type="checkbox" name="allowedForNewUsers" /><span>@this.Lang("AllowedForNewUsers")</span></label>
+                </li>
+            </ul>
+
+            <ul class="form card line">
+                <li><h4><i class="fi fiKey"></i> @this.Lang("TokenNameConfig")</h4></li>
+                <li>
+                    <header>@this.Lang("AccessTokenName")</header>
+                    <input type="text" name="accessTokenName" maxlength="64" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("RefreshTokenName")</header>
+                    <input type="text" name="refreshTokenName" maxlength="64" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("RefreshSignalHeaderName")</header>
+                    <input type="text" name="refreshSignalHeaderName" maxlength="64" autocomplete="off" />
+                </li>
+            </ul>
+        </div>
+
+        <footer class="pageFooter">
+            <span></span>
+            <div class="flexRow gapSm">
+                <button type="button" data-mode="reset"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                <button type="button" class="main"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+            </div>
+        </footer>
+    </article>
+</div>
+
+<!-- 가입 기본 그룹/역할 모달: 칩 목록만 고치고 닫으며, 저장은 계정 구성 하단 저장 버튼으로 함께 한다 -->
+<dialog id="joinGroupModal" class="chipEdit">
+    <header><i class="fi fiFolder"></i> @this.Lang("DefaultGroupConfig")</header>
+    <section>
+        <div class="chipBox auto" data-name="joinDefaultGroup" data-modal="groupSelect" data-sync>
+            <ul></ul>
+            <footer>
+                <button type="button" class="xs info"><i class="fi fiSettings"></i> @this.Lang("Manage")</button>
+            </footer>
+        </div>
+    </section>
+    <footer>
+        <button type="button" class="main" onclick="this.closest('dialog').close()"><i class="fi fiCheck"></i> @this.Lang("Confirm")</button>
+    </footer>
+</dialog>
+
+<dialog id="joinRoleModal" class="chipEdit">
+    <header><i class="fi fiBadge"></i> @this.Lang("DefaultRoleConfig")</header>
+    <section>
+        <div class="chipBox auto" data-name="joinDefaultRole" data-modal="roleSelect">
+            <ul></ul>
+            <footer>
+                <button type="button" class="xs info"><i class="fi fiAddCircle"></i> @this.Lang("Add")</button>
+            </footer>
+        </div>
+    </section>
+    <footer>
+        <button type="button" class="main" onclick="this.closest('dialog').close()"><i class="fi fiCheck"></i> @this.Lang("Confirm")</button>
+    </footer>
+</dialog>

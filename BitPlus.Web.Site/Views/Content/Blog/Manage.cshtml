@@ -1,0 +1,4 @@
+@model ContentPageModel
+
+@* 블로그 설정(/content/manage/{규칙}, 신규는 /content/manage?type=Blog) — 일반 형식 설정 화면을 쓰되 포럼과 같이 답글 권한·답글 허용·댓글 좋아요·비공개·익명 항목을 숨긴다(서버가 정함: ForumContentHandler 를 이어받은 BlogContentHandler). *@
+<partial name="~/Views/Content/Default/Manage.cshtml" model="Model" />

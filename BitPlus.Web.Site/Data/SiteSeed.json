@@ -1,0 +1,192 @@
+{
+  "boards": [
+    {
+      "alias": "free",
+      "type": "Default",
+      "title": {
+        "en": "Free Board",
+        "ko": "자유 게시판"
+      },
+      "options": {
+        "ManagerProxyApproval": false,
+        "ParallelApproval": true,
+        "SingleApproval": false,
+        "AllowDelete": true,
+        "AllowEdit": true,
+        "AllowAnswer": true,
+        "AllowComment": true,
+        "UseTags": true,
+        "UseLike": true,
+        "UseCommentLike": true,
+        "UseRelatedLinks": true,
+        "UseNotice": true,
+        "WriterPeriod": true,
+        "WriterTarget": true,
+        "UseHistory": true,
+        "UseSnsShare": true,
+        "ShowSummary": true,
+        "UsePrivate": true,
+        "UseAnonymous": false
+      },
+      "access": [
+        {
+          "mode": "Write",
+          "role": "Member"
+        },
+        {
+          "mode": "Answer",
+          "role": "Member"
+        },
+        {
+          "mode": "Comment",
+          "role": "Member"
+        }
+      ],
+      "file": {
+        "extensions": null,
+        "count": 5,
+        "size": 2147483648,
+        "totalSize": 4294967296,
+        "access": []
+      },
+      "menu": {
+        "parent": "ContentMap",
+        "icon": "<i class=\"fi fiChat\"></i>",
+        "sort": 1
+      },
+      "posts": [
+        {
+          "title": "BitPlus 엔터프라이즈 CMS 기능 가이드 및 시작 안내",
+          "notice": true,
+          "daysAgo": 5,
+          "body": "<p><strong>BitPlus 엔터프라이즈 CMS</strong>에 오신 것을 환영합니다.</p><p>본 시스템은 최신 <strong>.NET 10 LTS(장기 지원판)</strong> 기반으로 구축되어, Linux와 Windows 어디서나 가볍고 빠른 고성능 웹 서비스를 제공합니다.</p><p><strong>주요 특징 및 핵심 아키텍처:</strong></p><ul><li><strong>크로스 플랫폼 지원</strong>: Linux(Kestrel/Nginx/Docker), Windows(IIS) 완벽 호환</li><li><strong>멀티 DB & 속성 확장</strong>: MS-SQL, MariaDB, MySQL 기본 지원 및 IDbProvider 무한 확장, 스키마 변경 없는 JSON 속성(Property) 제공</li><li><strong>기업형 조직도 & 계정 체계</strong>: 다계층 부서 트리, 다중 소속/겸직, 활성 부서 및 역할 실시간 전환</li><li><strong>정교한 보안 인가</strong>: 정책 기반(Policy) 및 역할 기반(RBAC) 권한 관리와 RTR 토큰 체계</li><li><strong>지능형 AI & 이벤트 자동화</strong>: OpenAI, Claude, Gemini, Ollama 연동 및 시스템 전역 이벤트 버스 처리</li><li><strong>대용량 2GB 업로드</strong>: 청크 분할 스트리밍 파일 전송 엔진 내장</li><li><strong>강화된 다국어 지원</strong>: 4단계 문화권 감지 및 실시간 다국어 리소스 동기화</li><li><strong>무중단 하이브리드 캐시</strong>: Redis 장애 시 로컬 메모리 캐시로 즉시 자동 대체되는 무중단 가용성 보장</li></ul>"
+        },
+        {
+          "title": "기업형 조직도 기반 회원 관리 및 다중 역할(겸직) 활용법",
+          "daysAgo": 4,
+          "body": "<p><img src=\"/img/sample/003.webp\" alt=\"기업형 조직도\"></p><p>BitPlus는 일반 커뮤니티 회원 체계뿐만 아니라, 엔터프라이즈 사내 인트라넷 및 ERP/업무용 포탈로 즉시 전환 가능한 <strong>기업형 조직도(부서 계층)</strong>를 기본 내장하고 있습니다.</p><p>사용자는 여러 부서에 동시 소속되거나 다양한 역할을 겸직할 수 있으며, 상단 프로필에서 <strong>활성 부서(Active Group)</strong>와 <strong>활성 역할(Active Role)</strong>을 클릭 한 번으로 실시간 전환하며 업무를 수행할 수 있습니다.</p>"
+        },
+        {
+          "title": "멀티 데이터베이스(MS-SQL, MariaDB, MySQL)와 JSON 속성(Property) 확장 가이드",
+          "daysAgo": 3,
+          "body": "<p><img src=\"/img/sample/007.webp\" alt=\"멀티 데이터베이스\"></p><p>단일 DBMS에 종속되지 않고 <code>IDbProvider</code> 인터페이스를 통해 <strong>MS-SQL Server, MariaDB, MySQL</strong> 등 다양한 데이터베이스를 원클릭 웹 설치 마법사에서 선택할 수 있습니다.</p><p>또한 사용자, 부서, 컨텐츠 규칙 등 핵심 엔티티에 <code>Property</code>(JSON 확장 필드)가 기본 내장되어 있어, 데이터베이스 스키마 마이그레이션 없이도 업무에 필요한 동적 메타데이터를 유연하게 확장하고 저장할 수 있습니다.</p>"
+        },
+        {
+          "title": "2GB 대용량 분할 업로드 및 글로벌 다국어(i18n) 운영 노하우",
+          "daysAgo": 2,
+          "body": "<p><img src=\"/img/sample/001.webp\" alt=\"대용량 업로드 및 다국어\"></p><p>최대 <strong>2GB 대용량 파일</strong>을 브라우저에서 서버로 끊김 없이 분할 전송하는 청크 스트리밍 업로드 기능이 기본 구현되어 있습니다. 대용량 미디어 파일, CAD 도면, 소프트웨어 배포 패키지도 안정적으로 보관할 수 있습니다.</p><p>또한 쿼리, 쿠키, HTTP 헤더, 브라우저 선호 언어로 이어지는 4단계 문화권 자동 감지 파이프라인과 실시간 DB 사전 연동으로 전 세계 사용자를 위한 글로벌 웹 서비스를 손쉽게 운영할 수 있습니다.</p>"
+        },
+        {
+          "title": "생성형 AI 연계 컨텐츠 자동화와 시스템 이벤트 버스",
+          "daysAgo": 1,
+          "body": "<p><img src=\"/img/sample/ComfyUI_00298_.webp\" alt=\"AI 및 자동화\"></p><p>OpenAI, Anthropic Claude, Google Gemini뿐 아니라 사내 폐쇄망을 위한 <strong>로컬 Ollama</strong>까지 통합 지원합니다. 장문 게시글 자동 요약, AI 태깅, 유해글 실시간 필터링을 백그라운드에서 지능적으로 수행합니다.</p><p>아울러 회원 가입, 글 등록, 결재 승인, 시스템 에러 등 전역 이벤트를 감지하여 알림과 메일을 즉각 자동 발송하는 이벤트 버스 아키텍처가 결합되어 운영 효율을 극대화합니다.</p>"
+        }
+      ]
+    },
+    {
+      "alias": "gallery",
+      "type": "Gallery",
+      "title": {
+        "en": "Gallery",
+        "ko": "갤러리"
+      },
+      "options": {
+        "ManagerProxyApproval": false,
+        "ParallelApproval": false,
+        "SingleApproval": false,
+        "AllowDelete": true,
+        "AllowEdit": true,
+        "AllowAnswer": false,
+        "AllowComment": true,
+        "UseTags": true,
+        "UseLike": true,
+        "UseCommentLike": true,
+        "UseRelatedLinks": false,
+        "UseNotice": false,
+        "WriterPeriod": false,
+        "WriterTarget": false,
+        "UseSnsShare": true,
+        "UseHistory": false,
+        "UsePrivate": false,
+        "UseAnonymous": false
+      },
+      "access": [],
+      "file": {
+        "extensions": "jpg, jpeg, png, gif, webp, avif, bmp",
+        "count": 30,
+        "size": 104857600,
+        "totalSize": 2147483648,
+        "access": []
+      },
+      "menu": {
+        "parent": "ContentMap",
+        "icon": "<i class=\"fi fiPicture\"></i>",
+        "sort": 2
+      },
+      "posts": [
+        {
+          "title": "고성능 .NET 10 엔터프라이즈 아키텍처",
+          "daysAgo": 7,
+          "body": "<p><img src=\"/img/sample/003.webp\" alt=\"고성능 .NET 10 아키텍처\"></p><p>최신 C# 13과 .NET 10 LTS 기반의 압도적인 런타임 성능과 클라우드 최적화 인프라.</p>"
+        },
+        {
+          "title": "기업형 조직도 및 계층 부서 트리",
+          "daysAgo": 6.4,
+          "body": "<p><img src=\"/img/sample/007.webp\" alt=\"기업형 조직도 및 부서 트리\"></p><p>다계층 부서 구조, 겸직 지원 및 실시간 활성 부서/역할 전환 시스템.</p>"
+        },
+        {
+          "title": "지능형 AI 어시스턴트 & 자동화 엔진",
+          "daysAgo": 5.8,
+          "body": "<p><img src=\"/img/sample/009.webp\" alt=\"지능형 AI 어시스턴트\"></p><p>OpenAI, Claude, Gemini 및 로컬 Ollama 연동을 통한 컨텐츠 요약 및 검수 자동화.</p>"
+        },
+        {
+          "title": "멀티 DB 및 JSON 속성(Property) 확장",
+          "daysAgo": 5.2,
+          "body": "<p><img src=\"/img/sample/ComfyUI_00300_.webp\" alt=\"멀티 DB 및 스키마 확장\"></p><p>MS-SQL, MariaDB, MySQL 지원 및 스키마 변경 없는 유연한 비즈니스 속성 필드 제공.</p>"
+        },
+        {
+          "title": "2GB 대용량 분할 스트리밍 파일 전송",
+          "daysAgo": 4.6,
+          "body": "<p><img src=\"/img/sample/flux_krea_00008_.webp\" alt=\"2GB 대용량 분할 업로드\"></p><p>대용량 미디어 및 설치 파일 전송을 위한 안정적인 청크 스트리밍 업로드.</p>"
+        },
+        {
+          "title": "엔터프라이즈 다국어(i18n) 글로벌 최적화",
+          "daysAgo": 4,
+          "body": "<p><img src=\"/img/sample/z-image-turbo_00001_.webp\" alt=\"글로벌 다국어\"></p><p>4단계 문화권 자동 감지 및 실시간 DB 사전 연동으로 글로벌 무중단 운영 지원.</p>"
+        },
+        {
+          "title": "무중단 하이브리드 캐시(Failover) 시스템",
+          "daysAgo": 3.4,
+          "body": "<p><img src=\"/img/sample/011.webp\" alt=\"무중단 하이브리드 캐시\"></p><p>Redis 장애 시 로컬 메모리 캐시로 1초의 중단 없이 자동 전환되는 2중 안전 캐시 아키텍처.</p>"
+        },
+        {
+          "title": "반응형 위젯 & 테마 디자인 시스템",
+          "daysAgo": 2.8,
+          "body": "<p><img src=\"/img/sample/ComfyUI_00389_.webp\" alt=\"반응형 위젯 & 테마 시스템\"></p><p>웹에서 마우스 드래그로 조립하는 실시간 위젯 배치와 4대 브랜드 색상 테마 커스터마이징.</p>"
+        }
+      ]
+    }
+  ],
+  "menus": [
+    {
+      "key": "free",
+      "parent": "UserContent",
+      "names": {
+        "ko": "자유게시판",
+        "en": "Free Board"
+      },
+      "sort": 1,
+      "action": "/content/{free}"
+    },
+    {
+      "key": "gallery",
+      "parent": "UserContent",
+      "names": {
+        "ko": "갤러리",
+        "en": "Gallery"
+      },
+      "sort": 2,
+      "action": "/content/{gallery}"
+    }
+  ]
+}

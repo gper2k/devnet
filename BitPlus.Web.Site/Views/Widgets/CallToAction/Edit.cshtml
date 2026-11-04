@@ -1,0 +1,8 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 행동 유도 위젯 설정 — title, text, buttonText·buttonUrl *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_DesignFields.cshtml" model='new[] { "heading", "button" }' />
+</ul>

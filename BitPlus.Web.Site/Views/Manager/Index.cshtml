@@ -1,0 +1,192 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@using BitPlus.Data.Account.Model
+@using BitPlus.Data.CommonModel
+@using BitPlus.Data.Content
+@using BitPlus.Web.Site.Middlewares
+@using Microsoft.EntityFrameworkCore
+@{
+    Layout = "_AdminLayout";
+    this.SetTitle(this.Lang("Dashboard"));
+    this.SetDescription(this.Lang("DashboardInfo"));
+    // 관리자 대시보드: 방문 집계(업로드 폴더 Counter 파일, VisitCounter) + 회원·게시물·댓글·신고(DB) 실제 값.
+    // 하루 경계는 방문 집계와 같게 서버 날짜(오늘 0시를 UTC 로 바꿔 CDate 와 비교)
+    var db = (DbContext)this.DbContext!;
+    var counter = this.Context.RequestServices.GetRequiredService<VisitCounter>();
+    var today = VisitCounter.Today;
+    var (dayStart, weekStart, monthStart) = (DateTime.Today.ToUniversalTime(), DateTime.Today.AddDays(-6).ToUniversalTime(), new DateTime(today.Year, today.Month, 1).ToUniversalTime());
+
+    // 방문: 오늘·어제, 이번 달·올해, 최근 14일
+    var visitToday = counter.Day(today);
+    var visitYesterday = counter.Day(today.AddDays(-1));
+    var visitMonth = counter.Month(today);
+    var visitYear = counter.Year(today.Year);
+    var trend = Enumerable.Range(0, 14).Select(i => today.AddDays(i - 13)).Select(d => (Date: d, Count: counter.Day(d))).ToList();
+    var trendMax = Math.Max(1, trend.Max(p => p.Count.Pages));
+    int? Rate(long now, long before) => before == 0 ? null : (int)Math.Round((now - before) * 100.0 / before);
+    var visitRate = Rate(visitToday.Visitors, visitYesterday.Visitors);
+
+    // 회원·게시물·댓글·신고
+    var users = db.Set<AppUser>().AsNoTracking().Where(p => !p.IsSystem);
+    var (userTotal, userEnabled, userWeek, userMonthNew) = (await users.CountAsync(), await users.CountAsync(p => p.Enabler), await users.CountAsync(p => p.LastAccess >= weekStart), await users.CountAsync(p => p.CDate >= monthStart));
+    var posts = db.Set<ContentModel>().AsNoTracking().Where(p => p.ContentNo != null);
+    var (postTotal, postToday) = (await posts.CountAsync(), await posts.CountAsync(p => p.CDate >= dayStart));
+    var comments = db.Set<Comment>().AsNoTracking();
+    var (commentTotal, commentToday) = (await comments.CountAsync(), await comments.CountAsync(p => p.CDate >= dayStart));
+    var reports = db.Set<ContentReport>().AsNoTracking();
+    var (reportWeek, reportToday) = (await reports.CountAsync(p => p.CDate >= weekStart), await reports.CountAsync(p => p.CDate >= dayStart));
+
+    // 최근 가입 회원 5명
+    var newUsers = await users.Include(p => p.DpNames).Include(p => p.Properties.Where(x => x.Key == BitPlus.Web.Site.Controllers.API.UserController.PhotoKey))
+        .OrderByDescending(p => p.CDate).Take(5).ToListAsync();
+
+    // 최근 활동: 게시물·댓글을 합쳐 최신 8건 (포럼 답글은 댓글로)
+    var rules = await db.Set<ContentRule>().AsNoTracking().Include(p => p.Title).ToDictionaryAsync(p => p.Id);
+    var recentPosts = await posts.OrderByDescending(p => p.CDate).Take(8)
+        .Select(p => new { p.ContentRuleId, p.ContentNo, p.TargetNo, p.LevelNo, p.Title, p.WriterId, p.CDate }).ToListAsync();
+    var recentComments = await comments.OrderByDescending(p => p.CDate).Take(8)
+        .Select(p => new { p.Content!.ContentRuleId, p.Content.ContentNo, p.Content.Title, p.CommentUserId, p.CDate }).ToListAsync();
+    var activities = recentPosts.Select(p => (IsPost: !(rules.GetValueOrDefault(p.ContentRuleId) is { } r && BitPlus.Web.Data.Content.ForumContentHandler.UsesTopicComments(r.Type) && (p.LevelNo ?? 0) > 0), p.ContentRuleId, p.ContentNo, p.Title, WriterId: p.WriterId, p.CDate))
+        .Concat(recentComments.Select(p => (IsPost: false, p.ContentRuleId, p.ContentNo, p.Title, WriterId: p.CommentUserId, p.CDate)))
+        .OrderByDescending(p => p.CDate).Take(8).ToList();
+    var writerIds = activities.Select(p => p.WriterId).OfType<Guid>().Distinct().ToList();
+    var writers = await db.Set<AppUser>().AsNoTracking().Include(p => p.DpNames).Where(p => writerIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id);
+
+    string NameOf(AppUser user) => this.Context.Request.DisplayName(user.DpNames, user.UserName);
+    string BoardOf(Guid ruleId) => rules.TryGetValue(ruleId, out var rule) ? this.Context.Request.DisplayName(rule.Title, rule.RuleNo.ToString()) : string.Empty;
+    string UrlOf(Guid ruleId, int? contentNo) => rules.TryGetValue(ruleId, out var rule) ? $"/content/{rule.RuleNo}/view/{contentNo}" : "#";
+    string Num(long value) => value.ToString("N0");
+    var meName = this.CurrentUserId is { } meId ? (await db.Set<AppUser>().AsNoTracking().Include(p => p.DpNames).FirstOrDefaultAsync(p => p.Id == meId)) is { } me ? NameOf(me) : this.CurrentUserName : this.CurrentUserName;
+}
+
+@* 관리자 대시보드: 인사 / 방문(오늘·어제 대비·이번 달·올해) · 회원·게시물·댓글·신고 4칸 · 최근 14일 방문 막대 / 회원 현황·최근 가입 · 최근 활동 *@
+<div class="dashboard">
+    <header>
+        <h2>@string.Format(this.Lang("DashHello"), meName)</h2>
+        <p>@this.Lang("DashSubtitle") <small>v@(BitPlus.App.Version)</small></p>
+    </header>
+
+    <section>
+        @* 오늘 방문 *@
+        <article class="card">
+            <header>@this.Lang("DashTodayVisitors")</header>
+            <strong>@Num(visitToday.Visitors)</strong>
+            <p>
+                @if (visitRate is { } rate)
+                {
+                    <b class="badge sm @(rate >= 0 ? "success" : "danger")"><i class="fi @(rate >= 0 ? "fiArrUp" : "fiArrDown")"></i> @Math.Abs(rate)%</b>
+                }
+                @this.Lang("DashVsYesterday") · @this.Lang("DashPageViews") @Num(visitToday.Pages)
+            </p>
+            <ul>
+                <li><small>@this.Lang("DashYesterday")</small><b>@Num(visitYesterday.Visitors)</b><span>@this.Lang("DashPageViews") @Num(visitYesterday.Pages)</span></li>
+                <li><small>@this.Lang("DashThisMonth")</small><b>@Num(visitMonth.Visitors)</b><span>@this.Lang("DashPageViews") @Num(visitMonth.Pages)</span></li>
+                <li><small>@this.Lang("DashThisYear")</small><b>@Num(visitYear.Visitors)</b><span>@this.Lang("DashPageViews") @Num(visitYear.Pages)</span></li>
+            </ul>
+        </article>
+
+        @* 회원·게시물·댓글·신고 *@
+        <article>
+            <div class="card">
+                <header>@this.Lang("DashMembers") <i class="fi fiPeople"></i></header>
+                <strong>@Num(userTotal)</strong>
+                <span>@string.Format(this.Lang("DashMonthNew"), Num(userMonthNew))</span>
+            </div>
+            <div class="card">
+                <header>@this.Lang("UserPosts") <i class="fi fiDocText"></i></header>
+                <strong>@Num(postTotal)</strong>
+                <span>@string.Format(this.Lang("DashTodayNew"), Num(postToday))</span>
+            </div>
+            <div class="card">
+                <header>@this.Lang("Comment") <i class="fi fiComment"></i></header>
+                <strong>@Num(commentTotal)</strong>
+                <span>@string.Format(this.Lang("DashTodayNew"), Num(commentToday))</span>
+            </div>
+            <a class="card" href="/Manager/Content#reports" title="@this.Lang("Report")"> @* 신고 목록(컨텐츠 관리 > 신고 탭)으로 *@
+                <header>@this.Lang("Report") <i class="fi fiFlag"></i></header>
+                <strong>@Num(reportWeek)</strong>
+                <span>@this.Lang("DashLast7Days") · @string.Format(this.Lang("DashTodayNew"), Num(reportToday))</span>
+            </a>
+        </article>
+
+        @* 최근 14일 방문: 막대 높이 = 페이지 요청, 짙은 부분 = 방문자 *@
+        <article class="card">
+            <header>@this.Lang("DashVisitTrend") <small>@this.Lang("DashVisitTrendInfo")</small></header>
+            <figure>
+                <figcaption><i></i> @this.Lang("DashVisitors") <i></i> @this.Lang("DashPageViews")</figcaption>
+                <ol>
+                    @foreach (var (date, count) in trend)
+                    {
+                        <li title="@date.ToString("yyyy-MM-dd") · @this.Lang("DashVisitors") @Num(count.Visitors) · @this.Lang("DashPageViews") @Num(count.Pages)">
+                            <span style="height: @((count.Pages * 100.0 / trendMax).ToString("0.#"))%"><i style="height: @((count.Pages == 0 ? 0 : count.Visitors * 100.0 / count.Pages).ToString("0.#"))%"></i></span>
+                            <small>@date.Day</small>
+                        </li>
+                    }
+                </ol>
+            </figure>
+        </article>
+    </section>
+
+    <section>
+        @* 회원 현황 + 최근 가입 *@
+        <aside>
+            <article class="card">
+                <header>@this.Lang("DashMemberStatus")</header>
+                <label>@this.Lang("DashActiveMembers") <b>@Num(userWeek) / @Num(userTotal)</b></label>
+                <meter min="0" max="@Math.Max(1, userTotal)" value="@userWeek"></meter>
+                <label>@this.Lang("DashEnabledMembers") <b>@Num(userEnabled) / @Num(userTotal)</b></label>
+                <meter min="0" max="@Math.Max(1, userTotal)" value="@userEnabled"></meter>
+            </article>
+            <article class="card">
+                <header>@this.Lang("DashNewMembers")</header>
+                <ul>
+                    @foreach (var user in newUsers)
+                    {
+                        var photo = user.Properties.FirstOrDefault()?.Value;
+                        <li>
+                            <i>
+                                @if (string.IsNullOrEmpty(photo))
+                                {
+                                    <i class="fi fiPerson fiFill"></i>
+                                }
+                                else
+                                {
+                                    <img src="@photo" alt="" />
+                                }
+                            </i>
+                            <span><b>@NameOf(user)</b><small>@user.UserName</small></span>
+                            <time data-local="date" datetime="@DateTime.SpecifyKind(user.CDate, DateTimeKind.Utc).ToString("o")">@user.CDate.ToString("yyyy-MM-dd")</time>
+                        </li>
+                    }
+                </ul>
+            </article>
+        </aside>
+
+        @* 최근 활동 *@
+        <article class="card">
+            <header>@this.Lang("ContentLastActivity")</header>
+            <table>
+                <thead>
+                    <tr>
+                        <th>@this.Lang("DashKind")</th>
+                        <th>@this.Lang("ContentTitle")</th>
+                        <th>@this.Lang("ContentBoards")</th>
+                        <th>@this.Lang("ContentWriter")</th>
+                        <th>@this.Lang("ContentDate")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in activities)
+                    {
+                        <tr>
+                            <td><span class="badge sm @(item.IsPost ? "main" : "deco")">@this.Lang(item.IsPost ? "UserPosts" : "Comment")</span></td>
+                            <td><a href="@UrlOf(item.ContentRuleId, item.ContentNo)" target="_blank">@item.Title</a></td>
+                            <td>@BoardOf(item.ContentRuleId)</td>
+                            <td>@(item.WriterId is { } id && writers.TryGetValue(id, out var writer) ? NameOf(writer) : string.Empty)</td>
+                            <td><time data-local="ago" datetime="@DateTime.SpecifyKind(item.CDate, DateTimeKind.Utc).ToString("o")">@item.CDate.ToString("yyyy-MM-dd HH:mm") UTC</time></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </article>
+    </section>
+</div>

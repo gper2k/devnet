@@ -1,0 +1,38 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Site.Widgets
+@{
+    var image = SlotView.SafeUrl(Model.Text("image"));
+    // 막대: 줄마다 "이름 | 값" — 값은 0~100 으로 맞춤 (숫자가 아니면 0)
+    var bars = Model.Lines("bars").Select(p => (Name: p[0], Value: p.Length > 1 && int.TryParse(p[1].TrimEnd('%'), out var n) ? Math.Clamp(n, 0, 100) : 0)).ToList();
+}
+@* 통계 띠 위젯 — (설정 시) 테마색 띠(위쪽 사선) 위에 왼쪽 둥근 이미지, 오른쪽 제목·설명과 막대그래프(이름·값 %) *@
+<div class="widgetStats" data-band="@(Model.Bool("band", true) ? "true" : null)">
+    <figure>
+        @if (image is not null)
+        {
+            <img src="@image" alt="" />
+        }
+        else
+        {
+            <span><i class="fi fiImage"></i></span>
+        }
+    </figure>
+    <div>
+        @if (Model.Text("label").Length > 0)
+        {
+            <em>@Model.Text("label")</em>
+        }
+        <h2>@Model.Text("title")</h2>
+        <p>@Model.Text("text")</p>
+        <ul>
+            @foreach (var bar in bars)
+            {
+                <li>
+                    <span>@bar.Name</span>
+                    <b>@bar.Value%</b>
+                    <i style="--value: @(bar.Value)%"></i>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

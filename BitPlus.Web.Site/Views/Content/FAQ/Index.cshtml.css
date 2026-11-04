@@ -1,0 +1,148 @@
+﻿@charset "UTF-8";
+/* FAQ형 목록(FAQ/Index) 전용 스타일: 가운데 제목·검색바·카테고리 목록 아래에 질문(Q)·답변(A) 카드 */
+.contentFaq {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  width: 100%;
+  max-width: 56em;
+  margin-inline: auto;
+  /* 질문·답변 카드 (JS 로 그린 요소라 ::deep) */
+}
+.contentFaq > header {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  padding: 1em 0 0.5em 0;
+  /* 검색바: 카테고리 위쪽 가운데 */
+  /* 카테고리 목록: 태그처럼 늘어놓고 누르면 그 카테고리만, 한눈에 찾을 수 있는 크기 */
+}
+.contentFaq > header > h1 {
+  margin: 0;
+  font-size: 2em;
+  font-weight: bold;
+}
+.contentFaq > header > form {
+  width: min(26em, 100%);
+}
+.contentFaq > header > ul.faqCategory {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4em 1.4em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contentFaq > header > ul.faqCategory > li > span {
+  display: inline-block;
+  padding: 0.4em 0.1em;
+  border-bottom: 3px solid transparent;
+  color: var(--txLight);
+  font-size: 1.1em;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+.contentFaq > header > ul.faqCategory > li > span:hover {
+  color: var(--txColor);
+}
+.contentFaq > header > ul.faqCategory > li > span.active {
+  border-bottom-color: var(--primary);
+  color: var(--txColor);
+  font-weight: bold;
+}
+.contentFaq > .faqBar {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+.contentFaq > ul.faqList {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contentFaq > ul.faqList ::deep li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+  padding: 1.2em 1.4em;
+  border-radius: var(--roundBox);
+  background-color: var(--aLow);
+  /* 수정·삭제: 카드 아래 오른쪽, 평소에는 글자 */
+}
+.contentFaq > ul.faqList ::deep li.empty {
+  align-items: center;
+  color: var(--txLight);
+}
+.contentFaq > ul.faqList ::deep li > .q, .contentFaq > ul.faqList ::deep li > .a {
+  display: flex;
+  gap: 0.8em;
+}
+.contentFaq > ul.faqList ::deep li > .q > b, .contentFaq > ul.faqList ::deep li > .a > b {
+  flex: 0 0 auto;
+  font-size: 1.25em;
+  font-weight: normal;
+  font-family: serif;
+  color: var(--txLight);
+}
+.contentFaq > ul.faqList ::deep li > .q {
+  align-items: baseline;
+  padding-bottom: 0.9em;
+  border-bottom: 1px dashed var(--lineColor);
+}
+.contentFaq > ul.faqList ::deep li > .q > strong {
+  font-size: 1.15em;
+  overflow-wrap: anywhere;
+}
+.contentFaq > ul.faqList ::deep li > .a > .body {
+  min-width: 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.contentFaq > ul.faqList ::deep li > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.3em;
+  font-size: 0.85em;
+}
+.contentFaq > ul.faqList ::deep li > footer > span {
+  padding: 0.2em 0.8em;
+  border-radius: 2em;
+  color: var(--txLight);
+  cursor: pointer;
+  user-select: none;
+}
+.contentFaq > ul.faqList ::deep li > footer > span:hover {
+  background-color: var(--aColor);
+  color: var(--txColor);
+}
+.contentFaq > ul.faqList ::deep li > footer > span.danger:hover {
+  color: var(--danger1);
+}
+.contentFaq > footer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: 0.4em 0.8em;
+}
+.contentFaq > footer > div {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+.contentFaq > footer > div:first-child {
+  justify-content: flex-start;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/FAQ/Index.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AA4DA;;AA1DA;EACI;EACA;EACA;EACA;EACA;EACA;AAQA;AAKA;;AAXA;EACI;EACA;EACA;;AAIJ;EACI;;AAIJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAMhB;EACI;EACA;EACA;;AAIJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AAsCA;;AApCA;EACI;EACA;;AAGJ;EAEI;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EACI;EACA;EACA;;AAIJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAOpB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI%22%7D */

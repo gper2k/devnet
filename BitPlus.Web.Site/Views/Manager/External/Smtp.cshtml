@@ -1,0 +1,70 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("SmtpConfig"));
+}
+
+@* 메일 발송용 SMTP 구성 (설정 "AccountSmtp") — 계정 안내 메일(메일 검증, 비밀번호 재발급 등)에 사용 *@
+<div class="pageBox">
+    <div class="inform">
+        <header><i class="fi fiInfo fiFill"></i> @this.Lang("SmtpConfig")</header>
+        <p>@this.Lang("SmtpInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <div class="cardGrid auto">
+            <ul class="form card line">
+                <li><h4><i class="fi fiSend"></i> @this.Lang("SmtpConfig")</h4></li>
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("SmtpHost")</header>
+                        <input type="text" name="smtpHost" maxlength="256" placeholder="smtp.example.com" autocomplete="off" />
+                    </div>
+                    <div>
+                        <header>@this.Lang("SmtpPort")</header>
+                        <input type="number" name="smtpPort" min="1" max="65535" />
+                    </div>
+                </li>
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("SmtpUser")</header>
+                        <input type="text" name="smtpUser" maxlength="256" autocomplete="off" />
+                    </div>
+                    <div>
+                        <header>@this.Lang("Password")</header>
+                        <input type="password" name="smtpPassword" maxlength="256" placeholder="@this.Lang("KeepIfEmpty")" autocomplete="new-password" />
+                    </div>
+                </li>
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("SmtpFrom")</header>
+                        <input type="text" name="smtpFrom" maxlength="256" placeholder="noreply@@example.com" autocomplete="off" />
+                    </div>
+                    <div>
+                        <header>@this.Lang("SmtpFromName")</header>
+                        <input type="text" name="smtpFromName" maxlength="64" autocomplete="off" />
+                    </div>
+                </li>
+                <li>
+                    <label class="check main"><input type="checkbox" name="smtpSsl" /><span>@this.Lang("SmtpSsl")</span></label>
+                </li>
+                @* 테스트 발송: 화면에 입력된 값(저장 전 포함)으로 보낸다. 비밀번호를 비워 두면 저장된 비밀번호 사용 *@
+                <li>
+                    <header>@this.Lang("TestMailTo")</header>
+                    <div class="inputGroup">
+                        <input type="email" name="testTo" maxlength="256" placeholder="you@example.com" autocomplete="off" />
+                        <button type="button" data-mode="test"><i class="fi fiSend"></i> @this.Lang("SmtpTest")</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <footer class="pageFooter">
+            <span></span>
+            <div class="flexRow gapSm">
+                <button type="button" data-mode="reset"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                <button type="button" class="main"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+            </div>
+        </footer>
+    </article>
+</div>

@@ -1,0 +1,56 @@
+/* 메뉴얼 목차 메뉴(Manual/TocMenu) 전용 스타일: "목차" 버튼(span)과 그 아래로 열리는 목차 드롭다운 상자 */
+.manualBar {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    font-size: 1rem;
+    font-weight: normal;
+
+    /* 목차 버튼: 평소에는 글자, 마우스를 올리거나 열려 있으면 알약 모양 배경 */
+    & > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4em;
+        padding: 0.35em 0.9em;
+        border-radius: 2em;
+        border: 1px solid transparent;
+        color: var(--txLight);
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.15s, color 0.15s;
+
+        &:hover,
+        &:focus-visible,
+        &.expanded {
+            border-color: var(--aLow);
+            background-color: var(--aLow);
+            color: var(--txColor);
+        }
+
+        &.expanded > i.fi:last-child {
+            transform: rotate(180deg);
+        }
+    }
+
+    /* 목차 드롭다운 상자 */
+    & > .manualPanel {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 20;
+        width: min(24em, 94vw);
+        max-height: 70dvh;
+        overflow-y: auto;
+        margin-top: 0.3em;
+        padding: 0.9em 1em;
+        background-color: var(--bgColor);
+        border: 1px solid var(--lineColor);
+        border-radius: var(--roundBox);
+        box-shadow: 0 0.4em 1.5em var(--aDark);
+        text-align: left;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+}

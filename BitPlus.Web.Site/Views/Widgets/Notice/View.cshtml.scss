@@ -1,0 +1,47 @@
+/* 공지 위젯 — 한 줄에 제목(왼쪽, 말줄임)과 작성일(오른쪽) */
+ul.widgetNotice {
+    font-size: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & > li {
+        display: flex;
+        align-items: center;
+        gap: 0.8em;
+        padding: 0.5em 0;
+        border-bottom: 1px dashed var(--lineColor);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        & > a {
+            flex: 1 1 auto;
+            min-width: 0;
+            color: var(--txColor);
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        & > time {
+            flex: 0 0 auto;
+            font-size: 0.8em;
+            color: var(--txLight);
+        }
+
+        & > img {
+            flex: 0 0 auto;
+            width: 2.6em;
+            height: 2.6em;
+            object-fit: cover;
+            border-radius: var(--roundBox);
+        }
+    }
+}

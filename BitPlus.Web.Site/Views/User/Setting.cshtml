@@ -1,0 +1,57 @@
+@model UserPageModel
+@{
+    var culture = this.CurrentCulture.TwoLetterISOLanguageName;
+    var theme = this.Context.Request.Cookies["Theme"] == "dark" ? "dark" : "light";
+}
+
+@* 내 환경설정(/user/setting): 화면 언어(Culture 쿠키, common.setCulture), 테마(Theme 쿠키 — 레이아웃이 data-theme 로 적용), 메시지 받기. 바꾸면 바로 적용하고 모두 사용자 속성으로 저장(api/user/setting — 로그인하면 언어·테마 쿠키로 다시 적용) *@
+<div class="userSetting">
+    <partial name="_UserHead" model="Model" />
+    <div>
+        <ul class="form card line">
+            <li><h4><i class="fi fiSettings"></i> @this.Lang("Settings")</h4></li>
+            <li>
+                <header>@this.Lang("Language")</header>
+                <select name="culture">
+                    @foreach (var code in this.Config?.Cultures ?? ["ko", "en"])
+                    {
+                        <option value="@code" selected="@(code == culture)">@(System.Globalization.CultureInfo.GetCultureInfo(code).NativeName)</option>
+                    }
+                </select>
+            </li>
+            <li>
+                <header>@this.Lang("Theme")</header>
+                <select name="theme">
+                    <option value="light" selected="@(theme == "light")">@this.Lang("ThemeLight")</option>
+                    <option value="dark" selected="@(theme == "dark")">@this.Lang("ThemeDark")</option>
+                </select>
+            </li>
+            <li>
+                <header>@this.Lang("ReceiveMessage") <small>@this.Lang("ReceiveMessageInfo")</small></header>
+                <label class="toggle point"><input type="checkbox" name="receiveMessage" checked="@Model.ReceiveMessage" /><span><i></i></span></label>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('div.userSetting');
+        // 언어·테마는 사용자 속성에도 저장(다른 기기에서 로그인해도 같게, 서버가 보내는 알림·메일 언어)하고 이 브라우저에 바로 적용
+        const save = body => common.putSend('/api/user/setting', common.makeFormData(body), { useLoading: false, useInfo: false });
+        root.querySelector('[name="culture"]').onchange = async e => {
+            await save({ culture: e.target.value });
+            common.setCulture(e.target.value);
+        };
+        root.querySelector('[name="theme"]').onchange = e => {
+            save({ theme: e.target.value });
+            document.cookie = `Theme=${e.target.value}; path=/; max-age=31536000; samesite=lax`;
+            document.body.dataset.theme = e.target.value;
+        };
+        const receive = root.querySelector('[name="receiveMessage"]');
+        receive.onchange = async () => {
+            const res = await common.putSend('/api/user/setting', common.makeFormData({ receiveMessage: receive.checked }));
+            if (!res || !res.success) receive.checked = !receive.checked;
+        };
+    });
+</script>

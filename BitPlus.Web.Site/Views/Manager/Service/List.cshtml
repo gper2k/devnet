@@ -1,0 +1,44 @@
+﻿@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Services"));
+}
+
+@* 서비스 관리 > 서비스 탭 조각 — 등록된 서비스(사이트 + 플러그인, api/service) 목록: 명칭·설명, 구독 이벤트, 상태, 대기 작업, 처리 건수, 마지막 실행·오류, 활성 토글(바로 저장).
+   행 클릭 = 설정 모달: 서비스 이름과 같은 설정 양식 조각(/Manager/Service/Form/{이름} = Views/Manager/Service/Forms/{이름}.cshtml)을 모달 본문에 붙이고 저장 값을 [name] 입력칸에 채움.
+   초기화는 Service.cshtml 의 wireServicePage() 가 맡는다. *@
+<div class="pageBox serviceBox">
+    <div class="inform fix">
+        <header><i class="fi fiFlashOn"></i> @this.Lang("Services")</header>
+        <p>@this.Lang("ServiceInfoContent")</p>
+    </div>
+
+    <section class="card line flexCol auto">
+        <div class="dataList auto">
+            <header>
+                <span class="colName"><span>SERVICE</span></span>
+                <span class="colEvents"><span>EVENTS</span></span>
+                <span class="colState"><span>STATE</span></span>
+                <span class="colCount"><span>QUEUE</span></span>
+                <span class="colCount"><span>DONE</span></span>
+                <span class="colDate"><span>LAST RUN</span></span>
+                <span class="colFlag"><span>ENABLER</span></span>
+            </header>
+            <ul></ul>
+        </div>
+    </section>
+</div>
+
+<!-- 서비스 설정 모달: 설명, 서비스별 설정 양식(조각), 하단 활성 체크·취소·저장 -->
+<dialog id="serviceModal">
+    <header><i class="fi fiFlashOn"></i> <span></span></header>
+    <section>
+        <p></p>
+        <div></div>
+    </section>
+    <footer>
+        <label class="check main"><input type="checkbox" name="enabler" /><span>@this.Lang("Enabler")</span></label>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>

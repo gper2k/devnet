@@ -1,0 +1,14 @@
+{
+  "key": "LatestPosts",
+  "version": 2,
+  "name": { "ko": "최신 글", "en": "Latest posts" },
+  "description": { "ko": "고른 게시판(비우면 전체)의 최신 글. 볼 수 있는 글만 나옵니다. 설정하면 대표 이미지(첫 첨부·본문 이미지)를 함께 보여 줍니다.", "en": "Latest posts of the chosen boards (all if none). Only posts the viewer may read. Optionally shows the featured image." },
+  "categories": ["board"],
+  "size": { "min": [1, 1], "max": [4, 4] },
+  "settings": [
+    { "key": "ruleNos", "type": "boards", "default": [] },
+    { "key": "count", "type": "number", "default": 5, "min": 1, "max": 20 },
+    { "key": "summary", "type": "bool", "default": true },
+    { "key": "image", "type": "bool", "default": false }
+  ]
+}

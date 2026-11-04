@@ -1,0 +1,27 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@{
+    var posts = Model.Data as List<BitPlus.Web.Site.Widgets.WidgetPost> ?? [];
+    var summary = Model.Bool("summary", true);
+}
+@* 최신 글 위젯 — (설정 시, 있으면) 대표 이미지, 제목, 게시판 · 작성일, (설정 시) 본문 요약 *@
+<ul class="widgetPosts">
+    @foreach (var post in posts)
+    {
+        <li>
+            @if (!string.IsNullOrEmpty(post.Image))
+            {
+                <img src="@post.Image" alt="" loading="lazy" />
+            }
+            <a href="@post.Url">@post.Title</a>
+            <small>@post.Board · <time data-local="date" datetime="@post.Date.ToString("o")"></time></small>
+            @if (summary && !string.IsNullOrEmpty(post.Summary))
+            {
+                <p>@post.Summary</p>
+            }
+        </li>
+    }
+    @if (posts.Count == 0)
+    {
+        <li class="empty">@this.Lang("DataEmpty")</li>
+    }
+</ul>

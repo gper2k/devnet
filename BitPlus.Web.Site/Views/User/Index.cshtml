@@ -1,0 +1,286 @@
+@model UserPageModel
+
+@* 내 정보(/user): 머리(_UserHead — 커버 배너·이미지 등록/교체·초기화)·탭, 좌측(기본 정보·그룹/역할·외부 로그인 연결), 우측(활동 요약 카운터·최근 작성 게시물/댓글).
+   정보 편집은 api/account/profile, 암호 변경은 api/account/password, 이미지는 POST api/user/photo(서버가 긴 변 256px WebP 로 줄여 저장). 저장하면 새로 고침. *@
+<div class="userInfo">
+    <partial name="_UserHead" model="Model" />
+    <div>
+        <aside>
+            <ul class="form card line">
+                <li><h4><i class="fi fiPerson"></i> @this.Lang("MyInfo")</h4></li>
+                <li class="row"><header class="fix">@this.Lang("UserID")</header><span>@Model.UserName</span></li>
+                <li class="row"><header class="fix">@this.Lang("DpName")</header><span>@Model.Name</span></li>
+                <li class="row">
+                    <header class="fix">@this.Lang("Email")</header>
+                    <span>@Model.Email <i class="badge sm @(Model.EmailConfirmed ? "success" : "warning")">@this.Lang(Model.EmailConfirmed ? "MailVerified" : "MailNotVerified")</i></span>
+                </li>
+                <li class="row"><header class="fix">@this.Lang("Phone")</header><span>@Model.Phone</span></li>
+                <li class="row">
+                    <header class="fix">@this.Lang("LastAccess")</header>
+                    <span>
+                        @if (Model.LastAccess is { } last)
+                        {
+                            <time data-local="datetime" datetime="@DateTime.SpecifyKind(last, DateTimeKind.Utc).ToString("o")">@last.ToString("yyyy-MM-dd HH:mm") UTC</time>
+                        }
+                    </span>
+                </li>
+                <li>
+                    <footer>
+                        <button type="button" data-mode="withdraw" class="danger sm"><i class="fi fiPersonDelete"></i> @this.Lang("Withdraw")</button>
+                        <button type="button" data-mode="password" class="sm"><i class="fi fiKey"></i> @this.LangOf("ChangeOf", "Password")</button>
+                        <button type="button" class="main sm" data-mode="profile"><i class="fi fiEdit"></i> @this.LangOf("EditInfoOf", "User")</button>
+                    </footer>
+                </li>
+            </ul>
+            <ul class="form card line">
+                <li><h4><i class="fi fiPeopleTeam"></i> @this.Lang("Group") · @this.Lang("Role")</h4></li>
+                <li class="row">
+                    <header class="fix">@this.Lang("Group")</header>
+                    <span>
+                        @foreach (var group in Model.Groups)
+                        {
+                            <i class="badge sm @(group.Active ? "main" : null)" title="@(group.Default ? this.Lang("DefaultMark") : null)">@if (group.Default) { <i class="fi fiStar fiFill"></i> }@group.Name</i>
+                        }
+                    </span>
+                </li>
+                <li class="row">
+                    <header class="fix">@this.Lang("Role")</header>
+                    <span>
+                        @foreach (var role in Model.Roles)
+                        {
+                            <i class="badge sm @(role.Active ? "main" : null)" title="@(role.Default ? this.Lang("DefaultMark") : null)">@if (role.Default) { <i class="fi fiStar fiFill"></i> }@role.Name</i>
+                        }
+                    </span>
+                </li>
+                <li><p>@this.Lang("ActiveGroupInfo")</p></li>
+                @if (Model.Groups.Count > 1 || Model.Roles.Count > 1)
+                {
+                    @* 기본 그룹/역할 지정 (주 소속, Default) — 창은 레이아웃(_PageLayout)의 groupDialog, default 모드 *@
+                    <li>
+                        <footer>
+                            <button type="button" class="main sm" onclick="window.openGroupDialog?.('default')"><i class="fi fiStar"></i> @this.Lang("SetDefaultGroupRole")</button>
+                        </footer>
+                    </li>
+                }
+            </ul>
+            @* 외부 로그인 연결: 사용 중인 서비스마다 연결·해제 (api/account/logins, 연결은 /Account/ExternalLogin 으로 다녀옴). 서비스가 없으면 숨김 *@
+            <ul class="form card line" data-logins hidden>
+                <li><h4><i class="fi fiKey"></i> @this.Lang("ExternalLogins")</h4></li>
+                <li hidden><p>@this.Lang("NoPasswordInfo")</p></li>
+            </ul>
+        </aside>
+        <section>
+            <nav>
+                <a href="/user/posts">
+                    <span><i class="fi fiDocText"></i></span>
+                    <div>
+                        <strong data-stat="posts">0</strong>
+                        <span>@this.Lang("UserPosts")</span>
+                    </div>
+                </a>
+                <a href="/user/posts">
+                    <span><i class="fi fiComment"></i></span>
+                    <div>
+                        <strong data-stat="comments">0</strong>
+                        <span>@this.Lang("Comment")</span>
+                    </div>
+                </a>
+                <a href="/user/notice">
+                    <span><i class="fi fiAlert"></i></span>
+                    <div>
+                        <strong>@Model.UnreadNotice</strong>
+                        <span>@this.Lang("Notification")</span>
+                    </div>
+                </a>
+                <a href="/user/message">
+                    <span><i class="fi fiMail"></i></span>
+                    <div>
+                        <strong>@Model.Unread</strong>
+                        <span>@this.Lang("Message")</span>
+                    </div>
+                </a>
+            </nav>
+            <article class="card line">
+                <header>
+                    <h4><i class="fi fiDocText"></i> @this.Lang("ViewPosts")</h4>
+                    <nav>
+                        <a data-kind="posts" class="active"><i class="fi fiDocText"></i> @this.Lang("UserPosts") <b>0</b></a>
+                        <a data-kind="comments"><i class="fi fiComment"></i> @this.Lang("Comment") <b>0</b></a>
+                        <a href="/user/posts">@this.Lang("WidgetMore")</a>
+                    </nav>
+                </header>
+                <ul data-activity></ul>
+            </article>
+        </section>
+    </div>
+
+    @* 정보 편집: 다국어 이름(관리자 사용자 편집과 같은 다국어 입력)·메일(바꾸면 재인증)·전화번호. ID 는 고정, 설명(관리자 메모)은 다루지 않음 *@
+    <dialog id="profileDialog">
+        <header><i class="fi fiEdit"></i> @this.LangOf("EditInfoOf", "User")</header>
+        <section>
+            <ul class="form">
+                <li><header>@this.Lang("UserID")</header><input type="text" value="@Model.UserName" readonly /></li>
+                <li>
+                    <header>@this.Lang("DpName") <small class="txDanger">*</small></header>
+                    <div class="inputGroup">
+                        <input type="text" name="dpNames" data-lang="@System.Text.Json.JsonSerializer.Serialize(Model.DpNames)" data-title="@@DpName" autocomplete="off" />
+                        <button type="button" title="@this.Lang("LangInput")"><i class="fi fiTranslate"></i></button>
+                    </div>
+                </li>
+                <li><header>@this.Lang("Email") <small class="txDanger">*</small> <small>@this.Lang("MailChangeInfo")</small></header><input type="email" name="email" maxlength="256" value="@Model.Email" autocomplete="off" /></li>
+                <li><header>@this.Lang("Phone")</header><input type="tel" name="phoneNumber" maxlength="32" value="@Model.Phone" autocomplete="off" /></li>
+            </ul>
+        </section>
+        <footer>
+            <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiDismiss"></i> @this.Lang("Cancel")</button>
+            <button type="button" class="main"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+        </footer>
+    </dialog>
+    @* 암호 변경: 현재 암호 확인 후 새 암호 (다른 기기의 로그인은 끊김) *@
+    <dialog id="passwordDialog">
+        <header><i class="fi fiKey"></i> @this.LangOf("ChangeOf", "Password")</header>
+        <section>
+            <ul class="form">
+                <li><header>@this.Lang("CurrentPassword")</header><input type="password" name="currentPassword" autocomplete="current-password" /></li>
+                <li><header>@this.Lang("NewPassword")</header><input type="password" name="password" autocomplete="new-password" /></li>
+                <li><header>@this.Lang("PasswordConfirm")</header><input type="password" name="passwordConfirm" autocomplete="new-password" /></li>
+            </ul>
+        </section>
+        <footer>
+            <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiDismiss"></i> @this.Lang("Cancel")</button>
+            <button type="button" class="main"><i class="fi fiSave"></i> @this.LangOf("ChangeOf", "Password")</button>
+        </footer>
+    </dialog>
+    @* 회원 탈퇴: 현재 암호 확인 후 탈퇴(api/account/withdraw — ID·메일은 탈퇴 회원으로 옮기고 모든 기기 로그아웃), 끝나면 홈으로 *@
+    <dialog id="withdrawDialog">
+        <header><i class="fi fiPersonDelete"></i> @this.Lang("Withdraw")</header>
+        <section>
+            <ul class="form">
+                <li><p>@this.Lang("WithdrawInfo")</p></li>
+                <li><header>@this.Lang("CurrentPassword")</header><input type="password" name="currentPassword" autocomplete="current-password" /></li>
+            </ul>
+        </section>
+        <footer>
+            <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiDismiss"></i> @this.Lang("Cancel")</button>
+            <button type="button" class="danger"><i class="fi fiPersonDelete"></i> @this.Lang("Withdraw")</button>
+        </footer>
+    </dialog>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('div.userInfo');
+        const valuesOf = dialog => Object.fromEntries([...dialog.querySelectorAll('input[name], textarea[name]')].map(el => [el.name, el.value]));
+        // 스크립트로 만드는 요소에도 Razor 범위 CSS 속성(b-xxx)을 붙여 Index.cshtml.css 가 적용되게 함
+        const scope = [...root.attributes].find(p => p.name.startsWith('b-'))?.name;
+        const mk = (tag, text, props) => {
+            const el = Object.assign(document.createElement(tag), props);
+            if (text !== undefined) el.textContent = text;
+            if (scope) el.setAttribute(scope, '');
+            return el;
+        };
+
+        // 정보 편집: 이름은 다국어 입력(input[data-lang] — 지금 문화권 값을 보이고, 옆 버튼은 공용 다국어 입력 창)
+        const profile = document.getElementById('profileDialog');
+        const nameInput = profile.querySelector('[name="dpNames"]');
+        root.querySelector('[data-mode="profile"]').onclick = () => { common.setLang(nameInput, common.getLang(nameInput)); profile.showModal(); };
+        profile.querySelector('footer > button.main').onclick = async () => {
+            const names = common.getLang(nameInput);
+            if (!Object.values(names).some(v => v && v.trim())) { nameInput.focus(); return; }
+            const email = profile.querySelector('[name="email"]');
+            if (!email.value.trim() || !email.checkValidity()) { email.focus(); return; }
+            const body = { dpNames: JSON.stringify(names), email: email.value.trim(), phoneNumber: profile.querySelector('[name="phoneNumber"]').value };
+            const res = await common.putSend('/api/account/profile', common.makeFormData(body));
+            if (res && res.success) location.reload();
+        };
+        // 암호 변경
+        const password = document.getElementById('passwordDialog');
+        root.querySelector('[data-mode="password"]').onclick = () => { password.querySelectorAll('input').forEach(el => el.value = ''); password.showModal(); };
+        password.querySelector('footer > button.main').onclick = async () => {
+            const res = await common.postSend('/api/account/password', common.makeFormData(valuesOf(password)));
+            if (res && res.success) password.close();
+        };
+        // 회원 탈퇴 (한 번 더 확인)
+        const withdraw = document.getElementById('withdrawDialog');
+        root.querySelector('[data-mode="withdraw"]').onclick = () => { withdraw.querySelector('input').value = ''; withdraw.showModal(); };
+        withdraw.querySelector('footer > button.danger').onclick = async () => {
+            if (!await common.confirm(@this.Js(this.Lang("WithdrawConfirm")))) return;
+            const res = await common.postSend('/api/account/withdraw', common.makeFormData(valuesOf(withdraw)));
+            if (res && res.success) location.href = res.data.redirect;
+        };
+        loadLogins();
+        loadActivity('posts');
+
+        // 외부 로그인 연결 카드 — 비밀번호 없는 계정(외부 로그인 가입)은 암호 변경 버튼과 탈퇴 암호 입력을 숨김
+        async function loadLogins() {
+            const card = root.querySelector('ul[data-logins]');
+            const res = await common.getSend('/api/account/logins', { useLoading: false });
+            if (!res || !res.success) return;
+            const { providers, hasPassword } = res.data;
+            root.querySelector('[data-mode="password"]').hidden = !hasPassword;
+            withdraw.querySelector('li:has(> input)').hidden = !hasPassword;
+            card.querySelector(':scope > li[hidden]').hidden = hasPassword;
+            card.hidden = !providers.length;
+            card.querySelectorAll(':scope > li.row').forEach(li => li.remove());
+            const text = { linked: @this.Js(this.Lang("Linked")), link: @this.Js(this.Lang("LinkAccount")), unlink: @this.Js(this.Lang("UnlinkAccount")) };
+            // 행: [로고 서비스명] [상태 뱃지 — 연결됨(초록) / 계정 연결(누르면 연결, 주색)] ··· [연결 해제(작은 글자, 오른쪽 끝)]
+            providers.forEach(item => {
+                const li = mk('li', undefined, { className: 'row' });
+                const head = mk('header', undefined, { className: 'fix' });
+                const body = mk('span');
+                li.dataset.linked = item.linked;
+                // 브랜드 SVG 가 있으면 그 로고, 없으면(일반 OIDC) Fluent 아이콘
+                head.append(item.brandIcon ? mk('img', undefined, { src: item.brandIcon, alt: '' }) : mk('i', undefined, { className: `fi ${item.icon}` }), mk('span', item.name));
+                const action = item.linked ? mk('a', text.unlink) : mk('a', text.link, { className: 'badge sm main' });
+                Object.assign(action, { role: 'button', tabIndex: 0 });
+                if (item.linked) body.append(mk('i', text.linked, { className: 'badge sm success' }));
+                body.append(action);
+                li.append(head, body);
+                action.onkeydown = e => { if (e.key === 'Enter') action.click(); };
+                action.onclick = async () => {
+                    if (!item.linked) return location.href = `/Account/ExternalLogin?provider=${encodeURIComponent(item.id)}&returnUrl=/user`;
+                    const del = await common.delSend(`/api/account/logins/${encodeURIComponent(item.id)}`);
+                    if (del && del.success) loadLogins();
+                };
+                card.insertBefore(li, card.lastElementChild);
+            });
+        }
+
+        // 최근 활동(작성 게시물·댓글 요약 및 최근 목록)
+        async function loadActivity(kind) {
+            const list = root.querySelector('ul[data-activity]');
+            const tabs = [...root.querySelectorAll('article > header > nav > a[data-kind]')];
+            tabs.forEach(tab => {
+                tab.onclick = () => {
+                    if (tab.classList.contains('active')) return;
+                    tabs.forEach(p => p.classList.toggle('active', p === tab));
+                    loadActivity(tab.dataset.kind);
+                };
+            });
+            const res = await common.getSend(`/api/user/@Model.UserId/activity?${new URLSearchParams({ kind, page: 0, size: 6 })}`, { useLoading: false });
+            if (!res || !res.success) return;
+            const postStat = root.querySelector('[data-stat="posts"]');
+            const commentStat = root.querySelector('[data-stat="comments"]');
+            if (postStat) postStat.textContent = res.data.postTotal;
+            if (commentStat) commentStat.textContent = res.data.commentTotal;
+            if (tabs[0]) tabs[0].querySelector('b').textContent = res.data.postTotal;
+            if (tabs[1]) tabs[1].querySelector('b').textContent = res.data.commentTotal;
+
+            if (!res.data.items.length) {
+                const empty = mk('li', @this.Js(this.Lang("DataEmpty")));
+                empty.dataset.empty = 'true';
+                list.replaceChildren(empty);
+                return;
+            }
+            list.replaceChildren(...res.data.items.map(item => {
+                const li = mk('li'), head = mk('header'), board = mk('span', item.board), time = mk('time', common.ago(item.cDate)), title = mk('a', item.title);
+                time.title = common.localTime(item.cDate, true);
+                title.href = item.url;
+                head.append(board, time);
+                li.append(head, title);
+                if (item.excerpt) li.append(mk('p', item.excerpt));
+                return li;
+            }));
+        }
+    });
+</script>

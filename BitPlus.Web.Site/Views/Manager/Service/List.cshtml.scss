@@ -1,0 +1,87 @@
+/* 관리자 > 서비스 전용 스타일. 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.serviceBox {
+    font-size: 1rem;
+
+    & > section.card {
+        padding: 0;
+        overflow: hidden;
+
+        & > div.dataList ::deep {
+            padding: 0.5em;
+            overflow-y: auto;
+
+            & > header,
+            & > ul > li {
+                & > .colName {
+                    flex: 1 1 auto;
+                    min-width: 0;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                & > .colEvents {
+                    flex: 0 0 16em;
+                    min-width: 0;
+                    display: block;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                & > .colState,
+                & > .colFlag {
+                    flex: 0 0 6em;
+                    justify-content: center;
+                }
+
+                & > .colCount {
+                    flex: 0 0 5em;
+                    justify-content: flex-end;
+                }
+
+                & > .colDate {
+                    flex: 0 0 10em;
+                    justify-content: center;
+                    white-space: nowrap;
+                }
+            }
+
+            & > ul > li {
+                cursor: pointer;
+
+                & > .colName > small {
+                    max-width: 100%;
+                    font-size: 0.85em;
+                    color: var(--txLight);
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                /* 마지막 처리에 오류가 있으면 마지막 실행 시각을 경고색으로 (오류 문구는 title) */
+                &[data-error] > .colDate {
+                    color: var(--danger);
+                }
+            }
+        }
+    }
+}
+
+dialog#serviceModal {
+    width: 36em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section > p {
+        margin: 0 0 1em;
+        color: var(--txLight);
+    }
+
+    /* 하단: 왼쪽에 활성 체크, 오른쪽 끝에 취소·저장 */
+    & > footer > label.check {
+        width: auto;
+        margin-right: auto;
+    }
+}

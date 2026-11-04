@@ -1,0 +1,492 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null; // 설치 전에는 DB 가 없으므로 DB 를 읽는 공용 레이아웃을 쓰지 않는다
+    var culture = this.CurrentCulture.TwoLetterISOLanguageName;
+}
+<!DOCTYPE html>
+<html lang="@culture">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@this.Lang("SetupTitle") - BitPlus</title>
+    <link rel="stylesheet" href="~/lib/fluenticons/fluenticons.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/setup.min.css" asp-append-version="true" />
+</head>
+<body>
+    @* 설치 마법사: 라이선스 → DB → SMTP(선택) → Redis(선택) → 설치 준비 → 설치 진행. 입력값은 서버에 저장하지 않고 단계 API 마다 전부 보낸다 *@
+    <main class="setupBox">
+        @* 왼쪽: 제목·안내·단계 목록(완료/현재 표시)·진행 단계 *@
+        <aside>
+            <header><span><i class="fi fiSettings"></i></span> <b>BitPlus</b> @this.Lang("SetupTitle")</header>
+            <p>@this.Lang("SetupIntro")</p>
+            <ol>
+                <li data-for="license">@this.Lang("SetupLicense")</li>
+                <li data-for="database">@this.Lang("SetupDatabase")</li>
+                <li data-for="smtp">SMTP</li>
+                <li data-for="redis">Redis</li>
+                <li data-for="summary">@this.Lang("SetupSummary")</li>
+                <li data-for="install">@this.Lang("SetupInstall")</li>
+            </ol>
+            <footer>
+                <small id="stepCounter"></small>
+                <progress id="stepProgress" value="1" max="6"></progress>
+            </footer>
+        </aside>
+
+        @* 오른쪽: 단계 입력 패널 *@
+        <div>
+            @* 1. 라이선스 (LICENSE.txt) *@
+            <section data-step="license">
+                <h2>@this.Lang("SetupLicense")</h2>
+                <p>@this.Lang("SetupLicenseInfo")</p>
+                <pre id="licenseText"></pre>
+                <label class="check main"><input type="checkbox" name="agree" /><span>@this.Lang("SetupLicenseAgree")</span></label>
+            </section>
+
+            @* 2. DB: 프로바이더 선택 → 프로바이더 입력 항목 → 접속 테스트(필수) *@
+            <section data-step="database" hidden>
+                <h2>@this.Lang("SetupDatabase")</h2>
+                <p>@this.Lang("SetupDatabaseInfo")</p>
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("SetupDbProvider")</header>
+                        <select name="provider"></select>
+                    </li>
+                </ul>
+                <ul class="form" id="dbFields"></ul>
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("DbTablePrefix")</header>
+                        <input type="text" name="prefix" maxlength="16" autocomplete="off" />
+                        <small>@this.Lang("DbTablePrefixInfo")</small>
+                    </li>
+                </ul>
+                <div>
+                    <button type="button" data-test="db"><i class="fi fiServer"></i> @this.Lang("SetupTest")</button>
+                    <output></output>
+                </div>
+            </section>
+
+            @* 3. SMTP (선택) *@
+            <section data-step="smtp" data-optional hidden>
+                <h2>SMTP <small>@this.Lang("SetupOptional")</small></h2>
+                <p>@this.Lang("SetupSmtpInfo")</p>
+                <ul class="form">
+                    <li class="col2">
+                        <div><header>@this.Lang("SmtpHost")</header><input type="text" name="smtpHost" placeholder="smtp.example.com" autocomplete="off" /></div>
+                        <div><header>@this.Lang("SmtpPort")</header><input type="number" name="smtpPort" value="587" min="1" max="65535" /></div>
+                    </li>
+                    <li class="col2">
+                        <div><header>@this.Lang("SmtpUser")</header><input type="text" name="smtpUser" autocomplete="off" /></div>
+                        <div><header>@this.Lang("Password")</header><input type="password" name="smtpPassword" autocomplete="new-password" /></div>
+                    </li>
+                    <li class="col2">
+                        <div><header>@this.Lang("SmtpFrom")</header><input type="text" name="smtpFrom" placeholder="noreply@@example.com" autocomplete="off" /></div>
+                        <div><header>@this.Lang("SmtpFromName")</header><input type="text" name="smtpFromName" autocomplete="off" /></div>
+                    </li>
+                    <li><label class="check main"><input type="checkbox" name="smtpSsl" checked /><span>@this.Lang("SmtpSsl")</span></label></li>
+                    <li>
+                        <header>@this.Lang("TestMailTo")</header>
+                        <input type="email" name="testTo" placeholder="you@@example.com" autocomplete="off" />
+                    </li>
+                </ul>
+                <div>
+                    <button type="button" data-test="smtp"><i class="fi fiSend"></i> @this.Lang("SmtpTest")</button>
+                    <output></output>
+                </div>
+            </section>
+
+            @* 4. Redis (선택) *@
+            <section data-step="redis" data-optional hidden>
+                <h2>@this.Lang("SetupRedis") <small>@this.Lang("SetupOptional")</small></h2>
+                <p>@this.Lang("SetupRedisInfo")</p>
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("SetupRedisConnection")</header>
+                        <input type="text" name="redis" placeholder="localhost:6379,password=..." autocomplete="off" />
+                    </li>
+                </ul>
+                <div>
+                    <button type="button" data-test="redis"><i class="fi fiServer"></i> @this.Lang("SetupTest")</button>
+                    <output></output>
+                </div>
+            </section>
+
+            @* 5. 설치 준비 (입력 요약) *@
+            <section data-step="summary" hidden>
+                <h2>@this.Lang("SetupSummary")</h2>
+                <p>@this.Lang("SetupSummaryInfo")</p>
+                <dl id="summaryList"></dl>
+            </section>
+
+            @* 6. 설치 진행: 진행바 + 단계별 상태, 실패 시 재시도/설정으로 돌아가기 *@
+            <section data-step="install" hidden>
+                <h2>@this.Lang("SetupInstall")</h2>
+                <p>@this.Lang("SetupInstallInfo")</p>
+                <progress value="0" max="1"></progress>
+                <ol id="installSteps"></ol>
+                <div id="installFail" hidden>
+                    <output></output>
+                    <button type="button" data-action="retry"><i class="fi fiArrowsRotate"></i> @this.Lang("SetupRetry")</button>
+                    <button type="button" data-action="back"><i class="fi fiArrLeft"></i> @this.Lang("SetupBackToSettings")</button>
+                </div>
+                <div id="installDone" hidden>
+                    <p><i class="fi fiCheckCircle fiFill"></i> @this.Lang("SetupDone")</p>
+                    <p>@this.Lang("SetupRestartInfo")</p>
+                </div>
+            </section>
+
+            <footer>
+                <button type="button" data-action="prev"><i class="fi fiArrLeft"></i> @this.Lang("SetupPrev")</button>
+                <span></span>
+                <button type="button" data-action="skip" hidden>@this.Lang("SetupSkip")</button>
+                <button type="button" class="main" data-action="next">@this.Lang("SetupNext") <i class="fi fiArrRight"></i></button>
+                <button type="button" class="main" data-action="install" hidden><i class="fi fiDownload"></i> @this.Lang("SetupInstall")</button>
+            </footer>
+        </div>
+    </main>
+
+    <div id="modals"></div>
+    <div id="messages"></div>
+
+    <script type="module">
+        import { Site } from "/js/site.js";
+        const common = new Site({ culture: "@culture" });
+        const root = document.querySelector(".setupBox");
+        const $ = selector => root.querySelector(selector);
+        const sections = [...root.querySelectorAll(":scope > div > section[data-step]")];
+        const field = name => root.querySelector(`[name="${name}"]`);
+        const text = {
+            testRequired: @this.Js(this.Lang("SetupTestRequired")),
+            skipped: @this.Js(this.Lang("SetupSkipped")),
+            database: @this.Js(this.Lang("SetupDatabase")),
+            prefix: @this.Js(this.Lang("DbTablePrefix")),
+            stepOf: @this.Js(this.Lang("SetupStepOf")),
+            migrateSlow: @this.Js(this.Lang("SetupMigrateSlow")),
+            migrateProgress: @this.Js(this.Lang("SetupMigrateProgress")),
+            redis: @this.Js(this.Lang("SetupRedis"))
+        };
+        let info = null;
+        let current = 0;
+        // 단계별 테스트 통과 여부 (입력을 바꾸면 다시 false)
+        const passed = { db: false, smtp: false, redis: false };
+
+        /** POST 요청 (실패도 Result 로 받아 화면에 직접 표시) */
+        async function send(url, data) {
+            try {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
+                    body: common.makeFormData(data)
+                });
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    const clean = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+                    return { success: false, message: `[HTTP ${res.status}] ${clean.slice(0, 300) || res.statusText || "Request failed"}` };
+                }
+            } catch (e) {
+                return { success: false, message: String(e) };
+            }
+        }
+
+        /** 현재 DB 프로바이더와 입력값 */
+        function dbValues() {
+            const values = {};
+            $("#dbFields").querySelectorAll("input[name]").forEach(el => values[el.name] = el.type === "checkbox" ? String(el.checked) : el.value.trim());
+            return { provider: field("provider").value, values };
+        }
+
+        /** SMTP 입력값 (서버 비어 있으면 건너뜀) */
+        function smtpValues() {
+            const names = ["smtpHost", "smtpPort", "smtpUser", "smtpPassword", "smtpFrom", "smtpFromName"];
+            const values = Object.fromEntries(names.map(n => [n, field(n).value.trim()]));
+            values.smtpSsl = field("smtpSsl").checked;
+            return values;
+        }
+
+        /** 선택 단계(SMTP/Redis)에 입력이 있는지 */
+        const hasInput = step => step === "smtp" ? !!field("smtpHost").value.trim() : !!field("redis").value.trim();
+
+        /** 프로바이더 입력 항목을 그린다 (값이 있으면 채움) */
+        function renderDbFields(values = {}) {
+            const provider = info.providers.find(p => p.name === field("provider").value);
+            const list = $("#dbFields");
+            list.replaceChildren();
+            for (const f of provider?.fields ?? []) {
+                const li = document.createElement("li");
+                const header = document.createElement("header");
+                header.textContent = f.label + (f.required ? " *" : "");
+                const input = document.createElement("input");
+                input.name = f.key;
+                input.type = f.type;
+                input.autocomplete = f.type === "password" ? "new-password" : "off";
+                const value = values[f.key] ?? f.default ?? "";
+                if (f.type === "checkbox") {
+                    input.checked = String(value) === "true";
+                    const label = document.createElement("label");
+                    label.className = "check main";
+                    const span = document.createElement("span");
+                    span.textContent = f.label;
+                    label.append(input, span);
+                    li.append(label);
+                } else {
+                    input.value = value;
+                    li.append(header, input);
+                }
+                list.append(li);
+            }
+        }
+
+        /** 단계 이동: 섹션/단계 표시/버튼 갱신 */
+        function show(index) {
+            current = index;
+            const step = sections[index].dataset.step;
+            sections.forEach((s, i) => s.hidden = i !== index);
+            $("#stepCounter").textContent = text.stepOf.replace("{0}", index + 1).replace("{1}", sections.length);
+            $("#stepProgress").max = sections.length;
+            $("#stepProgress").value = index + 1;
+            root.querySelectorAll(":scope > aside > ol > li").forEach((li, i) => {
+                li.toggleAttribute("data-active", i === index);
+                li.toggleAttribute("data-done", i < index);
+            });
+            const installing = step === "install";
+            $('[data-action="prev"]').hidden = index === 0 || installing;
+            $('[data-action="skip"]').hidden = !sections[index].hasAttribute("data-optional");
+            $('[data-action="next"]').hidden = step === "summary" || installing;
+            $('[data-action="install"]').hidden = step !== "summary";
+            if (step === "summary") renderSummary();
+        }
+
+        /** 다음 단계로 갈 수 있는지 검사 (불가 사유는 그 단계 output 에 표시) */
+        function canNext(step) {
+            const output = sections[current].querySelector(":scope > div > output");
+            if (step === "license") return field("agree").checked;
+            const key = step === "database" ? "db" : step;
+            if (!(key in passed) || passed[key] || (step !== "database" && !hasInput(step))) return true;
+            if (output) {
+                output.textContent = text.testRequired;
+                output.dataset.state = "fail";
+            }
+            return false;
+        }
+
+        /** 설치 준비 화면의 입력 요약 */
+        function renderSummary() {
+            const db = dbValues();
+            const provider = info.providers.find(p => p.name === db.provider);
+            const rows = [
+                [text.database, `${provider?.title} · ${db.values.server ?? ""} / ${db.values.database ?? ""}`],
+                [text.prefix, field("prefix").value.trim()],
+                ["SMTP", hasInput("smtp") ? `${field("smtpHost").value} (${field("smtpFrom").value})` : text.skipped],
+                [text.redis, hasInput("redis") ? field("redis").value.replace(/password=[^,]*/i, "password=***") : text.skipped]
+            ];
+            const list = $("#summaryList");
+            list.replaceChildren();
+            for (const [term, desc] of rows) {
+                const dt = document.createElement("dt");
+                dt.textContent = term;
+                const dd = document.createElement("dd");
+                dd.textContent = desc;
+                list.append(dt, dd);
+            }
+        }
+
+        /** 테스트 실행 → 결과 표시, 통과 여부 기록 */
+        async function runTest(kind, button) {
+            const output = button.nextElementSibling;
+            output.textContent = "…";
+            delete output.dataset.state;
+            button.disabled = true;
+            const url = { db: "/Setup/Test/Db", smtp: "/Setup/Test/Smtp", redis: "/Setup/Test/Redis" }[kind];
+            const data = kind === "db" ? dbValues() : kind === "smtp" ? { ...smtpValues(), testTo: field("testTo").value.trim() } : { redis: field("redis").value.trim() };
+            const res = await send(url, data);
+            button.disabled = false;
+            passed[kind] = !!res.success;
+            output.textContent = res.message ?? "";
+            output.dataset.state = res.success ? "ok" : "fail";
+        }
+
+        // ---- 설치 진행 ----
+        let failedStep = 0;
+
+        /** 설치 단계를 from 부터 차례로 실행. 실패하면 재시도/돌아가기 표시 */
+        async function install(from = 0) {
+            const list = $("#installSteps");
+            const items = [...list.children];
+            const progress = $("progress");
+            $("#installFail").hidden = true;
+            const data = { ...dbValues(), prefix: field("prefix").value.trim(), ...(hasInput("smtp") ? smtpValues() : {}), redis: hasInput("redis") ? field("redis").value.trim() : "" };
+
+            for (let i = from; i < info.steps.length; i++) {
+                const li = items[i];
+                li.dataset.state = "run";
+                li.querySelector("small").textContent = "";
+
+                if (info.steps[i].key === "migrate") {
+                    const startRes = await send("/Setup/Install/migrate", data);
+                    if (!startRes.success) {
+                        li.dataset.state = "fail";
+                        failedStep = i;
+                        li.querySelector("small").textContent = startRes.message ?? "";
+                        $("#installFail > output").textContent = startRes.message ?? "";
+                        $("#installFail").hidden = false;
+                        return;
+                    }
+
+                    const watch = watchMigration(li);
+                    const outcome = await watch.wait();
+                    li.querySelector("small").textContent = outcome.message ?? "";
+                    if (!outcome.success) {
+                        li.dataset.state = "fail";
+                        failedStep = i;
+                        $("#installFail > output").textContent = outcome.message ?? "";
+                        $("#installFail").hidden = false;
+                        return;
+                    }
+
+                    li.dataset.state = "ok";
+                    progress.value = i + 1;
+                    continue;
+                }
+
+                const res = await send(`/Setup/Install/${info.steps[i].key}`, data);
+                li.querySelector("small").textContent = res.message ?? "";
+                if (!res.success) {
+                    li.dataset.state = "fail";
+                    failedStep = i;
+                    $("#installFail > output").textContent = res.message ?? "";
+                    $("#installFail").hidden = false;
+                    return;
+                }
+                li.dataset.state = "ok";
+                progress.value = i + 1;
+            }
+            $("#installDone").hidden = false;
+            waitRestart();
+        }
+
+        /** 테이블 생성(마이그레이션)은 오래 걸릴 수 있어 백그라운드로 실행하며, 주기적으로 진행바와 경과 시간을 갱신합니다 */
+        function watchMigration(li) {
+            const small = li.querySelector("small");
+            const bar = li.querySelector("progress");
+            const started = Date.now();
+            bar.hidden = false;
+            bar.value = 0;
+
+            return {
+                async wait() {
+                    return new Promise(resolve => {
+                        const tick = async () => {
+                            const res = await fetch("/Setup/Progress", { headers: { "Accept": "application/json" } })
+                                .then(r => r.json()).catch(() => null);
+                            const p = res?.data;
+                            const seconds = Math.floor((Date.now() - started) / 1000);
+                            const elapsed = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+                            if (p?.total > 0) {
+                                bar.max = p.total;
+                                bar.value = p.current;
+                            }
+                            if (p?.running) {
+                                small.textContent = `${text.migrateSlow} ${text.migrateProgress.replace("{0}", p?.current ?? 0).replace("{1}", p?.total ?? 0).replace("{2}", elapsed)}`;
+                            } else if (p && !p.running) {
+                                clearInterval(timer);
+                                bar.hidden = true;
+                                if (p.succeeded) {
+                                    resolve({ success: true, message: p.message ?? "" });
+                                } else {
+                                    resolve({ success: false, message: p.error || text.migrateSlow });
+                                }
+                            }
+                        };
+                        tick();
+                        const timer = setInterval(tick, 1000);
+                    });
+                }
+            };
+        }
+
+        /** 재시작 후 사이트가 열리면 첫 화면으로 이동 */
+        function waitRestart() {
+            const timer = setInterval(async () => {
+                try {
+                    const res = await fetch("/", { redirect: "manual" });
+                    if (res.ok) {
+                        clearInterval(timer);
+                        location.href = "/";
+                    }
+                } catch { }
+            }, 2000);
+        }
+
+        /** 설치 단계 목록을 그린다 */
+        function renderInstallSteps() {
+            const list = $("#installSteps");
+            list.replaceChildren();
+            for (const step of info.steps) {
+                const li = document.createElement("li");
+                li.dataset.step = step.key;
+                const span = document.createElement("span");
+                span.textContent = step.text;
+                const bar = document.createElement("progress");
+                bar.hidden = true;
+                li.append(span, document.createElement("small"), bar);
+                list.append(li);
+            }
+            $("progress").max = info.steps.length;
+            $("progress").value = 0;
+        }
+
+        // ---- 이벤트 ----
+        root.addEventListener("click", e => {
+            const button = e.target.closest("button");
+            if (!button) return;
+            const step = sections[current].dataset.step;
+            switch (button.dataset.action ?? (button.dataset.test ? "test" : "")) {
+                case "prev": show(current - 1); break;
+                case "next": if (canNext(step)) show(current + 1); break;
+                case "skip":
+                    sections[current].querySelectorAll("input:not([type=checkbox]):not([name=smtpPort])").forEach(el => el.value = "");
+                    show(current + 1);
+                    break;
+                case "test": runTest(button.dataset.test, button); break;
+                case "install":
+                    renderInstallSteps();
+                    show(sections.findIndex(s => s.dataset.step === "install"));
+                    install(0);
+                    break;
+                case "retry": install(failedStep); break;
+                case "back": show(sections.findIndex(s => s.dataset.step === "database")); break;
+            }
+        });
+
+        // 입력을 바꾸면 그 단계 테스트를 다시 해야 한다
+        root.addEventListener("input", e => {
+            const step = e.target.closest("section[data-step]")?.dataset.step;
+            const key = step === "database" ? "db" : step;
+            if (key in passed) passed[key] = false;
+        });
+        field("provider").addEventListener("change", () => renderDbFields());
+
+        // ---- 초기화: 라이선스, 프로바이더, setup.json 미리 채우기 ----
+        const res = await fetch("/Setup/Info").then(r => r.json());
+        info = res.data;
+        $("#licenseText").textContent = info.license;
+        for (const p of info.providers) field("provider").add(new Option(p.title, p.name));
+
+        const preset = info.preset ?? {};
+        const db = preset.database ?? {};
+        if (db.provider) field("provider").value = db.provider;
+        renderDbFields(db);
+        field("prefix").value = db.prefix ?? info.prefix ?? "";
+        const smtp = preset.smtp ?? {};
+        const smtpMap = { host: "smtpHost", port: "smtpPort", user: "smtpUser", password: "smtpPassword", from: "smtpFrom", fromName: "smtpFromName", testTo: "testTo" };
+        for (const [key, name] of Object.entries(smtpMap)) if (smtp[key] != null) field(name).value = smtp[key];
+        if (smtp.ssl != null) field("smtpSsl").checked = !!smtp.ssl;
+        if (preset.redis) field("redis").value = preset.redis;
+        show(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+﻿@charset "UTF-8";
+/* 사용자 및 조직 관리 (iframe 임베드) 페이지 전용 스코프 스타일.
+   좌측(조직 트리)/우측(목록) 모두 독립된 .card 라운드 박스이며,
+   flex-grow 비율만 다르게 준 flex 사이즈라 컨테이너 폭에 따라 유동적으로 늘고 줄고,
+   내용이 넘치면 각 박스 내부에서만 스크롤된다(overflow-y: auto). */
+div.pageBox > div.flexRow {
+  gap: 1em;
+}
+div.pageBox > div.flexRow > aside.orgBox {
+  flex: 0 0 18em;
+  overflow: hidden;
+  padding: 0.5em;
+  gap: 0.5em;
+}
+div.pageBox > div.flexRow > aside.orgBox > div.treeBox {
+  overflow-y: auto;
+}
+div.pageBox > div.flexRow > section {
+  flex: 1 1 auto;
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+div.pageBox > div.flexRow > section > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.5em;
+  /* 검색창 폭만 지정 — 나머지는 공용 .inputGroup 그대로 사용 */
+}
+div.pageBox > div.flexRow > section > header > strong {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5em;
+  gap: 0.4em;
+  font-size: 1.02em;
+  color: var(--txColor);
+}
+div.pageBox > div.flexRow > section > header > strong > i.fi {
+  font-size: 1.4em;
+}
+div.pageBox > div.flexRow > section > header > div.inputGroup {
+  width: 16em;
+}
+div.pageBox > div.flexRow > section > header > div.inputGroup > input {
+  font-size: 0.9em;
+}
+div.pageBox > div.flexRow > section > div ::deep {
+  overflow-y: auto;
+}
+div.pageBox > div.flexRow > section > div ::deep > * .colName {
+  flex: 1 1 auto;
+  cursor: pointer;
+}
+div.pageBox > div.flexRow > section > div ::deep > * .colFlag {
+  flex: 0 0 5em;
+}
+div.pageBox > div.flexRow > section > div ::deep > * .colDate {
+  flex: 0 0 8em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.pageBox > div.flexRow > section > div ::deep > * .colAction {
+  flex: 0 0 2em;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li {
+  padding: 0.2em 0.5em;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5em;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName > i.fi {
+  font-size: 1.4em;
+  color: var(--main);
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > button {
+  height: auto;
+  width: auto;
+  padding: 0.3em;
+}
+div.pageBox > div.flexRow > section > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.5em 1em;
+  border-top: 1px solid var(--lineColor);
+}
+
+dialog#userModal > header,
+dialog#groupModal > header {
+  color: var(--main);
+}
+dialog#userModal > header > span.badge,
+dialog#groupModal > header > span.badge {
+  background-color: var(--danger);
+  color: white;
+}
+dialog#userModal > section > section, dialog#userModal > section > section > div, dialog#userModal > section > section > div > div,
+dialog#groupModal > section > section,
+dialog#groupModal > section > section > div,
+dialog#groupModal > section > section > div > div {
+  width: 100%;
+  height: 100%;
+}
+
+/* 그룹/사용자 모달 — 탭마다 콘텐츠 양(기본정보 폼 vs 속성/그룹/역할 목록)이 달라
+   dialog 기본값(내용에 맞춰 자동 가로/세로 크기 조정)이 탭 전환마다 흔들린다.
+   dialog 자체 너비를 고정하고, 탭 패널 공통 컨테이너 높이를 기본정보 탭 기준으로 고정한다. */
+dialog#userModal,
+dialog#groupModal {
+  width: 34em;
+  /* 삭제 버튼은 저장/취소와 떨어진 왼쪽에 둔다 (그룹/사용자 모달 공통) */
+}
+dialog#userModal .tabBox > section,
+dialog#groupModal .tabBox > section {
+  /* min-height 는 바닥값일 뿐이라 기본정보 탭 실제 높이가 추정치보다 크면 그만큼 또 흔들린다.
+     고정 height + 내부 스크롤로 탭이 바뀌어도 콘텐츠 양과 무관하게 항상 동일 높이를 유지한다. */
+  height: 27em;
+  overflow-y: auto;
+}
+dialog#userModal .tabBox ul.form,
+dialog#groupModal .tabBox ul.form {
+  padding: 0;
+}
+dialog#userModal > footer > button.danger,
+dialog#groupModal > footer > button.danger {
+  margin-right: auto;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Manager/Account/Users.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AAAA;AAAA;AAAA;AASA;EACI;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AAcA;;AAZA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;;AAEA;EACI;;AAKZ;EACI;;AAGI;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;;AAIR;EACI;;AACA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;;AAOR;AAAA;EACI;;AACA;AAAA;EACI;EACA;;AAKJ;AAAA;AAAA;AAAA;EAGI;EACA;;;AAKZ;AAAA;AAAA;AAGA;AAAA;EAEI;AAaA;;AAXA;AAAA;AACI;AAAA;EAEA;EACA;;AAGJ;AAAA;EACI;;AAIJ;AAAA;EACI%22%7D */

@@ -1,0 +1,37 @@
+﻿@charset "UTF-8";
+div.flexRow.alignStart {
+  font-size: 1rem;
+  height: 100%;
+}
+div.flexRow.alignStart > div {
+  padding: 0 0 0 0.5em;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 1em;
+}
+div.flexRow.alignStart > div > .flexRow {
+  gap: 1em;
+}
+div.flexRow.alignStart > div > .flexRow > * {
+  flex: 1 1 auto;
+}
+div.flexRow.alignStart > div > .flexRow > img {
+  border-radius: var(--roundBox);
+}
+div.flexRow.alignStart > div > .flexRow > ul.vertical {
+  flex: 1 1 33%;
+  min-width: 16em;
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+  div.flexRow.alignStart > div.auto {
+    padding: 0;
+  }
+}
+/* 타블렛 H 이하 (~ 780px) */
+/* 모바일 (~ 520px) */
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Portal.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACI;EACA;;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;;AAMhB;AACA;EAEQ;IACI;;;AAKZ;AAOA%22%7D */

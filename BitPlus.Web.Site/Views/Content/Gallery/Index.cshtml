@@ -1,0 +1,164 @@
+@model ContentPageModel
+
+@* 갤러리형 목록(/content/{규칙}, /content/{규칙}/list): 글마다 첫 이미지(대표 이미지)를 보여 주는 카드 격자 목록이다. 목록은 페이지가 아니라 API(api/content/list)로 불러와 ul 에 채운다(일반 형식과 같은 API).
+   검색(제목·내용·글쓴이·태그)·카테고리·페이지·미승인 보기는 일반 형식과 같고 상태는 주소 쿼리(page, size, q, category, pending)로 다룬다. 열 수 없는 글(locked)은 잠금 표시와 함께 링크를 열지 못하게 하고,
+   대표 이미지는 업로드 때 저장해 둔 썸네일 /system/thumb/{파일 키} (파일 다운로드와 같은 권한 검사, 다운로드 횟수는 올리지 않음)로, 첨부 이미지가 없는 글은 본문의 첫 이미지(bodyImage)로 보여 준다. *@
+<article class="contentGallery">
+    <header>
+        <span>
+            @Model.Title
+            <i class="badge point" id="contentCount">All Items. <b id="contentTotal">0</b></i>
+            <small></small>
+        </span>
+    </header>
+    <div>
+        <header>
+            <div>
+                @if (Model.Permission.CanWrite)
+                {
+                    <button type="button" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiEdit"></i> @this.Lang("ContentWrite")</button>
+                }
+                <button type="button" id="contentPendingView" hidden><i class="fi fiShieldTask"></i><span></span></button>
+            </div>
+            <form id="contentSearch">
+                @if (Model.Categories.Count > 0)
+                {
+                    <div class="dropDown" id="contentCategory" data-val="*">
+                        <header>@this.Lang("All")</header>
+                        <ul class="dropBox">
+                            <li data-val="*" class="active">CATEGORY</li>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <li data-val="@category.Key">@category.Value</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="inputGroup inline sm">
+                    <input type="search" name="q" maxlength="100" autocomplete="off" placeholder="@this.Lang("Search")" />
+                    <button type="submit" class="deco"><i class="fi fiSearch"></i></button>
+                </div>
+            </form>
+        </header>
+        <ul></ul>
+    </div>
+    <footer>
+        <div>
+            <div class="pageSize">
+                <label>LIST SIZE</label>
+                <select name="pageSize">
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="36">36</option>
+                    <option value="48">48</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <ul class="pager" id="contentPager"></ul>
+        </div>
+    </footer>
+</article>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('article.contentGallery');
+        const ruleNo = @Model.RuleNo;
+        const list = root.querySelector(':scope > div > ul'); // 카드가 채워질 ul
+        const form = root.querySelector('#contentSearch');
+        const categoryBox = root.querySelector('#contentCategory');
+        const sizeSelect = root.querySelector('select[name="pageSize"]');
+        const noticeText = @this.Js(this.Lang("Notice"));
+        const unapprovedText = @this.Js(this.Lang("ContentUnapprovedCount")); // {0} 은 미승인 건수
+        const normalViewText = @this.Js(this.Lang("ContentNormalView"));
+        const draftText = @this.Js(this.Lang("SaveDraft"));
+        const rejectedText = @this.Js(this.Lang("ContentRejected"));
+        const pendingText = @this.Js(this.Lang("ContentPendingApproval"));
+        const emptyText = @this.Js(this.Lang("DataEmpty"));
+        const noReadText = @this.Js(this.Lang("ContentNoReadPermission"));
+        const pendingMode = new URLSearchParams(location.search).get('pending') === '1'; // ?pending=1 : 승인 목록 모드 (관리자·승인자일 때만 서버가 적용)
+        // 목록 상태는 주소줄 쿼리로 다룬다: 기본값이 아닌 옵션(page, size, q, category, pending)만 쿼리에 담아 주소에 반영하고, 글 보기로 갈 때도 그대로 붙여 보낸다.
+        const params = new URLSearchParams(location.search);
+        const defaultSize = 12;
+        let pageSize = defaultSize;
+        let listQuery = ''; // 지금 목록 상태의 쿼리 문자열 ("?page=2&q=…" 또는 빈 문자열)
+        const queryOf = (page, size, q, category) => {
+            const p = new URLSearchParams();
+            if (page > 1) p.set('page', page);
+            if (size !== defaultSize) p.set('size', size);
+            if (q) p.set('q', q);
+            if (category && category !== '*') p.set('category', category);
+            if (pendingMode) p.set('pending', '1');
+            return p.size ? `?${p}` : '';
+        };
+
+        // 카드 하나의 모양 (common.html: ${값} 은 자동 이스케이프). 대표 이미지가 없거나 잠긴 글은 그림 자리에 아이콘을 보여 준다.
+        const badge = (cls, text) => common.html`<i class="badge sm ${cls}">${text}</i> `;
+        const cardOf = i => common.html`
+            <li class="${i.isNotice ? 'notice' : ''}">
+                <a ${i.locked ? 'href="#" data-locked="true"' : i.movedTo ? common.html`href="/content/view/${i.movedTo}"` : common.html`href="/content/${ruleNo}/view/${i.contentNo}${listQuery}"`}>
+                    <figure>
+                        ${i.thumb ? common.html`<img src="/system/thumb/${i.thumb}" alt="${i.title}" loading="lazy" />` : i.bodyImage ? common.html`<img src="${i.bodyImage}" alt="${i.title}" loading="lazy" referrerpolicy="no-referrer" />` : common.html`<i class="fi ${i.gate ? 'fiLock' : 'fiImage'}"></i>`}
+                        <span>
+                            ${i.isNotice ? badge('main notice', noticeText) : ''}
+                            ${i.published === false ? badge('danger', draftText) : ''}
+                            ${i.approved ? '' : badge(i.state === 'rejected' ? 'danger' : 'warning', i.state === 'rejected' ? rejectedText : pendingText)}
+                        </span>
+                    </figure>
+                    <b title="${i.title}">${i.gate ? common.html`<i class="fi fiLock"></i> ` : ''}${i.title}</b>
+                    <small>
+                        <i class="fi fiPerson"></i>${i.writer}
+                        <i class="fi fiEye"></i>${i.readCount}
+                        ${i.fileCount > 0 ? common.html`<i class="fi fiAttach"></i>${i.fileCount}` : ''}
+                        ${i.commentCount > 0 ? common.html`<i class="fi fiComment"></i>${i.commentCount}` : ''}
+                        <time title="${common.localTime(i.cDate, true)}">${common.ago(i.cDate)}</time>
+                    </small>
+                </a>
+            </li>`;
+        const emptyCard = common.html`<li class="empty"><i class="fi fiAnimalDog"></i><br />${emptyText}</li>`;
+
+        /** 글 목록을 API 로 불러와 카드 목록(ul)과 페이저를 다시 그린다 (page: 1부터) */
+        const load = async (page = 1) => {
+            const query = new URLSearchParams({ ruleNo, page, size: pageSize, q: form.q.value.trim(), pending: pendingMode, category: categoryBox && categoryBox.dataset.val !== '*' ? categoryBox.dataset.val : '' });
+            const res = await common.getSend(`/api/content/list?${query}`, { useLoading: false });
+            if (!res || !res.success) return;
+            const data = res.data;
+            listQuery = queryOf(data.page, data.pageSize, form.q.value.trim(), categoryBox?.dataset.val); // 서버가 맞춘 실제 페이지로 쿼리를 만들고 주소에 반영
+            history.replaceState(null, '', location.pathname + listQuery);
+            root.querySelector('#contentTotal').textContent = data.total;
+            root.querySelector('#contentCount').classList.toggle('warning', data.pending);
+            root.querySelector('#contentCount').classList.toggle('point', !data.pending);
+            const toggle = root.querySelector('#contentPendingView'); // 승인 목록 모드면 "일반 보기", 아니면 미승인 글이 있을 때만 "미승인 N건"
+            toggle.hidden = !data.pending && !data.pendingCount;
+            toggle.querySelector('span').textContent = data.pending ? normalViewText : unapprovedText.replace('{0}', data.pendingCount);
+            common.bindList(list, data.items, cardOf, emptyCard); // 목록 바인딩
+            root.querySelector('#contentPager').replaceWith(common.makePager(data.page - 1, data.pageSize, data.pageCount * data.pageSize).then(p => load(p + 1)));
+            root.querySelector('ul.pager').id = 'contentPager';
+        };
+
+        root.querySelector('#contentPendingView').onclick = () => location.assign(pendingMode ? `/content/${ruleNo}` : `/content/${ruleNo}?pending=1`);
+        form.onsubmit = e => { e.preventDefault(); load(1); };
+        list.addEventListener('click', e => {
+            const a = e.target.closest('a[data-locked]');
+            if (a) {
+                e.preventDefault();
+                common.alert(noReadText);
+            }
+        });
+        categoryBox?.addEventListener('change', () => {
+            categoryBox.querySelectorAll('li').forEach(li => li.classList.toggle('active', li.dataset.val === categoryBox.dataset.val));
+            load(1);
+        });
+        sizeSelect.addEventListener('change', () => { pageSize = Number(sizeSelect.value); load(1); });
+        // 주소의 쿼리로 목록 상태 복원: 검색어·카테고리 선택·목록 크기를 되돌린 뒤 쿼리의 페이지를 연다
+        form.q.value = params.get('q') ?? '';
+        const category = categoryBox && [...categoryBox.querySelectorAll('li')].find(li => li.dataset.val === params.get('category'));
+        if (category) {
+            categoryBox.dataset.val = category.dataset.val;
+            categoryBox.querySelector('header').textContent = category.textContent;
+            categoryBox.querySelectorAll('li').forEach(li => li.classList.toggle('active', li === category));
+        }
+        const size = Number(params.get('size'));
+        if ([...sizeSelect.options].some(o => Number(o.value) === size)) { pageSize = size; sizeSelect.value = size; }
+        load(Number(params.get('page')) || 1);
+    });
+</script>

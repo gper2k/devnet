@@ -1,0 +1,317 @@
+@charset "UTF-8";
+/* 관리자 대시보드: 인사 / 첫 줄(오늘 방문 · 4칸 지표 · 14일 방문 막대) / 둘째 줄(회원 현황·최근 가입 · 최근 활동 표) */
+.dashboard {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+.dashboard .card {
+  padding: 1.2em;
+  gap: 0.6em;
+  border: 1px solid var(--lineColor);
+  border-radius: 1em;
+}
+.dashboard .card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  font-size: 1em;
+  white-space: normal;
+}
+.dashboard .card > header > small {
+  flex: 1 0 100%;
+}
+.dashboard .card > header > i.fi {
+  font-size: 1.3em;
+  color: var(--txLight);
+}
+.dashboard .card > strong {
+  font-size: 2.2em;
+  line-height: 1.1em;
+  color: var(--txColor);
+}
+.dashboard > header > h2 {
+  margin: 0;
+  font-size: 1.8em;
+  color: var(--txColor);
+}
+.dashboard > header > p {
+  margin: 0.3em 0 0;
+  color: var(--txLight);
+}
+.dashboard {
+  /* 첫 줄: 오늘 방문 / 4칸 지표 / 방문 막대 */
+}
+.dashboard > section:first-of-type {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.3fr;
+  gap: 1em;
+  /* 오늘 방문: 큰 수 · 어제 대비 · 어제/이번 달/올해 작은 칸 */
+}
+.dashboard > section:first-of-type > article:first-child > p {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin: 0;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+.dashboard > section:first-of-type > article:first-child > ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5em;
+  margin: auto 0 0;
+  padding: 0;
+  list-style: none;
+}
+.dashboard > section:first-of-type > article:first-child > ul > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  padding: 0.7em;
+  border-radius: 0.7em;
+  background: var(--main1);
+}
+.dashboard > section:first-of-type > article:first-child > ul > li > small {
+  font-size: 0.75em;
+  color: var(--txLight);
+}
+.dashboard > section:first-of-type > article:first-child > ul > li > b {
+  font-size: 1.2em;
+  color: var(--txColor);
+}
+.dashboard > section:first-of-type > article:first-child > ul > li > span {
+  font-size: 0.7em;
+  color: var(--txLight);
+}
+.dashboard > section:first-of-type {
+  /* 4칸 지표: 첫 칸은 메인색 강조 */
+}
+.dashboard > section:first-of-type > article:nth-child(2) {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1em;
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card {
+  justify-content: space-between;
+  background: var(--main1);
+  border-color: transparent;
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card > span {
+  flex: 0 0 auto;
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card {
+  /* 링크 칸(신고 → 신고 목록): 올리면 테두리 */
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card[href] {
+  text-decoration: none;
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card[href]:hover {
+  border-color: var(--main);
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card:first-child {
+  background: var(--main);
+}
+.dashboard > section:first-of-type > article:nth-child(2) > .card:first-child > header, .dashboard > section:first-of-type > article:nth-child(2) > .card:first-child > header > i.fi, .dashboard > section:first-of-type > article:nth-child(2) > .card:first-child > strong, .dashboard > section:first-of-type > article:nth-child(2) > .card:first-child > span {
+  color: white;
+}
+.dashboard > section:first-of-type {
+  /* 최근 14일 방문 막대: 막대 = 페이지 요청, 아래 짙은 부분 = 방문자 */
+}
+.dashboard > section:first-of-type > article:last-child > figure {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin: 0;
+  padding: 0.8em;
+  border-radius: 0.7em;
+  background: var(--main1);
+}
+.dashboard > section:first-of-type > article:last-child > figure > figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4em;
+  font-size: 0.75em;
+  color: var(--txLight);
+}
+.dashboard > section:first-of-type > article:last-child > figure > figcaption > i {
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 0.2em;
+  background: var(--main);
+}
+.dashboard > section:first-of-type > article:last-child > figure > figcaption > i:last-of-type {
+  margin-left: 0.6em;
+  background: var(--point);
+}
+.dashboard > section:first-of-type > article:last-child > figure > ol {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 0.3em;
+  min-height: 10em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dashboard > section:first-of-type > article:last-child > figure > ol > li {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.3em;
+}
+.dashboard > section:first-of-type > article:last-child > figure > ol > li > span {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 1.6em;
+  min-height: 0.2em;
+  border-radius: 0.4em;
+  overflow: hidden;
+  background: var(--point);
+}
+.dashboard > section:first-of-type > article:last-child > figure > ol > li > span > i {
+  display: block;
+  background: var(--main);
+}
+.dashboard > section:first-of-type > article:last-child > figure > ol > li > small {
+  font-size: 0.7em;
+  color: var(--txLight);
+}
+.dashboard {
+  /* 둘째 줄: 회원 현황·최근 가입 / 최근 활동 */
+}
+.dashboard > section:last-of-type {
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  gap: 1em;
+}
+.dashboard > section:last-of-type > aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.dashboard > section:last-of-type > aside > article > label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+.dashboard > section:last-of-type > aside > article > label > b {
+  color: var(--txColor);
+}
+.dashboard > section:last-of-type > aside > article > meter {
+  width: 100%;
+  height: 0.8em;
+}
+.dashboard > section:last-of-type > aside > article > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dashboard > section:last-of-type > aside > article > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.dashboard > section:last-of-type > aside > article > ul > li > i {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+  overflow: hidden;
+  color: var(--deco);
+  background: var(--main1);
+}
+.dashboard > section:last-of-type > aside > article > ul > li > i > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dashboard > section:last-of-type > aside > article > ul > li > span {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dashboard > section:last-of-type > aside > article > ul > li > span > b, .dashboard > section:last-of-type > aside > article > ul > li > span > small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dashboard > section:last-of-type > aside > article > ul > li > span > small {
+  font-size: 0.75em;
+  color: var(--txLight);
+}
+.dashboard > section:last-of-type > aside > article > ul > li > time {
+  font-size: 0.75em;
+  color: var(--txLight);
+}
+.dashboard > section:last-of-type > article {
+  overflow-x: auto;
+}
+.dashboard > section:last-of-type > article > table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+.dashboard > section:last-of-type > article > table th {
+  padding: 0.6em;
+  text-align: left;
+  font-size: 0.85em;
+  font-weight: normal;
+  color: var(--txLight);
+  border-bottom: 1px solid var(--lineColor);
+}
+.dashboard > section:last-of-type > article > table td {
+  padding: 0.7em 0.6em;
+  border-bottom: 1px solid var(--lineColor);
+  white-space: nowrap;
+}
+.dashboard > section:last-of-type > article > table td:nth-child(2) {
+  white-space: normal;
+}
+.dashboard > section:last-of-type > article > table td > a {
+  color: var(--txColor);
+}
+.dashboard > section:last-of-type > article > table td > a:hover {
+  color: var(--main);
+}
+.dashboard > section:last-of-type > article > table tr:last-child > td {
+  border-bottom: none;
+}
+
+/* 좁은 화면: 한 줄씩 */
+@media (width <= 1100px) {
+  .dashboard > section:first-of-type {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dashboard > section:first-of-type > article:last-child {
+    grid-column: 1/-1;
+  }
+  .dashboard > section:last-of-type {
+    grid-template-columns: 1fr;
+  }
+}
+@media (width <= 640px) {
+  .dashboard > section:first-of-type {
+    grid-template-columns: 1fr;
+  }
+}

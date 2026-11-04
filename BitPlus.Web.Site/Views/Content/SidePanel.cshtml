@@ -1,0 +1,17 @@
+@model dynamic
+@using Microsoft.EntityFrameworkCore
+@{
+    // 컨텐츠 공통 사이드 패널: 위젯 페이지 "side" 의 쌓기형 위젯 목록. 위쪽 메뉴 트리도 위젯(ContentMap, 사이드 전용·한 패널에 하나)이라 같은 위젯 편집에서 순서·추가·삭제를 함께 관리한다.
+    // 게시판 설정 사이드 구성의 연결 메뉴(또는 /content/menu/{메뉴 키} 의 메뉴)가 있으면(사용 중인 메뉴일 때만) 위젯 배치를 "side@{메뉴 키}" 로 따로 두고, 컨텐츠맵 위젯은 그 메뉴를 루트로 그린다.
+    // 부르는 쪽 view-data: SideMenuKey(연결 메뉴 키), TreeColor(트리 색), ContentArea(true 면 컨텐츠 페이지 영역 — 컨텐츠맵 머리줄의 + · 톱니 표시)
+    var sideKey = ViewData["SideMenuKey"] as string is { Length: > 0 } linkedKey ? linkedKey : null;
+    var sideMenu = sideKey is null ? null : await this.DbContext!.Menus.AsNoTracking().Include(p => p.DpNames).FirstOrDefaultAsync(p => p.Key == sideKey && p.Enabler);
+}
+
+<aside id="pageMenu" class="contentSide">
+    @* 사이드 패널 위젯 — 위젯 페이지 "side": 사이드 패널을 쓰는 화면(게시판·포탈 …)이 같은 배치(설정 PageLayout.side, 없으면 _Pages/side.json — 맨 위 컨텐츠맵 위젯).
+       연결 메뉴가 있으면 "side@{메뉴 키}" — 그 메뉴를 쓰는 사이드끼리만 따로 배치(PageLayout.side@{메뉴 키}), 편집해 저장하기 전에는 전역 배치를 그대로 씀.
+       쌓기형(Stack): 영역 추가 없이 위젯만 몇 개든 아래로, 관리자는 톱니 아이콘으로 편집. 패널 높이를 넘으면 위젯 부분만 스크롤.
+       위젯 뷰에 넘기는 값: SideMenu(사용 중인 연결 메뉴, 없으면 null), SidePage(이 패널을 부른 페이지 모델 — 게시판 번호·담당자 확인용) *@
+    <partial name="_PageSections" model="@(sideMenu is null ? "side" : "side@" + sideMenu.Key)" view-data='new ViewDataDictionary(ViewData) { { "Stack", true }, { "SideMenu", sideMenu }, { "SidePage", (object?)Model } }' />
+</aside>

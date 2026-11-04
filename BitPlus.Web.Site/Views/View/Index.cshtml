@@ -1,0 +1,21 @@
+@model ContentViewModel
+@{
+    this.SetTitle(Model.Title); // 글 제목은 페이지 제목으로만 쓰고 본문 영역에는 출력하지 않는다
+    this.SetPageKey("View");
+}
+@section Scripts {
+    <script>common.loadEditorAssets(true); // 에디터로 만든 본문 스타일(공급자 CSS)
+    </script>
+}
+@* 사이드 구성(편집 화면 ⋮ > 사이드 구성)대로: 감춤(기본)이면 본문만, 보이면 게시판과 같은 사이드 패널을 위치(좌측/우측)에 두고 연결 메뉴가 있으면 그 메뉴의 하위 트리 *@
+@if (Model.SideHidden)
+{
+    @await Html.PartialAsync("_Body", Model)
+}
+else
+{
+    <div class="@(Model.SideRight ? "pageWrap sideRight" : "pageWrap")">
+        <partial name="~/Views/Content/SidePanel.cshtml" view-data='new ViewDataDictionary(ViewData) { { "TreeColor", "deco" }, { "SideMenuKey", Model.SideMenuKey } }' />
+        @await Html.PartialAsync("_Body", Model)
+    </div>
+}

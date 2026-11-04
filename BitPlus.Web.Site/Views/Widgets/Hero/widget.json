@@ -1,0 +1,17 @@
+{
+  "key": "Hero",
+  "version": 2,
+  "name": { "ko": "히어로", "en": "Hero" },
+  "description": { "ko": "노트북 그림과 머리말·제목·설명·버튼을 나란히 둔 첫 화면 영역. 노트북 화면은 이미지 주소로 바꾸고, 뒤에 붓칠 장식이 깔립니다.", "en": "A first-screen block with a laptop beside a label, title, text and button. The image URL sets the laptop screen, over brush-stroke accents." },
+  "categories": ["design"],
+  "size": { "min": [4, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "label", "type": "text", "default": "" },
+    { "key": "title", "type": "text", "default": "" },
+    { "key": "text", "type": "lines", "default": "" },
+    { "key": "image", "type": "text", "default": "" },
+    { "key": "buttonText", "type": "text", "default": "" },
+    { "key": "buttonUrl", "type": "text", "default": "" },
+    { "key": "reverse", "type": "bool", "default": false }
+  ]
+}

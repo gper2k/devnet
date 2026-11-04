@@ -1,0 +1,15 @@
+@model ContentEditModel
+@{
+    Layout = "_AdminLayout";
+    var title = Model.IsNew ? this.LangOf("AddOf", "PageContents") : this.LangOf("EditOf", "PageContents");
+    this.SetTitle(title);
+    this.SetPageKey("Content");
+    this.SetDescription(this.Lang("ContentManageInfo"));
+    ViewData["ReturnUrl"] = "/Manager/Content#pages"; // 저장·취소·삭제하면 관리자 컨텐츠 화면의 페이지 컨텐츠 탭으로 돌아간다 (EditForm 파샬뷰가 읽음)
+}
+
+@* 관리자 콘솔 페이지 컨텐츠 작성/수정(/Manager/Content/Page/{글 번호}, 신규는 번호 없음) — 사용자 화면(/view/edit)과 같은 폼 파샬뷰를 관리자 레이아웃 안에 보여 준다 (ViewController.ManagerPage).
+   관리자 화면 전용 모양(에디터가 남는 높이를 채움, 저장 버튼 줄을 화면 아래에 고정)은 Page.cshtml.scss 가 맡는다. *@
+<div class="pageBox pageEdit">
+    <partial name="~/Views/View/EditForm.cshtml" model="Model" />
+</div>

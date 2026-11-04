@@ -1,0 +1,59 @@
+/* 갤러리 위젯 — 열 수(--cols, 설정값) 격자, 화면이 좁으면 2열, 아주 좁으면 1열. 이미지 아래 제목 한 줄 */
+ul.widgetGallery {
+    font-size: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+    gap: 0.8em;
+
+    @media (max-width: 779.98px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 519.98px) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    & > li > a {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4em;
+        color: var(--txColor);
+        text-decoration: none;
+
+        & > img,
+        & > span {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: var(--roundBox);
+            object-fit: cover;
+            background-color: var(--main1);
+        }
+
+        & > span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            & > i {
+                font-size: 3.2em;
+                color: var(--txLight);
+                opacity: 0.55;
+            }
+        }
+
+        & > b {
+            font-size: 0.85em;
+            font-weight: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    & > li.empty {
+        grid-column: 1 / -1;
+    }
+}

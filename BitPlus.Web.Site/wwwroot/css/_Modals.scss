@@ -1,0 +1,932 @@
+/* ==========================================================================
+   BitPlus 모달 스타일시트 (Site.scss)
+   기본 모달 및 개별 모달 구성
+   ========================================================================== */
+
+dialog {
+    font-size: 1rem;
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBox, 1em);
+    padding: 0;
+    margin: auto;
+    display: none;
+    flex-direction: column;
+    min-width: 18em;
+    max-width: 92vw;
+    max-height: 90vh;
+    box-shadow: 0 0.5em 2em var(--aDark);
+    overflow: hidden;
+    transition: filter 0.15s;
+    // 중첩 모달: 배경 어둡게/블러는 첫 모달(data-first)에만 주어 겹칠수록 어두워지지 않게 하고,
+    // 최상단 이전 모달(data-under)은 자체를 블러 처리한다. 상태 속성은 site.ts 의 모달 스택 감시가 부여.
+    &::backdrop {
+        background-color: transparent;
+    }
+
+    &[open] {
+        display: flex;
+        animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+        &[data-first]::backdrop {
+            background-color: var(--modalBg);
+            backdrop-filter: blur(0.25em);
+        }
+
+        &[data-under] {
+            filter: blur(0.1em);
+        }
+
+        &.closing {
+            pointer-events: none;
+            animation: modalSlideDown 0.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+
+            &::backdrop {
+                animation: modalFadeOut 0.2s ease-out forwards;
+            }
+        }
+    }
+
+    & > header {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        padding: 1em 1em 0.5em 1em;
+        font-size: 1.15em;
+        font-weight: 700;
+        text-transform: capitalize;
+        color: var(--primary);
+
+        & > i.fi {
+            font-size: 1.2em;
+        }
+    }
+
+    & > div,
+    & > section {
+        flex: 1 1 auto;
+        padding: 0.5em 1em;
+        font-size: 0.95em;
+        line-height: 1.5;
+        color: var(--txSub);
+        overflow-y: auto;
+        word-break: break-word;
+        min-width: 10em;
+        min-height: 5em;
+    }
+
+    & > footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.6em;
+        padding: 0.5em 1em 1em 1em;
+
+        & > button {
+            height: auto;
+            padding: 0.45em 0.8em 0.45em 0.6em;
+            font-size: 0.9em;
+        }
+    }
+
+    &.checkConfirm {
+        & > div {
+            & > p {
+                margin: 0 0 0.8em 0;
+            }
+
+            & > ul {
+                margin: 0;
+                padding: 0.5em 1em;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                gap: 0.4em;
+            }
+        }
+    }
+
+    &#reportUserModal,
+    &#reportModal,
+    &.groupDialog,
+    &.messageDialog,
+    &.qrDialog,
+    &.forumComment,
+    &.manualOrder {
+        & > header {
+            color: var(--main);
+        }
+
+        & > footer > button.primary {
+            background-color: var(--main);
+        }
+    }
+
+    &.groupDialog {
+        width: 28em;
+
+        & > section > section.tabBox > section > div > div.chipBox {
+            padding: 0;
+            border: none;
+            border-bottom: 1px solid var(--aColor);
+            border-radius: 0;
+
+            & > ul {
+                height: 12em;
+                overflow-y: auto;
+                padding: 0.2em;
+            }
+        }
+    }
+
+    &.checkConfirm,
+    &.alertWin {
+        max-width: 28em;
+
+        & > header {
+            color: var(--danger);
+        }
+
+        & > footer > button.primary {
+            background-color: var(--danger);
+        }
+    }
+
+    /* 회원 약관 전용 모달 (termsDialog) */
+    &.termsDialog {
+        width: 38em;
+        max-width: 92vw;
+        height: fit-content;
+        max-height: 85vh;
+        border: none;
+        border-radius: 0.8em;
+        padding: 1.3em 1.5em 1.2em;
+        background-color: var(--bgColor);
+        color: var(--txColor);
+        box-shadow: 0 0.8em 3em var(--aDark);
+        box-sizing: border-box;
+        gap: 0.8em;
+
+        &::backdrop {
+            background-color: var(--modalBg, rgba(0, 0, 0, 0.55));
+            backdrop-filter: blur(4px);
+        }
+
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5em 0;
+            margin: 0;
+            background: transparent;
+            border: none;
+            color: var(--txColor);
+            flex-shrink: 0;
+
+            & > .termsTitle {
+                font-size: 1.25em;
+                font-weight: 700;
+                color: var(--txColor);
+                margin: 0;
+                line-height: 1;
+            }
+
+            & > .closeBtn {
+                background: transparent;
+                border: none;
+                font-size: 1.3em;
+                cursor: pointer;
+                line-height: 1;
+                color: var(--txSub);
+                border-radius: var(--roundBtn, 2em);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+                height: auto;
+                transition: color 0.15s, background-color 0.15s;
+
+                &:hover {
+                    color: var(--txColor);
+                    background-color: var(--aLow);
+                }
+            }
+        }
+
+        & > .termsContent {
+            flex: 0 1 auto;
+            height: 28em;
+            max-height: 55vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 2px dashed var(--lineColor, #cfd6dc);
+            border-radius: 0.6em;
+            padding: 1em 1.1em;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+            font-size: 0.86em;
+            color: var(--txSub);
+            line-height: 1.65;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            margin: 0;
+
+            & > h1, & > h2, & > h3, & > h4, & > h5 {
+                margin: 1.1em 0 0.35em;
+                font-size: 1.05em;
+                font-weight: 700;
+                color: var(--txColor);
+
+                &:first-child {
+                    margin-top: 0;
+                }
+            }
+
+            & > p {
+                margin: 0 0 0.75em;
+
+                &:first-child {
+                    margin-top: 0;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            ol, ul {
+                padding-left: 1.4em;
+                margin: 0 0 0.75em;
+            }
+        }
+
+        & > footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border: none;
+            flex-shrink: 0;
+
+            & > button.confirmBtn {
+                height: 2.4em;
+                padding: 0 1.3em;
+                font-size: 0.9em;
+                font-weight: 600;
+                border-radius: 0.45em;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4em;
+                background-color: #475569;
+                color: #ffffff;
+                border: none;
+                transition: background-color 0.15s;
+                margin: 0;
+
+                &:hover {
+                    background-color: #334155;
+                }
+            }
+        }
+    }
+    /* 글 입력 모달 (textInput): 안내 문구 + 여러 줄 입력, danger 는 반려 같은 경고 입력 */
+    &.inputWin {
+        max-width: 28em;
+
+        &.wide {
+            width: 40em;
+            max-width: 95vw;
+        }
+
+        & > header {
+            color: var(--info);
+        }
+
+        & > div {
+            & > p {
+                margin: 0 0 0.6em 0;
+            }
+
+            & > textarea {
+                width: 100%;
+                min-height: 6em;
+                resize: vertical;
+            }
+        }
+
+        & > footer > button.primary {
+            background-color: var(--info);
+        }
+
+        &.danger {
+            & > header {
+                color: var(--danger);
+            }
+
+            & > footer > button.primary {
+                background-color: var(--danger);
+            }
+        }
+    }
+
+    &.infoWin {
+        max-width: 52em;
+
+        & > header {
+            color: var(--info);
+        }
+
+        & > footer > button.primary {
+            background-color: var(--info);
+        }
+    }
+
+    &.confirmWin {
+        max-width: 28em;
+
+        & > header {
+            color: var(--warning);
+        }
+
+        & > footer > button.primary {
+            background-color: var(--warning);
+        }
+    }
+
+    &.qrDialog > section > div.inputGroup > button {
+        color: var(--deco);
+    }
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(2em);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes modalSlideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(2em);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+dialog {
+    &.userSelect,
+    &.roleSelect,
+    &.groupSelect,
+    &.langInput {
+        & > header {
+            color: var(--main);
+        }
+
+        & > footer {
+            padding: 0.6em 1em;
+            border-top: 1px dashed var(--aColor);
+            justify-content: center;
+        }
+    }
+
+    &.userSelect > div,
+    &.roleSelect > div {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.5em;
+        height: 26em;
+
+        & > div {
+            flex: 0 0 auto;
+        }
+
+        & > ul.selectList {
+            flex: 1 1 auto;
+        }
+
+        & > ul.pager {
+            flex: 0 0 auto;
+            justify-content: center;
+        }
+    }
+
+    &.groupSelect > div {
+        width: 20em;
+        height: 26em
+    }
+}
+
+/* 메뉴 편집 모달 (modals/menuEdit.ts) — 탭 전환 시 크기가 흔들리지 않게 너비/탭 높이 고정 */
+dialog.menuEdit {
+    width: 34em;
+
+    & > header {
+        color: var(--main);
+
+        & > span.badge {
+            background-color: var(--danger);
+            color: white;
+        }
+    }
+
+    & .tabBox > section {
+        height: 24em;
+        overflow-y: auto;
+
+        &:has(> .tabAccess.active[inert]) {
+            cursor: not-allowed;
+        }
+    }
+
+    & .tabBox ul.form {
+        padding: 0;
+    }
+
+    & .tabAccess.active {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 0.5em;
+
+        &[inert] {
+            opacity: 0.45;
+
+            & > ul {
+                background-color: var(--bgSub);
+                border-color: var(--lineColor);
+
+                & > li > button {
+                    background-color: var(--bgSub);
+                    border-color: var(--lineColor);
+                    color: var(--txLight);
+                }
+            }
+        }
+
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5em;
+            flex-wrap: wrap;
+
+            & > small {
+                color: var(--txLight);
+            }
+
+            /* 추가 버튼 줄(.tools): 오른쪽 정렬, 모양은 공용 .tools 스타일(바깥 테두리와 안쪽 여백은 이 모달에서 쓰지 않음) */
+            & > div.tools {
+                margin-left: auto;
+                border: none;
+                padding: 0;
+            }
+        }
+
+        & > ul {
+            flex: 1 1 auto;
+            margin: 0;
+            padding: 0.5em;
+            border: 1px solid var(--aColor);
+            border-radius: var(--roundBox);
+            overflow-y: auto;
+
+            & > li {
+                display: flex;
+                align-items: center;
+                gap: 0.6em;
+                padding: 0.4em;
+                border-bottom: 1px dashed var(--aColor);
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                & > span {
+                    flex: 1 1 auto;
+                }
+
+                & > button {
+                    width: 1.8em;
+                    height: 1.8em;
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    & > footer > button.danger {
+        margin-right: auto;
+    }
+}
+
+/* 기간 설정 모달 (modals/periodEdit.ts) */
+dialog.periodEdit {
+    width: 24em; /* 날짜·시간 컨트롤(날짜 글자가 잘리지 않을 너비) */
+    &[data-mode="date"] { width: 19em; }
+    &[data-mode="time"] { width: 17em; }
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section {
+        padding: 0.5em 1em;
+
+        & ul.form {
+            padding: 0;
+        }
+
+        & > small {
+            color: var(--txLight);
+        }
+    }
+}
+
+/* 사이드 구성 모달 (modals/sideEdit.ts) */
+dialog.sideEdit {
+    width: 26em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section {
+        padding: 0.5em 1em;
+
+        & ul.form {
+            padding: 0;
+        }
+    }
+}
+
+/* 대상 편집 모달 (modals/targetEdit.ts) */
+dialog.targetEdit {
+    width: 30em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section {
+        display: flex;
+        flex-direction: column;
+        height: 20em;
+        gap: 0.5em;
+        padding: 0.5em 1em;
+
+        /* 대상 종류 추가 버튼(.tools): 오른쪽 정렬, 모양은 공용 .tools 스타일 */
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5em;
+            flex-wrap: wrap;
+
+            /* 추가 버튼 줄: 공용 .tools 의 바깥 테두리와 안쪽 여백은 이 모달에서 쓰지 않는다 */
+            & > div.tools {
+                border: none;
+                padding: 0;
+            }
+        }
+
+        & > ul {
+            flex: 1 1 auto;
+            margin: 0;
+            padding: 0.5em;
+            border: 1px solid var(--aColor);
+            border-radius: var(--roundBox);
+            overflow-y: auto;
+
+            & > li {
+                display: flex;
+                align-items: center;
+                gap: 0.6em;
+                padding: 0.4em;
+                border-bottom: 1px dashed var(--aColor);
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                & > span {
+                    flex: 1 1 auto;
+                }
+
+                & > button {
+                    font-size: 0.7em; /* 삭제 버튼은 이전 크기의 70% (크기와 아이콘 모두 em 기준) */
+                    width: 1.8em;
+                    height: 1.8em;
+                    padding: 0;
+                }
+            }
+        }
+    }
+}
+
+dialog {
+    /* 포럼 댓글 입력 모달 (forumComment): 에디터 + 첨부 파일 목록 */
+    /* 설문 항목 입력 모달 (surveyItem): 질문 + 선택 방식 + 옵션 목록 */
+    &.surveyItem {
+        width: 32em;
+        max-height: 92dvh;
+
+        & > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6em;
+
+            & > label:not(.check) {
+                font-size: 0.9em;
+                font-weight: 700;
+            }
+
+            & > textarea {
+                width: 100%;
+                resize: vertical;
+            }
+
+            & > ul {
+                display: flex;
+                flex-direction: column;
+                gap: 0.4em;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+
+                & > li {
+                    display: flex;
+                    gap: 0.4em;
+
+                    & > input {
+                        flex: 1 1 auto;
+                        min-width: 0;
+                    }
+
+                    & > button {
+                        flex: 0 0 auto;
+                        width: 2.2em;
+                        padding: 0;
+                    }
+                }
+            }
+
+            & > button {
+                align-self: flex-start;
+            }
+        }
+    }
+
+    /* 메뉴얼 페이지 순서 변경 모달 (manualOrder): 끌어서 정렬하는 페이지 목록 */
+    &.manualOrder {
+        width: 26em;
+        max-height: 90dvh;
+
+        & > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6em;
+
+            & > p {
+                margin: 0;
+                color: var(--txLight);
+                font-size: 0.9em;
+            }
+
+            & > ul {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3em;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+
+                & > li {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6em;
+                    padding: 0.5em 0.7em;
+                    border: 1px solid var(--lineColor);
+                    border-radius: var(--roundBox);
+                    background-color: var(--bgColor);
+                    cursor: grab;
+                    user-select: none;
+
+                    & > i.fi {
+                        color: var(--txLight);
+                    }
+
+                    &.empty {
+                        justify-content: center;
+                        color: var(--txLight);
+                        cursor: default;
+                    }
+                }
+            }
+        }
+    }
+
+    &.forumComment {
+        width: 46em;
+        max-height: 95dvh;
+
+        /* 작은 화면(720px 이하): 너비·높이 모두 화면의 99%, 에디터가 남는 높이를 채움 */
+        @media (width <= 720px) {
+            width: 99vw;
+            max-width: 99vw;
+            height: 99dvh;
+            max-height: 99dvh;
+        }
+
+        /* 에디터 엔진의 속성 창(이미지 등)은 이 대화상자 안에 position: fixed 로 붙는데, 열림 애니메이션이 끝난 뒤에도 transform 이 남으면
+           대화상자가 기준이 되어 속성 창이 대화상자 크기로 잘린다. 애니메이션이 끝나면 transform 을 없애 화면 전체를 기준으로 보이게 한다. */
+        &[open]:not(.closing) {
+            animation-fill-mode: backwards;
+        }
+
+        /* 에디터 엔진이 대화상자 안에 붙이는 툴팁·팝업 상자: 자리를 차지하면 아래에 빈 여백이 생기므로 높이 0 으로 */
+        & > .jodit-box {
+            flex: 0 0 0;
+            height: 0;
+            min-height: 0;
+            padding: 0;
+            overflow: visible;
+        }
+
+        & > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8em;
+            color: var(--txColor);
+
+            /* 첨부 파일: 일반 게시판 글쓰기의 첨부와 같은 모양 — 선택 버튼 + 제한 안내, 아래 목록은 한 줄에 파일명 / 전송 상태(진행률) / 용량 / 삭제, 4개 높이까지 보이고 넘으면 스크롤 */
+            & > section {
+                display: flex;
+                flex-direction: column;
+                gap: 0.6em;
+                padding: 0;
+                min-height: 0;
+                overflow: visible;
+
+                &[hidden] {
+                    display: none;
+                }
+
+                & > div {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 0.8em;
+                    padding: 0;
+                    min-height: 0;
+                    overflow: visible;
+
+                    & > small {
+                        color: var(--txLight);
+                    }
+
+                    /* 보이는 버튼 위에 투명한 파일 입력을 겹쳐 클릭이 곧바로 파일 선택창을 연다 */
+                    & > span {
+                        position: relative;
+                        display: inline-flex;
+
+                        & > button {
+                            width: auto;
+                            height: auto;
+                            padding: 0.45em 0.8em 0.45em 0.6em;
+                            font-size: 0.9em;
+                            pointer-events: none;
+                        }
+
+                        & > input[type="file"] {
+                            position: absolute;
+                            inset: 0;
+                            width: 100%;
+                            height: 100%;
+                            opacity: 0;
+                            cursor: pointer;
+                            font-size: 0;
+                        }
+                    }
+                }
+
+                & > ul {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.2em;
+                    margin: 0;
+                    padding: 0.3em;
+                    list-style: none;
+                    border: 1px solid var(--lineColor);
+                    border-radius: var(--roundBox);
+                    max-height: 8.7em; /* 4개 높이, 넘으면 스크롤 */
+                    overflow-y: auto;
+
+                    &:empty {
+                        display: none;
+                    }
+
+                    & > li {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5em;
+                        padding: 0.2em;
+                        border-top: 1px dashed var(--aColor);
+
+                        &:first-child {
+                            border-top: none;
+                        }
+
+                        & > span {
+                            flex: 0 1 12em;
+                            min-width: 0;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            font-size: 0.9em;
+                            padding-left: 0.4em;
+                        }
+
+                        & > div {
+                            flex: 1 1 0;
+                            min-width: 4em;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.6em;
+                            padding: 0;
+                            min-height: 0;
+                            overflow: visible;
+
+                            & > progress {
+                                flex: 1 1 auto;
+                                min-width: 0;
+                                height: 0.8em;
+                                accent-color: var(--deco);
+                            }
+
+                            & > em {
+                                flex: 0 0 auto;
+                                min-width: 3em;
+                                text-align: right;
+                                font-style: normal;
+                                font-size: 0.85em;
+                                color: var(--txLight);
+                            }
+                        }
+
+                        & > small {
+                            flex: 0 0 5em;
+                            text-align: right;
+                            font-size: 0.85em;
+                            color: var(--txLight);
+                        }
+
+                        & > button {
+                            flex: 0 0 auto;
+                            width: 1.35em;
+                            height: 1.35em;
+                            padding: 0;
+                        }
+
+                        &[data-state="error"] > div {
+                            & > progress {
+                                display: none;
+                            }
+
+                            & > em {
+                                flex: 1 1 auto;
+                                text-align: left;
+                                color: var(--danger5);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

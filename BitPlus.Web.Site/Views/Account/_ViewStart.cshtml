@@ -1,0 +1,9 @@
+@using BitPlus.Web.Site.Models
+@{
+    var config = this.Context.RequestServices.GetService<BitPlus.Web.WebConfig>();
+    var site = SiteInfo.Of(config);
+    var layoutParam = this.Context.Request.Query["layout"].ToString();
+    Layout = !string.IsNullOrEmpty(layoutParam)
+        ? SiteInfo.ResolveLayout("Account", layoutParam, "~/Views/Layouts/Account/Default/Layout.cshtml")
+        : site.AccountLayoutPath;
+}

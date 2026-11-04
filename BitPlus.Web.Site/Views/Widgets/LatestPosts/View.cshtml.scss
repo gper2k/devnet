@@ -1,0 +1,78 @@
+/* 최신 글 위젯 — 한 줄에 제목, 아래에 게시판 · 작성일, (설정 시) 두 줄 요약 */
+ul.widgetPosts {
+    font-size: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & > li {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2em;
+        padding: 0.6em 0;
+        border-bottom: 1px solid var(--lineColor);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        & > a {
+            color: var(--txColor);
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        & > small {
+            font-size: 0.8em;
+            color: var(--txLight);
+        }
+
+        & > p {
+            margin: 0;
+            font-size: 0.85em;
+            color: var(--txLight);
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+
+        /* 대표 이미지가 있으면 왼쪽에 이미지, 오른쪽에 글자 줄들 — 이미지 높이 = 글자 줄들 높이(height 0 + min-height 100%), 요약이 없으면 칸을 좁게 */
+        &:has(> img) {
+            display: grid;
+            grid-template-columns: 4em minmax(0, 1fr);
+            column-gap: 0.8em;
+            row-gap: 0.2em;
+            align-content: start;
+
+            & > * {
+                grid-column: 2;
+            }
+
+            & > img {
+                grid-column: 1;
+                grid-row: 1 / span 2;
+                width: 100%;
+                height: 0;
+                min-height: 100%;
+                object-fit: cover;
+                border-radius: var(--roundBox);
+            }
+        }
+
+        &:has(> img):has(> p) {
+            grid-template-columns: 7em minmax(0, 1fr);
+
+            & > img {
+                grid-row: 1 / span 3;
+            }
+        }
+    }
+}

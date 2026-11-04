@@ -1,0 +1,119 @@
+/* 시스템 설정 > 사이트 메뉴 전용 스타일.
+   좌측 메뉴 트리 / 우측 하위 메뉴 목록은 각각 독립된 .card 박스이며 내용이 넘치면 박스 안에서만 스크롤된다.
+   목록 행과 접근 권한 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.pageBox > div.flexRow {
+    gap: 1em;
+
+    & > aside {
+        flex: 0 0 18em;
+        overflow: hidden;
+        padding: 0.5em;
+
+        & > div.treeBox {
+            overflow-y: auto;
+        }
+    }
+
+    & > section {
+        flex: 1 1 auto;
+        padding: 0;
+        overflow: hidden;
+        gap: 0;
+
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1em;
+            padding: 0.5em;
+
+            & > strong {
+                display: flex;
+                align-items: center;
+                padding: 0 0.5em;
+                gap: 0.4em;
+                font-size: 1.02em;
+                color: var(--txColor);
+
+                & > i.fi {
+                    font-size: 1.4em;
+                }
+            }
+        }
+
+        & > div ::deep {
+            overflow-y: auto;
+
+            & > header,
+            & > ul > li {
+                & > .colName {
+                    flex: 0 0 24em; /* 표시명 + 키 · SYS 표시가 잘리지 않을 폭 */
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5em;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+
+                & > .colType {
+                    flex: 0 0 8em;
+                    justify-content: center;
+                }
+
+                & > .colAction {
+                    flex: 1 1 auto;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    font-size: 0.85em;
+                }
+
+                & > .colFlag {
+                    flex: 0 0 5em;
+                    justify-content: center;
+                }
+
+                & > .colDate {
+                    flex: 0 0 8em;
+                    font-size: 0.85em;
+                    justify-content: center;
+                }
+            }
+
+            & > ul > li {
+                padding: 0.2em 0.5em;
+
+                &[draggable="true"] {
+                    cursor: grab;
+                }
+
+                & > .colName {
+                    cursor: pointer;
+
+                    & > i.fiReOrderDotsVert {
+                        color: var(--txLight);
+                    }
+
+                    & > i:not(.fiReOrderDotsVert) {
+                        font-size: 1.3em;
+                        color: var(--main);
+                    }
+
+                    & > small {
+                        color: var(--txLight);
+                        min-width: 0;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                & > .colAction {
+                    color: var(--txSub);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}

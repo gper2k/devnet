@@ -1,0 +1,10 @@
+/* 계정 구성 — 가입 기본 그룹/역할 모달(chipEdit): 예전 카드와 같은 칩 목록 상자를 고정 폭·높이로 보여 준다 */
+dialog.chipEdit {
+    width: 28em;
+
+    & > section {
+        display: flex;
+        flex-direction: column;
+        height: 18em;
+    }
+}

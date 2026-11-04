@@ -1,0 +1,117 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Report"));
+}
+
+<div class="pageBox contentList">
+    <section class="card line flexCol auto">
+        <header class="fix">
+            <strong>
+                <i class="fi fiFlag"></i>
+                @this.Lang("Report")
+                <i class="badge deco">0</i>
+            </strong>
+            <div class="flexRow gapSm alignCenter">
+                <div class="inputGroup inline sm">
+                    <input type="text" name="search" placeholder="@this.Lang("Search")" autocomplete="off" />
+                    <button type="button" class="sub"><i class="fi fiSearch"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dataList auto">
+            <header>
+                <span class="colType"><span>TARGET</span></span>
+                <span class="colName"><span>TITLE / MESSAGE</span></span>
+                <span class="colAction"><span>REPORTER</span></span>
+                <span class="colCount"><span>REPORTS</span></span>
+                <span class="colFlag"><span>STATE</span></span>
+                <span class="colDate"><span>DATE</span></span>
+            </header>
+            <ul></ul>
+        </div>
+
+        <footer class="fix">
+            <div class="pageSize">
+                <label>List Size</label>
+                <select name="pageSize">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <ul class="pager"></ul>
+        </footer>
+    </section>
+</div>
+
+@* 신고 상세(항목 이름 옆에 값): 신고 대상, 글 제목(누르면 새 창) + 신고된 댓글·답글 내용 일부, 글쓴이·신고자(이름 + 작은 회색 아이디 — 누르면 사용자 정보 창), 신고 시각, 신고 내용.
+   버튼: 글(댓글) 삭제, 글 감추기/다시 보이기(글·포럼 답글만), 처리 완료(이 신고 한 건) *@
+<dialog id="reportModal">
+    <header><i class="fi fiFlag fiFill"></i> @this.Lang("Report")</header>
+    <section>
+        <ul class="form">
+            <li class="row">
+                <header class="fix">@this.Lang("ReportTarget")</header>
+                <p data-field="target"></p>
+            </li>
+            <li class="row">
+                <header class="fix">@this.Lang("ContentTitle")</header>
+                <p><a data-field="title" target="_blank"></a><small data-field="excerpt"></small></p>
+            </li>
+            <li class="row">
+                <header class="fix">@this.Lang("ContentWriter")</header>
+                <p><a href="#" data-field="writer"></a></p>
+            </li>
+            <li class="row">
+                <header class="fix">@this.Lang("ReportReporter")</header>
+                <p><a href="#" data-field="reporter"></a></p>
+            </li>
+            <li class="row">
+                <header class="fix">@this.Lang("ReportDate")</header>
+                <p data-field="reportDate"></p>
+            </li>
+            <li class="row">
+                <header class="fix">@this.Lang("Message")</header>
+                <p data-field="message"></p>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <button type="button" class="danger" data-mode="delete"><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" class="warning" data-mode="hide"><i class="fi fiEyeSlash"></i> @this.Lang("ReportHidePost")</button>
+        <button type="button" data-mode="show"><i class="fi fiEye"></i> @this.Lang("ReportShowPost")</button>
+        <button type="button" class="main" data-mode="resolve"><i class="fi fiCheck"></i> @this.Lang("ReportResolve")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiDismiss"></i> @this.Lang("Close")</button>
+    </footer>
+</dialog>
+
+@* 사용자 정보(신고 상세에서 글쓴이·신고자를 누르면): 이름·아이디·이메일과 설명 — 설명만 고쳐 저장(api/membership/user/{id}/description) *@
+<dialog id="reportUserModal">
+    <header><i class="fi fiPerson fiFill"></i> @this.Lang("User")</header>
+    <section>
+        <ul class="form">
+            <li class="row">
+                <header class="fix">@this.Lang("UserName")</header>
+                <p data-field="name"></p>
+            </li>
+            <li class="row">
+                <header class="fix">@this.Lang("Email")</header>
+                <p data-field="email"></p>
+            </li>
+            <li>
+                <header>@this.Lang("Description")</header>
+                <textarea name="description" rows="10"></textarea>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 Content.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 Content.cshtml 의 wireReportsPage() 가 담당한다.
+-->

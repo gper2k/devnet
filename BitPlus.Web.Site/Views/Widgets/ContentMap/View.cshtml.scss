@@ -1,0 +1,77 @@
+/* 컨텐츠맵 위젯(사이드 패널 전용, 틀 없음): 머리줄(제목 + 신규 게시판 + · 게시판 설정 톱니) + 메뉴 트리 상자 — 이전 SidePanel 의 머리줄·트리 모양 그대로 */
+div.widgetContentMap {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+
+    & > header {
+        color: var(--deco);
+        padding: 0 0.5em;
+        display: flex;
+        flex-direction: column;
+
+        & > label {
+            flex: 0 0 auto;
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            /* 설정 아이콘(i.fi)과 추가 드롭박스(.dropMenu: 아이콘 + ul.dropBox)를 오른쪽 끝부터 나란히 */
+            & > i.fi,
+            & > .dropMenu {
+                float: right;
+            }
+
+            & > i.fi + .dropMenu {
+                margin-right: 0.4em;
+            }
+
+            /* 너비는 떠 있는 목록(ul.dropBox, absolute)에만 준다 — .dropMenu(float 아이콘 자리)에 주면 헤더 한 줄에 들어가지 않아 아래 줄로 밀려남 */
+            & > .dropMenu {
+                position: relative;
+
+                & > ul.dropBox {
+                    min-width: 8em;
+                    font-weight: normal;
+                    text-transform: none;
+
+                    & a {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5em;
+                        color: inherit;
+                        text-decoration: none;
+                    }
+                }
+            }
+
+            & > i.fi,
+            & > .dropMenu > i.fi {
+                cursor: pointer;
+                transition: transform .2s color .2s;
+                font-size: 1.2em;
+                margin-top: .16em;
+                cursor: pointer;
+
+                &:hover {
+                    transform: scale(1.1);
+                    color: var(--decoDark);
+                }
+
+                &:active {
+                    transform: scale(1);
+                    color: var(--decoLight);
+                }
+            }
+        }
+    }
+
+    & > nav {
+        overflow: auto;
+        background-color: var(--deco1);
+        border: 0.1em solid var(--deco2);
+        border-radius: var(--roundBox);
+        padding: 0.5em;
+    }
+}

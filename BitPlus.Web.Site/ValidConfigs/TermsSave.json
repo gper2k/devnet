@@ -1,0 +1,28 @@
+[
+  {
+    "name": "key",
+    "displayName": "@TermsKey",
+    "filters": {
+      "required": [],
+      "maxLength": [64],
+      "regex": ["^[A-Za-z][A-Za-z0-9_-]*$"]
+    }
+  },
+  {
+    "name": "titles",
+    "displayName": "@TermsTitle",
+    "filters": {
+      "required": [],
+      "maxLength": [128]
+    },
+    "converter": "language"
+  },
+  {
+    "name": "bodies",
+    "displayName": "@TermsBody",
+    "filters": {
+      "required": []
+    },
+    "converter": "language"
+  }
+]

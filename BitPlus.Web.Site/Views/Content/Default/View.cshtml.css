@@ -1,0 +1,564 @@
+﻿@charset "UTF-8";
+/* 일반 형식 글 보기(View) 전용 스타일 */
+.contentPost {
+  flex: 1 1 auto;
+  height: 100%;
+  /* 메뉴얼: 맨 위 제목줄 — 게시판 제목은 크고 굵게 왼쪽, 목차 메뉴는 반대편 끝 */
+  /* 제목줄: 배지(공지·카테고리·상태)와 제목 */
+  /* 댓글 */
+  /* 이전/다음 글 */
+  /* 메뉴얼의 이전/다음 페이지: 양쪽 끝, 작은 "이전 글/다음 글" 글자 아래에 제목을 크게 */
+  /* 비회원 글 본인 확인(PostPassword) */
+}
+.contentPost > header.withToc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+.contentPost > header.withToc > span {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+.contentPost > header.withToc > span > a {
+  color: var(--txLight);
+}
+.contentPost > div.contentWrap {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  /* 다국어: 언어 전환 (제목줄 아래 작은 글자, 지금 보이는 언어는 진한 글자 + 밑줄 막대) */
+  /* AI 번역 안내 (본문 앞) */
+  /* 본문 (샌드박스 프레임이 들어간다) */
+}
+.contentPost > div.contentWrap > header {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--deco);
+  border-bottom: 1px solid var(--lineColor);
+}
+.contentPost > div.contentWrap > header > div.title {
+  display: flex;
+  flex-direction: row;
+  padding: 0.5em 0;
+  align-items: center;
+  gap: 0.5em;
+}
+.contentPost > div.contentWrap > header > div.title > div {
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  vertical-align: text-top;
+  gap: 0.5em;
+  /* 보이는 배지가 하나도 없으면(숨긴 "이전 글" 배지뿐) 칸 자체를 없애 제목 앞에 간격(gap)이 남지 않게 */
+}
+.contentPost > div.contentWrap > header > div.title > div > i[hidden] {
+  display: none;
+}
+.contentPost > div.contentWrap > header > div.title > div:not(:has(> i:not([hidden]))) {
+  display: none;
+}
+.contentPost > div.contentWrap > header > div.title > div > i.badge {
+  white-space: nowrap;
+}
+.contentPost > div.contentWrap > header > div.title > span {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+.contentPost > div.contentWrap div.contentInfo {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0.3em;
+}
+.contentPost > div.contentWrap div.contentInfo > ul {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1em;
+  color: var(--txLight);
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1em;
+  /* 변경 기록 버튼 (변경 기록이 있을 때만) */
+}
+.contentPost > div.contentWrap div.contentInfo > ul:first-child {
+  justify-content: flex-start;
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li {
+  font-size: 0.85em;
+  /* 글쓴이: 댓글 작성자와 같은 모양 (이미지 + 굵은 이름 + 활성 그룹·역할) */
+  /* 클릭하는 항목(변경 기록, 승인 기록) */
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li.writer {
+  font-size: 1em;
+  color: var(--main);
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong > small {
+  font-weight: normal;
+  color: var(--txLight);
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong > img {
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong > i.fi {
+  font-size: 1.3em;
+  color: var(--txLight);
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li[id] {
+  cursor: pointer;
+}
+.contentPost > div.contentWrap div.contentInfo > ul > li > i.fi {
+  vertical-align: middle;
+  font-size: 1.3em;
+}
+.contentPost > div.contentWrap div.contentInfo > ul button {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.contentPost > div.contentWrap > nav {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em 1em;
+  padding: 0.6em 1em 0;
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+.contentPost > div.contentWrap > nav > a {
+  color: inherit;
+  text-decoration: none;
+  padding-bottom: 0.15em;
+  border-bottom: 2px solid transparent;
+}
+.contentPost > div.contentWrap > nav > a:hover {
+  color: var(--txColor);
+}
+.contentPost > div.contentWrap > nav > a.active {
+  color: var(--main6);
+  font-weight: bold;
+  border-bottom-color: var(--main6);
+}
+.contentPost > div.contentWrap > p {
+  flex: 0 0 auto;
+  margin: 1em 1em 0;
+  padding: 0.6em 0.9em;
+  border-radius: 0.5em;
+  background: var(--info1);
+  color: var(--txColor);
+  font-size: 0.85em;
+}
+.contentPost > div.contentWrap > section {
+  flex: 1 1 auto;
+  min-height: 12em;
+  padding: 1em;
+  font-size: 0.9em; /* 본문 이미지 높이 제한은 공용 .contentBody(_Editor.scss) — 스크립트로 넣는 본문이라 이 격리 스타일은 닿지 않음 */
+}
+.contentPost > div.contentWrap > footer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 1em;
+  /* 연관 링크 */
+  /* 태그, 첨부 파일 */
+  /* 좋아요(+1)·싫어요(-1) 합산, SNS 공유 / 승인전 글은 승인·반려 버튼 */
+  /* 승인 현황 (미승인 글) */
+}
+.contentPost > div.contentWrap > footer > aside {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  margin: 1em 0;
+  padding: 0.8em 1em;
+  border: 1px solid var(--aLow);
+  border-radius: var(--roundBox);
+  background-color: var(--aLow);
+}
+.contentPost > div.contentWrap > footer > aside > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contentPost > div.contentWrap > footer > aside > ul a {
+  color: var(--txLight);
+  overflow-wrap: anywhere;
+  font-size: 0.85em;
+}
+.contentPost > div.contentWrap > footer > div.viewExtend {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.contentPost > div.contentWrap > footer > div.viewExtend > div.tags, .contentPost > div.contentWrap > footer > div.viewExtend > div.files {
+  width: 100%;
+  padding: 0.5em 0;
+  border-radius: var(--roundBox);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  font-size: 0.85em;
+}
+.contentPost > div.contentWrap > footer > div.viewExtend > div.tags > label, .contentPost > div.contentWrap > footer > div.viewExtend > div.files > label {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-right: 0.5em;
+}
+.contentPost > div.contentWrap > footer > div.viewExtend > div.tags > i.badge, .contentPost > div.contentWrap > footer > div.viewExtend > div.tags > a.badge, .contentPost > div.contentWrap > footer > div.viewExtend > div.files > i.badge, .contentPost > div.contentWrap > footer > div.viewExtend > div.files > a.badge {
+  background-color: var(--aLow);
+  border: 1px solid var(--aLow);
+  color: var(--aDeep);
+  font-weight: bold;
+}
+.contentPost > div.contentWrap > footer > div.viewExtend > div.tags > a.badge, .contentPost > div.contentWrap > footer > div.viewExtend > div.files > a.badge {
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.contentPost > div.contentWrap > footer > menu {
+  display: flex;
+  justify-content: center;
+  gap: 0.8em;
+  padding: 1em 0;
+  /* 내가 누른 표 */
+}
+.contentPost > div.contentWrap > footer > menu > button.voted {
+  font-weight: bold;
+  border-color: var(--aDeep);
+  color: var(--aDeep);
+}
+.contentPost > div.contentWrap > footer > menu > b {
+  background-color: var(--aLow);
+  border: 1px solid var(--aLow);
+  border-radius: var(--roundBox);
+  padding: 0.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 3em;
+}
+.contentPost > div.contentWrap > footer > dl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+  margin: 1em 0 0;
+  padding: 0.6em 1em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+}
+.contentPost > div.contentWrap > footer > dl[hidden] {
+  display: none;
+}
+.contentPost > div.contentWrap > footer > dl > dt {
+  font-weight: bold;
+}
+.contentPost > div.contentWrap > footer > dl > dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin: 0;
+}
+.contentPost > article {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 0;
+}
+.contentPost > article[hidden] {
+  display: none;
+}
+.contentPost > article > header {
+  border-bottom: 2px solid var(--deco);
+  font-weight: bold;
+  font-size: 1em;
+  color: var(--main);
+  padding: 0.3em 0;
+}
+.contentPost > article > ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contentPost > article > ul > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 0.5em 0.3em 0.3em 0.3em;
+  border-bottom: 1px solid var(--lineColor);
+  /* 아래줄: 좋아요 묶음(좌) / 편집·삭제 묶음(우) */
+}
+.contentPost > article > ul > li > div:first-child {
+  display: flex;
+  gap: 0.8em;
+  align-items: center;
+  color: var(--main);
+  /* 작성자: 이미지가 있으면 이름 앞에 작은 둥근 이미지 (한 줄) */
+}
+.contentPost > article > ul > li > div:first-child > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  /* 활성 그룹·역할 */
+}
+.contentPost > article > ul > li > div:first-child > strong > small {
+  font-weight: normal;
+  color: var(--txLight);
+}
+.contentPost > article > ul > li > div:first-child > strong > img {
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.contentPost > article > ul > li > div:first-child > strong > i.fi {
+  font-size: 1.3em;
+  color: var(--txLight);
+}
+.contentPost > article > ul > li > div:first-child > time {
+  color: var(--txLight);
+  font-size: 0.85em;
+}
+.contentPost > article > ul > li > p {
+  margin: 0 0 0.3em 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--txSub);
+}
+.contentPost > article > ul > li > textarea {
+  width: 100%;
+}
+.contentPost > article > ul > li > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.contentPost > article > ul > li > div:last-child > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5em;
+}
+.contentPost > article > ul > li > div:last-child > div > span {
+  padding: 0 0.5em;
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+  gap: 0.2em;
+  color: var(--txLight);
+  height: auto;
+  font-size: 0.9em;
+  transition: color 0.2s;
+  cursor: pointer;
+  /* 내가 누른 표 */
+}
+.contentPost > article > ul > li > div:last-child > div > span:hover {
+  color: var(--txColor);
+}
+.contentPost > article > ul > li > div:last-child > div > span:active {
+  color: var(--txLight);
+}
+.contentPost > article > ul > li > div:last-child > div > span.voted {
+  font-weight: bold;
+}
+.contentPost > article > ul > li > div:last-child > div > span.voted[data-vote="1"] {
+  color: var(--deco);
+}
+.contentPost > article > ul > li > div:last-child > div > span.voted[data-vote="-1"] {
+  color: var(--danger);
+}
+.contentPost > article > ul > li > div:last-child > div > b {
+  padding: 0.2em 0.5em;
+  color: var(--deco);
+  background-color: var(--aLow);
+  border: 1px solid var(--aLow);
+  border-radius: var(--roundBox);
+  line-height: 1.2em;
+}
+.contentPost > article ::deep > form {
+  padding-top: 0.5em;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+}
+.contentPost > article ::deep > form[hidden] {
+  display: none;
+}
+.contentPost > article ::deep > form > textarea {
+  width: 100%;
+}
+.contentPost > article ::deep > form > button {
+  height: 100%;
+  flex-direction: column;
+  font-size: 0.9em;
+}
+.contentPost > nav {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+}
+.contentPost > nav > a {
+  display: flex;
+  gap: 1em;
+  padding: 0.5em 1em;
+  border-bottom: 1px dashed var(--lineColor);
+  color: var(--txColor);
+  text-decoration: none;
+  /* 열 수 없는 이전/다음 글 (잠금) */
+}
+.contentPost > nav > a:last-child {
+  border-bottom: none;
+}
+.contentPost > nav > a:hover {
+  background-color: var(--aLow);
+}
+.contentPost > nav > a:not([href]) {
+  color: var(--txLight);
+  cursor: default;
+}
+.contentPost > nav > a:not([href]):hover {
+  background-color: transparent;
+}
+.contentPost > nav > a > b {
+  flex: 0 0 6em;
+  color: var(--txLight);
+  font-weight: normal;
+}
+.contentPost > nav > a > span {
+  overflow-wrap: anywhere;
+}
+.contentPost > nav.manualNav {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  padding: 0.5em;
+  border: none;
+  border-top: 1px solid var(--lineColor);
+  border-radius: 0;
+}
+.contentPost > nav.manualNav > a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  padding: 0;
+  border: none;
+  color: var(--deco);
+  font-size: 1em;
+  font-weight: bold;
+}
+.contentPost > nav.manualNav > a:hover {
+  background-color: transparent;
+}
+.contentPost > nav.manualNav > a.next {
+  grid-column: 2;
+  align-items: flex-end;
+  text-align: right;
+}
+.contentPost > nav.manualNav > a > b {
+  flex: 0 0 auto;
+  color: var(--txLight);
+  font-size: 0.75em;
+  font-weight: bold;
+}
+.contentPost > nav.manualNav > a > span {
+  padding-left: 1em;
+}
+.contentPost > nav.manualNav > a.next > span {
+  padding-right: 1em;
+}
+.contentPost > nav.manualNav > a:not([href]) {
+  color: var(--txLight);
+}
+.contentPost > form {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8em;
+  padding: 2em 0;
+}
+.contentPost > form > p {
+  margin: 0;
+  color: var(--txLight);
+}
+.contentPost > form > strong {
+  color: var(--danger1);
+}
+.contentPost > form > div {
+  display: flex;
+  gap: 0.6em;
+}
+.contentPost > footer {
+  flex: 0 0 auto;
+  border-top: 1px dashed var(--aColor);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top: 1em;
+}
+.contentPost > footer > div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 0.5em;
+}
+.contentPost > footer > div > button, .contentPost > footer > div > .btn {
+  font-size: 0.9rem;
+  padding: 0.65em 0.8em;
+  height: auto;
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+  .contentPost > div.contentWrap > header > div.title {
+    display: block;
+  }
+  .contentPost > div.contentWrap > header > div.title > div {
+    margin-right: 0.5em;
+  }
+}
+/* 타블렛 H 이하 (~ 780px) */
+/* 모바일 (~ 520px) */
+/* 작성자 메뉴(메시지 보내기·글 보기)가 있는 작성자 이름: 누를 수 있음 표시 */
+.contentPost [data-user] {
+  cursor: pointer;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Default/View.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;AACA;AAgBA;AA4SA;AA8JA;AA4CA;AAmDA;;AAxjBA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;AA6HA;AA4BA;AAUA;;AAjKA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAKA;;AAHA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AA8CA;;AA5CA;EACI;;AAGJ;EACI;AACA;AA4BA;;AA3BA;EACI;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;AACA;AA0BA;AAwCA;AAwBA;;AAzFA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EAEI;EACA;EAEA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AA+CA;;AA7CA;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;AACA;;AACA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AASA;;AAPA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAOpB;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AASA;;AAPA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EAEI;EACA;EACA;;;AAMhB;AACA;EAIgB;IACI;;EAEA;IACI;;;AAQxB;AAOA;AAOA;AACA;EACI%22%7D */

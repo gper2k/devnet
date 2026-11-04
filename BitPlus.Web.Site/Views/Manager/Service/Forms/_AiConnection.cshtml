@@ -1,0 +1,23 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@using BitPlus.Web.Site.Ai
+@{
+    // 모델: 없으면 기본(입력 이름 AiConnection.ServiceSettingKey, 빈 값 = 기본 접속), (Name, EmptyKey) 를 주면 그 입력 이름과 빈 값 문구 리소스 키 — 한 서비스에서 기능별로 접속을 고를 때
+    (string Name, string EmptyKey) select = Model is ValueTuple<string, string> given ? given : (AiConnection.ServiceSettingKey, "DefaultMark");
+    var connections = AiConnection.ListOf(this.Config).Where(p => p.Enabler).ToList();
+}
+
+@* AI 를 쓰는 서비스 설정 양식이 함께 쓰는 AI 접속 선택 (외부 서비스 > AI API 의 사용 중인 접속). 쓰는 양식의 ul.form 안에 넣는다. 접속이 하나도 없으면 안내 줄. *@
+<li>
+    <header>@this.Lang("AiConnection")</header>
+    <select name="@select.Name">
+        <option value="">@this.Lang(select.EmptyKey)</option>
+        @foreach (var item in connections)
+        {
+            <option value="@item.Id">@item.Name (@item.Model)</option>
+        }
+    </select>
+</li>
+@if (connections.Count == 0)
+{
+    <li><p class="txDanger">@this.Lang("ContentSummaryNoAi")</p></li>
+}

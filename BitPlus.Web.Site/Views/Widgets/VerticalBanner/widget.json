@@ -1,0 +1,13 @@
+{
+  "key": "VerticalBanner",
+  "version": 1,
+  "name": { "ko": "세로형 배너", "en": "Vertical banner" },
+  "description": { "ko": "사이드 패널처럼 좁은 칸에 맞는 세로(3:4) 이미지 배너를 차례로 넘겨 보여 줍니다. 한 줄에 '이미지 주소 | 링크 | 문구'.", "en": "Rotating portrait (3:4) image banners for narrow slots such as the side panel. One per line: image URL | link | caption." },
+  "categories": ["general"],
+  "size": { "min": [1, 1], "max": [4, 4] },
+  "settings": [
+    { "key": "items", "type": "lines", "default": "" },
+    { "key": "interval", "type": "number", "default": 5, "min": 0, "max": 60 },
+    { "key": "height", "type": "number", "default": 0, "min": 0, "max": 1200 }
+  ]
+}

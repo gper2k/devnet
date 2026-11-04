@@ -1,0 +1,90 @@
+/* 블로그형 첫 화면(Index/List) 전용 스타일: 글 보기 피드 */
+.contentBlog {
+    overflow: visible;
+
+    & > div {
+        overflow: visible;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.8em;
+        /* 도구줄: 쓰기·미승인 버튼 / 검색 */
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0;
+            gap: 0.6em;
+
+            & ::deep > form {
+                display: flex;
+                align-items: center;
+                gap: 0.4em;
+
+                & > .dropDown > header {
+                    height: 2.6em;
+                    min-height: 2.6em;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    font-size: 0.9rem;
+                }
+            }
+
+            & > div {
+                display: flex;
+                flex-direction: row;
+                padding: 0;
+                gap: 0.5em;
+
+                & > button {
+                    font-size: 0.9rem;
+                    padding: 0.65em 0.8em;
+                    height: auto;
+                }
+            }
+        }
+        /* 글 피드: 글마다 글 보기 화면(Default/View)을 그대로. 글 사이는 앞 글 댓글 영역의 옅은 밑줄 + 간격(gap) + 다음 글 제목줄의 선명한 윗선 */
+        & > ul {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            & > li {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                /* 빈 목록: 남은 높이를 채우고 문구를 가로·세로 가운데 */
+                &.empty {
+                    flex: 1 1 auto;
+                    justify-content: center;
+                    align-items: center;
+                    border-bottom: none;
+                    text-align: center;
+                    padding: 3em 0;
+                    color: var(--txLight);
+                }
+                /* 열 수 없는 글·비밀번호 확인이 필요한 비회원 글: 제목만 */
+                &.locked {
+                    font-size: 1.1em;
+                    color: var(--txLight);
+
+                    & > a {
+                        color: var(--txColor);
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+    /* 하단: 페이저 */
+    & > footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

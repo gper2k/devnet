@@ -1,0 +1,657 @@
+/* 일반 형식 글 보기(View) 전용 스타일 */
+.contentPost {
+    flex: 1 1 auto;
+    height: 100%;
+    /* 메뉴얼: 맨 위 제목줄 — 게시판 제목은 크고 굵게 왼쪽, 목차 메뉴는 반대편 끝 */
+    & > header.withToc {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1em;
+
+        & > span {
+            font-size: 1.2em;
+            font-weight: bold;
+
+            & > a {
+                color: var(--txLight);
+            }
+        }
+    }
+    /* 제목줄: 배지(공지·카테고리·상태)와 제목 */
+    & > div.contentWrap {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+
+        & > header {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            border-top: 2px solid var(--deco);
+            border-bottom: 1px solid var(--lineColor);
+
+            & > div.title {
+                display: flex;
+                flex-direction: row;
+                padding: 0.5em 0;
+                align-items: center;
+                gap: 0.5em;
+
+                & > div {
+                    flex: 0 0 auto;
+                    display: inline-flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    vertical-align: text-top;
+                    gap: 0.5em;
+
+                    & > i[hidden] {
+                        display: none;
+                    }
+                    /* 보이는 배지가 하나도 없으면(숨긴 "이전 글" 배지뿐) 칸 자체를 없애 제목 앞에 간격(gap)이 남지 않게 */
+                    &:not(:has(> i:not([hidden]))) {
+                        display: none;
+                    }
+
+                    & > i.badge {
+                        white-space: nowrap;
+                    }
+                }
+
+                & > span {
+                    flex: 1 1 auto;
+                    margin: 0;
+                    font-size: 1.2em;
+                    font-weight: bold;
+                    overflow-wrap: anywhere;
+                    padding: 0.2em 0.5em;
+                }
+            }
+        }
+
+        & div.contentInfo {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0.3em;
+
+            & > ul {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                line-height: 1em;
+                color: var(--txLight);
+                justify-content: flex-end;
+                align-items: center;
+                gap: 1em;
+
+                &:first-child {
+                    justify-content: flex-start;
+                }
+
+                & > li {
+                    font-size: 0.85em;
+                    /* 글쓴이: 댓글 작성자와 같은 모양 (이미지 + 굵은 이름 + 활성 그룹·역할) */
+                    &.writer {
+                        font-size: 1em;
+                        color: var(--main);
+
+                        & > strong {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.4em;
+
+                            & > small {
+                                font-weight: normal;
+                                color: var(--txLight);
+                            }
+
+                            & > img {
+                                width: 1.6em;
+                                height: 1.6em;
+                                border-radius: 50%;
+                                object-fit: cover;
+                            }
+
+                            & > i.fi {
+                                font-size: 1.3em;
+                                color: var(--txLight);
+                            }
+                        }
+                    }
+                    /* 클릭하는 항목(변경 기록, 승인 기록) */
+                    &[id] {
+                        cursor: pointer;
+                    }
+
+                    & > i.fi {
+                        vertical-align: middle;
+                        font-size: 1.3em;
+                    }
+                }
+                /* 변경 기록 버튼 (변경 기록이 있을 때만) */
+                & button {
+                    height: auto;
+                    padding: 0;
+                    border: 0;
+                    background: none;
+                    color: inherit;
+                    cursor: pointer;
+                }
+            }
+        }
+        /* 다국어: 언어 전환 (제목줄 아래 작은 글자, 지금 보이는 언어는 진한 글자 + 밑줄 막대) */
+        & > nav {
+            flex: 0 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3em 1em;
+            padding: 0.6em 1em 0;
+            font-size: 0.8em;
+            color: var(--txLight);
+
+            & > a {
+                color: inherit;
+                text-decoration: none;
+                padding-bottom: 0.15em;
+                border-bottom: 2px solid transparent;
+
+                &:hover {
+                    color: var(--txColor);
+                }
+
+                &.active {
+                    color: var(--main6);
+                    font-weight: bold;
+                    border-bottom-color: var(--main6);
+                }
+            }
+        }
+        /* AI 번역 안내 (본문 앞) */
+        & > p {
+            flex: 0 0 auto;
+            margin: 1em 1em 0;
+            padding: 0.6em 0.9em;
+            border-radius: 0.5em;
+            background: var(--info1);
+            color: var(--txColor);
+            font-size: 0.85em;
+        }
+        /* 본문 (샌드박스 프레임이 들어간다) */
+        & > section {
+            flex: 1 1 auto;
+            min-height: 12em;
+            padding: 1em;
+            font-size: 0.9em; /* 본문 이미지 높이 제한은 공용 .contentBody(_Editor.scss) — 스크립트로 넣는 본문이라 이 격리 스타일은 닿지 않음 */
+        }
+
+        & > footer {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: 1em;
+            /* 연관 링크 */
+            & > aside {
+                flex: 0 0 auto;
+                display: flex;
+                flex-direction: column;
+                margin: 1em 0;
+                padding: 0.8em 1em;
+                border: 1px solid var(--aLow);
+                border-radius: var(--roundBox);
+                background-color: var(--aLow);
+
+                & > ul {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.2em;
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+
+                    & a {
+                        color: var(--txLight);
+                        overflow-wrap: anywhere;
+                        font-size: 0.85em;
+                    }
+                }
+            }
+            /* 태그, 첨부 파일 */
+            & > div.viewExtend {
+                flex: 0 0 auto;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+
+                & > div.tags,
+                & > div.files {
+                    width: 100%;
+                    padding: 0.5em 0;
+                    //border: 1px solid var(--aLight);
+                    border-radius: var(--roundBox);
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    gap: 0.5em;
+                    font-size: 0.85em;
+
+                    & > label {
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        margin-right: 0.5em;
+                    }
+
+                    & > i.badge,
+                    & > a.badge {
+                        background-color: var(--aLow);
+                        border: 1px solid var(--aLow);
+                        color: var(--aDeep);
+                        font-weight: bold;
+                    }
+
+                    & > a.badge {
+                        text-decoration: none;
+                        overflow-wrap: anywhere;
+                    }
+                }
+            }
+            /* 좋아요(+1)·싫어요(-1) 합산, SNS 공유 / 승인전 글은 승인·반려 버튼 */
+            & > menu {
+                display: flex;
+                justify-content: center;
+                gap: 0.8em;
+                padding: 1em 0;
+                /* 내가 누른 표 */
+                & > button.voted {
+                    font-weight: bold;
+                    border-color: var(--aDeep);
+                    color: var(--aDeep);
+                }
+
+                & > b {
+                    background-color: var(--aLow);
+                    border: 1px solid var(--aLow);
+                    border-radius: var(--roundBox);
+                    padding: 0.5em;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-width: 3em;
+                }
+            }
+            /* 승인 현황 (미승인 글) */
+            & > dl {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.5em;
+                margin: 1em 0 0;
+                padding: 0.6em 1em;
+                border: 1px solid var(--lineColor);
+                border-radius: var(--roundBox);
+
+                &[hidden] {
+                    display: none;
+                }
+
+                & > dt {
+                    font-weight: bold;
+                }
+
+                & > dd {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.4em;
+                    margin: 0;
+                }
+            }
+        }
+    }
+    /* 댓글 */
+    & > article {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        padding: 0;
+
+        &[hidden] {
+            display: none;
+        }
+
+        & > header {
+            border-bottom: 2px solid var(--deco);
+            font-weight: bold;
+            font-size: 1em;
+            color: var(--main);
+            padding: 0.3em 0;
+        }
+
+        & > ul {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            & > li {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+                padding: 0.5em 0.3em 0.3em 0.3em;
+                border-bottom: 1px solid var(--lineColor);
+
+                & > div:first-child {
+                    display: flex;
+                    gap: 0.8em;
+                    align-items: center;
+                    color: var(--main);
+                    /* 작성자: 이미지가 있으면 이름 앞에 작은 둥근 이미지 (한 줄) */
+                    & > strong {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.4em;
+                        /* 활성 그룹·역할 */
+                        & > small {
+                            font-weight: normal;
+                            color: var(--txLight);
+                        }
+
+                        & > img {
+                            width: 1.6em;
+                            height: 1.6em;
+                            border-radius: 50%;
+                            object-fit: cover;
+                        }
+
+                        & > i.fi {
+                            font-size: 1.3em;
+                            color: var(--txLight);
+                        }
+                    }
+
+                    & > time {
+                        color: var(--txLight);
+                        font-size: 0.85em;
+                    }
+                }
+
+                & > p {
+                    margin: 0 0 0.3em 0;
+                    white-space: pre-wrap;
+                    overflow-wrap: anywhere;
+                    color: var(--txSub);
+                }
+
+                & > textarea {
+                    width: 100%;
+                }
+                /* 아래줄: 좋아요 묶음(좌) / 편집·삭제 묶음(우) */
+                & > div:last-child {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    & > div {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        gap: 0.5em;
+
+                        & > span {
+                            padding: 0 0.5em;
+                            border: none;
+                            background-color: transparent;
+                            box-shadow: none;
+                            gap: 0.2em;
+                            color: var(--txLight);
+                            height: auto;
+                            font-size: 0.9em;
+                            transition: color .2s;
+                            cursor: pointer;
+
+                            &:hover {
+                                color: var(--txColor);
+                            }
+
+                            &:active {
+                                color: var(--txLight);
+                            }
+                            /* 내가 누른 표 */
+                            &.voted {
+                                font-weight: bold;
+
+                                &[data-vote="1"] {
+                                    color: var(--deco);
+                                }
+
+                                &[data-vote="-1"] {
+                                    color: var(--danger);
+                                }
+                            }
+                        }
+
+                        & > b {
+                            padding: 0.2em 0.5em;
+                            color: var(--deco);
+                            background-color: var(--aLow);
+                            border: 1px solid var(--aLow);
+                            border-radius: var(--roundBox);
+                            line-height: 1.2em;
+                        }
+                    }
+                }
+            }
+        }
+
+        & ::deep > form {
+            padding-top: 0.5em;
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+
+            &[hidden] {
+                display: none;
+            }
+
+            & > textarea {
+                width: 100%;
+            }
+
+            & > button {
+                height: 100%;
+                flex-direction: column;
+                font-size: 0.9em;
+            }
+        }
+    }
+    /* 이전/다음 글 */
+    & > nav {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--aColor);
+        border-radius: var(--roundBox);
+
+        & > a {
+            display: flex;
+            gap: 1em;
+            padding: 0.5em 1em;
+            border-bottom: 1px dashed var(--lineColor);
+            color: var(--txColor);
+            text-decoration: none;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: var(--aLow);
+            }
+            /* 열 수 없는 이전/다음 글 (잠금) */
+            &:not([href]) {
+                color: var(--txLight);
+                cursor: default;
+
+                &:hover {
+                    background-color: transparent;
+                }
+            }
+
+            & > b {
+                flex: 0 0 6em;
+                color: var(--txLight);
+                font-weight: normal;
+            }
+
+            & > span {
+                overflow-wrap: anywhere;
+            }
+        }
+    }
+    /* 메뉴얼의 이전/다음 페이지: 양쪽 끝, 작은 "이전 글/다음 글" 글자 아래에 제목을 크게 */
+    & > nav.manualNav {
+        flex: 0 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1em;
+        padding: 0.5em;
+        border: none;
+        border-top: 1px solid var(--lineColor);
+        border-radius: 0;
+
+        & > a {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+            padding: 0;
+            border: none;
+            color: var(--deco);
+            font-size: 1em;
+            font-weight: bold;
+
+            &:hover {
+                background-color: transparent;
+            }
+
+            &.next {
+                grid-column: 2;
+                align-items: flex-end;
+                text-align: right;
+            }
+
+            & > b {
+                flex: 0 0 auto;
+                color: var(--txLight);
+                font-size: 0.75em;
+                font-weight: bold;
+            }
+
+            & > span {
+                padding-left: 1em;
+            }
+
+            &.next > span {
+                padding-right: 1em;
+            }
+
+            &:not([href]) {
+                color: var(--txLight);
+            }
+        }
+    }
+    /* 비회원 글 본인 확인(PostPassword) */
+    & > form {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8em;
+        padding: 2em 0;
+
+        & > p {
+            margin: 0;
+            color: var(--txLight);
+        }
+
+        & > strong {
+            color: var(--danger1);
+        }
+
+        & > div {
+            display: flex;
+            gap: 0.6em;
+        }
+    }
+
+    & > footer {
+        flex: 0 0 auto;
+        border-top: 1px dashed var(--aColor);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-top: 1em;
+
+        & > div {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 0.5em;
+
+            & > button,
+            & > .btn {
+                font-size: 0.9rem;
+                padding: 0.65em 0.8em;
+                height: auto;
+            }
+        }
+    }
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+    .contentPost {
+        & > div.contentWrap {
+            & > header {
+                & > div.title {
+                    display: block;
+
+                    & > div {
+                        margin-right: 0.5em;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+    .contentPost {
+
+    }
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+    .contentPost {
+
+    }
+}
+
+/* 작성자 메뉴(메시지 보내기·글 보기)가 있는 작성자 이름: 누를 수 있음 표시 */
+.contentPost [data-user] {
+    cursor: pointer;
+}

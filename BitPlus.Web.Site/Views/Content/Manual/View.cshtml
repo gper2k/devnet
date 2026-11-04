@@ -1,0 +1,25 @@
+@model ContentPageModel
+
+@* 메뉴얼형 화면(글 보기 /content/{규칙}/view/{글 번호}, 글이 하나도 없을 때의 첫 화면) — 목록과 보기가 한 화면: 제목줄 오른쪽 끝의 "목차" 버튼(Manual/TocMenu.cshtml)이 목차 드롭다운 상자를 열고,
+   그 아래에 고른 글(일반 형식 글 보기 Default/View.cshtml 을 그대로 씀: 댓글·첨부·변경 기록·신고 포함)이 나온다. 글 보기에서는 목차 메뉴가 Default/View.cshtml 의 제목줄 안에 들어가고,
+   글이 없으면(Model.Post 없음) 이 파일이 제목줄과 빈 안내, "그룹 쓰기" 버튼을 보여 준다. *@
+<div class="contentManual">
+    @if (Model.Post is not null)
+    {
+        <partial name="~/Views/Content/Default/View.cshtml" model="Model" />
+    }
+    else
+    {
+        <div class="manualEmpty">
+            <header>
+                <h2>@Model.Title</h2>
+                <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
+            </header>
+            <p>@this.Lang("ManualEmpty")</p>
+            @if (Model.Permission.CanWrite)
+            {
+                <button type="button" class="deco" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiAdd"></i> @this.Lang("ManualNewGroup")</button>
+            }
+        </div>
+    }
+</div>

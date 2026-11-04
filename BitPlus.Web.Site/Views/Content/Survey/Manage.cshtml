@@ -1,0 +1,4 @@
+@model ContentPageModel
+
+@* 설문형 설정(/content/manage/{규칙}, 신규는 /content/manage?type=Survey) — 일반 형식 설정 화면을 쓰되 설문이면 파일 탭과 답글·변경 기록·게시 기간/대상 항목, 답변 권한을 숨긴다(서버가 정함: SurveyContentHandler). *@
+<partial name="~/Views/Content/Default/Manage.cshtml" model="Model" />

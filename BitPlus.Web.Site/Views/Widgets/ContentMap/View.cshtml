@@ -1,0 +1,104 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Data.Content
+@using BitPlus.Data.Content
+@using BitPlus.Data.SiteMap
+@using Microsoft.AspNetCore.Mvc.ViewEngines
+@{
+    // 컨텐츠맵 위젯(사이드 패널 전용, 틀 없음): 머리줄(제목 + 신규 게시판 + · 게시판 설정 톱니) + 루트 메뉴의 하위 메뉴 트리 (루트 메뉴 자신은 보이지 않음).
+    // 루트 메뉴 = 사이드 패널(SidePanel)이 view-data "SideMenu" 로 준 연결 메뉴(사용 중인 메뉴만), 없으면 컨텐츠맵(ContentMap) — 제목도 연결 메뉴 이름, 없으면 Contents.
+    // 사용 중이고 감추지 않았으며 현재 사용자가 접근할 수 있는 메뉴만, 메뉴 아이콘이 있으면 폴더 아이콘 대신 그 아이콘으로, 이동 형식 메뉴는 누르면 그 경로로 이동한다.
+    // + · 톱니는 컨텐츠 페이지 영역(view-data "ContentArea" = true: 게시판·컨텐츠 포탈)에서만 보인다 (/view/{번호} 페이지 등에서는 숨김).
+    var sideMenu = ViewData["SideMenu"] as AppMenu;
+    var rootKey = sideMenu?.Key ?? DefaultContentHandler.BoardMenuRootKey;
+    var sideTitle = sideMenu is null ? "Contents" : this.Context.Request.DisplayName(sideMenu.DpNames, sideMenu.Key);
+    var menus = await MenuReader.ReadTreeAsync(this.DbContext!, rootKey, this.CurrentUserAssets);
+    var contentArea = ViewData["ContentArea"] is true;
+    var sidePage = ViewData["SidePage"]; // 사이드 패널을 부른 페이지의 모델 (게시판 페이지면 ContentPageModel)
+    var isPolicyAdmin = this.IsAllowed(WebConfig.ManagerPolicyName) || this.IsAllowed(WebConfig.ContentManagerPolicyName); // 신규 게시판 추가는 관리자 정책만
+    var isAdmin = isPolicyAdmin || (sidePage is ContentPageModel boardPage && boardPage.Permission.IsAdmin); // 게시판 설정은 그 게시판 담당자도
+    // 신규 게시판 유형 목록: 설정(Manage) 화면이 있는 유형만 (없는 유형은 /content/manage?type= 이 404 라서 고를 수 없게 뺌)
+    var viewEngine = this.Context.RequestServices.GetService(typeof(ICompositeViewEngine)) as ICompositeViewEngine;
+    var boardTypes = ContentPageModel.ManageTypes(viewEngine).Select(t => new { type = t.ToString(), text = this.Lang("ContentType" + t) }).ToList();
+    List<object> Nodes(string? parentKey) => [.. menus.Where(p => p.ParentKey == parentKey).Select(p => (object)new
+    {
+        key = p.Key,
+        text = this.Context.Request.DisplayName(p.DpNames, p.Key),
+        icon = p.Icon,
+        url = p.Type == LinkType.Move ? p.Action : null,
+        child = Nodes(p.Key)
+    })];
+    var treeColor = ViewData["TreeColor"] as string; // 트리 주 색상(사이트 색상 이름: main, sub, point, deco, primary, info, success, warning, danger). 부르는 쪽이 view-data 로 줄 수 있고 없으면 기본
+    // 지금 보고 있는 게시판의 메뉴 키: 컨텐츠 페이지 모델(목록·글 보기·글쓰기·게시판 설정 등 /content/{규칙}/… 과 /content/manage/{규칙})의 규칙 번호로 정함 —
+    // 트리에 게시판 메뉴(Content_{규칙번호})가 있으면 그 메뉴, 없으면(연결 메뉴) 이동 경로가 /content/{규칙번호} 인 메뉴
+    var ruleNo = sidePage is ContentPageModel page && page.RuleNo > 0 ? page.RuleNo : null as int?;
+    var boardKey = ruleNo.HasValue ? DefaultContentHandler.BoardMenuKey(ruleNo.Value) : null;
+    var currentKey = menus.Any(p => p.Key == boardKey) ? boardKey : menus.FirstOrDefault(p => ruleNo.HasValue && string.Equals(p.Action, $"/content/{ruleNo}", StringComparison.OrdinalIgnoreCase))?.Key;
+    var treeJson = System.Text.Json.JsonSerializer.Serialize(Nodes(rootKey));
+}
+<div class="widgetContentMap">
+    <header>
+        <label class="flat">
+            <span>@sideTitle</span>
+            @* 오른쪽 끝부터 float: 설정 아이콘(게시판 번호를 알 때만, 그 게시판 담당자 포함), 그 앞에 신규 게시판 + 아이콘(관리자 정책) — 둘 다 컨텐츠 페이지 영역에서만.
+               + 는 공용 드롭박스(.dropMenu > i.fi 로 열고 닫음, 바깥 클릭 닫기는 공용 body 클릭 처리): 유형을 고르면 /content/manage?type= 으로 이동 *@
+            @if (contentArea && ruleNo.HasValue && isAdmin)
+            {
+                <i class="fi fiGear" onclick="location.href='/content/manage/@ruleNo.Value'"></i>
+            }
+            @if (contentArea && isPolicyAdmin && boardTypes.Count > 0)
+            {
+                <span class="dropMenu">
+                    <i class="fi fiPlus"></i>
+                    <ul class="dropBox right">
+                        @foreach (var type in boardTypes)
+                        {
+                            <li><a href="/content/manage?type=@type.type"><i class="fi fiPlusCircle"></i> @type.text</a></li>
+                        }
+                    </ul>
+                </span>
+            }
+        </label>
+    </header>
+    <nav id="contentSideTree" class="treeBox">
+        @if (menus.Count == 0)
+        {
+            <small>@this.Lang("DataEmpty")</small>
+        }
+    </nav>
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const nodes = JSON.parse(@this.Js(treeJson));
+        if (!nodes.length) return;
+
+        // 이동 경로가 있는 메뉴는 누르면 이동, 없는 메뉴(묶음)는 눌러서 펼치기/접기
+        const urls = {}, folders = [], parents = {};
+        const walk = (list, parent) => list.forEach(n => { parents[n.key] = parent; if (n.url) urls[n.key] = n.url; if (n.child && n.child.length) { folders.push(n.key); walk(n.child, n.key); } });
+        walk(nodes, null);
+        const openKey = 'contentSideOpen';
+        let current = null; // 지금 보고 있는 경로의 메뉴 (트리에서 선택 표시)
+        const tree = common.makeTree({
+            color: @this.Js(treeColor ?? string.Empty) || undefined,
+            openSaveKey: openKey,
+            openKeys: sessionStorage.getItem(openKey) === null ? folders : null, // 처음 열면 모든 묶음을 펼쳐 둔다
+            onSelect: (mode, key) => {
+                if (urls[key]) return location.assign(urls[key]);
+                // 묶음: 선택 표시 없이 폴더 아이콘을 눌러 열고 닫는다 (아이콘 모양도 함께 바뀜)
+                tree.clearSelect();
+                if (current) tree.select(current);
+                document.querySelector(`#contentSideTree li[data-key="${CSS.escape(key)}"] > div > i.fi`)?.click();
+            }
+        });
+        tree.render('#contentSideTree', nodes);
+        // 지금 보는 게시판의 메뉴를 선택하고, 접혀 있는 상위 묶음은 펼친다 (게시판 메뉴 키는 서버가 규칙 번호로 알려 주고, 없으면 현재 경로와 같은 이동 경로의 메뉴)
+        const pageKey = @this.Js(currentKey ?? string.Empty);
+        current = (pageKey in parents ? pageKey : null) ?? Object.keys(urls).find(key => urls[key].toLowerCase() === location.pathname.toLowerCase()) ?? null;
+        if (current) {
+            tree.select(current);
+            for (let parent = parents[current]; parent; parent = parents[parent]) {
+                const row = document.querySelector(`#contentSideTree li[data-key="${CSS.escape(parent)}"]`);
+                if (row && !row.classList.contains('opened')) row.querySelector(':scope > div > i.fi')?.click();
+            }
+        }
+    });
+</script>

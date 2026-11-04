@@ -1,0 +1,322 @@
+/* 위젯 페이지 편집 — 오른쪽 아래 편집 버튼, 영역 추가 모달(썸네일 4단계 + 정보), 위젯 모달(칸 썸네일 + 위젯 목록 → 제목·설정 양식). 목록·썸네일은 스크립트가 만들므로 ::deep */
+div.sectionEditor {
+    font-size: 1rem;
+
+    & > button {
+        position: fixed;
+        right: 1.5em;
+        bottom: 1.5em;
+        z-index: 50;
+        box-shadow: 0 0.3em 1em var(--aColor);
+    }
+
+    /* 변형 페이지 리셋 버튼: 편집 버튼 바로 위 (버튼 높이 2.6em + 0.5em) */
+    & > button[data-mode="reset"] {
+        bottom: 4.6em;
+    }
+
+    /* 쌓기형 편집기 줄(영역들 아래, 편집기가 pageSections 의 마지막 요소): 왼쪽 위젯 추가 +(편집 중, 스크립트가 넣음), 오른쪽 리셋(변형 페이지, 편집 중) · 편집 톱니.
+       위젯이 많아 스크롤되어도 스크롤 영역 아래쪽에 붙어 보임 */
+    &:has(> span[data-icon]) {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5em;
+        background-color: var(--bgColor);
+    }
+
+    & > span[data-icon] {
+        font-size: 0.9em;
+        color: var(--txLight);
+        cursor: pointer;
+
+        &:hover {
+            color: var(--main);
+        }
+    }
+
+    /* 톱니는 맨 오른쪽 (리셋 아이콘이 그 왼쪽) */
+    & > span[data-mode="toggle"] {
+        order: 1;
+    }
+
+    /* 위젯 추가 +: flex 로 아이콘(inline span)의 위아래 여백까지 줄 높이에 넣음 (block 이면 여백만큼 줄 밖으로 나가 패널에 스크롤이 생김) */
+    & ::deep > div.sectionPlus {
+        margin-right: auto;
+        display: flex;
+    }
+
+    /* 편집 모달 제목은 main 색 */
+    & > dialog > header {
+        color: var(--main);
+    }
+
+    & > dialog#sectionModal {
+        width: 52em;
+
+        & > section {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        & ::deep ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8em;
+
+            & > li {
+                display: flex;
+                align-items: center;
+                gap: 1em;
+                padding: 0.8em;
+                border: 1px solid var(--lineColor);
+                border-radius: var(--roundBox);
+
+                & > div:first-child {
+                    display: flex;
+                    align-items: flex-end;
+                    gap: 0.5em;
+                    flex: 0 0 auto;
+
+                    & figure {
+                        margin: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 0.2em;
+                    }
+
+                    & figcaption {
+                        font-size: 0.7em;
+                        color: var(--txLight);
+                    }
+                }
+
+                & > div:nth-child(2) {
+                    flex: 1 1 auto;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.2em;
+                    min-width: 0;
+
+                    & > p {
+                        margin: 0;
+                        font-size: 0.85em;
+                        color: var(--txLight);
+                    }
+
+                    & > small {
+                        font-size: 0.8em;
+                        color: var(--primary);
+                    }
+
+                    & > label > select {
+                        width: auto;
+                        min-width: 5em;
+                        margin-left: 0.4em;
+                    }
+                }
+            }
+        }
+    }
+
+    & > dialog#widgetModal {
+        width: 50em;
+
+        & > section {
+            max-height: 72vh;
+            overflow-y: auto;
+
+            & > div[data-step="pick"]:not([hidden]) {
+                display: flex;
+                gap: 1.2em;
+
+                /* 좁은 화면: 칸 선택 위, 위젯 목록 아래 (가로로 두면 목록이 좁아져 글자가 세로로 늘어짐) */
+                @media (width <= 780px) {
+                    flex-direction: column;
+                }
+
+                & > div:first-child {
+                    flex: 0 0 auto;
+                }
+
+                & > div:last-child {
+                    flex: 1 1 auto;
+                    min-width: 0;
+                }
+
+                & h5 {
+                    margin: 0 0 0.5em;
+                }
+            }
+
+            /* 위젯 목록: 위젯 약 3개 높이까지, 넘치면 목록 안에서 스크롤 (왼쪽 칸 선택보다 모달이 길어지지 않게) */
+            & ::deep ul[data-role="widgets"] {
+                list-style: none;
+                margin: 0;
+                padding: 0 0.3em 0 0;
+                max-height: 20em;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+
+                & > li {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.15em;
+                    padding: 0.6em 0.8em;
+                    border: 1px solid var(--lineColor);
+                    border-radius: var(--roundBox);
+                    cursor: pointer;
+
+                    &:hover {
+                        border-color: var(--primary);
+                    }
+
+                    &.disabled {
+                        opacity: 0.45;
+                        cursor: not-allowed;
+
+                        &:hover {
+                            border-color: var(--lineColor);
+                        }
+                    }
+
+                    & > p {
+                        margin: 0;
+                        font-size: 0.85em;
+                        color: var(--txLight);
+                    }
+
+                    & > small {
+                        font-size: 0.8em;
+                        color: var(--primary);
+                    }
+                }
+            }
+        }
+    }
+
+    /* 썸네일: 칸 = 옅은 칸 색, 위젯 있는 칸 = 진하게, 고른 칸 = 테두리 강조 (위젯 모달의 칸은 눌러서 고름) */
+    & ::deep svg {
+        display: block;
+
+        & g > rect {
+            fill: var(--primary1);
+            stroke: var(--primary);
+            stroke-width: 1;
+        }
+
+        & g.filled > rect {
+            fill: var(--primary3);
+        }
+
+        & g.selected > rect {
+            fill: var(--primary2);
+            stroke-width: 3;
+        }
+
+        & g > text {
+            font-size: 0.7em;
+            fill: var(--txColor);
+        }
+    }
+
+    /* 설정 단계: 칸·목록이 없으므로 1단계(50em)보다 좁게 */
+    & > dialog#widgetModal:has(> section > div[data-step="settings"]:not([hidden])) {
+        width: 36em;
+    }
+
+    /* 설정 조각의 안내 목록(입력 양식이 아닌 ul, 예: 컨텐츠맵) */
+    & > dialog#widgetModal ::deep div[data-role="form"] > ul:not(.form) {
+        margin: 0;
+        padding-left: 1.2em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4em;
+    }
+
+    /* 입력할 것이 없는 위젯의 설명·안내 */
+    & > dialog#widgetModal div[data-role="empty"] {
+        & > p {
+            margin: 0 0 0.5em;
+        }
+
+        & > small {
+            color: var(--txLight);
+        }
+    }
+
+    /* 설정 양식 조각의 게시판 여러 개 고르기: 목록 상자로 보이게 */
+    & > dialog#widgetModal ::deep div[data-role="form"] select[multiple] {
+        height: auto;
+        min-height: 8em;
+        padding: 0.3em;
+        border-radius: var(--roundBox);
+    }
+
+    & > dialog#widgetModal ::deep div[data-role="slots"] g {
+        cursor: pointer;
+    }
+
+    /* 위젯 제목 줄: 틀 없는 위젯(frame = false)은 hidden 으로 감춤 (ul.form > li 의 display 가 전역 [hidden] 을 덮으므로 여기서 다시 숨김) */
+    & > dialog#widgetModal div[data-step="settings"] > ul.form > li[hidden] {
+        display: none;
+    }
+
+    /* 다국어 언어 탭 (스크립트가 생성하므로 ::deep 필수) */
+    & > dialog#widgetModal ::deep div[data-role="langTabs"] {
+        display: flex;
+        gap: 0.5em;
+        margin-bottom: 1.2em;
+        padding-bottom: 0.8em;
+        border-bottom: 1px solid var(--lineColor);
+
+        &[hidden] {
+            display: none;
+        }
+
+        & > button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            padding: 0.4em 1em;
+            font-size: 0.85em;
+            border-radius: var(--roundBtn);
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:not(.active) {
+                background: var(--bgColor);
+                border: 1px solid var(--lineColor);
+                color: var(--txSub);
+
+                &:hover {
+                    color: var(--txColor);
+                    border-color: var(--txLight);
+                    background: var(--aLow);
+                }
+            }
+
+            &.active {
+                background: var(--main);
+                color: white;
+                border-color: var(--main);
+                font-weight: 700;
+                box-shadow: 0 2px 8px var(--aDark);
+
+                &,
+                & * {
+                    color: white;
+                }
+            }
+        }
+    }
+}

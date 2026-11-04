@@ -1,0 +1,92 @@
+@model ContentPageModel
+@using BitPlus.Web.Data.Content
+
+@* 설문 편집기 — 일반 글쓰기 화면(Default/Write.cshtml)에서 설문이면 에디터 자리에 들어간다. 소개문(글자 입력)과 설문 항목 목록으로 이루어지고, 항목은 "설문 항목 추가" 모달(modals/surveyItem.ts)에서 등록하면
+   아래 목록에 보기 전용 카드로 나오며 카드의 "편집"으로 다시 같은 모달에서 고친다. 처음에는 빈 항목 하나가 있고(첫 항목을 등록하면 그 자리를 채움), 항목은 최대 @SurveyContentHandler.MaxQuestions 개다.
+   글쓰기 화면은 에디터와 같은 모양(getHtml/setHtml/focus)으로 쓰므로 저장할 때 getHtml() 의 JSON({intro, questions})이 본문으로 간다. 참여자가 있는 설문은 기존 항목을 고칠 수 없고 새 항목만 추가할 수 있다
+   (서버도 같은 규칙으로 지킴). *@
+<div class="surveyEditor" id="surveyEditor"></div>
+<script>
+    /**
+     * 설문 편집기를 만든다 (글쓰기 화면의 에디터 자리 host 에): 에디터와 같은 모양의 객체(getHtml: 본문 JSON, setHtml: 본문 JSON 채우기, focus, destroy)를 돌려준다.
+     * @@param host 편집기를 그릴 요소
+     * @@param participants 이 설문의 참여자 수 (0 보다 크면 기존 항목은 고칠 수 없음)
+     */
+    window.makeSurveyEditor = (host, participants) => {
+        const limit = { minOptions: @SurveyContentHandler.MinOptions, maxOptions: @SurveyContentHandler.MaxOptions, maxQuestion: @SurveyContentHandler.MaxQuestionLength, maxOption: @SurveyContentHandler.MaxOptionLength };
+        const maxItems = @SurveyContentHandler.MaxQuestions;
+        const text = {
+            intro: @this.Js(this.Lang("SurveyIntro")), items: @this.Js(this.Lang("SurveyItems")), add: @this.Js(this.Lang("SurveyAdd")), edit: @this.Js(this.Lang("Edit")), remove: @this.Js(this.Lang("Delete")),
+            empty: @this.Js(this.Lang("SurveyEmptyItem")), multiple: @this.Js(this.Lang("SurveyMultiple")), single: @this.Js(this.Lang("SurveySingle")), locked: @this.Js(this.Lang("SurveyLocked")),
+            tooMany: @this.Js(this.Lang("SurveyTooManyItems"))
+        };
+        const blank = () => ({ id: '', text: '', multiple: false, options: [], locked: false });
+        const isBlank = q => !q.text && q.options.length === 0;
+        let items = [blank()]; // [{ id, text, multiple, options: [{ id, text }], locked }] — 처음에는 빈 항목 하나
+
+        host.innerHTML = `
+            <section class="intro"><label>${text.intro}</label><textarea rows="4" maxlength="@SurveyContentHandler.MaxIntroLength"></textarea></section>
+            <section class="items">
+                <header><strong>${text.items}</strong> <small></small><button type="button" class="deco"><i class="fi fiAdd"></i> ${text.add}</button></header>
+                <p class="note" hidden>${text.locked}</p>
+                <ol></ol>
+            </section>`;
+        const intro = host.querySelector('textarea'), list = host.querySelector('ol'), addBtn = host.querySelector('header button'), count = host.querySelector('header small'), note = host.querySelector('.note');
+
+        /** 항목 카드 한 장 (보기 전용): 번호, 질문(없으면 안내), 선택 방식, 옵션, 편집·삭제 (참여자가 있어 잠긴 항목은 잠금 표시만) */
+        const cardOf = (q, i) => common.html`
+            <li data-i="${i}">
+                <div class="head"><b>${i + 1}.</b> <span class="q ${q.text ? '' : 'empty'}">${q.text || text.empty}</span>${q.text ? common.html`<em>${q.multiple ? text.multiple : text.single}</em>` : ''}</div>
+                ${q.options.length ? common.html`<ol>${q.options.map(o => common.html`<li>${o.text}</li>`)}</ol>` : ''}
+                <div class="tools">${q.locked ? common.html`<i class="fi fiLock"></i>` : common.html`<span role="button" tabindex="0" data-act="edit">${text.edit}</span><span role="button" tabindex="0" data-act="remove" class="danger">${text.remove}</span>`}</div>
+            </li>`;
+        const paint = () => {
+            common.bindList(list, items, cardOf);
+            count.textContent = `${items.filter(q => !isBlank(q)).length}/${maxItems}`;
+            note.hidden = !items.some(q => q.locked);
+        };
+        /** 입력 모달을 열어 항목을 받는다 (item 이 있으면 고치기) */
+        const openItem = item => common.modal.append('surveyItem', { item, ...limit });
+
+        addBtn.addEventListener('click', async () => {
+            if (items.filter(q => !isBlank(q)).length >= maxItems) return common.alert(text.tooMany.replace('{0}', maxItems));
+            const result = await openItem();
+            if (!result) return;
+            const slot = items.findIndex(isBlank); // 비어 있는 첫 항목이 있으면 그 자리를 채움
+            if (slot >= 0) items[slot] = { ...result, locked: false }; else items.push({ ...result, locked: false });
+            paint();
+        });
+        list.addEventListener('click', async e => {
+            const act = e.target.closest('[data-act]');
+            if (!act) return;
+            const i = Number(act.closest('li[data-i]').dataset.i);
+            if (act.dataset.act === 'edit') {
+                const result = await openItem(items[i]);
+                if (result) { items[i] = { ...result, locked: false }; paint(); }
+            } else {
+                items.splice(i, 1);
+                if (items.length === 0) items.push(blank());
+                paint();
+            }
+        });
+        list.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-act]')) e.target.click(); });
+        paint();
+
+        return {
+            native: null,
+            /** 본문 JSON: 소개문과 (빈 항목을 뺀) 설문 항목 */
+            getHtml: () => JSON.stringify({ intro: intro.value.trim(), questions: items.filter(q => !isBlank(q)).map(({ id, text, multiple, options }) => ({ id, text, multiple, options })) }),
+            /** 저장돼 있던 본문 JSON 을 채운다 (참여자가 있으면 기존 항목은 잠금) */
+            setHtml: json => {
+                let doc = {};
+                try { doc = JSON.parse(json || '{}'); } catch { }
+                intro.value = doc.intro ?? '';
+                const loaded = (doc.questions ?? []).map(q => ({ id: q.id ?? '', text: q.text ?? '', multiple: !!q.multiple, options: (q.options ?? []).map(o => ({ id: o.id ?? '', text: o.text ?? '' })), locked: participants > 0 }));
+                items = loaded.length ? loaded : [blank()];
+                paint();
+            },
+            focus: () => intro.focus(),
+            destroy: () => { host.innerHTML = ''; }
+        };
+    };
+</script>

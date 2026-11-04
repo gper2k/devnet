@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BitPlus.Data.MariaDb/BitPlus.Data.MariaDb.csproj" />
+  <Project Path="BitPlus.Web.Site/BitPlus.Web.Site.csproj" />
+</Solution>

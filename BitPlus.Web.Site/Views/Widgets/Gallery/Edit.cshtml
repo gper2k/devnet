@@ -1,0 +1,18 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 갤러리 위젯 설정 — ruleNos(갤러리 게시판, 비우면 전체), count(개수), columns(열 수) *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_BoardSelect.cshtml" model="new[] { BitPlus.Data.Content.ContentTypes.Gallery }" />
+    <li class="col2">
+        <div>
+            <header>@this.Lang("WidgetCount")</header>
+            <input type="number" name="count" min="1" max="24" />
+        </div>
+        <div>
+            <header>@this.Lang("WidgetColumns")</header>
+            <input type="number" name="columns" min="1" max="6" />
+        </div>
+    </li>
+</ul>

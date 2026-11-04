@@ -1,0 +1,69 @@
+@model ContentPageModel
+@{
+    // 글에 올린 이미지 중 내려받을 수 있는 것(화면 표시용 경로가 있는 것)만, 올린 순서대로
+    var images = Model.Post!.Files.Where(p => p.InlineUrl.Length > 0).ToList();
+}
+
+@* 갤러리형 글 보기의 이미지 캐러셀: 큰 이미지 한 장과 이전/다음 버튼, 아래 썸네일 줄. 키보드 좌우 화살표·화면 밀기(터치)·썸네일 선택으로 넘기고, 큰 이미지를 누르면 전체 화면으로 키운다.
+   이미지는 파일 다운로드 경로(/system/down/{파일 키}?inline=true)로 보여 주므로 글 열람·파일 다운로드 권한 검사를 그대로 거친다. *@
+@if (images.Count > 0)
+{
+    <section class="galleryViewer">
+        <div>
+            <button type="button" aria-label="@this.Lang("ContentPrevious")"><i class="fi fiChevronLeft"></i></button>
+            <ul>
+                @for (var i = 0; i < images.Count; i++)
+                {
+                    <li class="@(i == 0 ? "active" : null)"><img src="@images[i].InlineUrl" alt="@images[i].Name" loading="@(i == 0 ? "eager" : "lazy")" /></li>
+                }
+            </ul>
+            <button type="button" aria-label="@this.Lang("ContentNext")"><i class="fi fiChevronRight"></i></button>
+            <span><b>1</b> / @images.Count</span>
+        </div>
+        @if (images.Count > 1)
+        {
+            <ol>
+                @for (var i = 0; i < images.Count; i++)
+                {
+                    <li class="@(i == 0 ? "active" : null)"><img src="@images[i].InlineUrl" alt="" loading="lazy" /></li>
+                }
+            </ol>
+        }
+    </section>
+    <script>
+        (() => {
+            const root = document.querySelector('section.galleryViewer');
+            const stage = root.querySelector(':scope > div'), slides = [...stage.querySelectorAll(':scope > ul > li')], thumbs = [...root.querySelectorAll(':scope > ol > li')];
+            const [prev, next] = stage.querySelectorAll(':scope > button'), counter = stage.querySelector(':scope > span > b');
+            let index = 0;
+            const show = n => { // 마지막 다음은 처음, 처음 이전은 마지막
+                index = (n + slides.length) % slides.length;
+                slides.forEach((li, i) => li.classList.toggle('active', i === index));
+                thumbs.forEach((li, i) => li.classList.toggle('active', i === index));
+                counter.textContent = index + 1;
+                thumbs[index]?.scrollIntoView({ block: 'nearest', inline: 'center' });
+                [index - 1, index, index + 1].forEach(n => { slides[(n + slides.length) % slides.length].querySelector('img').loading = 'eager'; }); // 지금·앞·뒤 이미지는 바로 불러온다 (숨겨진 이미지는 지연 로딩이라 보이게 될 때 높이가 늦게 잡히는 것을 막음)
+            };
+            show(0);
+            prev.onclick = () => show(index - 1);
+            next.onclick = () => show(index + 1);
+            thumbs.forEach((li, i) => li.onclick = () => show(i));
+            if (slides.length < 2) prev.hidden = next.hidden = true;
+            // 키보드 좌우 화살표 (입력 칸에 있을 때는 제외)
+            document.addEventListener('keydown', e => {
+                if (e.target.closest('input, textarea, select, [contenteditable]') || slides.length < 2) return;
+                if (e.key === 'ArrowLeft') show(index - 1);
+                else if (e.key === 'ArrowRight') show(index + 1);
+            });
+            // 화면 밀기(터치·펜): 가로로 50px 이상 밀면 넘김
+            let startX = null;
+            stage.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') startX = e.clientX; });
+            stage.addEventListener('pointerup', e => {
+                if (startX !== null && Math.abs(e.clientX - startX) > 50 && slides.length > 1) show(index + (e.clientX < startX ? 1 : -1));
+                startX = null;
+            });
+            // 큰 이미지를 누르면 전체 화면 (다시 누르면 해제)
+            slides.forEach(li => li.onclick = () => document.fullscreenElement ? document.exitFullscreen() : stage.requestFullscreen?.());
+        })();
+    </script>
+}

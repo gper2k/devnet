@@ -1,0 +1,77 @@
+@model BitPlus.Data.Content.PopupArea
+@using BitPlus.Web.Data.Content
+@{
+    // 사이트 팝업: 이 레이아웃의 화면 영역(모델: 사용자/관리자/인증)에서 현재 사용자에게 보여 줄 팝업(활성 + 게시 대상 + 게시 기간 안)을
+    // 영역·사용자별 캐시 → DB 순서로 읽는다 (PopupReader, 캐시 키 popup:{영역}:{사용자}). 레이아웃은 <partial name="_SitePopup" model="PopupArea.X" /> 로 붙인다.
+    var popups = await PopupReader.ReadAsync(this.DbContext!, Model, this.CurrentUserAssets);
+    // 화면에 넘길 값: 종료 시각은 읽음 기록 보관 기한이라 UTC 밀리초로 (없으면 0)
+    var json = System.Text.Json.JsonSerializer.Serialize(popups.Select(p => new
+    {
+        id = p.Id,
+        title = p.Title,
+        body = p.Body,
+        end = p.End is { } end ? new DateTimeOffset(DateTime.SpecifyKind(end, DateTimeKind.Utc)).ToUnixTimeMilliseconds() : 0,
+        width = p.Width,
+        height = p.Height
+    }));
+}
+@* 팝업 영역: 읽은 기록이 없는 팝업만 겹쳐 띄우고, 닫으면 읽은 기록을 게시 기간 동안 브라우저에 남긴다.
+   창을 만드는 showSitePopup 은 출력할 팝업이 없어도 두어 관리 화면의 미리보기(기록 없이 띄움)도 같은 모양·스타일(_SitePopup.cshtml.scss)을 쓴다. *@
+<div class="sitePopup" id="sitePopup"></div>
+<script>
+    /**
+     * 사이트 팝업 창 하나를 #sitePopup 에 띄운다: 본문만 보이고 오른쪽 위에 고정된 닫기(×) 버튼을 겹친다 (제목은 화면에 쓰지 않고 aria-label 로만).
+     * @@param {{title: string, body: string, width: number, height: number}} p 팝업 (너비 px, 높이 px — 0 이면 내용 높이)
+     * @@param {number} index 여러 개를 띄울 때 순번 (조금씩 비켜 겹침)
+     * @@param {(() => void)|null} onClose 닫을 때 먼저 할 일 (읽은 기록 저장, 미리보기는 null)
+     */
+    window.showSitePopup = (p, index = 0, onClose = null) => {
+        const win = document.createElement('section');
+        win.style.setProperty('--i', index);
+        win.style.width = `min(${p.width}px, calc(100vw - 2em))`;
+        if (p.height > 0) win.style.height = `min(${p.height}px, calc(100vh - 6em))`;
+        // 닫기는 두 곳: 오른쪽 위 ×, 하단 가운데 작은 "닫기" (둘 다 본문 위에 겹침, 같은 동작)
+        win.innerHTML = '<div></div><button type="button"><i class="fi fiDismiss"></i></button><button type="button" class="bottom"><i class="fi fiDismiss"></i><span></span></button>';
+        const closeText = @this.Js(this.Lang("Close"));
+        win.querySelector(':scope > button').title = closeText;
+        win.querySelector(':scope > button.bottom > span').textContent = closeText;
+        win.setAttribute('aria-label', p.title);
+        common.renderContent(win.querySelector(':scope > div'), p.body);
+        win.querySelectorAll(':scope > button').forEach(button => button.onclick = () => {
+            onClose?.();
+            win.remove();
+        });
+        document.getElementById('sitePopup').appendChild(win);
+        return win;
+    };
+</script>
+@if (popups.Count > 0)
+{
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const popups = JSON.parse(@this.Js(json));
+            const storeKey = 'sitePopupRead';
+            const live = new Set(popups.map(p => p.id));
+            // 읽은 기록 = { 팝업 식별키: 게시 종료 시각(UTC ms, 종료일이 없으면 0) } 하나의 localStorage 값.
+            // 읽거나 고칠 때마다 정리해 커지지 않게 한다: 종료 시각이 지난 기록, 종료일 없는 기록 중 지금 출력 대상에서 빠진 팝업(삭제·비활성·대상 변경)의 기록을 지움
+            const load = () => {
+                let read = {};
+                try { read = JSON.parse(localStorage.getItem(storeKey) || '{}') || {}; } catch { }
+                const now = Date.now();
+                for (const [id, end] of Object.entries(read)) if (end ? end < now : !live.has(id)) delete read[id];
+                return read;
+            };
+            const save = read => {
+                try { Object.keys(read).length ? localStorage.setItem(storeKey, JSON.stringify(read)) : localStorage.removeItem(storeKey); } catch { }
+            };
+            const read = load();
+            save(read);
+
+            popups.filter(p => !(p.id in read)).forEach((p, index) => showSitePopup(p, index, () => {
+                const current = load();
+                current[p.id] = p.end;
+                save(current);
+            }));
+        });
+    </script>
+}

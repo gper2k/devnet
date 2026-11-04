@@ -1,0 +1,60 @@
+[
+  {
+    "name": "smtpHost",
+    "displayName": "@SmtpHost",
+    "filters": {
+      "maxLength": [
+        256
+      ]
+    }
+  },
+  {
+    "name": "smtpPort",
+    "displayName": "@SmtpPort",
+    "filters": {
+      "minValue": [
+        1
+      ],
+      "maxValue": [
+        65535
+      ]
+    }
+  },
+  {
+    "name": "smtpUser",
+    "displayName": "@SmtpUser",
+    "filters": {
+      "maxLength": [
+        256
+      ]
+    }
+  },
+  {
+    "name": "smtpPassword",
+    "displayName": "@Password",
+    "filters": {
+      "maxLength": [
+        256
+      ]
+    }
+  },
+  {
+    "name": "smtpFrom",
+    "displayName": "@SmtpFrom",
+    "filters": {
+      "email": [],
+      "maxLength": [
+        256
+      ]
+    }
+  },
+  {
+    "name": "smtpFromName",
+    "displayName": "@SmtpFromName",
+    "filters": {
+      "maxLength": [
+        64
+      ]
+    }
+  }
+]

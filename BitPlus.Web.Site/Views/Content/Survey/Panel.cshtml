@@ -1,0 +1,72 @@
+@model ContentPageModel
+
+@* 설문 패널 — 설문 보기(Default/View.cshtml 이 설문이면 본문 자리에 넣음): api/content/survey 에서 소개문·설문 항목을 받아 그린다.
+   아직 참여하지 않은 사람에게는 설문 항목(하나만 선택은 라디오, 여러 개 선택은 체크 상자)과 "참여하기" 버튼(비회원은 로그인 안내), 결과(옵션별 득표수·비율 막대, 내가 고른 옵션 표시, 참여자 수)는 설문 기간이 끝난 뒤나 기간 없는 설문에 참여한 뒤에 보여 준다.
+   참여 전에는 누구나 참여 화면(설문 기간이 끝났으면 결과)이 먼저이고, 기간 중에 참여하면 "설문이 진행중입니다." 만 보이며, 결과는 설문 기간이 끝났거나 기간 없는 설문에 참여한 뒤에만 보인다(관리자만 "결과 보기"로 미리 볼 수 있음). 소개문과 질문·옵션은 글자로만 출력한다(HTML 로 해석되지 않음). *@
+<div class="surveyPanel" id="surveyPanel"></div>
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const box = document.querySelector('#surveyPanel');
+        const ruleNo = @Model.RuleNo, contentNo = @Model.Post!.ContentNo;
+        const text = {
+            participants: @this.Js(this.Lang("SurveyParticipants")), vote: @this.Js(this.Lang("SurveyVote")), voted: @this.Js(this.Lang("SurveyVoted")), login: @this.Js(this.Lang("SurveyLoginNeeded")),
+            multiple: @this.Js(this.Lang("SurveyMultiple")), single: @this.Js(this.Lang("SurveySingle")), showResults: @this.Js(this.Lang("SurveyShowResults")), showForm: @this.Js(this.Lang("SurveyShowForm")),
+            running: @this.Js(this.Lang("SurveyRunning")), answerAll: @this.Js(this.Lang("SurveyAnswerAll")), mine: @this.Js(this.Lang("SurveyMine")), votes: @this.Js(this.Lang("SurveyVotes"))
+        };
+        let data = null;
+        let peek = false; // 관리자가 참여 전에 결과를 미리 보는 중인지
+
+        /** 질문 한 장: 질문 글자와 선택 방식 */
+        const headOf = (q, i) => common.html`<div class="head"><b>${i + 1}.</b> <span>${q.text}</span><em>${q.multiple ? text.multiple : text.single}</em></div>`;
+        /** 참여 폼: 질문마다 라디오(하나만) 또는 체크 상자(여러 개) */
+        const formOf = d => common.html`
+            ${d.questions.map((q, i) => common.html`
+            <section class="question" data-id="${q.id}">
+                ${headOf(q, i)}
+                <ul>${q.options.map(o => common.html`<li><label class="${q.multiple ? 'check' : 'radio'}"><input type="${q.multiple ? 'checkbox' : 'radio'}" name="q_${q.id}" value="${o.id}" ${d.canVote ? '' : 'disabled'} /><span>${o.text}</span></label></li>`)}</ul>
+            </section>`)}`;
+        /** 결과: 옵션마다 득표수·비율 막대, 내가 고른 옵션은 표시 */
+        const resultOf = d => common.html`
+            ${d.questions.map((q, i) => common.html`
+            <section class="question">
+                ${headOf(q, i)}
+                <ol class="result">${q.options.map(o => common.html`
+                    <li class="${(d.mine?.[q.id] ?? []).includes(o.id) ? 'mine' : ''}">
+                        <div class="line"><span class="name">${o.text}${(d.mine?.[q.id] ?? []).includes(o.id) ? common.html` <i class="fi fiCheckmark" title="${text.mine}"></i>` : ''}</span><span class="num">${o.count ?? 0} ${text.votes} · ${o.percent ?? 0}%</span></div>
+                        <div class="bar"><i style="width: ${o.percent ?? 0}%"></i></div>
+                    </li>`)}</ol>
+            </section>`)}`;
+
+        const paint = () => {
+            const showResult = data.showResults || (data.admin && peek); // 서버가 정함: 설문 기간이 끝났거나, 기간 없는 설문에 참여한 경우만 결과
+            const intro = data.intro ? common.html`<p class="intro">${data.intro}</p>` : '';
+            const stat = common.html`<p class="stat">${text.participants.replace('{0}', data.participants)}${data.participated ? common.html` · <b>${text.voted}</b>` : ''}</p>`;
+            const toggle = data.admin && !data.showResults ? common.html`<span role="button" tabindex="0" class="toggle" data-act="toggle">${peek ? text.showForm : text.showResults}</span>` : ''; // 관리자만 결과 보기 버튼
+            const footer = showResult ? '' : data.participated ? common.html`<p class="notice">${text.running}</p>` : data.canVote ? common.html`<button type="button" class="primary" data-act="vote"><i class="fi fiCheckmark"></i> ${text.vote}</button>` : data.needLogin ? common.html`<p class="notice">${text.login}</p>` : '';
+            box.innerHTML = common.html`${intro}${stat}${toggle}${data.participated && !showResult ? '' : common.html`<div class="questions">${showResult ? resultOf(data) : formOf(data)}</div>`}${footer}`.toString(); // 값은 모두 html 템플릿이 이스케이프함
+        };
+
+        const load = async () => {
+            const res = await common.getSend(`/api/content/survey?${new URLSearchParams({ ruleNo, contentNo })}`, { useLoading: false });
+            if (!res?.success) return;
+            data = res.data;
+            paint();
+        };
+
+        box.addEventListener('click', async e => {
+            const act = e.target.closest('[data-act]');
+            if (!act) return;
+            if (act.dataset.act === 'toggle') { peek = !peek; return paint(); }
+            // 참여하기: 모든 질문에 답했는지 확인하고 보낸다 (서버도 같은 검사)
+            const answers = {};
+            box.querySelectorAll('section.question[data-id]').forEach(s => { const chosen = [...s.querySelectorAll('input:checked')].map(p => p.value); if (chosen.length) answers[s.dataset.id] = chosen; });
+            if (Object.keys(answers).length !== data.questions.length) return common.alert(text.answerAll);
+            const res = await common.postSend('/api/content/survey/vote', common.makeFormData({ ruleNo, contentNo, answers: JSON.stringify(answers) }));
+            if (!res?.success) return;
+            data = res.data;
+            paint();
+        });
+        box.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-act="toggle"]')) e.target.click(); });
+        load();
+    });
+</script>

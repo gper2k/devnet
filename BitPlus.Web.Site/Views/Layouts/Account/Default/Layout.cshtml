@@ -1,0 +1,263 @@
+@inherits BitPlus.Web.HTTP.View.LayoutBase<dynamic>
+@{
+    // 로그인 전 요청 페이지(ReturnUrl)는 메뉴 이동 시에도 유지
+    var returnUrl = this.Context.Request.Query["ReturnUrl"].ToString();
+    var returnQuery = string.IsNullOrEmpty(returnUrl) ? null : "?ReturnUrl=" + Uri.EscapeDataString(returnUrl);
+
+    var isEditable = this.Context.Request.Query["editable"] == "1";
+    var isSystemManager = this.CurrentUserAssets?.IsInRole(BitPlus.Web.Site.Data.SystemNames.SystemManagerRole) == true;
+    var canEditLayout = isEditable || isSystemManager;
+
+    // 인증된 사용자의 계정 레이아웃 접근 제한 (editable=1 편집 모드, 메일 미인증 상태의 VerifyMail 페이지, 지금 계정에 연결하는 외부 로그인 페이지는 예외 허용)
+    if (this.IsAuthenticated && !isEditable && this.PageKey != "External" && (this.PageKey != "VerifyMail" || this.CurrentUser?.EmailConfirmed == true))
+    {
+        var targetUrl = !string.IsNullOrEmpty(returnUrl) && this.Url.IsLocalUrl(returnUrl) ? returnUrl : "/";
+        this.Context.Response.Redirect(targetUrl);
+        return;
+    }
+
+    Layout = "_Layout";
+    var site = BitPlus.Web.Site.Models.SiteInfo.Of(this.Config);
+    var requestedLayout = this.Context.Request.Query["layout"].ToString();
+    var currentLayout = !string.IsNullOrEmpty(requestedLayout) ? requestedLayout : site.AccountLayout;
+    var themeConfigKey = BitPlus.Web.Site.Models.LayoutThemeConfig.ConfigKey("Account", currentLayout);
+    var themeConfig = this.Config?.GetModel<BitPlus.Web.Site.Models.LayoutThemeConfig>(themeConfigKey);
+    var membersOnly = this.Config?.AccountRule.MembersOnly == true;
+
+    // 상단 메뉴: 로그인 / 아이디·비밀번호 찾기 / 회원가입 중 현재 페이지를 제외하고 표시
+    var navItems = new[] { ("SignIn", "/Account/SignIn"), ("FindAccount", "/Account/FindAccount"), ("SignUp", "/Account/SignUp") }
+        .Where(p => p.Item1 != this.PageKey).ToArray();
+    // 언어 선택: 지원 문화권(네이티브명), 현재 문화권 표시
+    var current = this.CurrentUICulture.TwoLetterISOLanguageName;
+    var cultures = this.Config?.Cultures ?? new[] { "ko", "en" };
+    string GetNativeName(string code)
+    {
+        try { return System.Globalization.CultureInfo.GetCultureInfo(code).NativeName; }
+        catch { return code; }
+    }
+}
+@if (themeConfig != null)
+{
+    <style id="layoutThemeColors">@Html.Raw(themeConfig.ToCss())</style>
+}
+else
+{
+    <style id="layoutThemeColors"></style>
+}
+
+<div id="app" class="accountLayout">
+    <div class="postcard">
+        <!-- 좌측: 다크 무드 브랜드 패널 -->
+        <aside class="brandSide">
+            <header>
+                <a class="brandLogo" href="@(membersOnly ? (this.Config?.SignPage ?? "/Account/SignIn") : "/")">DevNet</a>
+                @if (canEditLayout)
+                {
+                    <i class="fi fiSettings" title="@this.Lang("LayoutSetting")" onclick="openLayoutConfig('Account', '@currentLayout')"></i>
+                }
+            </header>
+
+            <div class="brandContent">
+                <h1>@this.Title</h1>
+                @{
+                    var rawGreeting = themeConfig?.GetGreeting(current, this.Lang("WelcomeVisit")) ?? this.Lang("WelcomeVisit");
+                    var greetingHtml = Html.Raw(Html.Encode(rawGreeting).Replace("\r\n", "<br />").Replace("\n", "<br />"));
+                }
+                <p class="brandGreeting">@greetingHtml</p>
+            </div>
+
+            <footer>
+                @* 언어 선택 (공용 .dropDown, 위로 펼침) — 선택 시 Culture 쿠키 저장 후 새로고침 *@
+                <div class="dropDown" id="cultureDrop" data-val="@current">
+                    <header><i class="fi fiGlobe"></i> @GetNativeName(current)</header>
+                    <ul class="up">
+                        @foreach (var cult in cultures)
+                        {
+                            <li data-val="@cult">@GetNativeName(cult)</li>
+                        }
+                    </ul>
+                </div>
+            </footer>
+        </aside>
+
+        <!-- 우측: 엽서 종이 질감의 인터랙티브 폼 패널 -->
+        <article class="formSide">
+            <header>
+                <nav>
+                    @foreach (var (key, href) in navItems)
+                    {
+                        <a href="@(href + returnQuery)">@this.Lang(key)</a>
+                    }
+                </nav>
+            </header>
+
+            <main>
+                @RenderBody()
+            </main>
+        </article>
+    </div>
+
+    <partial name="_SitePopup" model="BitPlus.Data.Content.PopupArea.Account" /> @* 사이트 팝업 — 인증 화면 영역 (대부분 비로그인이라 게시 대상이 없는 팝업만 보임) *@
+    @if (canEditLayout)
+    {
+        <aside id="layoutConfigPanel" class="layoutConfigSidePanel"></aside>
+    }
+</div>
+
+<script>
+    document.getElementById('cultureDrop')?.addEventListener('change', e => common.setCulture(e.detail.value));
+</script>
+
+@section Styles {
+    <style>
+        :root {
+            /* Account 전용 기본 테마 */
+            --main: #346472;
+            --mainLight: #4d7d8b;
+            --mainDark: #20505e;
+            --point: #2a8699;
+            --pointLight: #3d9eb2;
+            --pointDark: #1b6a7a;
+            --sub: #31363b;
+            --subLight: #4a4f54;
+            --subDark: #1d2227;
+            --deco: #638791;
+            --primary: var(--main);
+            --primaryLight: var(--mainLight);
+            --primaryDark: var(--mainDark);
+            --primary0: var(--main0);
+            --primary1: var(--main1);
+            --primary2: var(--main2);
+            --primary8: var(--main8);
+            --primary9: var(--main9);
+        }
+        /* 다크 테마: 인증 레이아웃 기본 색상 */
+        [data-theme="dark"] {
+            --main: #346472;
+            --mainLight: #4d7d8b;
+            --mainDark: #20505e;
+            --sub: #31363b;
+            --subLight: #4a4f54;
+            --subDark: #1d2227;
+            --point: #8eeadc;
+            --pointLight: #b5f5eb;
+            --pointDark: #4dd0c0;
+            --deco: #475569;
+            --primary: var(--point);
+            --primaryLight: var(--pointLight);
+            --primaryDark: var(--pointDark);
+            --primary0: var(--main0);
+            --primary1: var(--point1);
+            --primary2: var(--point2);
+            --primary8: var(--main8);
+            --primary9: var(--main9);
+        }
+        aside.layoutConfigSidePanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 21.5em;
+            max-width: 100vw;
+            z-index: 99999;
+            background-color: var(--bgColor);
+            border-left: 1px solid var(--lineColor);
+            box-shadow: -4px 0 20px var(--aColor);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        aside.layoutConfigSidePanel.open {
+            transform: translateX(0);
+        }
+        div#app.accountLayout {
+            transition: padding-right 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-sizing: border-box;
+        }
+        div#app.accountLayout.hasLayoutConfigSide {
+            padding-right: 21.5em;
+        }
+        .brandLogo + i.fiSettings {
+            margin-left: 0.4em;
+            font-size: 1.1em;
+            color: var(--txLight);
+            cursor: pointer;
+            vertical-align: middle;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .brandLogo + i.fiSettings:hover {
+            color: var(--pointLight);
+            transform: rotate(30deg) scale(1.1);
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+}
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+    @if (canEditLayout)
+    {
+        <script>
+            window.openLayoutConfig = async function(category, name) {
+                let panel = document.getElementById('layoutConfigPanel');
+                if (!panel) {
+                    panel = document.createElement('aside');
+                    panel.id = 'layoutConfigPanel';
+                    panel.className = 'layoutConfigSidePanel';
+                    (document.getElementById('app') || document.body).appendChild(panel);
+                }
+                try {
+                    const res = await fetch(`/api/config/layout/view/${category}/${name}?editable=1`, { credentials: 'include' });
+                    if (!res.ok) {
+                        common.alert('설정 화면을 불러오지 못했습니다. (' + res.status + ')', 'Error');
+                        return;
+                    }
+                    panel.innerHTML = await res.text();
+                    panel.querySelectorAll('script').forEach(s => {
+                        const ns = document.createElement('script');
+                        ns.textContent = s.textContent;
+                        panel.appendChild(ns);
+                        s.remove();
+                    });
+                    if (typeof initLayoutConfig === 'function') {
+                        initLayoutConfig(panel, category, name);
+                    } else if (typeof window.initLayoutConfig === 'function') {
+                        window.initLayoutConfig(panel, category, name);
+                    }
+                    panel.classList.add('open');
+                    panel.style.transform = 'translateX(0)';
+                    const app = document.getElementById('app');
+                    if (app) app.classList.add('hasLayoutConfigSide');
+                } catch (err) {
+                    console.error('[LayoutConfig Error]', err);
+                    common.alert('설정 화면을 불러오지 못했습니다: ' + (err.message || err), 'Error');
+                }
+            };
+
+            window.closeLayoutConfig = function(revert = true) {
+                const panel = document.getElementById('layoutConfigPanel');
+                if (panel) {
+                    if (revert && typeof panel._revertColors === 'function') {
+                        panel._revertColors();
+                    }
+                    panel.classList.remove('open');
+                    panel.style.transform = 'translateX(100%)';
+                }
+                const app = document.getElementById('app');
+                if (app) app.classList.remove('hasLayoutConfigSide');
+            };
+
+            @if (isEditable)
+            {
+                <text>
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(function() {
+                        openLayoutConfig('Account', '@currentLayout');
+                    }, 150);
+                });
+                </text>
+            }
+        </script>
+    }
+}

@@ -1,0 +1,4 @@
+@model ContentPageModel
+
+@* 블로그 글 보기(피드의 제목 링크·댓글 링크) — 일반 형식 글 보기 화면을 쓰되 포럼 토픽과 같이 댓글 영역은 Forum/Replies.cshtml(포럼형 댓글), 이전/다음 글은 없이, 활동 시각(UDate)을 보인다. 답글은 없다. *@
+<partial name="~/Views/Content/Default/View.cshtml" model="Model" />

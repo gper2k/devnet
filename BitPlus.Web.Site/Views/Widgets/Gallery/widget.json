@@ -1,0 +1,13 @@
+{
+  "key": "Gallery",
+  "version": 1,
+  "name": { "ko": "갤러리", "en": "Gallery" },
+  "description": { "ko": "갤러리 게시판(비우면 전체 갤러리)의 최신 이미지를 격자로 보여 줍니다.", "en": "Latest images of the chosen gallery boards (all galleries if none) in a grid." },
+  "categories": ["board"],
+  "size": { "min": [2, 1], "max": [4, 3] },
+  "settings": [
+    { "key": "ruleNos", "type": "boards", "default": [] },
+    { "key": "count", "type": "number", "default": 8, "min": 1, "max": 24 },
+    { "key": "columns", "type": "number", "default": 4, "min": 1, "max": 6 }
+  ]
+}

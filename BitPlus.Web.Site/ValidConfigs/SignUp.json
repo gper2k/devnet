@@ -1,0 +1,56 @@
+[
+  {
+    "name": "uid",
+    "displayName": "@UserID",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        32
+      ],
+      "regex": [
+        "^[A-Za-z][A-Za-z0-9_]*$"
+      ]
+    }
+  },
+  {
+    "name": "dpName",
+    "displayName": "@DpName",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        64
+      ]
+    }
+  },
+  {
+    "name": "email",
+    "displayName": "@Email",
+    "filters": {
+      "required": [],
+      "email": [],
+      "maxLength": [
+        256
+      ]
+    }
+  },
+  {
+    "name": "password",
+    "displayName": "@Password",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        128
+      ]
+    }
+  },
+  {
+    "name": "passwordConfirm",
+    "displayName": "@PasswordConfirm",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        128
+      ]
+    }
+  }
+]

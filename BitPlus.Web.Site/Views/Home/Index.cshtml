@@ -1,0 +1,9 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    this.SetTitle("Home");
+    this.SetPageKey("Home");
+}
+@* 홈 — 위젯 페이지 "home": 관리자가 페이지 위 편집 모드에서 영역을 배치하고 영역의 칸에 위젯을 넣는다 (_PageSections, 배치는 설정 PageLayout.home, 없으면 Views/Sections/_Pages/home.json 기본 배치) *@
+<div class="pageWrap">
+    <partial name="_PageSections" model="@("home")" />
+</div>

@@ -1,0 +1,14 @@
+{
+  "key": "Grid2x2",
+  "version": 1,
+  "order": 3,
+  "name": { "ko": "복합형 2×2", "en": "Mixed 2x2" },
+  "description": { "ko": "왼쪽에 넓은 칸 하나(2×2), 오른쪽에 작은 칸 두 개(2×1). 780 미만에서는 넓은 칸이 위로 갑니다.", "en": "One large slot on the left (2x2) and two small slots on the right (2x1). Below 780 the large slot moves to the top." },
+  "slots": ["a", "b", "c"],
+  "layouts": {
+    "1024": ["a a b b", "a a c c"],
+    "1023": ["a a b b", "a a c c"],
+    "779": ["a a", "b c"],
+    "519": ["a", "b", "c"]
+  }
+}

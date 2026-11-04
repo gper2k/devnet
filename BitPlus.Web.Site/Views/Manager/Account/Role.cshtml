@@ -1,0 +1,68 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Role"));
+}
+
+<div class="pageBox">
+    <div class="flexRow alignStretch gapMd auto">
+        @* 좌측: 역할 검색 + 목록 + 페이저 (선택하면 우측이 편집 모드, 다시 누르면 선택 해제 → 신규 모드) *@
+        <aside class="asideList flexCol gapSm">
+            <div class="inputGroup">
+                <input type="search" name="roleSearch" placeholder="@this.Lang("Search")" autocomplete="off" />
+                <button type="button"><i class="fi fiSearch"></i></button>
+            </div>
+            <ul class="selectList main auto"></ul>
+            <ul class="pager"></ul>
+        </aside>
+
+        @* 우측: 안내 + 역할 등록/수정 폼 + 모드별 버튼 *@
+        <article class="auto flexCol gapMd">
+            <div class="inform">
+                <header><i class="fi fiInfo fiFill"></i> @this.Lang("RoleInfoTitle") <span class="badge" hidden>@this.Lang("System")</span></header>
+                <p>@this.Lang("RoleInfoContent")</p>
+            </div>
+
+            <ul class="form auto" style="overflow: auto;">
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("RoleName")</header>
+                        <input type="text" name="name" maxlength="64" autocomplete="off" />
+                    </div>
+                    <div>
+                        <header>@this.Lang("SortCode")</header>
+                        <input type="text" name="grade" maxlength="4" placeholder="A1" autocomplete="off" />
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("DpName")</header>
+                    <div class="inputGroup">
+                        <input type="text" name="dpNames" data-lang="{}" data-title="@@DpName" />
+                        <button type="button" title="@this.Lang("LangInput")"><i class="fi fiTranslate"></i></button>
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("Description")</header>
+                    <textarea name="description" rows="5" maxlength="256"></textarea>
+                </li>
+                <li class="right">
+                    <label class="check main">
+                        <input type="checkbox" name="visible" checked />
+                        <span>@this.Lang("Visible")</span>
+                    </label>
+                </li>
+            </ul>
+
+            @* data-mode: new = 신규 입력일 때만, edit = 편집일 때만 표시 (저장은 항상) *@
+            <footer class="pageFooter">
+                <button type="button" class="danger" data-mode="edit" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+                    <span></span>
+                <div class="flexRow gapSm">
+                    <button type="button" data-mode="edit" hidden><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+                    <button type="button" data-mode="new"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                    <button type="button" class="main"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+                </div>
+            </footer>
+        </article>
+    </div>
+</div>

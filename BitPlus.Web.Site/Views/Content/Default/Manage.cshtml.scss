@@ -1,0 +1,136 @@
+/* 게시판 관리(Manage) 전용 스타일 */
+.contentManage {
+    & > section {
+        flex: 1 1 auto;
+
+        & > section {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+
+            & > div {
+                flex: 1 1 auto;
+
+                & > .form {
+                    & > .flexRow {
+                        justify-content: flex-start;
+                        flex-wrap: wrap;
+                        gap: 1em;
+
+                        & > label.check {
+                            width: auto;
+                        }
+                    }
+
+                    /* 안내 문구: 작은 글씨, 옅은 색 (모든 탭 공통, 예: 갤러리 파일 구성 하단) */
+                    & > li > span.infoMsg {
+                        font-size: 0.85em;
+                        color: var(--txLight);
+                        padding-left: 0.3em;
+                    }
+
+                    & > li.subTitle > span > label {
+                        font-weight: normal !important;
+                        float: right;
+                        margin: 0.5em 0.5em 0 0;
+                    }
+                }
+
+                &#boardTabAccess,
+                &#boardTabFile,
+                &#boardTabApprove {
+                    flex-direction: column;
+                    flex-wrap: nowrap;
+
+                    &.active {
+                        display: flex;
+                    }
+
+                    & > ul.form {
+                        flex: 1 1 auto;
+
+                        & > li {
+                            flex: 0 0 auto;
+
+                            &.auto {
+                                flex: 1 1 auto;
+
+                                & > header {
+                                    display: flex;
+                                    flex-direction: row;
+                                    flex-wrap: nowrap;
+                                    justify-content: space-between;
+                                    flex: 0 0 auto;
+                                    padding: 0 0 0 0.3em;
+
+                                    & > div {
+                                        border: none;
+                                        padding: 0;
+                                        gap: 0.4em;
+
+                                        &:first-child {
+                                            padding-top: 0.4em;
+                                            line-height: 1em;
+                                        }
+                                    }
+                                }
+
+                                & > span.infoMsg {
+                                    flex: 0 0 auto;
+                                    font-size: 0.85em;
+                                    color: var(--txLight);
+                                    padding-left: 0.3em;
+                                }
+
+                                & > ul.managedList {
+                                    flex: 1 1 auto;
+                                    height: 10em;
+                                }
+
+                                & > footer {
+                                    border: none;
+                                    justify-content: flex-end;
+                                    gap: 0.5em;
+                                }
+
+                                &[inert] {
+                                    opacity: 0.45;
+
+                                    & > ul.managedList {
+                                        background-color: var(--bgSub);
+                                        border-color: var(--lineColor);
+                                    }
+                                }
+                            }
+                        }
+
+                        & > li.subTitle, & > .flexRow {
+                            flex: 0 0 auto;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /* 승인자 목록: 드래그 앤 드롭 순서 조정 */
+    & #boardTabApprove ul.managedList > li {
+        cursor: grab;
+
+        &.dragging {
+            opacity: 0.4;
+        }
+
+        & > .authDrag {
+            color: var(--txLight);
+            cursor: grab;
+        }
+    }
+
+    & > footer {
+        border-top: 1px dashed var(--aColor);
+        padding-top: 1em;
+        display: flex;
+        justify-content: center;
+        gap: 0.6em;
+    }
+}

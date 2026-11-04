@@ -1,0 +1,103 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- 구형 TypeScript SDK 검사 및 빌드 완전 차단, ES2022 명시 -->
+    <TypeScriptNoVersionCheck>true</TypeScriptNoVersionCheck>
+    <EnableTypeScriptNuGetTarget>true</EnableTypeScriptNuGetTarget>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <TypeScriptTarget>ES2022</TypeScriptTarget>
+    <TypeScriptModuleKind>ESNext</TypeScriptModuleKind>
+    <NoWarn>$(NoWarn);NU1901;NU1902;NU1903;NU1904</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Logs\**" />
+    <Compile Remove="Uploads\**" />
+    <Content Remove="Logs\**" />
+    <Content Remove="Uploads\**" />
+    <Content Remove="wwwroot\ts\**" />
+    <None Include="wwwroot\ts\**" />
+    <EmbeddedResource Remove="Logs\**" />
+    <EmbeddedResource Remove="Uploads\**" />
+    <None Remove="Logs\**" />
+    <None Remove="Uploads\**" />
+    <Content Remove="setup.json" />
+    <!-- 게시(Publish) 시 개발용 설정 파일 제외 (설치 설정 파일은 아래 ExcludeInstallSettingsFromPublish Target) -->
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+    <!-- 게시 제외: 빌드 도구 설정(TypeScript·SCSS 컴파일, 로컬 도구) -->
+    <Content Update="tsconfig.json;compilerconfig.json;dotnet-tools.json" CopyToPublishDirectory="Never" />
+    <!-- 게시·정적 파일 제외: SCSS 원본, 소스 맵, 폴더 설명서 (화면은 컴파일된 css/js 만 씀) -->
+    <Content Remove="wwwroot\**\*.scss;wwwroot\**\*.map;wwwroot\**\README.md" />
+    <None Include="wwwroot\**\*.scss;wwwroot\**\*.map;wwwroot\**\README.md" />
+    <!-- 설치 마법사용 라이선스 파일 게시 포함 -->
+    <Content Include="LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- 제3자 라이선스 고지 게시 포함 -->
+    <Content Include="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="QRCoder" Version="1.8.1" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BitPlus.Data.MariaDb\BitPlus.Data.MariaDb.csproj" />
+  </ItemGroup>
+
+  <!-- BitPlus.Web 은 libs 의 dll 로 참조 (BitPlus.dll 과 그 패키지는 libs\BitPlus.Libs.props). dll 참조는 NuGet 의존성을 끌고 오지 않으므로 BitPlus.Web.csproj 의 패키지를 같은 버전으로 둔다 -->
+  <ItemGroup>
+    <Reference Include="BitPlus.Web">
+      <HintPath>$(BitPlusLibsDir)BitPlus.Web.dll</HintPath>
+    </Reference>
+    <PackageReference Include="HtmlSanitizer" Version="9.2.1039" />
+    <PackageReference Include="SkiaSharp" Version="4.153.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.0" />
+    <!-- Web SDK 공유 프레임워크에 이미 포함 (NU1510) -->
+    <PackageReference Remove="Microsoft.Extensions.Caching.Memory" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LogicalName>BitPlus.Web.Site.Properties.Resources.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.ko.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <LogicalName>BitPlus.Web.Site.Properties.Resources.ko.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\img\sample\" />
+  </ItemGroup>
+
+  <!-- 게시 제외: 이 PC 의 설치 결과(appsettings.Setup.json)·설치 미리 채움(setup.json).
+       항목(Content Update)으로 두면 VS 에서 파일을 지울 때 그 줄도 같이 지워지므로, VS 가 손대지 않는 Target 으로 게시 목록에서 뺌 -->
+  <Target Name="ExcludeInstallSettingsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(RelativePath)' == 'appsettings.Setup.json' Or '%(RelativePath)' == 'setup.json'" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CompileTypeScript" BeforeTargets="Build" Condition="Exists('tsconfig.json')">
+    <Exec Command="npx --yes tsc -p tsconfig.json" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+</Project>

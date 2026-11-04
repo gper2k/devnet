@@ -1,0 +1,157 @@
+/* 시스템 설정 > 로그 — 설정 관리 목록 카드와 같은 모양(제목·조건 한 줄, 아래 목록, 바닥 읽은 위치·더 보기). 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.logBox > section.card {
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+
+    & > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5em 1em;
+        padding: 0.5em;
+
+        & > strong {
+            display: flex;
+            align-items: center;
+            padding: 0 0.5em;
+            gap: 0.4em;
+            font-size: 1.02em;
+            color: var(--txColor);
+
+            & > i.fi {
+                font-size: 1.4em;
+            }
+        }
+
+        & > div {
+            flex-wrap: wrap;
+
+            & > select,
+            & > input {
+                width: auto;
+                font-size: 0.85em;
+            }
+
+            & > select[name="kind"] {
+                max-width: 18em;
+            }
+
+            & > .inputGroup {
+                width: 12em;
+            }
+        }
+    }
+
+    & > div.dataList {
+        overflow-y: auto;
+
+        & ::deep > header > .colTime,
+        & ::deep > ul > li > .colTime {
+            flex: 0 0 7.5em;
+            font-family: monospace;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+
+        & ::deep > header > .colLevel,
+        & ::deep > ul > li > .colLevel {
+            flex: 0 0 7em;
+            justify-content: center;
+        }
+
+        & ::deep > header > .colSummary,
+        & ::deep > ul > li > .colSummary {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: 0.9em;
+        }
+
+        & ::deep > header > .colDuration,
+        & ::deep > ul > li > .colDuration {
+            flex: 0 0 5em;
+            justify-content: flex-end;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+
+        & ::deep > ul > li {
+            padding: 0.2em 0.5em;
+            cursor: pointer;
+        }
+    }
+
+    & > footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5em 0.8em;
+        border-top: 1px solid var(--lineColor);
+
+        & > span {
+            color: var(--txLight);
+            font-size: 0.85em;
+        }
+    }
+}
+
+dialog#logModal {
+    width: 52em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section > pre {
+        margin: 0;
+        max-height: 60vh;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        font-size: 0.85em;
+    }
+}
+/* 로그 제외 규칙 모달: 줄마다 카테고리 · 수준 · 포함 글자 · 지우기 */
+dialog#logExcludeModal {
+    width: 52em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section {
+        & > p {
+            margin: 0 0 0.8em;
+            color: var(--txLight);
+            font-size: 0.9em;
+        }
+
+        & > ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+            max-height: 55vh;
+            overflow: auto;
+
+            & > li {
+                display: grid;
+                grid-template-columns: 2fr 9em 1.5fr auto;
+                gap: 0.5em;
+                align-items: center;
+
+                & > span {
+                    cursor: pointer;
+                    color: var(--danger5);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,54 @@
+@model UserPageModel
+
+@* 작성글 보기: 내 작성글(/user/posts)과 다른 사용자의 작성글(/user/{식별키}, 게시판 작성자 메뉴) — 머리(_UserHead) 아래 게시물/댓글 탭.
+   목록은 api/user/{식별키}/activity 로 불러오며 지금 사용자가 열 수 있는 글과 그 글에 단 댓글만 담긴다(익명 게시판 제외). *@
+<div class="userPosts">
+    <partial name="_UserHead" model="Model" />
+    <article>
+        <nav>
+            <a data-kind="posts" class="active"><i class="fi fiDocText"></i> @this.Lang("UserPosts") <b>0</b></a>
+            <a data-kind="comments"><i class="fi fiComment"></i> @this.Lang("Comment") <b>0</b></a>
+        </nav>
+        <ul></ul>
+    </article>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('div.userPosts > article');
+        const userId = '@Model.UserId', pageSize = 10;
+        const list = root.querySelector(':scope > ul');
+        const tabs = [...root.querySelectorAll(':scope > nav > a')];
+        const scope = [...root.attributes].find(p => p.name.startsWith('b-'))?.name; // 격리 스타일 속성을 스크립트로 만든 요소에도 붙임
+        const mk = (tag, text) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (scope) el.setAttribute(scope, ''); return el; };
+        const state = { kind: 'posts', page: 0 };
+
+        // 한 줄: 게시판 배지·작성 시각 / 제목(글로 이동) / 댓글이면 댓글 내용 일부
+        const itemOf = item => {
+            const li = mk('li'), head = mk('header'), board = mk('span', item.board), time = mk('time', common.ago(item.cDate)), title = mk('a', item.title);
+            time.title = common.localTime(item.cDate, true);
+            title.href = item.url;
+            head.append(board, time);
+            li.append(head, title);
+            if (item.excerpt) li.append(mk('p', item.excerpt));
+            return li;
+        };
+        const load = async page => {
+            state.page = page;
+            const res = await common.getSend(`/api/user/${userId}/activity?${new URLSearchParams({ kind: state.kind, page, size: pageSize })}`, { useLoading: false });
+            if (!res || !res.success) return;
+            tabs[0].querySelector('b').textContent = res.data.postTotal;
+            tabs[1].querySelector('b').textContent = res.data.commentTotal;
+            list.replaceChildren(...(res.data.items.length ? res.data.items.map(itemOf) : [mk('li', @this.Js(this.Lang("DataEmpty")))]));
+            root.querySelector(':scope > ul.pager')?.remove();
+            if (res.data.total > pageSize) list.after(common.makePager(page, pageSize, res.data.total).then(load));
+        };
+        tabs.forEach(tab => tab.onclick = () => {
+            if (tab.classList.contains('active')) return;
+            tabs.forEach(p => p.classList.toggle('active', p === tab));
+            state.kind = tab.dataset.kind;
+            load(0);
+        });
+        load(0);
+    });
+</script>

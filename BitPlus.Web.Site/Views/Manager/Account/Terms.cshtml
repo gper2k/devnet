@@ -1,0 +1,59 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Terms"));
+}
+
+<div class="pageBox">
+    <div class="flexRow alignStretch gapMd auto">
+        @* 좌측: 약관 목록 (드래그로 순서 변경, 선택하면 우측이 편집 모드, 다시 누르면 선택 해제 → 신규 모드) *@
+        <aside class="asideList flexCol gapSm">
+            <ul class="selectList main auto"></ul>
+        </aside>
+
+        @* 우측: 안내 + 약관 등록/수정 폼 + 모드별 버튼 *@
+        <article class="auto flexCol gapMd">
+            <div class="inform">
+                <header><i class="fi fiInfo fiFill"></i> @this.Lang("TermsInfoTitle")</header>
+                <p>@this.Lang("TermsInfoContent")</p>
+            </div>
+
+            <ul class="form auto" style="overflow: auto;">
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("TermsKey")</header>
+                        <input type="text" name="key" maxlength="64" placeholder="service_terms" autocomplete="off" />
+                    </div>
+                    <div>
+                        <partial name="~/Views/Manager/Account/_CultureSelect.cshtml" />
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("TermsTitle")</header>
+                    <input type="text" name="titles" maxlength="128" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("TermsBody")</header>
+                    <textarea name="bodies" rows="12"></textarea>
+                </li>
+                <li class="right">
+                    <label class="check main">
+                        <input type="checkbox" name="essential" checked />
+                        <span>@this.Lang("EssTerms")</span>
+                    </label>
+                </li>
+            </ul>
+
+            @* data-mode: new = 신규 입력일 때만, edit = 편집일 때만 표시 (저장은 항상) *@
+            <footer class="pageFooter">
+                <button type="button" class="danger" data-mode="edit" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+                <span></span>
+                <div class="flexRow gapSm">
+                    <button type="button" data-mode="edit" hidden><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+                    <button type="button" data-mode="new"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                    <button type="button" class="main"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+                </div>
+            </footer>
+        </article>
+    </div>
+</div>

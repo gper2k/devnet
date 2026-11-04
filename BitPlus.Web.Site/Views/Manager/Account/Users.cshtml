@@ -1,0 +1,240 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("UserAndGroup"));
+}
+
+<div class="pageBox">
+    <div class="flexRow alignStretch auto">
+        <!-- 좌측: 툴바 + 그룹 조직도 트리를 하나의 라운드 박스로 통합 -->
+        <aside class="card line flexCol orgBox">
+            <div class="toolBar fix">
+                <button type="button" class="item" onclick="openGroupModal(null, orgTree.getSelect())">
+                    <i class="fi fiFolderAdd"></i> @this.Lang("Group")
+                </button>
+                <button type="button" class="item" onclick="openUserModal(null, orgTree.getSelect())">
+                    <i class="fi fiPersonAdd"></i> @this.Lang("User")
+                </button>
+            </div>
+            <div id="orgTree" class="treeBox auto"></div>
+        </aside>
+
+        <!-- 우측: 헤더(제목+검색) / 목록(컬럼바+행, 스크롤) / 푸터(페이징·표시개수) 박스 -->
+        <section class="card line flexCol">
+            <header class="fix">
+                <strong>
+                    <i class="fi fiPersonNote"></i>
+                    @this.Lang("AccountList")
+                    <i id="pageCounter" class="badge deco"></i>
+                </strong>
+                <div class="inputGroup inline sm">
+                    <input type="text" name="search" placeholder="@this.Lang("SearchNameOrId")" autocomplete="off" />
+                    <button type="button" class="sub"><i class="fi fiSearch"></i></button>
+                </div>
+            </header>
+
+            <div class="dataList auto">
+                <header>
+                    <span class="colName"><span>NAME</span></span>
+                    <span class="colFlag"><span>VISIBLE</span></span>
+                    <span class="colFlag"><span>ENABLER</span></span>
+                    <span class="colDate"><span>CREATE</span></span>
+                </header>
+                <ul></ul>
+            </div>
+
+            <footer class="fix">
+                <div class="pageSize">
+                    <label>List Size</label>
+                    <select name="pageSize">
+                        @for(var i = 1; i < 10; i ++)
+                        {
+                            <option value="@(i * 10)">@(i * 10)</option>
+                        }
+                    </select>
+                </div>
+                <ul class="pager"></ul>
+            </footer>
+        </section>
+    </div>
+</div>
+
+<!-- 사용자 등록/수정 모달 -->
+<dialog id="userModal">
+    <header><i class="fi fiPerson fiFill"></i> @this.LangOf("EditInfoOf", "User") <span class="badge" hidden>SYS</span></header>
+    <section class="tabBox">
+        <header>
+            <span data-for="#userTabBasic" class="active">@this.Lang("BasicInfo")</span>
+            <span data-for="#userTabProps">@this.Lang("Property")</span>
+            <span data-for="#userTabGroups">@this.Lang("Group")</span>
+            <span data-for="#userTabRoles">@this.Lang("Role")</span>
+        </header>
+        <section>
+            <div id="userTabBasic" class="active">
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("UserID")</header>
+                        <input type="text" name="userName" maxlength="32" placeholder="@this.Lang("UidRule")" autocomplete="off" data-min="@(this.Config?.AccountRule.UidMinSize ?? 4)" />
+                    </li>
+                    <li>
+                        <header>@this.Lang("DpName")</header>
+                        <div class="inputGroup">
+                            <input type="text" name="dpNames" data-lang="{}" data-title="@@DpName" />
+                            <button type="button" title="@this.Lang("LangInput")"><i class="fi fiTranslate"></i></button>
+                        </div>
+                    </li>
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("Email")</header>
+                            <input type="email" name="email" maxlength="256" autocomplete="off" />
+                        </div>
+                        <div>
+                            <header>@this.Lang("Phone")</header>
+                            <input type="tel" name="phoneNumber" maxlength="32" autocomplete="off" />
+                        </div>
+                    </li>
+                    <li>
+                        <header>@this.Lang("Description")</header>
+                        <textarea name="description" rows="3"></textarea>
+                    </li>
+                    <li class="right">
+                        <label class="check main">
+                            <input type="checkbox" name="visible" checked />
+                            <span>@this.Lang("Visible")</span>
+                        </label>
+                        <label class="check main">
+                            <input type="checkbox" name="enabler" checked />
+                            <span>@this.Lang("Enabler")</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <div id="userTabProps">
+                <div class="keyValueBox">
+                    <ul></ul>
+                    <footer>
+                        <input type="text" placeholder="KEY" maxlength="64" autocomplete="off" />
+                        <input type="text" placeholder="VALUE" autocomplete="off" />
+                        <button type="button" class="sm info"><i class="fi fiAddCircle"></i></button>
+                    </footer>
+                </div>
+            </div>
+            <div id="userTabGroups">
+                <div class="chipBox" data-name="userDefaultGroup" data-modal="groupSelect" data-sync>
+                    <ul></ul>
+                    <footer>
+                        <button type="button" class="xs info"><i class="fi fiSettings"></i> @this.Lang("Manage")</button>
+                    </footer>
+                </div>
+            </div>
+            <div id="userTabRoles">
+                <div class="chipBox" data-name="userDefaultRole" data-modal="roleSelect">
+                    <ul></ul>
+                    <footer>
+                        <button type="button" class="xs info"><i class="fi fiAddCircle"></i> ADD</button>
+                    </footer>
+                </div>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <button type="button" class="danger" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" id="userSaveBtn"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!-- 그룹 등록/수정 모달 (추후 부서 등 다른 조직 단위와 함께 쓰일 수 있으나 현재는 그룹 단일 개념) -->
+<dialog id="groupModal">
+    <header><i class="fi fiFolder fiFill"></i> @this.LangOf("EditInfoOf", "Group") <span class="badge" hidden>SYS</span></header>
+    <section class="tabBox">
+        <header>
+            <span data-for="#groupTabBasic" class="active">@this.Lang("BasicInfo")</span>
+            <span data-for="#groupTabProps">@this.Lang("Property")</span>
+            <span data-for="#groupTabRoles">@this.Lang("Role")</span>
+        </header>
+        <section>
+            <div id="groupTabBasic" class="active">
+                <ul class="form">
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("GroupName")</header>
+                            <input type="text" name="name" />
+                        </div>
+                        <div>
+                            <header>@this.Lang("Manager")</header>
+                            <div class="inputGroup">
+                                <input type="text" name="managerName" readonly placeholder="@this.Lang("NotAssigned")" />
+                                <button type="button"><i class="fi fiSearch"></i></button>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <header>@this.Lang("DpName")</header>
+                        <div class="inputGroup">
+                            <input type="text" name="dpNames" data-lang="{}" data-title="@@DpName" />
+                            <button type="button" title="@this.Lang("LangInput")"><i class="fi fiTranslate"></i></button>
+                        </div>
+                    </li>
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("ParentGroup")</header>
+                            <div class="inputGroup">
+                                <input type="text" name="parentName" readonly placeholder="@this.Lang("TopLevel")" />
+                                <button type="button"><i class="fi fiSearch"></i></button>
+                            </div>
+                        </div>
+                        <div>
+                            <header>@this.Lang("SortCode")</header>
+                            <input type="text" name="grade" maxlength="4" placeholder="A1" />
+                        </div>
+                    </li>
+                    <li>
+                        <header>@this.Lang("Description")</header>
+                        <textarea name="description" rows="3"></textarea>
+                    </li>
+                    <li class="right">
+                        <label class="check main">
+                            <input type="checkbox" name="inherit" checked />
+                            <span>@this.Lang("Inherit")</span>
+                        </label>
+                        <label class="check main">
+                            <input type="checkbox" name="visible" checked />
+                            <span>@this.Lang("Visible")</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <div id="groupTabProps">
+                <div class="keyValueBox">
+                    <ul></ul>
+                    <footer>
+                        <input type="text" placeholder="KEY" maxlength="64" autocomplete="off" />
+                        <input type="text" placeholder="VALUE" autocomplete="off" />
+                        <button type="button" class="sm info"><i class="fi fiAddCircle"></i></button>
+                    </footer>
+                </div>
+            </div>
+            <div id="groupTabRoles">
+                <div class="chipBox" data-name="defaultRole" data-modal="roleSelect">
+                    <ul></ul>
+                    <footer>
+                        <button type="button" class="xs info"><i class="fi fiAddCircle"></i> ADD</button>
+                    </footer>
+                </div>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <button type="button" class="danger" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" id="groupSaveBtn"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 Account.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다.
+    innerHTML 로 꽂힌 <script> 는 브라우저가 실행해주지 않으므로, 트리 초기화 로직은
+    여기 두지 않고 Account.cshtml 의 initUsers() 로 옮겨서 콘텐츠 교체 직후 직접 호출한다.
+-->
+

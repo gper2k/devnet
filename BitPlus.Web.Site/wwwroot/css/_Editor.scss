@@ -1,0 +1,119 @@
+﻿/* 컨텐츠 본문 공통 규칙 — 보기 화면(.editorContentPage > section)과 에디터 편집 영역에 같이 쓴다 */
+@mixin editorContent {
+    & figure {
+        margin: 0;
+    }
+
+    & img {
+        max-width: 100% !important;
+        max-height: min(80vh, 48em); /* 너무 긴 이미지는 화면 높이를 넘지 않게 (비율은 유지) */
+        object-fit: contain;
+        border-radius: var(--roundBox);
+    }
+}
+
+/* 글 보기의 본문 상자 (common.renderContent): 본문을 사이트 문서에 직접 출력하므로 contain 으로 상자 밖(화면 고정 레이어 등)에 그리지 못하게 막는다 */
+.contentBody {
+    contain: content;
+    overflow-wrap: anywhere;
+    @include editorContent;
+}
+
+.editorContentPage {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 1em 0 0 0;
+
+    & > section {
+        flex: 1 1 auto;
+        overflow: auto;
+        padding: 0.5em;
+        @include editorContent;
+    }
+
+    & > footer {
+        flex: 0 0 auto;
+        padding: 0.5em 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+    }
+}
+
+/* 에디터 편집 영역 (common.makeEditor 의 siteCss: SunEditor iframe 에 사이트 CSS 를 연결한 body).
+   사이트 CSS 의 문서 전체용 body 규칙(float·100vw/100vh)과 글자 선택 금지를 되돌려, 편집할 때도 보기 화면과 같은 스타일로 보이게 한다. */
+html:has(> body:is(.sun-editor-editable, .jodit-wysiwyg)) {
+    float: none;
+    width: auto;
+    height: auto;
+}
+
+html > body:is(.sun-editor-editable, .jodit-wysiwyg) {
+    float: none;
+    width: auto;
+    height: auto;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+
+    &,
+    & * {
+        user-select: text;
+    }
+
+    /* 편집 중인 본문(contenteditable)만 가장자리에서 0.5em 띄운다 (SunEditor, Jodit 공통) */
+    &[contenteditable] {
+        padding: 0.5em;
+    }
+
+    @include editorContent;
+}
+
+/* 모달(dialog) 안의 Jodit: Jodit 가 툴팁 상자(.jodit-ui-tooltip-container)를 dialog 의 직계 자식으로 붙이는데, 모달의 flex 흐름에 들어가 footer 아래에 빈 공간이 생기므로 흐름에서 뺀다 */
+dialog > .jodit-ui-tooltip-container {
+    position: absolute;
+}
+
+/* 좁은 화면(태블릿 이하, 사이트 두 번째 중단점 780px)에서는 덜 쓰는 도구 버튼을 숨겨 도구줄이 3단까지 늘어나지 않게 한다: 글머리 기호·번호 목록, 가로줄, 표
+   (Jodit: 버튼 이름 클래스 — Jodit 자체 CSS 가 나중에 로드되므로 .jodit-container 로 우선순위를 높임, SunEditor: data-command) */
+@media (width <= 780px) {
+    .jodit-container .jodit-toolbar-button_ul,
+    .jodit-container .jodit-toolbar-button_ol,
+    .jodit-container .jodit-toolbar-button_hr,
+    .jodit-container .jodit-toolbar-button_table,
+    .sun-editor .se-toolbar button[data-command="list"],
+    .sun-editor .se-toolbar button[data-command="hr"],
+    .sun-editor .se-toolbar button[data-command="table"] {
+        display: none;
+    }
+}
+
+/* 400px 미만(아주 좁은 화면)에서는 스타일 지우기 버튼도 숨겨 도구줄을 2단으로 맞춘다 (400px 이상에서는 보임) */
+@media (width < 400px) {
+    .jodit-container .jodit-toolbar-button_eraser,
+    .sun-editor .se-toolbar button[data-command="removeFormat"] {
+        display: none;
+    }
+}
+
+/* Jodit 다크 테마(사이트 다크 테마일 때 JoditProvider 가 theme: "dark" 로 만듦)의 색을 사이트 다크 팔레트로 맞춤 (Jodit 기본 다크는 회색 톤) */
+[data-theme="dark"] {
+    --jd-dark-background-color: var(--bgSub);
+    --jd-dark-background-darknes: var(--bgColor);
+    --jd-dark-background-ligher: var(--silver);
+    --jd-dark-border-color: var(--lineColor);
+    --jd-dark-text-color: var(--txColor);
+    --jd-dark-icon-color: var(--txSub);
+    --jd-dark-toolbar-color: var(--bgSub);
+    --jd-dark-toolbar-seperator-color1: var(--lineColor);
+    --jd-dark-toolbar-seperator-color2: var(--lineColor);
+    --jd-dark-toolbar-seperator-color3: var(--lineColor);
+    --jd-dark-toolbar-seperator-color-opacity80: var(--lineColor);
+
+    & .jodit_theme_dark {
+        --jd-color-border: var(--lineColor);
+    }
+}

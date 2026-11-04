@@ -1,0 +1,667 @@
+@inherits BitPlus.Web.HTTP.View.LayoutBase<dynamic>
+@using BitPlus.Web.Data
+@using BitPlus.Web.Site.Data
+@using BitPlus.Web.Site.Models
+@using Microsoft.EntityFrameworkCore
+@{
+    Layout = "_Layout";
+    ViewData["UserTheme"] = true; // 회원 환경설정의 테마(Theme 쿠키)는 사용자·관리자 레이아웃에 적용, 계정 레이아웃은 기본 테마 (_Layout)
+    // 상단 메뉴: DB 의 "User" 메뉴 자손(사용 중 + 현재 사용자가 접근 가능) 을 정렬 순서대로 2단까지 그린다 (이 레이아웃은 메뉴 아이콘을 표시하지 않음)
+    var menuTree = await MenuReader.ReadTreeAsync(this.DbContext!, "User", this.CurrentUserAssets);
+    var menus = menuTree.Where(p => p.ParentKey == "User").ToList();
+    List<BitPlus.Data.SiteMap.AppMenu> ChildrenOf(BitPlus.Data.SiteMap.AppMenu menu) => menuTree.Where(p => p.ParentKey == menu.Key).ToList();
+    string? HrefOf(BitPlus.Data.SiteMap.AppMenu menu) => menu.Type == BitPlus.Data.SiteMap.LinkType.Move ? menu.Action : null;
+    string? OpenOf(BitPlus.Data.SiteMap.AppMenu menu) => menu.Type == BitPlus.Data.SiteMap.LinkType.Open ? menu.Action : null;
+    // 하단 링크: DB 의 "Footer"(하단 메뉴) 하위 — 이용약관·개인정보 처리방침 등 (설치 때 기본 등록)
+    var footerMenus = await MenuReader.ReadAsync(this.DbContext!, BitPlus.Web.Site.Data.SystemNames.FooterMenu, this.CurrentUserAssets);
+    // 상단·하단 로고·사이트명·회사 정보·카피라이트: 관리자 "시스템 설정 > 사이트 정보"(사이트명·카피라이트는 저장할 때 정제된 간단한 HTML)
+    var site = SiteInfo.Of(this.Config);
+    var siteName = Html.Raw(site.SiteName);
+
+    // 레이아웃 테마 색상 설정 및 관리자 확인
+    var isEditable = this.Context.Request.Query["editable"] == "1";
+    var isSystemManager = this.CurrentUserAssets?.IsInRole(SystemNames.SystemManagerRole) == true;
+    var canEditLayout = isEditable || isSystemManager;
+
+    // 멤버 전용 구성: 미인증 사용자의 일반 레이아웃 접근 제한 (editable=1 편집 모드는 예외 허용)
+    if (this.Config?.AccountRule.MembersOnly == true && !this.IsAuthenticated && !isEditable)
+    {
+        var returnUrl = this.Context.Request.Path + this.Context.Request.QueryString;
+        var loginUrl = this.Config?.SignPage ?? "/Account/SignIn";
+        var targetUrl = $"{loginUrl}?ReturnUrl={Uri.EscapeDataString(returnUrl)}";
+        this.Context.Response.Redirect(targetUrl);
+        return;
+    }
+
+    var requestedLayout = this.Context.Request.Query["layout"].ToString();
+    var currentLayout = !string.IsNullOrEmpty(requestedLayout) ? requestedLayout : site.GeneralLayout;
+    var hasLayoutConfig = SiteInfo.HasConfig("General", currentLayout);
+    var themeConfigKey = LayoutThemeConfig.ConfigKey("General", currentLayout);
+    var themeConfig = this.Config?.GetModel<LayoutThemeConfig>(themeConfigKey);
+
+    // 로그인 사용자 정보 (상단 회원 정보 상자·사이드 패널 하단 공용)
+    var me = this.CurrentUser;
+    // 이름: 현재 문화권에 맞는 표시명(다국어 출력 기본 규칙), 없으면 사용자 ID. 기본 그룹·역할이 없으면 지정된(활성) 그룹·역할로 대신함
+    var displayName = me is null ? this.CurrentUserName : this.Context.Request.PickCulture(me.DpNames, p => p.Key, p => p.Value) ?? me.UserName;
+    // 표시할 그룹·역할 선택 규칙: 활성(Active) 항목 먼저, 없으면 기본(Default) 항목, 그도 없으면 각 첫 번째 항목
+    var groupId = me?.ActiveGroupId ?? me?.DefaultGroupId ?? me?.Groups.Keys.FirstOrDefault() ?? Guid.Empty;
+    var roleId = me?.ActiveRoleId ?? me?.DefaultRoleId ?? me?.Roles.Keys.FirstOrDefault() ?? Guid.Empty;
+    // 그룹·역할 이름도 현재 문화권에 맞는 표시명이 기본, 없으면 원래 이름
+    string? GroupNameOf(Guid id) => me is null ? null : this.Context.Request.PickCulture(me.GroupDpNames.GetValueOrDefault(id), p => p.Key, p => p.Value) ?? me.Groups.GetValueOrDefault(id);
+    var groupName = GroupNameOf(groupId);
+    var roleName = me is null ? null : this.Context.Request.PickCulture(me.RoleDpNames.GetValueOrDefault(roleId), p => p.Key, p => p.Value) ?? me.Roles.GetValueOrDefault(roleId);
+    string? RoleNameOf(Guid id) => me is null ? null : this.Context.Request.PickCulture(me.RoleDpNames.GetValueOrDefault(id), p => p.Key, p => p.Value) ?? me.Roles.GetValueOrDefault(id);
+    // 그룹·역할 변경 창: 그룹이나 역할이 여럿일 때만, 그룹을 고르면 그 그룹의 기본 역할을 미리 골라 줌
+    var canSwitch = (me?.Groups.Count ?? 0) > 1 || (me?.Roles.Count ?? 0) > 1;
+    var defaultRoles = canSwitch ? await BitPlus.Web.Site.Controllers.API.UserController.DefaultRolesOfAsync((Microsoft.EntityFrameworkCore.DbContext)this.DbContext!, me!.Groups.Keys) : [];
+    var photo = me?.Properties.GetValueOrDefault(BitPlus.Web.Site.Controllers.API.UserController.PhotoKey);
+    // 관리자(Manager 정책): 회원 정보 상자의 사람 아이콘을 누르면 관리자 화면으로 이동 (그 밖은 드롭박스)
+    var isManager = this.IsAllowed(BitPlus.Web.WebConfig.ManagerPolicyName);
+    var managerTitle = isManager ? this.Lang("GoToManager") : null;
+    // 안 읽은 받은 메시지 수 (회원 정보 상자에 표시)
+    var unread = me is null ? 0 : await ((Microsoft.EntityFrameworkCore.DbContext)this.DbContext!).Set<BitPlus.Data.Account.Model.AppUserMessage>()
+        .CountAsync(p => p.ReceiverId == me.Id && p.RDate == null && !p.ReceiverDeleted);
+    // 확인하지 않은 알림 수 (회원 정보 상자에 메시지와 같은 줄 모양으로 표시)
+    var unreadNotice = me is null ? 0 : await ((Microsoft.EntityFrameworkCore.DbContext)this.DbContext!).Set<BitPlus.Data.Account.Model.AppUserNotice>()
+        .CountAsync(p => p.ReceiverId == me.Id && p.RDate == null);
+}
+
+@if (themeConfig != null)
+{
+    <style id="layoutThemeColors">@Html.Raw(themeConfig.ToCss())</style>
+}
+else
+{
+    <style id="layoutThemeColors"></style>
+}
+
+<div id="app" class="pageLayout @this.AppClass">
+    <header>
+        <div>
+            <div class="left">
+                <span class="menu" onclick="openSide('side', true)">
+                    <i class="fi fiBars"></i>
+                </span>
+                <img class="logo" src="@site.Logo" />
+                <span class="logo" onclick="location.href='/'">@siteName</span>
+                @if (canEditLayout && hasLayoutConfig)
+                {
+                    <i class="fi fiSettings" title="@this.Lang("LayoutSetting")" onclick="openLayoutConfig('General', '@currentLayout')"></i>
+                }
+            </div>
+            <div class="right">
+                <nav>
+                    <header onclick="openSide('side', false)">
+                        <span class="logoWrap">
+                            <img class="logo" src="@site.Logo" />
+                            <span class="logo">@siteName</span>
+                        </span>
+                        <span class="closer">
+                            <i class="fi fiPanelRightExpand"></i>
+                         </span>
+                   </header>
+                    @* 1단 메뉴: 하위 메뉴가 있으면 이름 끝 화살표, 하위(2단)는 안쪽 ul — 데스크톱은 마우스를 올리면 아래 둥근 가로 바, 사이드 패널은 늘 펼쳐 보임(목록이 넘치면 스크롤).
+                       하위 메뉴가 지금 페이지면 1단도 active. 이동·새 창은 아래 스크립트가 data-href/data-open 으로 처리 *@
+                    <ul>
+                        @foreach (var menu in menus)
+                        {
+                            var children = ChildrenOf(menu);
+                            var childActive = children.Any(this.IsActiveMenu);
+                            <li class="@(this.IsActiveMenu(menu) || childActive ? "active" : null)" data-href="@HrefOf(menu)" data-open="@OpenOf(menu)">
+                                <span>
+                                    @this.Context.Request.DisplayName(menu.DpNames, menu.Key)
+                                    @if (children.Count > 0)
+                                    {
+                                        <i class="fi fiChevronDown"></i>
+                                    }
+                                </span>
+                                @if (children.Count > 0)
+                                {
+                                    <ul>
+                                        @foreach (var child in children)
+                                        {
+                                            <li class="@(this.IsActiveMenu(child) ? "active" : null)" data-href="@HrefOf(child)" data-open="@OpenOf(child)">@this.Context.Request.DisplayName(child.DpNames, child.Key)</li>
+                                        }
+                                    </ul>
+                                }
+                            </li>
+                        }
+                        @if (this.IsAllowed("Mgmt"))
+                        {
+                            <li onclick="location.href='/Manager'">Management</li>
+                        }
+                    </ul>
+                    <span class="space"></span>
+                    @* 통합 검색 바로가기 (사이드 패널, 780 이하 — 회원 상자가 숨을 때): 인증 상자 바로 위 검색창 모양 *@
+                    <a href="/search" class="@(this.Context.Request.Path.StartsWithSegments("/search") ? "active" : null)">
+                        <i><i class="fi fiSearch"></i></i>
+                        <span>@this.Lang("IntegratedSearch")<small>@this.Lang("SearchKeyword")</small></span>
+                        <i class="fi fiChevronRight"></i>
+                    </a>
+                    <footer>
+                        <span onclick="location.href='@(this.IsAuthenticated ? "/user" : this.LoginUrl)'">
+                            @if (string.IsNullOrEmpty(photo))
+                            {
+                                <i class="fi fiPerson fiFill"></i>
+                            }
+                            else
+                            {
+                                <img src="@photo" alt="" />
+                            }
+                        </span>
+                        <ul>
+                            @if (this.IsAuthenticated)
+                            {
+                                <li class="name">
+                                    <span>@displayName <small>@this.CurrentUserName</small></span>
+                                </li>
+                                <li class="userInfo">
+                                    @string.Join(" / ", new[] { groupName, roleName }.Where(p => !string.IsNullOrEmpty(p)))
+                                    @if (canSwitch)
+                                    {
+                                        <i class="fi fiArrRepeatAll" title="@this.Lang("SetActiveGroupRole")" data-mode="group"></i>
+                                    }
+                                </li>
+                                @* 확인하지 않은 알림·안 읽은 메시지 수 (상단 회원 정보 상자와 같은 값) *@
+                                <li>
+                                    <a href="/user/notice" title="@this.Lang("Notification")"><i class="fi fiAlert"></i> @unreadNotice</a>
+                                    <a href="/user/message" title="@this.Lang("Message")"><i class="fi fiComments"></i> @unread</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="name" onclick="location.href='@this.LoginUrl'">
+                                    <span>@this.Lang("SignIn")</span>
+                                </li>
+                                <li onclick="location.href='/Account/SignUp'">
+                                    <span>@this.Lang("SignUp")</span>
+                                </li>
+                            }
+                        </ul>
+                        <span>
+                            @if (this.IsAuthenticated)
+                            {
+                                <i class="fi fiSignOutAlt" onclick="location.href='/Account/SignOut'"></i>
+                            }
+                            else
+                            {
+                                <i class="fi fiKey" onclick="location.href='@this.LoginUrl'"></i>
+                            }
+                        </span>
+                    </footer>
+                </nav>
+                <ul>
+                    @* 통합 검색 아이콘 — 회원 상자 맨 앞 (780 미만은 메뉴 쪽 항목) *@
+                    <li data-search title="@this.Lang("IntegratedSearch")" onclick="location.href='/search'"><i class="fi fiSearch"></i></li>
+                    @* 로그인 전·후 같은 배치: 검색 · 글자 항목(Join US / Log out) · 인증 칸(bgMain: Log in / 회원 정보 상자)이 맨 끝 *@
+                    @if (this.IsAuthenticated)
+                    {
+                        <li class="stack" title="Log out" onclick="location.href='/Account/SignOut'">
+                            <span>Log</span><span>out</span>
+                        </li>
+                        @* 회원 정보 상자: 누르면 드롭박스(공용 .open/.active)로 이미지·이름·ID·활성 그룹/역할·확인하지 않은 알림·안 읽은 메시지, 그룹이나 역할이 여럿이면 활성 그룹/역할 지정(groupDialog, active 모드). 이미지·이름은 내 정보(/user)로 *@
+                        <li class="bgMain" id="userBox">
+                            <i data-href="@(isManager ? "/Manager" : null)" title="@managerTitle" aria-label="@managerTitle" role="@(isManager ? "link" : null)" tabindex="@(isManager ? "0" : null)">
+                                @if (string.IsNullOrEmpty(photo))
+                                {
+                                    <i class="fi fiPerson fiFill"></i>
+                                }
+                                else
+                                {
+                                    <img src="@photo" alt="" />
+                                }
+                            </i>
+                            <span class="userName" title="@this.CurrentUserName">@this.CurrentUserName</span>
+                            <section class="dropBox right">
+                                <header>
+                                    <div class="pic">
+                                        @if (string.IsNullOrEmpty(photo))
+                                        {
+                                            <i class="fi fiPerson fiFill"></i>
+                                        }
+                                        else
+                                        {
+                                            <img src="@photo" alt="" />
+                                        }
+                                    </div>
+                                    <div>
+                                        <span><strong>@displayName</strong><small>@this.CurrentUserName</small></span>
+                                        <span>
+                                            @(groupName.AnyAfterJoin(" / ") + roleName)  
+                                            @if (canSwitch)
+                                            {
+                                                <i class="fi fiArrRepeatAll" title="@this.Lang("SetActiveGroupRole")" data-mode="group"></i>
+                                            }
+                                        </span>
+                                    </div>
+                                </header>
+                                <ul>
+                                    <li>
+                                        <label><i class="fi fiAlert"></i> @this.Lang("Notification")</label>
+                                        <a href="/user/notice">@string.Format(this.Lang("UnreadOf"), unreadNotice)</a>
+                                    </li>
+                                    <li>
+                                        <label><i class="fi fiComments"></i> @this.Lang("Message")</label>
+                                        <a href="/user/message">@string.Format(this.Lang("UnreadOf"), unread)</a>
+                                    </li>
+                                </ul>
+                                <footer>
+                                    <button type="button" class="sm main" onclick="location.href='/user'"><i class="fi fiPerson"></i> @this.Lang("MyInfo")</button>
+                                </footer>
+                            </section>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="stack" title="Join US" onclick="location.href='/Account/SignUp'">
+                            <span>Join</span><span>US</span>
+                        </li>
+                        <li class="bgMain" onclick="location.href='@this.LoginUrl'">
+                            <i><i class="fi fiPerson fiFill"></i></i>
+                            <span>Log in</span>
+                        </li>
+                    }
+                </ul>
+                <i id="pageMore" class="fi fiEllipsisV" onclick="openSide('page')"></i>
+            </div>
+        </div>
+    </header>
+    <div>
+        <main>
+            @RenderBody()
+        </main>
+        <footer>
+            <div class="logoContainer">
+                <div>
+                    <img src="@site.Logo" />
+                    <span class="logo gray" onclick="location.href='/'">@siteName</span>
+                </div>
+                <p>@site.Slogan</p>
+            </div>
+            <div>
+                <section class="nav">
+                    <header>Navigation</header>
+                    <ul>
+                        @foreach (var menu in footerMenus)
+                        {
+                            <li>
+                                @if (menu.Type == BitPlus.Data.SiteMap.LinkType.Move)
+                                {
+                                    <a href="@menu.Action">@this.Context.Request.DisplayName(menu.DpNames, menu.Key)</a>
+                                }
+                                else if (menu.Type == BitPlus.Data.SiteMap.LinkType.Open)
+                                {
+                                    <a href="@menu.Action" target="_blank" rel="noopener">@this.Context.Request.DisplayName(menu.DpNames, menu.Key)</a>
+                                }
+                                else
+                                {
+                                    <span>@this.Context.Request.DisplayName(menu.DpNames, menu.Key)</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+                <section class="com">
+                    <header>Contact</header>
+                    <ul>
+                        @foreach (var line in new[] { site.CompanyName, site.Phone, site.Email, site.Address }.Where(p => !string.IsNullOrEmpty(p)))
+                        {
+                            <li>@line</li>
+                        }
+                    </ul>
+                </section>
+            </div>
+            <section class="page">
+                <div id="pageQr" style="cursor: pointer">
+                    <header>
+                        GET QR CODE
+                        <small>Get link to this page</small>
+                    </header>
+                    <i class="fi fiQrcode"></i>
+                </div>
+                <small>@Html.Raw(site.Copyright)</small>
+            </section>
+        </footer>
+    </div>
+    @* 하단 "GET QR CODE" 모달: 지금 페이지 주소의 QR 코드(api/qr) + 주소 입력 상자와 복사 버튼, 가운데 정렬된 확인 버튼 *@
+    <dialog id="qrDialog" class="qrDialog">
+        <header><i class="fi fiQrcode"></i> QR CODE</header>
+        <section>
+            <img alt="QR" />
+            <div class="inputGroup">
+                <input type="text" name="qrUrl" readonly />
+                <button type="button" title="@this.Lang("ContentCopyLink")"><i class="fi fiCopy"></i></button>
+            </div>
+        </section>
+        <footer>
+            <button type="button" class="main" onclick="this.closest('dialog').close()"><i class="fi fiCheck"></i> @this.Lang("Confirm")</button>
+        </footer>
+    </dialog>
+    @if (this.IsAuthenticated)
+    {
+        @* 사용자에게 메시지 보내기 창 (로그인 사용자만): 글 보기·댓글의 작성자 메뉴(userMenu)와 사용자 포탈이 sendUserMessage 로 연다 *@
+        <dialog id="messageDialog" class="messageDialog">
+            <header><i class="fi fiSend"></i> <span></span></header>
+            <section>
+                <textarea name="message" rows="6" maxlength="1000" placeholder="@this.Lang("ContentBody")"></textarea>
+            </section>
+            <footer>
+                <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiDismiss"></i> @this.Lang("Cancel")</button>
+                <button type="button" class="main"><i class="fi fiSend"></i> @this.Lang("SendMessage")</button>
+            </footer>
+        </dialog>
+        @* 그룹·역할 지정 창 (그룹이나 역할이 여럿일 때): window.openGroupDialog(mode) — "active"(회원 정보 상자, 지금 활동할 그룹·역할 = Active) 또는 "default"(내 정보, 주 소속 = Default).
+           그룹/역할 탭, 항목은 칩 나열(라디오, 넓게 — 넘치면 탭 안에서 자동 스크롤). 그룹을 고르면 그 그룹의 역할 중 기본 역할(data-role)을 역할 탭에서 미리 골라 주고, 역할은 직접 바꿀 수 있음 → 저장 후 새로 고침 *@
+        @if (canSwitch)
+        {
+            <dialog id="groupDialog" class="groupDialog"
+                    data-active-group="@me!.ActiveGroupId" data-active-role="@me.ActiveRoleId" data-default-group="@me.DefaultGroupId" data-default-role="@me.DefaultRoleId"
+                    data-title-active="@this.Lang("ActiveGroupRoleChange")" data-title-default="@this.Lang("SetDefaultGroupRole")">
+                <header><i class="fi fiArrSwap"></i> <span></span></header>
+                <section>
+                    <section class="tabBox">
+                        <header>
+                            @if (me.Groups.Count > 0)
+                            {
+                                <span data-for="#groupDialogGroups" class="active">@this.Lang("Group")</span>
+                            }
+                            <span data-for="#groupDialogRoles" class="@(me.Groups.Count > 0 ? null : "active")">@this.Lang("Role")</span>
+                        </header>
+                        <section>
+                            @if (me.Groups.Count > 0)
+                            {
+                                <div id="groupDialogGroups" class="active">
+                                    <div class="chipBox"><ul>
+                                        @foreach (var id in me.Groups.Keys)
+                                        {
+                                            <li><label class="radio"><input type="radio" name="groupId" value="@id" data-role="@(defaultRoles.TryGetValue(id, out var defaultRole) ? defaultRole : null)" /><span>@GroupNameOf(id)</span></label></li>
+                                        }
+                                    </ul></div>
+                                </div>
+                            }
+                            <div id="groupDialogRoles" class="@(me.Groups.Count > 0 ? null : "active")">
+                                <div class="chipBox"><ul>
+                                    @foreach (var id in me.Roles.Keys)
+                                    {
+                                        <li><label class="radio"><input type="radio" name="roleId" value="@id" /><span>@RoleNameOf(id)</span></label></li>
+                                    }
+                                </ul></div>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+                <footer>
+                    <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiDismiss"></i> @this.Lang("Cancel")</button>
+                    <button type="button" class="main"><i class="fi fiCheck"></i> @this.Lang("Confirm")</button>
+                </footer>
+            </dialog>
+        }
+    }
+    <partial name="_SitePopup" model="BitPlus.Data.Content.PopupArea.User" /> @* 사이트 팝업 — 사용자 화면 영역 (관리자 > 시스템 설정 > 팝업에서 등록, 읽은 팝업은 게시 기간 동안 다시 띄우지 않음) *@
+    @if (isSystemManager && hasLayoutConfig)
+    {
+        <aside id="layoutConfigPanel" class="layoutConfigSidePanel"></aside>
+    }
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            /* PageLayout 전용 기본 테마 색상 (필요시 내부 재선언 가능) */
+            --main: #1f4738;
+            --mainLight: #2d614e;
+            --mainDark: #143026;
+            --point: #84cc16;
+            --pointLight: #a3e635;
+            --pointDark: #65a30d;
+        }
+        /* 다크 테마: 이 레이아웃의 라이트 색상값을 기준으로 밝기만 조정 (규칙은 _Document.scss 다크 테마 주석) */
+        [data-theme="dark"] {
+            --main: #367c63;
+            --mainLight: #3f876c;
+            --mainDark: #31775d;
+            --point: #6aa412;
+            --pointLight: #7fbe17;
+            --pointDark: #588f0b;
+        }
+        aside.layoutConfigSidePanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 21.5em;
+            max-width: 100vw;
+            z-index: 10000;
+            background-color: var(--bgColor);
+            border-left: 1px solid var(--lineColor);
+            box-shadow: -4px 0 20px var(--aColor);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        aside.layoutConfigSidePanel.open {
+            transform: translateX(0);
+        }
+        div#app.pageLayout {
+            transition: padding-right 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-sizing: border-box;
+        }
+        div#app.pageLayout.hasLayoutConfigSide {
+            padding-right: 21.5em;
+            margin-right: 0;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+}
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        function openSide(mode, opened) {
+            const app = document.getElementById('app');
+            const head = app.querySelector(":scope > header");
+            const close = function(node) {
+                if (node.classList.contains("open")) node.classList.remove("open");
+                if (node.classList.contains("active")) node.classList.remove("active");
+            }
+            const open = function(node) {
+                if (!node.classList.contains("open")) node.classList.add("open");
+                node.classList.add("active");
+            }
+            const toggle = function(node) {
+                node.classList.toggle("open");
+                if (node.classList.contains("open")) node.classList.add("active");
+            }
+            const act = function(node) {
+                if (opened == true || opened == false) {
+                    if (opened) open(node);
+                    else close(node)
+                }
+                else toggle(node);
+            }
+
+            if (mode == "page") {
+                close(head);
+                act(app);
+            }
+            else {
+                close(app);
+                act(head);
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            // 하단 "GET QR CODE": 지금 페이지 주소(경로 + 쿼리)의 QR 코드를 모달로 보여 준다 (이미지는 api/qr 가 이 사이트 주소로만 만들어 줌)
+            // QR 코드 창: 하단 "GET QR CODE" 와 글 보기의 QR 코드 항목(Views/Content/Default/View.cshtml)이 같이 쓴다
+            const qrDialog = document.getElementById("qrDialog");
+            window.showPageQr = function() {
+                const path = location.pathname + location.search;
+                qrDialog.querySelector("img").src = "/api/qr?path=" + encodeURIComponent(path);
+                qrDialog.querySelector('[name="qrUrl"]').value = location.origin + path;
+                qrDialog.showModal();
+            };
+            document.getElementById("pageQr").addEventListener("click", showPageQr);
+            // 입력 그룹 끝 복사 버튼: 주소를 클립보드에 복사하고 안내
+            qrDialog.querySelector(".inputGroup > button").addEventListener("click", async function() {
+                try {
+                    await navigator.clipboard.writeText(qrDialog.querySelector('[name="qrUrl"]').value);
+                    common.info(@this.Js(this.Lang("ContentLinkCopied")));
+                } catch { }
+            });
+
+            // 작성자 메뉴(로그인 사용자만, 메시지 창이 있을 때): 메시지 보내기(본인 제외)·글 보기(사용자 포탈 /user/{식별키}). 글 보기·댓글의 작성자 이름을 누르면 userMenu 로 연다
+            const messageDialog = document.getElementById("messageDialog");
+            if (messageDialog) {
+                const me = "@this.CurrentUserId", area = messageDialog.querySelector("textarea");
+                const titleOf = @this.Js(this.Lang("MessageTo"));
+                window.sendUserMessage = function(userId, name) {
+                    messageDialog.dataset.user = userId;
+                    messageDialog.querySelector("header > span").textContent = titleOf.replace("{0}", name);
+                    area.value = "";
+                    messageDialog.showModal();
+                    area.focus();
+                };
+                messageDialog.querySelector("footer > button.main").addEventListener("click", async function() {
+                    if (!area.value.trim()) return area.focus();
+                    const res = await common.postSend(`/api/user/${messageDialog.dataset.user}/message`, common.makeFormData({ message: area.value }));
+                    if (res && res.success) messageDialog.close();
+                });
+                window.userMenu = function(anchor, userId, name) {
+                    const items = [];
+                    if (userId !== me) items.push({ text: @this.Js(this.Lang("SendMessage")), icon: "fi fiSend", action: () => sendUserMessage(userId, name) });
+                    items.push({ text: @this.Js(this.Lang("ViewPosts")), icon: "fi fiDocText", action: () => location.href = `/user/${userId}` });
+                    common.popMenu(anchor, items, "left", true);
+                };
+            }
+
+            // 회원 정보 상자: 버튼을 누르면 열고 닫음(공용 .open/.active — 바깥을 누르면 닫힘), 상자 안을 누르면 닫히지 않음. 그룹 변경 버튼은 그룹 변경 창
+            const userBox = document.getElementById("userBox");
+            if (userBox) {
+                userBox.addEventListener("click", function() {
+                    const open = !userBox.classList.contains("open");
+                    userBox.classList.toggle("open", open);
+                    userBox.classList.toggle("active", open);
+                });
+                userBox.querySelector(":scope > section").addEventListener("click", e => e.stopPropagation());
+                // 관리자: 사람 아이콘(data-href)은 드롭박스 대신 관리자 화면으로 이동 (키보드 Enter 포함)
+                const managerIcon = userBox.querySelector(":scope > i[data-href]");
+                if (managerIcon) {
+                    managerIcon.addEventListener("click", e => { e.stopPropagation(); location.href = managerIcon.dataset.href; });
+                    managerIcon.addEventListener("keydown", e => { if (e.key === "Enter") managerIcon.click(); });
+                }
+            }
+            // 활성 그룹/역할 지정 아이콘·버튼(회원 정보 상자, 모바일 사이드 메뉴 하단): 회원 정보 상자를 닫고 지정 창 (사이드 메뉴는 누름이 머리까지 올라가 닫힘)
+            document.querySelectorAll('#app > header [data-mode="group"]').forEach(p => p.addEventListener("click", () => { userBox?.classList.remove("open", "active"); window.openGroupDialog("active"); }));
+
+            // 그룹·역할 지정 창: mode = "active"(활성, api/user/group) | "default"(기본, api/user/group/default). 열 때 그 모드의 현재 그룹·역할을 골라 두고,
+            // 그룹을 고르면 그 그룹의 기본 역할(data-role)을 역할 탭에서 미리 골라 줌(내 역할에 있을 때), 역할은 직접 바꿀 수 있음
+            const groupDialog = document.getElementById("groupDialog");
+            if (groupDialog) {
+                let groupMode = "active";
+                const pick = (name, value) => groupDialog.querySelectorAll(`input[name="${name}"]`).forEach(p => p.checked = p.value === value);
+                window.openGroupDialog = mode => {
+                    groupMode = mode === "default" ? "default" : "active";
+                    const data = groupDialog.dataset, key = groupMode === "default" ? "Default" : "Active";
+                    groupDialog.querySelector(":scope > header > span").textContent = data["title" + key];
+                    pick("groupId", data[groupMode + "Group"]);
+                    pick("roleId", data[groupMode + "Role"]);
+                    groupDialog.showModal();
+                };
+                groupDialog.querySelectorAll('input[name="groupId"]').forEach(input => input.addEventListener("change", () => {
+                    if (input.dataset.role && groupDialog.querySelector(`input[name="roleId"][value="${input.dataset.role}"]`)) pick("roleId", input.dataset.role);
+                }));
+                groupDialog.querySelector("footer > button.main").addEventListener("click", async () => {
+                    const group = groupDialog.querySelector('input[name="groupId"]:checked'), role = groupDialog.querySelector('input[name="roleId"]:checked');
+                    const body = {};
+                    if (group) body.groupId = group.value;
+                    if (role) body.roleId = role.value;
+                    const res = await common.postSend(groupMode === "default" ? "/api/user/group/default" : "/api/user/group", common.makeFormData(body));
+                    if (res && res.success) location.reload();
+                });
+            }
+            if (!document.getElementById("pageMenu"))
+                document.getElementById("pageMore").classList.add("locked");
+
+            // 사이드 패널(aside#pageMenu) 안의 클릭은 패널이 닫히지 않도록 전파를 막는다. 그래서 공용 body 클릭 처리(드롭다운 열기/바깥 클릭 닫기)가 오지 않으므로,
+            // 패널 안의 드롭박스(.dropMenu, 예: 사이드 패널의 게시판 추가 +)는 여기서 직접 처리한다: 아이콘을 누르면 열기/닫기, 그 밖을 누르면 바로 닫기.
+            document.getElementById("pageMenu")?.addEventListener("click", function(e) {
+                const menu = e.target.closest(".dropMenu");
+                this.querySelectorAll(".dropMenu.open").forEach(p => { if (p !== menu) p.classList.remove("open", "active"); });
+                if (menu && e.target.closest(".dropMenu > i.fi")) menu.classList.toggle("open");
+                e.stopPropagation();
+            });
+            const nav = document.querySelector("div#app.pageLayout > header > div > div.right > nav");
+            // 상단 메뉴(1·2단): 누른 항목(가장 안쪽 li)의 data-href 이동·data-open 새 창
+            nav.querySelector(":scope > ul").addEventListener("click", function(e) {
+                const li = e.target.closest("li");
+                if (!li) return;
+                if (li.dataset.href) location.href = li.dataset.href;
+                else if (li.dataset.open) window.open(li.dataset.open, "_blank");
+            });
+            nav.addEventListener("click", function(e) { e.stopPropagation(); });
+        });
+
+        window.openLayoutConfig = async function(category, name) {
+            let panel = document.getElementById('layoutConfigPanel');
+            if (!panel) {
+                panel = document.createElement('aside');
+                panel.id = 'layoutConfigPanel';
+                panel.className = 'layoutConfigSidePanel';
+                (document.getElementById('app') || document.body).appendChild(panel);
+            }
+            try {
+                const res = await fetch(`/api/config/layout/view/${category}/${name}`, { credentials: 'include' });
+                if (!res.ok) {
+                    common.alert('설정 화면을 불러오지 못했습니다. (' + res.status + ')', 'Error');
+                    return;
+                }
+                panel.innerHTML = await res.text();
+                // 뷰 안의 inline 스크립트 실행
+                panel.querySelectorAll('script').forEach(s => {
+                    const ns = document.createElement('script');
+                    ns.textContent = s.textContent;
+                    panel.appendChild(ns);
+                    s.remove();
+                });
+                if (typeof initLayoutConfig === 'function') {
+                    initLayoutConfig(panel, category, name);
+                } else if (typeof window.initLayoutConfig === 'function') {
+                    window.initLayoutConfig(panel, category, name);
+                }
+                
+                // 사이드 패널 열기 및 본문 레이아웃 우측 공간 축소/확보
+                panel.classList.add('open');
+                panel.style.transform = 'translateX(0)';
+                const app = document.getElementById('app');
+                if (app) app.classList.add('hasLayoutConfigSide');
+            } catch (err) {
+                console.error('[LayoutConfig Error]', err);
+                common.alert('설정 화면을 불러오지 못했습니다: ' + (err.message || err), 'Error');
+            }
+        };
+
+        window.closeLayoutConfig = function(revert = true) {
+            const panel = document.getElementById('layoutConfigPanel');
+            if (panel) {
+                if (revert && typeof panel._revertColors === 'function') {
+                    panel._revertColors();
+                }
+                panel.classList.remove('open');
+                panel.style.transform = 'translateX(100%)';
+            }
+            const app = document.getElementById('app');
+            if (app) app.classList.remove('hasLayoutConfigSide');
+        };
+
+        @if (isEditable)
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    openLayoutConfig('General', '@currentLayout');
+                }, 150);
+            });
+            </text>
+        }
+    </script>
+}

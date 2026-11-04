@@ -1,0 +1,13 @@
+{
+  "key": "Notice",
+  "version": 2,
+  "name": { "ko": "공지", "en": "Notices" },
+  "description": { "ko": "고른 게시판(비우면 전체)의 공지글을 최신순으로 보여 줍니다.", "en": "Notice posts of the chosen boards (all if none), newest first." },
+  "categories": ["board"],
+  "size": { "min": [1, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "ruleNos", "type": "boards", "default": [] },
+    { "key": "count", "type": "number", "default": 5, "min": 1, "max": 20 },
+    { "key": "image", "type": "bool", "default": false }
+  ]
+}

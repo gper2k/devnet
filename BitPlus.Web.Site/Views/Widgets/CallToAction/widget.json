@@ -1,0 +1,15 @@
+{
+  "key": "CallToAction",
+  "version": 2,
+  "name": { "ko": "행동 유도", "en": "Call to action" },
+  "description": { "ko": "옅은 테마색 상자 가운데에 제목·설명과 버튼 하나. 가입·문의 안내에 씁니다.", "en": "A light theme-colored box with a centered title, text and one button, for sign-up or contact." },
+  "categories": ["design"],
+  "size": { "min": [2, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "label", "type": "text", "default": "" },
+    { "key": "title", "type": "text", "default": "" },
+    { "key": "text", "type": "lines", "default": "" },
+    { "key": "buttonText", "type": "text", "default": "" },
+    { "key": "buttonUrl", "type": "text", "default": "" }
+  ]
+}

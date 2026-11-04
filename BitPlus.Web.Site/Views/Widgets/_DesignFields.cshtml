@@ -1,0 +1,53 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<string[]>
+@{
+    // 디자인 위젯 설정 양식 공용 입력 — 모델 = 넣을 항목 이름 목록 (heading: label·title·text, image, button: buttonText·buttonUrl, reverse, band)
+    var fields = Model ?? [];
+}
+@if (fields.Contains("heading"))
+{
+    <li>
+        <header>@this.Lang("WidgetLabel")</header>
+        <input type="text" name="label" maxlength="100" autocomplete="off" />
+    </li>
+    <li>
+        <header>@this.Lang("WidgetHeading")</header>
+        <input type="text" name="title" maxlength="200" autocomplete="off" />
+    </li>
+    <li>
+        <header>@this.Lang("WidgetText")</header>
+        <textarea name="text" rows="3"></textarea>
+    </li>
+}
+@if (fields.Contains("image"))
+{
+    <li>
+        <header>@this.Lang("WidgetImage")</header>
+        <input type="text" name="image" maxlength="200" placeholder="/img/banners/img1.jpg" autocomplete="off" />
+    </li>
+}
+@if (fields.Contains("button"))
+{
+    <li class="col2">
+        <div>
+            <header>@this.Lang("WidgetButtonText")</header>
+            <input type="text" name="buttonText" maxlength="200" autocomplete="off" />
+        </div>
+        <div>
+            <header>@this.Lang("WidgetButtonUrl")</header>
+            <input type="text" name="buttonUrl" maxlength="200" placeholder="/content" autocomplete="off" />
+        </div>
+    </li>
+}
+@if (fields.Contains("reverse") || fields.Contains("band"))
+{
+    <li>
+        @if (fields.Contains("reverse"))
+        {
+            <label class="check main"><input type="checkbox" name="reverse" /><span>@this.Lang("WidgetReverse")</span></label>
+        }
+        @if (fields.Contains("band"))
+        {
+            <label class="check main"><input type="checkbox" name="band" /><span>@this.Lang("WidgetBand")</span></label>
+        }
+    </li>
+}

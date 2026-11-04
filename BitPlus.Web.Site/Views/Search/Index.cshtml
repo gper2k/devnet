@@ -1,0 +1,137 @@
+@model SearchPageModel
+@using System.Net
+@using Microsoft.AspNetCore.Html
+@using System.Text.RegularExpressions
+@{
+    this.SetPageKey("Search");
+    this.AppClass = "fit"; // 레이아웃을 창 높이에 맞춤 — main 이 남은 높이를 채워 검색 전 안내가 남은 여백의 가운데에 옴
+    var total = Model.Groups.Sum(p => p.Result.Total);
+    string Link(string? type, int page = 1) => $"/search?q={Uri.EscapeDataString(Model.Keyword)}{(type is null ? "" : $"&type={type}")}{(page > 1 ? $"&page={page}" : "")}";
+    var searched = Model.Keyword.Length > 0;
+}
+@functions {
+    /// <summary>글자를 HTML 이스케이프하고 검색어(대소문자 무시)를 mark 로 감쌉니다.</summary>
+    private IHtmlContent Mark(string? text)
+    {
+        var encoded = WebUtility.HtmlEncode(text ?? string.Empty);
+        var keyword = WebUtility.HtmlEncode(this.Model.Keyword);
+        return new HtmlString(keyword.Length == 0 ? encoded : Regex.Replace(encoded, Regex.Escape(keyword), m => $"<mark>{m.Value}</mark>", RegexOptions.IgnoreCase));
+    }
+}
+
+@* 통합 검색 — 검색어 입력, 구분 탭(전체 + 공급자별, 검색 뒤에는 건수), 결과 목록(제목·묶음 이름·날짜·본문 일부, 검색어 표시). 전체는 구분마다 앞부분과 "더 보기", 구분을 고르면 페이지 이동.
+   검색 전에는 탭(고른 구분으로 검색)과 안내 영역: 큰 검색 아이콘·안내 문구, 최근 검색어(이 브라우저 localStorage, 최대 8개). *@
+<div class="searchPage">
+    <form method="get" action="/search">
+        <h2>@this.Lang("IntegratedSearch")</h2>
+        <div class="inputGroup">
+            <input type="search" name="q" value="@Model.Keyword" maxlength="100" placeholder="@this.Lang("SearchKeyword")" autofocus />
+            <button type="submit" class="main"><i class="fi fiSearch"></i> @this.Lang("Search")</button>
+        </div>
+        @if (Model.Type is not null)
+        {
+            <input type="hidden" name="type" value="@Model.Type" />
+        }
+    </form>
+
+    <nav>
+        <a href="@Link(null)" class="@(Model.Type is null ? "active" : "")">@this.Lang("All") @if (searched) { <b>@total</b> }</a>
+        @foreach (var provider in Model.Providers)
+        {
+            <a href="@Link(provider.Name)" class="@(Model.Type == provider.Name ? "active" : "")">@provider.Title @if (searched) { <b>@(Model.Groups.FirstOrDefault(p => p.Name == provider.Name).Result?.Total ?? 0)</b> }</a>
+        }
+    </nav>
+
+    @if (!searched)
+    {
+        <article>
+            <span><i class="fi fiSearch"></i></span>
+            <h3>@this.Lang("SearchHeadline")</h3>
+            <p>@this.Lang("SearchGuide")</p>
+            <footer hidden>
+                <header>
+                    <span><i class="fi fiHistory"></i> @this.Lang("SearchRecent")</span>
+                    <button type="button" class="xs">@this.Lang("SearchRecentClear")</button>
+                </header>
+                <div></div>
+            </footer>
+        </article>
+    }
+    else
+    {
+        if (total == 0)
+        {
+            <p>@this.Lang("SearchNoResult")</p>
+        }
+        foreach (var group in Model.Groups.Where(p => p.Result.Total > 0 && (Model.Type is null || Model.Type == p.Name)))
+        {
+            <section>
+                <header>
+                    <h3>@group.Title <small>@group.Result.Total</small></h3>
+                    @if (Model.Type is null && group.Result.Total > group.Result.Items.Count)
+                    {
+                        <a href="@Link(group.Name)">@this.Lang("LoadMore") <i class="fi fiChevronRight"></i></a>
+                    }
+                </header>
+                <ul>
+                    @foreach (var item in group.Result.Items)
+                    {
+                        <li>
+                            <a href="@item.Url">@Mark(item.Title)</a>
+                            <div>
+                                @if (item.Group is not null)
+                                {
+                                    <span>@item.Group</span>
+                                }
+                                @if (item.Date is { } date)
+                                {
+                                    <time data-local="date" datetime="@date.ToString("o")"></time>
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.Snippet))
+                            {
+                                <p>@Mark(item.Snippet)</p>
+                            }
+                        </li>
+                    }
+                </ul>
+                @if (Model.Type is not null && group.Result.Total > Model.PageSize)
+                {
+                    var last = (group.Result.Total + Model.PageSize - 1) / Model.PageSize;
+                    var first = Math.Max(1, Math.Min(Model.Page - 2, last - 4));
+                    <ul class="pager">
+                        <li class="@(Model.Page <= 1 ? "disabled" : "")"><a href="@Link(Model.Type, Model.Page - 1)"><i class="fi fiChevronLeft"></i></a></li>
+                        @for (var p = first; p <= Math.Min(last, first + 4); p++)
+                        {
+                            <li class="@(p == Model.Page ? "active" : "")"><a href="@Link(Model.Type, p)">@p</a></li>
+                        }
+                        <li class="@(Model.Page >= last ? "disabled" : "")"><a href="@Link(Model.Type, Model.Page + 1)"><i class="fi fiChevronRight"></i></a></li>
+                    </ul>
+                }
+            </section>
+        }
+    }
+</div>
+
+<script>
+    // 최근 검색어 (이 브라우저에만, 최대 8개): 검색하면 앞에 넣고, 검색 전 화면에 칩으로 보여 줌
+    (function () {
+        const key = 'searchRecent', page = document.querySelector('.searchPage');
+        const read = () => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
+        const write = list => { try { localStorage.setItem(key, JSON.stringify(list)); } catch { } };
+        const keyword = @this.Js(Model.Keyword);
+        if (keyword) write([keyword, ...read().filter(p => p !== keyword)].slice(0, 8));
+        const box = page.querySelector(':scope > article > footer');
+        const list = read();
+        if (!box || list.length === 0) return;
+        const chips = box.querySelector(':scope > div');
+        list.forEach(word => {
+            const a = document.createElement('a');
+            a.href = '/search?q=' + encodeURIComponent(word);
+            a.textContent = word;
+            chips.append(a);
+        });
+        box.hidden = false;
+        box.querySelector('button').onclick = () => { write([]); box.hidden = true; };
+    })();
+</script>

@@ -1,0 +1,53 @@
+MIT License
+
+Copyright (c) 2026 BitPlus (비트플러스)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+USER RESPONSIBILITY
+
+The user installs, configures, operates and uses the Software entirely at the
+user's own risk. The user is solely responsible for any damage or loss arising
+from the use of the Software, including but not limited to data loss, service
+interruption, security incidents, business loss, and damage to third parties.
+The user is responsible for backing up data, verifying security settings and
+complying with applicable laws before and while using the Software.
+
+----------------------------------------------------------------------------
+
+[한국어 안내 - 참고용, 영문 원문이 우선합니다]
+
+MIT 라이선스
+
+이 소프트웨어는 무료로 사용, 복제, 수정, 병합, 게시, 배포, 재라이선스 및
+판매할 수 있습니다. 단, 위 저작권 표시와 이 허가 표시를 소프트웨어의 모든
+복제본 또는 주요 부분에 포함해야 합니다.
+
+이 소프트웨어는 "있는 그대로" 제공되며, 상품성, 특정 목적 적합성, 비침해에
+대한 보증을 포함하여 명시적이거나 묵시적인 어떠한 보증도 하지 않습니다.
+저작자 또는 저작권자는 소프트웨어나 그 사용으로 인해 발생하는 어떠한 청구,
+손해 또는 기타 책임에 대해서도 책임지지 않습니다.
+
+사용자 책임
+
+사용자는 자신의 책임하에 이 소프트웨어를 설치, 설정, 운영 및 사용합니다.
+데이터 손실, 서비스 중단, 보안 사고, 영업 손실, 제3자에 대한 피해 등 이
+소프트웨어의 사용으로 발생하는 모든 피해와 손실에 대한 책임은 전적으로
+사용자에게 있습니다. 사용자는 사용 전과 사용 중에 데이터 백업, 보안 설정
+확인 및 관련 법령 준수에 대한 책임을 집니다.

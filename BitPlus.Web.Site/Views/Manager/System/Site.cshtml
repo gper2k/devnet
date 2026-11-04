@@ -1,0 +1,137 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("SiteInfo"));
+}
+
+@* 사이트 기본 정보 (설정 "SiteInfo") — 문서 머리 정보, 상단·하단 표시 정보, 회사 정보. 저장은 한 번에(api/config/site), 이미지 칸은 경로 입력 또는 업로드 *@
+<div class="pageBox siteInfo">
+    <div class="inform">
+        <header><i class="fi fiInfo fiFill"></i> @this.Lang("SiteInfo")</header>
+        <p>@this.Lang("SiteInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <div class="cardGrid auto">
+            <ul class="form card line">
+                <li><h4><i class="fi fiGlobe"></i> @this.Lang("SiteHeadInfo")</h4></li>
+                <li>
+                    <header>@this.Lang("SiteTitle") <small class="txDanger">*</small></header>
+                    <input type="text" name="title" maxlength="128" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("SiteKeywords") <small>@this.Lang("SiteKeywordsInfo")</small></header>
+                    <input type="text" name="keywords" maxlength="512" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("Description")</header>
+                    <textarea name="description" rows="3" maxlength="512"></textarea>
+                </li>
+                <li>
+                    <header>@this.Lang("Favicon")</header>
+                    <div class="inputGroup" data-image>
+                        <input type="text" name="favicon" maxlength="512" autocomplete="off" />
+                        <button type="button" title="@this.Lang("Upload")"><i class="fi fiUpload"></i></button>
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("ShareImage") <small>@this.Lang("ShareImageInfo")</small></header>
+                    <div class="inputGroup" data-image>
+                        <input type="text" name="shareImage" maxlength="512" autocomplete="off" />
+                        <button type="button" title="@this.Lang("Upload")"><i class="fi fiUpload"></i></button>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="form card line">
+                <li><h4><i class="fi fiWindow"></i> @this.Lang("SiteDisplayInfo")</h4></li>
+                <li>
+                    <header>@this.Lang("Logo")</header>
+                    <div class="inputGroup" data-image>
+                        <input type="text" name="logo" maxlength="512" autocomplete="off" />
+                        <button type="button" title="@this.Lang("Upload")"><i class="fi fiUpload"></i></button>
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("SiteName") <small>@this.Lang("HtmlAllowedInfo")</small></header>
+                    <input type="text" name="siteName" maxlength="256" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("Slogan")</header>
+                    <textarea name="slogan" rows="3" maxlength="512"></textarea>
+                </li>
+                <li>
+                    <header>@this.Lang("GeneralLayout")</header>
+                    <div class="inputGroup">
+                        <select name="generalLayout" id="generalLayoutSelect"></select>
+                        <button type="button" class="btnLayoutConfig" data-category="General" title="@this.Lang("LayoutSetting")"><i class="fi fiSettings"></i></button>
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("AccountLayout")</header>
+                    <div class="inputGroup">
+                        <select name="accountLayout" id="accountLayoutSelect"></select>
+                        <button type="button" class="btnLayoutConfig" data-category="Account" title="@this.Lang("LayoutSetting")"><i class="fi fiSettings"></i></button>
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("MainEditor") <small>@this.Lang("MainEditorInfo")</small></header>
+                    <select name="editor"></select>
+                </li>
+                <li>
+                    <header>@this.Lang("Copyright") <small>@this.Lang("HtmlAllowedInfo")</small></header>
+                    <input type="text" name="copyright" maxlength="512" autocomplete="off" />
+                </li>
+            </ul>
+
+            <ul class="form card line">
+                <li><h4><i class="fi fiBriefcase"></i> @this.Lang("CompanyInfo")</h4></li>
+                <li>
+                    <header>@this.Lang("CompanyName")</header>
+                    <input type="text" name="companyName" maxlength="128" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("Phone")</header>
+                    <input type="text" name="phone" maxlength="64" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("Email")</header>
+                    <input type="text" name="email" maxlength="128" autocomplete="off" />
+                </li>
+                <li>
+                    <header>@this.Lang("Address")</header>
+                    <input type="text" name="address" maxlength="256" autocomplete="off" />
+                </li>
+            </ul>
+            <ul class="form card line" data-section="cultures">
+                <li><h4><i class="fi fiLocalLanguage"></i> @this.Lang("CultureSettings")</h4></li>
+                <li>
+                    <header>@this.Lang("SupportedLanguages") <small>@this.Lang("SupportedLanguagesInfo")</small></header>
+                    <div class="chipBox">
+                        <ul></ul>
+                        <footer class="inputGroup">
+                            <select></select>
+                            <button type="button" class="xs info"><i class="fi fiAddCircle"></i> @this.Lang("Add")</button>
+                        </footer>
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("DefaultLanguage")</header>
+                    <select data-default></select>
+                </li>
+            </ul>
+        </div>
+
+        <footer class="pageFooter">
+            <span></span>
+            <div class="flexRow gapSm">
+                <button type="button" data-mode="reset"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+            </div>
+        </footer>
+    </article>
+</div>
+
+<!--
+    주의: 이 뷰는 System.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 System.cshtml 의 wireSitePage() 가 담당한다.
+-->

@@ -1,0 +1,78 @@
+@model ContentPageModel
+@{
+    var useTags = Model.Option("UseTags");
+    var isEdit = Model.EditNo > 0; // 글 번호(?no=)가 있으면 수정: 기존 글을 API 로 불러와 채운다
+}
+
+@* FAQ형 등록·수정(/content/{규칙}/write, 수정은 ?no=글 번호) — 쓰기 권한이 있는 로그인 회원만 열린다(컨트롤러 검사). 제목 입력이 질문(Q), 큰 글자 입력 칸이 답변(A)이고 에디터는 쓰지 않는다.
+   저장은 일반 글 API(api/content/post)이며 서버가 답변의 줄바꿈을 br 로 바꿔 저장한다. 태그는 검색용이라 보기에 나오지 않고(쉼표로 구분), 태그 옵션이 켜져 있을 때만 입력칸이 있다. *@
+<article class="contentFaqWrite">
+    <header>
+        <span>
+            @Model.Title
+            <small>@this.Lang(Model.EditNo > 0 ? "Edit" : "FaqNew")</small>
+        </span>
+    </header>
+    <ul class="form">
+        <li>
+            <header>@this.Lang("FaqQuestion")</header>
+            <input type="text" name="title" maxlength="512" autocomplete="off" />
+        </li>
+        @if (Model.Categories.Count > 0)
+        {
+            <li>
+                <header>@this.Lang("ContentCategory")</header>
+                <select name="category">
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Key">@category.Value</option>
+                    }
+                </select>
+            </li>
+        }
+        <li>
+            <header>@this.Lang("FaqAnswer")</header>
+            <textarea name="body" rows="12" maxlength="@BitPlus.Web.Data.Content.FaqContentHandler.MaxTextLength"></textarea>
+        </li>
+        @if (useTags)
+        {
+            <li>
+                <header>@this.Lang("Tag")</header>
+                <input type="text" name="tags" maxlength="500" autocomplete="off" placeholder="@this.Lang("FaqTagHint")" />
+            </li>
+        }
+    </ul>
+    <footer>
+        <button type="button" id="faqCancel"><i class="fi fiProhibit"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" id="faqSave"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</article>
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const root = document.querySelector('article.contentFaqWrite');
+        const ruleNo = @Model.RuleNo, editNo = @Model.EditNo;
+        const field = name => root.querySelector(`[name="${name}"]`);
+        const listUrl = `/content/${ruleNo}`;
+
+        // 수정: 기존 질문·답변·카테고리·태그를 불러와 채운다 (답변은 서버가 줄바꿈 글자로 돌려줌)
+        if (editNo) {
+            const res = await common.postSend('/api/content/post/load', common.makeFormData({ ruleNo, contentNo: editNo }));
+            if (!res?.success) return;
+            const d = res.data;
+            field('title').value = d.title ?? '';
+            field('body').value = d.body ?? '';
+            if (field('category') && d.category) field('category').value = d.category;
+            if (field('tags')) field('tags').value = (d.tags ?? []).join(', ');
+        }
+
+        root.querySelector('#faqCancel').onclick = () => { location.href = listUrl; };
+        root.querySelector('#faqSave').onclick = async () => {
+            const title = field('title').value.trim(), body = field('body').value.trim();
+            const tags = field('tags') ? field('tags').value.split(',').map(p => p.trim()).filter(Boolean) : [];
+            const res = await common.postSend('/api/content/post', common.makeFormData({
+                ruleNo, contentNo: editNo || 0, title, body, category: field('category')?.value ?? '', tags: JSON.stringify(tags), published: true
+            }));
+            if (res?.success) location.href = listUrl;
+        };
+    });
+</script>

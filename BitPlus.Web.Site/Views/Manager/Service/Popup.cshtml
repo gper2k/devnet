@@ -1,0 +1,107 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Popup"));
+}
+
+<div class="pageBox popupBox">
+    <section class="card line flexCol auto">
+        <header class="fix">
+            <strong>
+                <i class="fi fiWindow"></i>
+                @this.Lang("Popup")
+                <i id="popupCounter" class="badge deco">0</i>
+            </strong>
+            <button type="button" class="sub sm" id="addPopupBtn"><i class="fi fiAdd"></i> @this.Lang("Add")</button>
+        </header>
+
+        <div class="dataList auto">
+            <header>
+                <span class="colName"><span>TITLE</span></span>
+                <span class="colArea"><span>AREA</span></span>
+                <span class="colPeriod"><span>PERIOD</span></span>
+                <span class="colTarget"><span>TARGET</span></span>
+                <span class="colSize"><span>SIZE</span></span>
+                <span class="colFlag"><span>ENABLER</span></span>
+                <span class="colDate"><span>CREATE</span></span>
+                <span class="colPreview"></span>
+            </header>
+            <ul id="popupList"></ul>
+        </div>
+
+        <footer class="fix">
+            <div class="pageSize">
+                <label>List Size</label>
+                <select name="pageSize">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <ul class="pager"></ul>
+        </footer>
+    </section>
+</div>
+
+<!-- 팝업 등록/수정 모달: 제목, 게시 기간(periodEdit), 게시 대상(targetEdit, 비우면 모든 사용자), 크기, 활성, 본문(에디터) -->
+<dialog id="popupModal">
+    <header><i class="fi fiWindow fiFill"></i> <span></span></header>
+    <section>
+        <ul class="form">
+            <li class="col2">
+                <div>
+                    <header>@this.Lang("ContentTitle") <small class="txDanger">*</small></header>
+                    <input type="text" name="title" maxlength="256" autocomplete="off" />
+                </div>
+                <div>
+                    <header>@this.Lang("PopupArea")</header>
+                    <select name="area">
+                        @foreach (var area in Enum.GetNames<BitPlus.Data.Content.PopupArea>())
+                        {
+                            <option value="@area">@this.Lang("PopupArea" + area)</option>
+                        }
+                    </select>
+                </div>
+            </li>
+            <li class="col2">
+                <div>
+                    <header>@this.Lang("PublishPeriod") <small class="txDanger">*</small></header>
+                    <div class="inputGroup">
+                        <input type="text" name="periodText" readonly />
+                        <button type="button" data-act="period"><i class="fi fiCalClock"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <header>@this.Lang("PublishTarget")</header>
+                    <div class="inputGroup">
+                        <input type="text" name="targetText" readonly placeholder="@this.Lang("AllUsers")" />
+                        <button type="button" data-act="target"><i class="fi fiShieldKeyhole"></i></button>
+                    </div>
+                </div>
+            </li>
+            <li class="col2">
+                <div>
+                    <header>@this.Lang("PopupWidth")</header>
+                    <input type="number" name="width" min="100" max="2000" step="1" />
+                </div>
+                <div>
+                    <header>@this.Lang("PopupHeight") <small>@this.Lang("PopupHeightInfo")</small></header>
+                    <input type="number" name="height" min="0" max="2000" step="1" />
+                </div>
+            </li>
+            <li class="editorFill">
+                <textarea name="body"></textarea>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <label class="check main"><input type="checkbox" name="enabler" /><span>@this.Lang("Enabler")</span></label>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="danger" data-mode="delete" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 Service.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 Service.cshtml 의 wirePopupPage() 가 담당한다.
+-->

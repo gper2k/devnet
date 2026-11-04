@@ -1,0 +1,54 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Site.Widgets
+@{
+    var items = Model.Lines("items");
+}
+@* 기능 탭 위젯 — 가운데 제목·설명, 왼쪽 기능 목록(고른 것은 테마색 카드), 오른쪽 고른 기능의 이미지. 마우스를 올리거나 누르면 바뀜 *@
+<div class="widgetTabs">
+    @if (Model.Text("label").Length > 0)
+    {
+        <em>@Model.Text("label")</em>
+    }
+    @if (Model.Text("title").Length > 0)
+    {
+        <h2>@Model.Text("title")</h2>
+    }
+    @if (Model.Text("text").Length > 0)
+    {
+        <p>@Model.Text("text")</p>
+    }
+    <div>
+        <ul>
+            @for (var i = 0; i < items.Count; i++)
+            {
+                <li class="@(i == 0 ? "active" : "")" data-image="@(items[i].Length > 2 ? SlotView.SafeUrl(items[i][2]) : null)">
+                    <strong>@items[i][0]</strong>
+                    <span>@(items[i].Length > 1 ? items[i][1] : "")</span>
+                </li>
+            }
+        </ul>
+        <figure>
+            @{
+                var first = items.Count > 0 && items[0].Length > 2 ? SlotView.SafeUrl(items[0][2]) : null;
+            }
+            <img src="@first" alt="" hidden="@(first is null)" />
+            <i class="fi fiImage" hidden="@(first is not null)"></i>
+        </figure>
+    </div>
+</div>
+<script>
+    (function (root) {
+        const tabs = [...root.querySelectorAll(':scope > div > ul > li')], img = root.querySelector('figure > img'), icon = root.querySelector('figure > i');
+        const show = li => {
+            tabs.forEach(t => t.classList.toggle('active', t === li));
+            const src = li.dataset.image;
+            img.hidden = !src;
+            icon.hidden = !!src;
+            if (src) img.src = src;
+        };
+        tabs.forEach(li => {
+            li.onclick = () => show(li);
+            li.onmouseenter = () => show(li);
+        });
+    })(document.currentScript.previousElementSibling);
+</script>

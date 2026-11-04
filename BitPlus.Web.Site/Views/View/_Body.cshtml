@@ -1,0 +1,31 @@
+﻿@model ContentViewModel
+@{
+    var shown = Model.Translations.FirstOrDefault(p => p.Culture.NEqual(Model.Culture)); // 지금 보이는 번역 (원문이면 기본값)
+    string LangUrl(string culture) => $"{this.Context.Request.Path}?lang={Uri.EscapeDataString(culture)}";
+}
+@* 페이지 뷰 본문 (Index.cshtml 이 사이드 패널 유무와 상관없이 같은 본문을 그림). 번역이 있으면 위에 언어 전환(게시판 글 보기와 같은 모양), AI 번역을 보고 있으면 안내 *@
+<article class="editorContentPage">
+    @if (Model.Translations.Count > 0)
+    {
+        <nav>
+            <i class="fi fiLocalLanguage"></i>
+            <a href="@LangUrl(Model.OriginalCulture)" class="@(Model.Culture.NEqual(Model.OriginalCulture) ? "active" : null)">@(Model.OriginalCulture.ToCulture()?.NativeName ?? Model.OriginalCulture) · @this.Lang("Original")</a>
+            @foreach (var item in Model.Translations)
+            {
+                <a href="@LangUrl(item.Culture)" class="@(item.Culture.NEqual(Model.Culture) ? "active" : null)" title="@(item.Outdated ? this.Lang("TranslationOutdated") : null)">@item.Name@if (item.IsMachine) { <i class="fi fiSparkle"></i> }@if (item.Outdated) { <i class="fi fiWarning"></i> }</a>
+            }
+        </nav>
+    }
+    @if (shown.IsMachine)
+    {
+        <p><i class="fi fiSparkle"></i> @this.Lang("TranslationMachineNotice")</p>
+    }
+    <section>@Html.Raw(Model.Body)</section>
+    @if (Model.CanEdit)
+    {
+        @* 관리자(SystemManager/Manager)에게만 보이는 하단 중앙 편집 버튼 *@
+        <footer style="text-align:center;">
+            <a class="btn main" href="/view/edit/@Model.ContentNo"><i class="fi fiEdit"></i> @this.Lang("Edit")</a>
+        </footer>
+    }
+</article>

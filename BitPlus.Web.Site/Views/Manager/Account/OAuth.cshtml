@@ -1,0 +1,90 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("OAuthConfig"));
+}
+
+@* 외부 로그인 서비스 (설정 "OAuthProviders") — 목록(행 클릭 = 편집), 하단 추가 버튼 = 등록 모달. 저장·삭제는 서비스 하나씩(api/membership/oauth), 저장 즉시 로그인 화면에 반영 *@
+<div class="pageBox oauthBox">
+    <div class="inform">
+        <header><i class="fi fiKey"></i> @this.Lang("OAuthConfig")</header>
+        <p>@this.Lang("OAuthInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <section class="card line flexCol auto">
+            <div class="dataList auto">
+                <header>
+                    <span class="colName"><span>NAME</span></span>
+                    <span class="colKind"><span>TYPE</span></span>
+                    <span class="colClient"><span>CLIENT ID</span></span>
+                    <span class="colFlag"><span>ENABLER</span></span>
+                </header>
+                <ul></ul>
+            </div>
+        </section>
+
+        <footer class="pageFooter">
+            <span></span>
+            <button type="button" class="main" data-mode="add"><i class="fi fiPlus"></i> @this.LangOf("AddOf", "OAuthProvider")</button>
+        </footer>
+    </article>
+</div>
+
+<!-- 외부 로그인 서비스 등록/수정 모달: 종류·이름·Client ID·Secret(비우면 유지)·발급자 주소(일반 OIDC 만)·순서, 콜백 주소(저장 후 표시·복사), 하단 사용 체크와 삭제(편집일 때만)·취소·저장 -->
+<dialog id="oauthModal">
+    <header><i class="fi fiKey fiFill"></i> <span></span></header>
+    <section>
+        <ul class="form">
+            <li class="col2">
+                <div>
+                    <header>@this.Lang("OAuthKind")</header>
+                    <select name="kind">
+                        <option value="Google">Google</option>
+                        <option value="Microsoft">Microsoft</option>
+                        <option value="Kakao">Kakao</option>
+                        <option value="Naver">Naver</option>
+                        <option value="Oidc">OpenID Connect</option>
+                    </select>
+                </div>
+                <div>
+                    <header>@this.Lang("Name") <small class="txDanger">*</small></header>
+                    <input type="text" name="name" maxlength="64" autocomplete="off" />
+                </div>
+            </li>
+            <li data-kind="Oidc">
+                <header>@this.Lang("OAuthAuthority") <small class="txDanger">*</small></header>
+                <input type="url" name="authority" maxlength="512" placeholder="https://example.okta.com" autocomplete="off" />
+            </li>
+            <li>
+                <header>Client ID <small class="txDanger">*</small></header>
+                <input type="text" name="clientId" maxlength="256" autocomplete="off" />
+            </li>
+            <li>
+                <header>Client Secret <small class="txDanger">*</small></header>
+                <input type="password" name="clientSecret" maxlength="512" autocomplete="new-password" />
+            </li>
+            <li>
+                <header>@this.Lang("SortOrder")</header>
+                <input type="number" name="sort" min="0" max="999" />
+            </li>
+            <li data-callback>
+                <header>@this.Lang("CallbackUrl") <small>@this.Lang("CallbackUrlInfo")</small></header>
+                <div class="inputGroup">
+                    <input type="text" name="callbackUrl" readonly />
+                    <button type="button" title="@this.Lang("Copy")"><i class="fi fiCopy"></i></button>
+                </div>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <label class="check main"><input type="checkbox" name="enabler" /><span>@this.Lang("Enabler")</span></label>
+        <button type="button" class="danger" data-mode="delete" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 Account.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 Account.cshtml 의 wireOAuthPage() 가 담당한다.
+-->

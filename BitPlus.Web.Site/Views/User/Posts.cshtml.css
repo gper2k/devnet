@@ -1,0 +1,84 @@
+﻿@charset "UTF-8";
+/* 작성글 보기: 머리 아래 게시물·댓글 탭 / 목록 */
+.userPosts {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.userPosts > article {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  min-width: 0;
+  padding: 0;
+  /* 게시물·댓글 탭 (개수 포함) */
+  /* 목록: 게시판 배지·시각 / 제목 / 댓글 내용 일부 */
+}
+.userPosts > article > nav {
+  display: flex;
+  justify-content: right;
+  gap: 0.5em;
+}
+.userPosts > article > nav > a {
+  padding: 0.4em 1em;
+  cursor: pointer;
+  color: var(--txLight);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBtn);
+}
+.userPosts > article > nav > a.active {
+  color: var(--bgColor);
+  background: var(--main);
+  border-color: var(--main);
+}
+.userPosts > article > ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border-top: 2px solid var(--aColor);
+  list-style: none;
+}
+.userPosts > article > ul > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  padding: 0.5em;
+  border-bottom: 1px dashed var(--aColor);
+  color: var(--txLight);
+}
+.userPosts > article > ul > li > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  font-size: 0.85em;
+}
+.userPosts > article > ul > li > header > span {
+  padding: 0.3em 0.6em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBtn);
+  background-color: var(--main4);
+  color: white;
+  line-height: 1em;
+}
+.userPosts > article > ul > li > a {
+  color: var(--txColor);
+}
+.userPosts > article > ul > li > a:hover {
+  color: var(--main);
+}
+.userPosts > article > ul > li > p {
+  margin: 0;
+  font-size: 0.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.userPosts > article ::deep > ul.pager {
+  justify-content: center;
+  padding: 0.8em 0.5em;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/User/Posts.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AACA;AAoBA;;AAnBA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;;AAEA;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA%22%7D */

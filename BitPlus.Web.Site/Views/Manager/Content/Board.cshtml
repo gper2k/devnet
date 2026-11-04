@@ -1,0 +1,14 @@
+@model ContentPageModel
+@{
+    Layout = "_AdminLayout";
+    this.SetTitle(this.Lang("BoardSettings"));
+    this.SetPageKey("Content");
+    this.SetDescription(this.Lang("ContentManageInfo"));
+    ViewData["ReturnUrl"] = "/Manager/Content"; // 저장하면 관리자 컨텐츠 화면(게시판 탭)으로 돌아간다 (형식별 Manage 파샬뷰가 읽음)
+}
+
+@* 관리자 콘솔 게시판 설정(/Manager/Content/Board/{규칙}, 신규는 ?type=) — 사용자 화면(/content/manage/{규칙})과 같은 형식별 설정 파샬뷰를 관리자 레이아웃 안에 보여 준다 (ContentController.ManagerBoard).
+   관리자 화면 전용 모양(파샬뷰 제목줄 숨김, 탭 본문만 스크롤, 저장 버튼 줄을 화면 아래에 고정)은 Board.cshtml.scss 가 맡는다. *@
+<div class="pageBox boardSettings">
+    <partial name="@Model.ViewPath" model="Model" />
+</div>

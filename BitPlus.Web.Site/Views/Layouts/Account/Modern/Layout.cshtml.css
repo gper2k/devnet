@@ -1,0 +1,716 @@
+div#app.modernAccountLayout {
+    --modernMain: var(--main, #182134);
+    --modernSub: var(--sub, #707b90);
+    --modernPoint: var(--point, #538fa8);
+    --modernDeco: var(--deco, #184957);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    box-sizing: border-box;
+    padding: 1.5em;
+    background-color: var(--modernMain);
+    color: var(--txColor);
+    background-image: 
+        radial-gradient(ellipse at 15% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 80%, rgba(15, 23, 42, 0.95) 0%, transparent 60%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.95) 100%),
+        repeating-linear-gradient(60deg, rgba(255, 255, 255, 0.015) 0, rgba(255, 255, 255, 0.015) 1px, transparent 0, transparent 40px),
+        repeating-linear-gradient(-60deg, rgba(255, 255, 255, 0.012) 0, rgba(255, 255, 255, 0.012) 1px, transparent 0, transparent 40px);
+    background-size: cover;
+    background-attachment: fixed;
+}
+div#app.modernAccountLayout > .modernContainer {
+    width: 100%;
+    max-width: 76em;
+    min-height: min(46em, 92dvh);
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    border-radius: 2em;
+    overflow: hidden;
+    border: 1px solid var(--aLight);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+    background-color: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection {
+    padding: 3.2em 3.4em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    color: #ffffff;
+    box-sizing: border-box;
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.88) 100%);
+    border-right: 1px solid var(--aLight);
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+        linear-gradient(215deg, transparent 65%, rgba(56, 189, 248, 0.08) 100%),
+        linear-gradient(35deg, transparent 70%, rgba(255, 255, 255, 0.04) 100%);
+    pointer-events: none;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .brandWrap {
+    display: flex;
+    align-items: center;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .brandWrap > .brandLogo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    text-decoration: none;
+    color: #ffffff;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .brandWrap > .brandLogo > img.logoImg {
+    height: 2em;
+    max-height: 2.2em;
+    width: auto;
+    object-fit: contain;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .brandWrap > .brandLogo > .logoText {
+    font-size: 1.35em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .backToWeb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    font-size: 0.88em;
+    font-weight: 500;
+    padding: 0.45em 0.9em;
+    border-radius: var(--roundBtn, 2em);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .backToWeb:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px);
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader > .backToWeb > i.fi {
+    font-size: 1em;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent {
+    position: relative;
+    z-index: 2;
+    margin: 4em 0 3em;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4em;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1em;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .sloganTitle {
+    margin: 0;
+    font-size: 2.5em;
+    line-height: 1.18;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #ffffff;
+    word-break: keep-all;
+    background: linear-gradient(135deg, #ffffff 40%, var(--modernPoint) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .brandGreeting {
+    margin: 0;
+    font-size: 1.05em;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 400;
+    word-break: keep-all;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sliderIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sliderIndicator > .indBar {
+    width: 2.2em;
+    height: 0.32em;
+    border-radius: 0.2em;
+    background-color: var(--modernPoint);
+    transition: width 0.3s;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sliderIndicator > .indDot {
+    width: 0.35em;
+    height: 0.35em;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.35);
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    padding-top: 1.2em;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter > .cultureDrop {
+    position: relative;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter > .cultureDrop > header {
+    padding: 0.35em 0.8em;
+    font-size: 0.82em;
+    border-radius: var(--roundBtn, 2em);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter > .cultureDrop > header:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter > .cultureDrop > ul.up {
+    border: 1px solid var(--aLight);
+    border-radius: 0.6em;
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    box-shadow: 0 4px 16px var(--aDark);
+}
+div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter > .copyright {
+    font-size: 0.78em;
+    color: rgba(255, 255, 255, 0.45);
+    white-space: nowrap;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection {
+    padding: 2.2em 2.4em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bgColor);
+    box-sizing: border-box;
+    position: relative;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 0 0 auto;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader > .authNav {
+    display: flex;
+    align-items: center;
+    gap: 1.1em;
+    flex-wrap: wrap;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader > .authNav > .navLink {
+    font-size: 0.88em;
+    font-weight: 500;
+    color: var(--txSub);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.3em 0.4em;
+    transition: color 0.18s;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader > .authNav > .navLink > i.fi {
+    font-size: 1.05em;
+    opacity: 0.85;
+    transition: opacity 0.18s;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader > .authNav > .navLink:hover {
+    color: var(--modernPoint);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader > .authNav > .navLink:hover > i.fi {
+    opacity: 1;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .sectionHeader > .authNav > .navLink:active {
+    transform: scale(0.98);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard {
+    width: 100%;
+    max-width: 27em;
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardHeader > .cardTitle {
+    margin: 0;
+    font-size: 1.85em;
+    font-weight: 700;
+    color: var(--txColor);
+    letter-spacing: -0.02em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardHeader > .cardDesc {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--txSub);
+    line-height: 1.5;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1em;
+    width: 100%;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid.single {
+    grid-template-columns: 1fr;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol label {
+    font-size: 0.82em;
+    font-weight: 600;
+    color: var(--txColor);
+    letter-spacing: 0.01em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input[type="text"],
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input[type="password"],
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input[type="email"] {
+    width: 100%;
+    height: 2.85em;
+    min-height: 2.85em;
+    padding: 0 1em;
+    border: 1px solid var(--aLight);
+    border-radius: 0.65em;
+    background-color: var(--bgSub);
+    color: var(--txColor);
+    font-size: 0.92em;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input[type="text"]:focus,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input[type="password"]:focus,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input[type="email"]:focus {
+    border-color: var(--modernPoint);
+    background-color: var(--bgColor);
+    box-shadow: 0 0 0 3px var(--aLight);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid .fieldCol input::placeholder {
+    color: var(--txLight);
+    opacity: 0.7;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid small {
+    grid-column: 1 / -1;
+    font-size: 0.78em;
+    color: var(--txLight);
+    line-height: 1.4;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form button.submitBtn,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form button[type="submit"].submitBtn,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form button[type="submit"] {
+    width: 100%;
+    height: 2.85em;
+    min-height: 2.85em;
+    border-radius: var(--roundBtn, 2em);
+    background: linear-gradient(135deg, var(--modernMain) 0%, var(--modernSub) 100%);
+    color: #ffffff;
+    border: 1px solid var(--aColor);
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    margin-top: 0.6em;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px var(--aLow);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form button.submitBtn:hover,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form button[type="submit"]:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 4px 12px var(--aDark);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+    margin: 0.4em 0 0.8em;
+    padding: 0.9em 1.1em;
+    background-color: var(--bgSub);
+    border: 1px solid var(--aLight);
+    border-radius: 0.75em;
+    box-sizing: border-box;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree[hidden] {
+    display: none;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > label.agreeAll {
+    font-size: 0.92em;
+    font-weight: 600;
+    color: var(--txColor);
+    padding-bottom: 0.6em;
+    margin-bottom: 0.2em;
+    border-bottom: 1px dashed var(--aLight);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    cursor: pointer;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > label.agreeAll > span {
+    color: var(--txColor);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8em;
+    margin: 0;
+    padding: 0.15em 0;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li > label.check {
+    font-size: 0.85em;
+    color: var(--txColor);
+    flex: 1 1 auto;
+    min-width: 0;
+    cursor: pointer;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li > label.check > span {
+    color: var(--txColor);
+    line-height: 1.4;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li > label.check > span b,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li > label.check > span strong {
+    color: var(--txColor);
+    font-weight: 600;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li > button.termsBtn {
+    flex: 0 0 auto;
+    font-size: 0.78em;
+    padding: 0.25em 0.7em;
+    height: auto;
+    min-height: unset;
+    border-radius: var(--roundBtn, 2em);
+    border: 1px solid var(--aLight);
+    background-color: var(--bgColor);
+    color: var(--txSub);
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 1.3;
+    margin: 0;
+    width: auto;
+    box-shadow: none;
+    transition: all 0.2s;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form section.termsAgree > ul > li > button.termsBtn:hover {
+    color: var(--modernPoint);
+    border-color: var(--modernPoint);
+    background-color: var(--aLow);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    width: 100%;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount nav[role="tablist"] {
+    display: flex;
+    gap: 0.5em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount nav[role="tablist"] span[role="tab"] {
+    padding: 0.45em 0.9em;
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: var(--roundBtn, 2em);
+    cursor: pointer;
+    border: 1px solid var(--aLight);
+    background: var(--bgSub);
+    color: var(--txSub);
+    transition: all 0.2s;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount nav[role="tablist"] span[role="tab"]:hover {
+    border-color: var(--modernPoint);
+    color: var(--modernPoint);
+    box-shadow: 0 4px 12px var(--aDark);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount nav[role="tablist"] span[role="tab"]:active {
+    transform: scale(0.98);
+    box-shadow: inset 0 2px 4px var(--aHigh);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount nav[role="tablist"] span[role="tab"][aria-selected="true"] {
+    background: var(--modernPoint);
+    color: var(--pointText, #ffffff);
+    border-color: var(--modernPoint);
+    box-shadow: 0 2px 8px var(--aDark);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount nav[role="tablist"] span[role="tab"][aria-selected="true"]:hover {
+    color: var(--pointText, #ffffff);
+    background-color: var(--pointLight, var(--modernPoint));
+    box-shadow: 0 4px 14px var(--aDark);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount article[role="tabpanel"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount article[role="tabpanel"][hidden] {
+    display: none;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount article[role="tabpanel"] p {
+    font-size: 0.88em;
+    color: var(--txSub);
+    line-height: 1.5;
+    margin: 0 0 0.5em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep section.findAccount article[role="tabpanel"] form {
+    margin-top: 0.2em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep > form button.submitBtn:active,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep > form button[type="submit"]:active {
+    transform: scale(0.98);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+    margin-top: 0.5em;
+    position: relative;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > span {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    font-size: 0.78em;
+    color: var(--txLight);
+    text-align: center;
+    margin: 0.4em 0;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > span::before,
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > span::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--aLight);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > a {
+    width: 100%;
+    height: 2.85em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    border-radius: var(--roundBtn, 2em);
+    border: 1px solid var(--aLight);
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > a:hover {
+    background-color: var(--aLow);
+    border-color: var(--aColor);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > a > img.brandIcon {
+    width: 1.25em;
+    height: 1.25em;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep nav.externalLogin > a > i.fi {
+    font-size: 1.15em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.6em;
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardFooter > .securedBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: 0.76em;
+    color: var(--txLight);
+}
+div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardFooter > .securedBadge > i.fi {
+    color: var(--modernPoint);
+    font-size: 1.1em;
+}
+
+/* 태블릿 (1024px 이하) */
+@media (max-width: 1024px) {
+    div#app.modernAccountLayout {
+        padding: 1.2em;
+    }
+    div#app.modernAccountLayout > .modernContainer {
+        grid-template-columns: 1fr 1fr;
+        min-height: min(42em, 95dvh);
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection {
+        padding: 2.5em 2.2em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent {
+        margin: 2.5em 0 2em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .sloganTitle {
+        font-size: 2em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection {
+        padding: 2em 1.8em;
+    }
+}
+
+/* 모바일 표준 (860px 이하) - 단일 컬럼 세로 스택 전환 */
+@media (max-width: 860px) {
+    div#app.modernAccountLayout {
+        padding: 0 0 1em 0;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+    }
+    div#app.modernAccountLayout > .modernContainer {
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+        min-height: 100dvh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection {
+        flex: 0 0 auto;
+        padding: 1.4em 1.4em 1em;
+        border-right: none;
+        border-bottom: none;
+        background: transparent;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroHeader {
+        margin-bottom: 0.6em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent {
+        margin: 0.8em 0 0.6em;
+        gap: 0.8em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap {
+        gap: 0.4em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .sloganTitle {
+        font-size: 1.35em;
+        line-height: 1.25;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .brandGreeting {
+        font-size: 0.85em;
+        line-height: 1.5;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sliderIndicator {
+        display: none;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter {
+        padding-top: 0.8em;
+        margin-top: 0.4em;
+        border-top: none;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroFooter > .copyright {
+        display: none;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection {
+        flex: 1 1 auto;
+        margin: 0 1em 1em 1em;
+        padding: 1.8em 1.4em max(1.8em, env(safe-area-inset-bottom, 1.8em));
+        align-items: flex-start;
+        background-color: var(--bgColor);
+        border-radius: 1.5em;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+        border: 1px solid var(--aLight);
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard {
+        max-width: 100%;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardHeader > .cardTitle {
+        font-size: 1.5em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardBody ::deep form .inputGrid {
+        grid-template-columns: 1fr;
+        gap: 0.8em;
+    }
+}
+
+/* 소형 스마트폰 (480px 이하) - 콤팩트 최적화 */
+@media (max-width: 480px) {
+    div#app.modernAccountLayout {
+        padding: 0 0 1em 0;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection {
+        padding: 1.2em 1.2em 0.8em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .sloganTitle {
+        font-size: 1.2em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .heroSection > .heroContent > .sloganWrap > .brandGreeting {
+        font-size: 0.82em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection {
+        margin: 0 1em 1em 1em;
+        padding: 1.4em 1.2em max(1.6em, env(safe-area-inset-bottom, 1.6em));
+        border-radius: 1.3em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard {
+        gap: 1.2em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardHeader {
+        gap: 0.8em;
+    }
+    div#app.modernAccountLayout > .modernContainer > .cardSection > .authCard > .cardHeader > .cardTitle {
+        font-size: 1.35em;
+    }
+}

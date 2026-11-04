@@ -1,0 +1,787 @@
+div#app.accountLayout {
+    --main: #346472;
+    --sub: #31363b;
+    --point: var(--point, #2a8699);
+    --accountActionColor: var(--main);
+    --accountActionHover: var(--mainDark);
+    /* 화면 높이에 고정: 카드가 화면보다 크면 카드 안 main 영역이 세로 스크롤된다 */
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3em 1.5em;
+    font-size: 1rem;
+    box-sizing: border-box;
+    /* sub 색상 기반 배경색 & 부드러운 radial gradient 앰비언트 조명 */
+    background-color: var(--sub);
+    background-image: radial-gradient(ellipse at 50% 35%, var(--subLight) 0%, var(--subDark) 100%), radial-gradient(circle at 1px 1px, var(--aLight) 1px, transparent 0);
+    background-size: 100% 100%, 24px 24px;
+    /* 배경과 뚜렷하게 분리되는 엽서 카드: 입체 그림자 및 클린 외곽선 */
+    & > .postcard {
+        width: 100%;
+        max-width: 66em;
+        min-height: min(40em, 100%);
+        max-height: 100%;
+        display: flex;
+        flex-direction: row;
+        border-radius: 0.8em;
+        overflow: hidden;
+        background-color: #444444;
+        border: 1px solid var(--aColor);
+        box-shadow: 0.1em 0.1em 0.6em 0.2em var(--aColor);
+        /* 좌측 프레스티지 블루 브랜드 영역 (main 색상 바인딩) */
+        & > .brandSide {
+            flex: 0 0 42%;
+            background: linear-gradient(155deg, var(--main) 0%, var(--mainDark) 100%);
+            color: var(--mainText, #fff);
+            padding: 3.2em 3em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+                content: "";
+                position: absolute;
+                top: -20%;
+                left: -20%;
+                width: 140%;
+                height: 140%;
+                background: radial-gradient(circle at 30% 25%, var(--decoLight) 0%, transparent 60%);
+                opacity: 0.35;
+                pointer-events: none;
+            }
+
+            & > header {
+                position: relative;
+                z-index: 1;
+
+                & > .brandLogo {
+                    font-size: 1.3em;
+                    font-weight: bold;
+                    letter-spacing: 0.02em;
+                    color: var(--pointLight);
+                    text-transform: uppercase;
+                }
+            }
+
+            & > .brandContent {
+                position: relative;
+                z-index: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 1em;
+
+                & > h1 {
+                    font-family: "Playfair Display", Didot, "Cinzel", Georgia, serif;
+                    font-size: 2.6em;
+                    line-height: 1.15;
+                    font-weight: 500;
+                    margin: 0;
+                    color: var(--mainText, #fff);
+                    letter-spacing: -0.02em;
+
+                    &::after {
+                        content: "";
+                        display: block;
+                        width: 2em;
+                        height: 3px;
+                        background-color: var(--deco);
+                        margin-top: 0.45em;
+                        border-radius: 2px;
+                    }
+                }
+                /* 방문 환영 문구 (옅은 색) */
+                & > p {
+                    margin: 0;
+                    font-size: 0.95em;
+                    line-height: 1.6;
+                    color: var(--mainText, #fff);
+                    opacity: 0.75;
+                }
+            }
+            /* 언어 선택 드롭다운 (공용 .dropDown, ul.up 으로 위로 펼침) — 어두운 패널용 색만 조정 */
+            & > footer {
+                position: relative;
+                z-index: 1;
+
+                & > .dropDown {
+                    font-size: 0.85em;
+
+                    & > header {
+                        background-color: transparent;
+                        color: var(--mainText, #fff);
+                        border-color: var(--aColor);
+                        opacity: 0.85;
+                    }
+
+                    & > ul {
+                        color: var(--txColor);
+                        background-color: var(--bgColor);
+                    }
+                }
+            }
+        }
+        /* 우측 라이트 클린 스튜디오 폼 영역 */
+        & > .formSide {
+            flex: 1 1 58%;
+            min-height: 0;
+            background-color: var(--bgColor);
+            color: var(--txColor);
+            padding: 3.2em 3.8em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+
+            & > header {
+                & > nav {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    gap: 1.8em;
+                    font-size: 0.88em;
+
+                    & > a {
+                        color: var(--txSub);
+                        text-decoration: none;
+                        font-weight: 500;
+                        transition: color 0.2s;
+
+                        &:hover {
+                            color: var(--accountActionColor);
+                        }
+
+                        &.navBtn {
+                            border: 1px solid var(--accountActionColor);
+                            border-radius: var(--roundBtn, 2em);
+                            padding: 0.4em 1em;
+                            color: var(--accountActionColor);
+                            font-weight: 600;
+                            transition: background-color 0.2s, color 0.2s, transform 0.15s;
+
+                            &:hover {
+                                background-color: var(--accountActionColor);
+                                color: var(--mainText, #fff);
+                            }
+                        }
+                    }
+                }
+            }
+
+            & > main {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-x: hidden;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: safe center;
+                padding: 1.5em 0;
+
+                ::deep {
+                    & > h2, h2 {
+                        font-family: "Playfair Display", Didot, Georgia, serif;
+                        font-size: 2.2em;
+                        font-weight: 500;
+                        color: var(--txColor);
+                        margin: 0 0 1em;
+                        letter-spacing: -0.01em;
+                    }
+                    /* 모던 언더라인 입력 필드 그리드 */
+                    .inputGrid {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 1.4em;
+                        margin-bottom: 1.3em;
+
+                        &.single {
+                            grid-template-columns: 1fr;
+                        }
+                        /* 입력 아래 보조 안내 (예: 비밀번호 규칙) — 그리드 전체 폭 */
+                        & > small {
+                            grid-column: 1 / -1;
+                            margin-top: -1.2em;
+                            font-size: 0.75em;
+                            color: var(--txLight);
+                            line-height: 1.4;
+                        }
+                    }
+
+                    .fieldCol {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.35em;
+
+                        & > label {
+                            font-size: 0.85em;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                            letter-spacing: 0.12em;
+                            color: var(--txSub);
+                        }
+
+                        & > input {
+                            border: none;
+                            border-bottom: 1px solid var(--silver);
+                            background: transparent;
+                            height: 2.2em;
+                            padding: 0.4em 0;
+                            font-size: 0.95em;
+                            color: var(--txColor);
+                            border-radius: 0;
+                            outline: none;
+                            transition: border-color 0.2s, box-shadow 0.2s;
+                            box-shadow: none;
+
+                            &:focus {
+                                border-bottom-color: var(--accountActionColor);
+                                box-shadow: 0 1px 0 var(--accountActionColor);
+                            }
+
+                            &::placeholder {
+                                color: var(--txLight);
+                                font-weight: 300;
+                                font-size: 0.9em;
+                            }
+                        }
+                    }
+                    /* 약관 동의 한 줄 문장(로그인) & 약관 동의 목록(회원가입) — 보기/팝업 링크 버튼 공용 */
+                    .termsSentence {
+                        font-size: 0.82em;
+                        color: var(--txSub);
+                        line-height: 1.5;
+                        margin: 0.6em 0 1.2em;
+                    }
+
+                    .termsAgree {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
+                        margin: 0.6em 0 1.2em;
+                        font-size: 0.85em;
+                        color: var(--txSub);
+
+                        &[hidden] {
+                            display: none;
+                        }
+
+                        & > label.agreeAll,
+                        & > label {
+                            font-size: 1.05em;
+                            font-weight: 600;
+                            color: var(--txColor);
+                            padding-bottom: 0.5em;
+                            border-bottom: 1px dashed var(--lineColor);
+                        }
+
+                        & > ul {
+                            list-style: none;
+                            margin: 0;
+                            padding: 0.2em 0 0;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.45em;
+
+                            & > li {
+                                list-style: none;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 1em;
+
+                                & > label > span {
+                                    font-size: 0.9em;
+                                    color: var(--txColor);
+                                }
+                            }
+                        }
+                    }
+
+                    .termsSentence, .termsAgree > ul > li {
+                        & > .termsBtn {
+                            background: none;
+                            border: none;
+                            height: auto;
+                            padding: 0;
+                            margin: 0;
+                            font-size: inherit;
+                            color: var(--accountActionColor);
+                            font-weight: 600;
+                            text-decoration: underline;
+                            cursor: pointer;
+                            border-radius: 0;
+                            box-shadow: none;
+                            transition: color 0.2s;
+
+                            &:hover {
+                                color: var(--accountActionHover);
+                            }
+                        }
+                    }
+                    /* 모던 제출 액션 버튼 (스타일 기반 화살표 가상 요소 포함) */
+                    .submitBtn,
+                    .submitArrow {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5em;
+                        background: none;
+                        border: none;
+                        border-radius: 0;
+                        box-shadow: none;
+                        height: auto;
+                        font-size: 1.05em;
+                        font-weight: 600;
+                        color: var(--accountActionColor);
+                        cursor: pointer;
+                        padding: 0.4em 0.8em 0.4em 0;
+                        margin-top: 0.5em;
+                        overflow: visible;
+                        transition: color 0.2s, transform 0.15s;
+
+                        &::after {
+                            content: "→";
+                            display: inline-block;
+                            font-size: 1.15em;
+                            line-height: 1;
+                            margin-left: 0.1em;
+                            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+                        }
+
+                        &:hover {
+                            color: var(--accountActionHover);
+
+                            &::after {
+                                transform: translateX(0.35em);
+                            }
+                        }
+
+                        &:active {
+                            transform: scale(0.98);
+                        }
+                    }
+                    /* 아이디 찾기 / 비밀번호 재설정 요청 (.findAccount) */
+                    .findAccount {
+                        font-size: 1rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.5em;
+                        width: 100%;
+
+                        @media (max-width: 780px) {
+                            max-width: 24em;
+
+                            & > nav > span {
+                                flex: 1 1 0;
+                                padding: 0.6em 0.4em;
+                                text-align: center;
+                                white-space: nowrap;
+                            }
+                        }
+
+                        & > nav {
+                            display: flex;
+                            gap: 0.5em;
+                            border-bottom: 1px solid var(--lineColor);
+
+                            & > span {
+                                padding: 0.6em 1.2em;
+                                font-size: 0.95em;
+                                font-weight: 500;
+                                color: var(--txLight);
+                                border-bottom: 2px solid transparent;
+                                cursor: pointer;
+                                user-select: none;
+                                transition: color 0.2s, border-color 0.2s;
+
+                                &:hover {
+                                    color: var(--accountActionColor);
+                                }
+
+                                &[aria-selected="true"] {
+                                    font-weight: 600;
+                                    color: var(--accountActionColor);
+                                    border-bottom-color: var(--accountActionColor);
+
+                                    &:hover {
+                                        color: var(--accountActionColor);
+                                    }
+                                }
+                            }
+                        }
+
+                        & > article:not([hidden]) {
+                            display: flex;
+                            flex-direction: column;
+
+                            & > p {
+                                margin: 0 0 1.5em;
+                                font-size: 0.88em;
+                                line-height: 1.6;
+                                color: var(--txLight);
+                            }
+
+                            & > div:not([hidden]) {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 1em;
+                                padding: 2.2em 1.5em;
+                                text-align: center;
+                                border: 1px solid var(--lineColor);
+                                border-radius: var(--roundSize);
+
+                                & > b {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 2em;
+                                    height: 2em;
+                                    font-size: 1.4em;
+                                    border-radius: 50%;
+                                    background-color: var(--success);
+                                    color: var(--bgColor);
+                                }
+
+                                & > p {
+                                    margin: 0;
+                                    font-size: 0.85em;
+                                    color: var(--txColor);
+                                }
+
+                                & > strong {
+                                    font-size: 0.9em;
+                                    color: var(--accountActionColor);
+                                }
+
+                                & > nav {
+                                    display: flex;
+                                    justify-content: center;
+                                    gap: 0.8em;
+                                    margin-top: 0.8em;
+                                }
+                            }
+                        }
+                    }
+                    /* 비밀번호 재설정 (.resetPassword) */
+                    .resetPassword {
+                        font-size: 1rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.2em;
+                        width: 100%;
+
+                        & > p {
+                            margin: 0 0 1em;
+                            font-size: 0.88em;
+                            line-height: 1.6;
+                            color: var(--txLight);
+                        }
+
+                        & > div {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 1.2em;
+                            padding: 2.2em 1.5em;
+                            text-align: center;
+                            border: 1px solid var(--danger);
+                            border-radius: var(--roundSize);
+
+                            & > p {
+                                margin: 0;
+                                font-size: 0.95em;
+                                line-height: 1.6;
+                                color: var(--danger);
+                            }
+
+                            & > nav {
+                                display: flex;
+                                justify-content: center;
+                                gap: 0.8em;
+                            }
+                        }
+                    }
+                    /* 메일 인증 안내 (.verifyMail) */
+                    .verifyMail {
+                        font-size: 1rem;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 0.85em;
+                        width: 100%;
+                        max-width: 30em;
+                        margin: 0 auto;
+                        text-align: center;
+
+                        & > b {
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 3.8em;
+                            height: 3.8em;
+                            border-radius: 50%;
+                            border: 2px solid var(--primary2);
+                            background-color: var(--primary1);
+                            color: var(--accountActionColor);
+
+                            & > i.fi {
+                                font-size: 1.9em;
+                            }
+                        }
+
+                        &.notSent > b {
+                            border-color: var(--warning2);
+                            background-color: var(--warning1);
+                            color: var(--warning);
+                        }
+
+                        &.failed > b {
+                            border-color: var(--danger2);
+                            background-color: var(--danger1);
+                            color: var(--danger);
+                        }
+
+                        & > h2 {
+                            margin: 0;
+                            font-size: 1.45em;
+                            font-weight: 700;
+                            color: var(--txColor);
+                        }
+
+                        & > p {
+                            margin: 0;
+                            font-size: 0.9em;
+                            line-height: 1.5;
+                            color: var(--txLight);
+                        }
+
+                        & > strong {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.5em;
+                            padding: 0.5em 1.2em;
+                            font-size: 0.95em;
+                            border: 1px solid var(--lineColor);
+                            border-radius: var(--roundBtn);
+                            color: var(--txColor);
+
+                            & > i.fi {
+                                color: var(--accountActionColor);
+                            }
+                        }
+
+                        & > small {
+                            font-size: 0.82em;
+                            line-height: 1.5;
+                            color: var(--txLight);
+                        }
+
+                        & > form {
+                            display: flex;
+                            justify-content: center;
+                            width: 100%;
+                            margin: 0;
+
+                            & > button.btn {
+                                width: 100%;
+                                max-width: 22em;
+                            }
+                        }
+
+                        & > form + form > button,
+                        & > a {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.4em;
+                            padding: 0.4em 0.8em;
+                            font-size: 0.85em;
+                            border: none;
+                            background: none;
+                            color: var(--txLight);
+                            text-decoration: none;
+
+                            &:hover {
+                                color: var(--txColor);
+                            }
+                        }
+
+                        & > aside {
+                            width: 100%;
+                            margin-top: 0.8em;
+                            padding: 0.9em 1.2em;
+                            font-size: 0.8em;
+                            text-align: left;
+                            border: 1px solid var(--lineColor);
+                            border-radius: var(--roundSize);
+                            color: var(--txLight);
+                            box-sizing: border-box;
+
+                            & > h4 {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.4em;
+                                margin: 0 0 0.4em;
+                                font-size: 1em;
+                                color: var(--txColor);
+
+                                & > i.fi {
+                                    color: var(--info);
+                                }
+                            }
+
+                            & > ul {
+                                margin: 0;
+                                padding-left: 1.2em;
+                                line-height: 1.4;
+                            }
+                        }
+                    }
+                    /* 외부 로그인 버튼 (nav.externalLogin) */
+                    nav.externalLogin {
+                        font-size: 1rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.6em;
+                        margin-top: 1.6em;
+
+                        @media (max-width: 780px) {
+                            width: 100%;
+                            max-width: 24em;
+                        }
+
+                        & > span {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.8em;
+                            font-size: 0.8em;
+                            color: var(--txLight);
+
+                            &::before,
+                            &::after {
+                                content: "";
+                                flex: 1 1 auto;
+                                border-top: 1px solid var(--lineColor);
+                            }
+                        }
+
+                        & > a {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 0.5em;
+                            height: 2.6em;
+                            border: 1px solid var(--lineColor);
+                            border-radius: var(--roundBtn);
+                            font-size: 0.9em;
+                            font-weight: 600;
+                            color: var(--txColor);
+                            text-decoration: none;
+                            transition: border-color 0.2s, color 0.2s;
+
+                            &:hover {
+                                border-color: var(--accountActionColor);
+                                color: var(--accountActionColor);
+                                background-color: var(--aLow);
+                            }
+
+                            & > img.brandIcon {
+                                width: 1.25em;
+                                height: 1.25em;
+                                object-fit: contain;
+                                flex-shrink: 0;
+                            }
+
+                            & > i.fi {
+                                font-size: 1.15em;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* 모바일 반응형 대응 (세로 모드 시 상하로 화면을 가득 채우도록 구현) */
+    @media (max-width: 780px) {
+        padding: 0;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+
+        & > .postcard {
+            flex-direction: column;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            min-height: 100vh;
+            min-height: 100dvh;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+
+            & > .brandSide {
+                flex: 0 0 auto;
+                padding: 2.2em 1.8em 1.5em;
+                gap: 1.2em;
+
+                & > .brandContent {
+                    gap: 1em;
+
+                    & > h1 {
+                        font-size: 1.8em;
+                    }
+                }
+            }
+
+            & > .formSide {
+                flex: 1 1 auto;
+                min-height: 0;
+                padding: 1.8em 1.8em max(2em, env(safe-area-inset-bottom, 2em));
+                border-radius: 0;
+                box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+
+                & > main {
+                    padding: 1em 0;
+                    justify-content: flex-start;
+                    align-items: center;
+                    overflow: visible;
+
+                    ::deep {
+                        & > form {
+                            width: 100%;
+                            max-width: 24em;
+
+                            & input {
+                                padding: 0.3em 0.5em !important;
+                            }
+                        }
+
+                        .inputGrid {
+                            grid-template-columns: 1fr;
+                            gap: 1.2em;
+                            margin-bottom: 1.2em;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* 다크 테마 오버라이드: 어두운 배경 위에서 화사하고 선명한 민트 포인트 색상 바인딩 */
+[data-theme="dark"] div#app.accountLayout {
+    --accountActionColor: var(--point);
+    --accountActionHover: var(--pointLight);
+
+    & > .postcard > .formSide > header > nav > a.navBtn:hover {
+        color: var(--pointText, #112019);
+    }
+}

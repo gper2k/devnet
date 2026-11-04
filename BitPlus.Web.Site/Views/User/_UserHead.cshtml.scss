@@ -1,0 +1,289 @@
+/* 회원 페이지 머리(커버 배너·프로필 아바타·이름·가입일·활성 소속·버튼)와 내 페이지 탭 */
+.userHead {
+    position: relative;
+    overflow: hidden;
+    font-size: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.4em;
+    padding: 1.5em 1.8em 1.25em;
+    background: var(--bgColor);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBox);
+
+    /* 상단 커버 배너 스트립 — 은은한 세이지 파스텔 톤으로 아바타 상단이 걸치도록 배치 */
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 4.5em;
+        background: linear-gradient(125deg, var(--main2) 0%, var(--main1) 55%, var(--deco2) 100%);
+        border-bottom: 1px solid var(--lineColor);
+    }
+
+    &:has(+ .userTabs) {
+        border-bottom: none;
+        border-radius: var(--roundBox) var(--roundBox) 0 0;
+    }
+
+    /* 프로필 아바타(없으면 사람 아이콘), 내 페이지에서는 눌러서 이미지 등록/교체 */
+    & > span {
+        position: relative;
+        z-index: 1;
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 6.4em;
+        height: 6.4em;
+        border-radius: 50%;
+        color: var(--main6);
+        background: var(--bgSub);
+        border: 0.25em solid var(--bgColor);
+        box-shadow: 0 0.2em 0.65em var(--aColor);
+
+        & > i.fi {
+            font-size: 3.2em;
+        }
+
+        & > img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        &[data-editable] {
+            cursor: pointer;
+
+            &:hover {
+                border-color: var(--main2);
+                box-shadow: 0 0.3em 0.9em var(--aDark);
+            }
+        }
+
+        & > span {
+            font-size: 1.1em;
+            position: absolute;
+            bottom: 0.15em;
+            right: -0.15em;
+            background-color: var(--main);
+            color: var(--bgColor);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 1.6em;
+            height: 1.6em;
+            line-height: 1em;
+            border: 0.15em solid var(--bgColor);
+            border-radius: 50%;
+            box-shadow: 0 0.15em 0.4em var(--aColor);
+
+            &:hover {
+                background-color: var(--mainDark);
+            }
+        }
+    }
+
+    & > div {
+        position: relative;
+        z-index: 1;
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 0.35em;
+        padding-top: 3.5em;
+
+        & > h2 {
+            margin: 0;
+            font-size: 1.45em;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--txColor);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.4em;
+
+            & ::deep > small {
+                font-size: 0.72em;
+                font-weight: normal;
+                color: var(--txLight);
+            }
+        }
+
+        & > p {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.35em 1.2em;
+            font-size: 0.86em;
+            color: var(--txSub);
+
+            & > span {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35em;
+            }
+        }
+
+        & > ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4em;
+            margin: 0.15em 0 0;
+            padding: 0;
+            list-style: none;
+
+            & > li {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3em;
+                padding: 0.2em 0.65em;
+                font-size: 0.78em;
+                border-radius: var(--roundBtn);
+                background: var(--main1);
+                color: var(--main7);
+                border: 1px solid var(--main2);
+            }
+        }
+
+        &.btns {
+            flex: 0 0 auto;
+            align-items: flex-end;
+            margin-left: auto;
+            padding-top: 3.3em;
+        }
+    }
+}
+
+.userTabs {
+    font-size: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    margin-top: -1em;
+    padding: 0 1.2em;
+    background: color-mix(in srgb, var(--bgSub) 55%, var(--bgColor));
+    border: 1px solid var(--lineColor);
+    border-radius: 0 0 var(--roundBox) var(--roundBox);
+
+    & > a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45em;
+        padding: 0.75em 0.85em;
+        color: var(--txSub);
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+
+        &:hover {
+            color: var(--main);
+        }
+
+        & > b {
+            font-size: 0.75em;
+            padding: 0.1em 0.5em;
+            border-radius: var(--roundBtn);
+            color: var(--bgColor);
+            background: var(--danger);
+        }
+
+        &.active {
+            color: var(--main);
+            font-weight: bold;
+            border-bottom-color: var(--main);
+        }
+    }
+}
+
+/* 태블릿 (~ 780px) */
+@media (width <= 780px) {
+    .userHead {
+        padding: 1.4em 1.2em 1.1em;
+        gap: 1.1em;
+
+        &::before {
+            height: 4.1em;
+        }
+
+        & > span {
+            width: 5.6em;
+            height: 5.6em;
+
+            & > i.fi {
+                font-size: 2.8em;
+            }
+        }
+
+        & > div {
+            padding-top: 3.1em;
+        }
+    }
+
+    .userTabs {
+        padding: 0 0.8em;
+        gap: 0.2em;
+
+        & > a {
+            padding: 0.7em 0.65em;
+            font-size: 0.92em;
+        }
+    }
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+    .userHead {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.4em 1em 1.1em;
+        gap: 0.6em;
+
+        &::before {
+            height: 4.2em;
+        }
+
+        & > div {
+            padding-top: 0;
+            align-items: center;
+
+            & > h2 {
+                justify-content: center;
+                font-size: 1.35em;
+            }
+
+            & > p {
+                justify-content: center;
+                font-size: 0.84em;
+            }
+
+            & > ul {
+                justify-content: center;
+            }
+
+            &.btns {
+                width: 100%;
+                align-items: center;
+                margin-left: 0;
+                padding-top: 0.3em;
+            }
+        }
+    }
+
+    .userTabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 0 0.5em;
+
+        & > a {
+            padding: 0.65em 0.6em;
+            font-size: 0.88em;
+        }
+    }
+}

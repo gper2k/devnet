@@ -1,0 +1,125 @@
+/* 설문 패널(Survey/Panel) 전용 스타일: 소개문, 참여 폼 또는 결과 (JS 로 그린 요소라 ::deep) */
+.surveyPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    padding: 1em 0;
+
+    & ::deep p.intro {
+        margin: 0;
+        line-height: 1.7;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    & ::deep p.stat {
+        margin: 0;
+        font-size: 0.9em;
+        color: var(--txLight);
+    }
+
+    & ::deep p.notice {
+        margin: 0;
+        color: var(--txLight);
+    }
+
+    & ::deep .toggle {
+        align-self: flex-start;
+        padding: 0.3em 0.9em;
+        border-radius: 2em;
+        color: var(--txLight);
+        cursor: pointer;
+        user-select: none;
+
+        &:hover {
+            background-color: var(--aColor);
+            color: var(--txColor);
+        }
+    }
+
+    & ::deep .questions {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+
+        & > section.question {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7em;
+            padding: 1em 1.2em;
+            border-radius: var(--roundBox);
+            background-color: var(--aLow);
+
+            & > .head {
+                display: inline-block;
+                font-weight: bold;
+
+                & > em {
+                    padding: 0 0 0 0.5em;
+                    font-style: normal;
+                    font-size: 0.8em;
+                    font-weight: normal;
+                    color: var(--txLight);
+                }
+            }
+
+            & > ul,
+            & > ol {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+
+            & > ol.result {
+                padding-left: 2em;
+                list-style: lower-alpha;
+            }
+            /* 결과: 옵션 이름·득표수 줄과 비율 막대 */
+            & > ol.result > li {
+                display: list-item; /* flex 로 두면 번호가 나오지 않음 */
+
+                & > .line {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 1em;
+                    font-size: 0.95em;
+
+                    & > .num {
+                        flex: 0 0 auto;
+                        color: var(--txLight);
+                    }
+                }
+
+                & > .bar {
+                    margin-top: 0.25em;
+                    height: 0.6em;
+                    border-radius: 1em;
+                    background-color: var(--aColor);
+                    overflow: hidden;
+
+                    & > i {
+                        display: block;
+                        height: 100%;
+                        background-color: var(--main);
+                    }
+                }
+
+                &.mine > .line > .name {
+                    font-weight: bold;
+                    color: var(--pointDark);
+                }
+
+                &.mine > .bar > i {
+                    background-color: var(--point);
+                }
+            }
+        }
+    }
+
+    & > ::deep button {
+        align-self: center;
+    }
+}

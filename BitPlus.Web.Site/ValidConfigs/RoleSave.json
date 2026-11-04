@@ -1,0 +1,34 @@
+[
+  {
+    "name": "name",
+    "displayName": "@RoleName",
+    "filters": {
+      "required": [],
+      "minLength": [2],
+      "maxLength": [64]
+    }
+  },
+  {
+    "name": "dpNames",
+    "displayName": "@DpName",
+    "filters": {
+      "required": [],
+      "maxLength": [64]
+    },
+    "converter": "language"
+  },
+  {
+    "name": "grade",
+    "displayName": "@SortCode",
+    "filters": {
+      "maxLength": [4]
+    }
+  },
+  {
+    "name": "description",
+    "displayName": "@Description",
+    "filters": {
+      "maxLength": [256]
+    }
+  }
+]

@@ -1,0 +1,18 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 커피 후원 위젯 설정 — url(후원 링크 주소), image(배너 이미지 주소), target(새 창으로 열기) *@
+<ul class="form">
+    <li>
+        <header>@this.Lang("WidgetButtonUrl")</header>
+        <input type="text" name="url" placeholder="https://buymeacoffee.com/yourname" spellcheck="false" />
+    </li>
+    <li>
+        <header>@this.Lang("WidgetImage")</header>
+        <input type="text" name="image" placeholder="/img/banners/side_coffee.svg" spellcheck="false" />
+    </li>
+    <li>
+        <label><input type="checkbox" name="target" /> @(this.CurrentCulture.TwoLetterISOLanguageName == "ko" ? "새 창으로 링크 열기" : "Open in a new window")</label>
+    </li>
+</ul>

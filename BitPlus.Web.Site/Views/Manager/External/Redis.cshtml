@@ -1,0 +1,58 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle("Redis");
+}
+
+@* Redis 캐시 구성 (설치 결과 설정 파일 appsettings.Setup.json) — 저장 후 사이트를 다시 시작하면 적용. 테스트는 화면 입력값(저장 전 포함)으로 PING *@
+<div class="pageBox">
+    <div class="inform">
+        <header><i class="fi fiServer"></i> Redis</header>
+        <p>@this.Lang("RedisInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <div class="cardGrid auto">
+            <ul class="form card line">
+                <li><h4><i class="fi fiServer"></i> Redis</h4></li>
+                <li>
+                    <header>@this.Lang("CacheInUse")</header>
+                    <output name="redisRunning"></output>
+                </li>
+                <li>
+                    <header>@this.Lang("SetupRedisConnection")</header>
+                    <div class="inputGroup">
+                        <input type="text" name="redisConnection" maxlength="512" placeholder="localhost:6379,ssl=false" autocomplete="off" />
+                        <button type="button" data-mode="test"><i class="fi fiFlashCheck"></i> @this.Lang("SetupTest")</button>
+                    </div>
+                </li>
+                <li class="col2">
+                    <div>
+                        <header>@this.Lang("Password")</header>
+                        <input type="password" name="redisPassword" maxlength="256" placeholder="@this.Lang("KeepIfEmpty")" autocomplete="new-password" />
+                    </div>
+                    <div>
+                        <header>@this.Lang("RedisDbIndex")</header>
+                        <input type="number" name="redisDbIndex" min="0" max="255" placeholder="@this.Lang("ServerDefaultIfEmpty")" />
+                    </div>
+                </li>
+                <li>
+                    <header>@this.Lang("RedisInstanceName")</header>
+                    <input type="text" name="redisInstanceName" maxlength="64" placeholder="bitplus:" autocomplete="off" />
+                </li>
+            </ul>
+        </div>
+
+        <footer class="pageFooter">
+            <span></span>
+            <div class="flexRow gapSm">
+                <button type="button" data-mode="reset"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+            </div>
+        </footer>
+    </article>
+</div>
+
+<!--
+    주의: 이 뷰는 External.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 External.cshtml 의 wireRedisPage() 가 담당한다.
+-->

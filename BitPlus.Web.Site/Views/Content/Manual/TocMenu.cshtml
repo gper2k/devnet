@@ -1,0 +1,26 @@
+@model ContentPageModel
+
+@* 메뉴얼 목차 메뉴: "목차" 버튼(span)과 그 아래로 열리는 목차 드롭다운 상자(Manual/Toc.cshtml: 카테고리 선택 + 그룹/페이지 목차).
+   글 보기의 맨 위 제목줄(Default/View.cshtml, 메뉴얼일 때)과 글이 없을 때의 빈 화면(Manual/View.cshtml)의 제목줄 오른쪽 끝에 들어간다.
+   상자는 목차 버튼·상자 밖을 누르거나 Esc 를 누르거나 글을 고르면 닫히고, 열 때 지금 보는 글이 보이게 스크롤한다. *@
+<div class="manualBar">
+    <span role="button" tabindex="0" id="manualTocBtn" aria-haspopup="true" aria-expanded="false"><i class="fi fiList"></i> @this.Lang("ManualToc") <i class="fi fiChevronDown"></i></span>
+    <div class="manualPanel" id="manualTocPanel" hidden>
+        <partial name="~/Views/Content/Manual/Toc.cshtml" model="Model" />
+    </div>
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const btn = document.querySelector('#manualTocBtn'), panel = document.querySelector('#manualTocPanel');
+        const toggle = open => {
+            panel.hidden = !open;
+            btn.setAttribute('aria-expanded', open);
+            btn.classList.toggle('expanded', open);
+            if (open) panel.querySelector('a.active')?.scrollIntoView({ block: 'center' });
+        };
+        btn.addEventListener('click', () => toggle(panel.hidden));
+        btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); } });
+        document.addEventListener('click', e => { if (!panel.hidden && !e.target.closest('#manualTocBtn, #manualTocPanel')) toggle(false); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') toggle(false); });
+    });
+</script>

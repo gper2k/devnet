@@ -1,0 +1,43 @@
+@charset "UTF-8";
+/* 외부 서비스 > 접근 토큰 전용 스타일. 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.tokenBox > article > section.card {
+  padding: 0;
+  overflow: hidden;
+  min-height: 12em;
+}
+div.tokenBox > article > section.card > div.dataList ::deep {
+  padding: 0.5em;
+  overflow-y: auto;
+}
+div.tokenBox > article > section.card > div.dataList ::deep > header > .colName, div.tokenBox > article > section.card > div.dataList ::deep > ul > li > .colName {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+div.tokenBox > article > section.card > div.dataList ::deep > header > .colUser, div.tokenBox > article > section.card > div.dataList ::deep > ul > li > .colUser {
+  flex: 0 0 9em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.tokenBox > article > section.card > div.dataList ::deep > header > .colState, div.tokenBox > article > section.card > div.dataList ::deep > ul > li > .colState {
+  flex: 0 0 6em;
+  justify-content: center;
+}
+div.tokenBox > article > section.card > div.dataList ::deep > header > .colDate, div.tokenBox > article > section.card > div.dataList ::deep > ul > li > .colDate {
+  flex: 0 0 9em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.tokenBox > article > section.card > div.dataList ::deep > header > .colAction, div.tokenBox > article > section.card > div.dataList ::deep > ul > li > .colAction {
+  flex: 0 0 4em;
+  justify-content: flex-end;
+}
+div.tokenBox > article > section.card > div.dataList ::deep > ul > li[data-invalid] {
+  color: var(--txLight);
+}
+
+dialog#tokenModal {
+  width: 32em;
+}
+dialog#tokenModal > header {
+  color: var(--main);
+}

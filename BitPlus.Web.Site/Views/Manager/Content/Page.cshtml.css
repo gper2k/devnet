@@ -1,0 +1,20 @@
+@charset "UTF-8";
+/* 관리자 페이지 컨텐츠 편집 전용 스타일 — 사용자 화면(/view/edit)과 같은 폼 파샬뷰(article.contentEdit)를 관리자 화면 톤에 맞춘다.
+   폼이 남는 높이를 채우고(에디터가 늘어남), 취소·저장 줄은 다른 관리자 화면(.pageFooter)처럼 화면 아래에 붙는다. */
+div.pageEdit ::deep article.contentEdit {
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 1em;
+}
+div.pageEdit ::deep article.contentEdit > footer {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 0.6em;
+  padding: 0.5em;
+  border: 1px solid var(--aLight);
+  border-radius: var(--roundBox);
+  background-color: var(--aLow);
+}
+div.pageEdit ::deep article.contentEdit > footer > a, div.pageEdit ::deep article.contentEdit > footer > button {
+  font-size: 0.85em;
+}

@@ -1,0 +1,122 @@
+@charset "UTF-8";
+/* 컨텐츠 관리 전용 스타일 — 탭 조각(Content/Boards, Content/Pages)은 fetch 로 #contentManage 안에 꽂히고 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다.
+   두 탭이 같은 목록 카드 구조(.contentList)라 한곳에 둔다. */
+div#contentManage ::deep div.contentList > section {
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+div#contentManage ::deep div.contentList > section > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.5em;
+}
+div#contentManage ::deep div.contentList > section > header > strong {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5em;
+  gap: 0.4em;
+  font-size: 1.02em;
+  color: var(--txColor);
+}
+div#contentManage ::deep div.contentList > section > header > strong > i.fi {
+  font-size: 1.4em;
+}
+div#contentManage ::deep div.contentList > section > header .inputGroup {
+  width: 14em;
+}
+div#contentManage ::deep div.contentList > section > div.dataList {
+  overflow-y: auto;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colNo, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colNo {
+  flex: 0 0 4em;
+  justify-content: center;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colName, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colName {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.5em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colType, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colType {
+  flex: 0 0 7em;
+  justify-content: center;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colCount, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colCount {
+  flex: 0 0 5em;
+  justify-content: center;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colAction, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colAction {
+  flex: 0 0 9em;
+  font-size: 0.85em;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colFlag, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colFlag {
+  flex: 0 0 6em;
+  justify-content: center;
+  gap: 0.4em;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colDate, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colDate {
+  flex: 0 0 8em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > header > .colMore, div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colMore {
+  flex: 0 0 2.4em;
+  justify-content: center;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > ul > li {
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+}
+div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colFlag {
+  color: var(--main);
+}
+div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colAction {
+  color: var(--txSub);
+}
+div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colMore {
+  border-radius: var(--roundBtn);
+}
+div#contentManage ::deep div.contentList > section > div.dataList > ul > li > .colMore:hover {
+  background-color: var(--aColor);
+}
+div#contentManage ::deep div.contentList > section > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em 0.8em;
+  border-top: 1px solid var(--lineColor);
+}
+
+/* 신고 상세 창(신고 탭 조각): 항목 이름 옆 값, 제목 아래 신고된 댓글·답글 내용 일부, 신고자 옆 신고 시각 */
+div#contentManage ::deep dialog:is(#reportModal, #reportUserModal) ul.form > li > p {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+div#contentManage ::deep dialog:is(#reportModal, #reportUserModal) ul.form > li > p > small {
+  display: block;
+  margin-top: 0.3em;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+div#contentManage ::deep dialog:is(#reportModal, #reportUserModal) ul.form > li > p > a[href="#"]:hover {
+  text-decoration: underline;
+}
+
+/* 사용자 표시(이름 + 아이디): 아이디는 작은 회색 — 신고 목록의 신고자 열, 신고 상세·사용자 정보 창 */
+div#contentManage ::deep div.contentList li > .colAction > span > small,
+div#contentManage ::deep dialog ul.form > li > p span > small {
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+
+/* 사용자 정보 창(신고 상세에서): 기본 최소 너비(18em)보다 75% 넓게 */
+div#contentManage ::deep dialog#reportUserModal {
+  width: 31.5em;
+}

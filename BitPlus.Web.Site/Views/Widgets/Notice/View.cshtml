@@ -1,0 +1,22 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@{
+    var posts = Model.Data as List<BitPlus.Web.Site.Widgets.WidgetPost> ?? [];
+}
+@* 공지 위젯 — (설정 시, 있으면) 작은 대표 이미지, 제목과 작성일 한 줄씩 *@
+<ul class="widgetNotice">
+    @foreach (var post in posts)
+    {
+        <li>
+            @if (!string.IsNullOrEmpty(post.Image))
+            {
+                <img src="@post.Image" alt="" loading="lazy" />
+            }
+            <a href="@post.Url">@post.Title</a>
+            <time data-local="date" datetime="@post.Date.ToString("o")"></time>
+        </li>
+    }
+    @if (posts.Count == 0)
+    {
+        <li class="empty">@this.Lang("DataEmpty")</li>
+    }
+</ul>

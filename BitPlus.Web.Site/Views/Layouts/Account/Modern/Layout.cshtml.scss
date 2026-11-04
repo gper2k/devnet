@@ -1,0 +1,859 @@
+div#app.modernAccountLayout {
+    --modernMain: var(--main, #182134);
+    --modernSub: var(--sub, #707b90);
+    --modernPoint: var(--point, #538fa8);
+    --modernDeco: var(--deco, #184957);
+
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    box-sizing: border-box;
+    padding: 1.5em;
+    background-color: var(--modernMain);
+    color: var(--txColor);
+
+    /* 1. 배경: 세련된 다크 아키텍처 & 기하학 패턴 (VidPro 레퍼런스 무드) */
+    background-image: 
+        radial-gradient(ellipse at 15% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 80%, rgba(15, 23, 42, 0.95) 0%, transparent 60%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.95) 100%),
+        repeating-linear-gradient(60deg, rgba(255, 255, 255, 0.015) 0, rgba(255, 255, 255, 0.015) 1px, transparent 0, transparent 40px),
+        repeating-linear-gradient(-60deg, rgba(255, 255, 255, 0.012) 0, rgba(255, 255, 255, 0.012) 1px, transparent 0, transparent 40px);
+    background-size: cover;
+    background-attachment: fixed;
+
+    /* 2. 메인 컨테이너: 2열 분할 스플릿 그리드 */
+    & > .modernContainer {
+        width: 100%;
+        max-width: 76em;
+        min-height: min(46em, 92dvh);
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        border-radius: 2em;
+        overflow: hidden;
+        border: 1px solid var(--aLight);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        background-color: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+
+        /* 3. 좌측 히어로 / 브랜드 섹션 */
+        & > .heroSection {
+            padding: 3.2em 3.4em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            color: #ffffff;
+            box-sizing: border-box;
+            background: linear-gradient(160deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.88) 100%);
+            border-right: 1px solid var(--aLight);
+
+            /* 구조적 건축 다각형 엠비언트 레이어 */
+            &::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: 
+                    linear-gradient(215deg, transparent 65%, rgba(56, 189, 248, 0.08) 100%),
+                    linear-gradient(35deg, transparent 70%, rgba(255, 255, 255, 0.04) 100%);
+                pointer-events: none;
+            }
+
+            /* 상단 로고 & 홈으로 돌아가기 */
+            & > .heroHeader {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1em;
+
+                & > .brandWrap {
+                    display: flex;
+                    align-items: center;
+
+                    & > .brandLogo {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.6em;
+                        text-decoration: none;
+                        color: #ffffff;
+
+                        & > img.logoImg {
+                            height: 2em;
+                            max-height: 2.2em;
+                            width: auto;
+                            object-fit: contain;
+                        }
+
+                        & > .logoText {
+                            font-size: 1.35em;
+                            font-weight: 700;
+                            letter-spacing: -0.01em;
+                        }
+                    }
+                }
+
+                & > .backToWeb {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.4em;
+                    color: rgba(255, 255, 255, 0.75);
+                    text-decoration: none;
+                    font-size: 0.88em;
+                    font-weight: 500;
+                    padding: 0.45em 0.9em;
+                    border-radius: var(--roundBtn, 2em);
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    background-color: rgba(255, 255, 255, 0.05);
+                    transition: all 0.2s;
+
+                    &:hover {
+                        color: #ffffff;
+                        background-color: rgba(255, 255, 255, 0.12);
+                        border-color: rgba(255, 255, 255, 0.3);
+                        transform: translateX(-2px);
+                    }
+
+                    & > i.fi {
+                        font-size: 1em;
+                    }
+                }
+            }
+
+            /* 중앙 슬로건 & 인사말 문구 */
+            & > .heroContent {
+                position: relative;
+                z-index: 2;
+                margin: 4em 0 3em;
+                display: flex;
+                flex-direction: column;
+                gap: 2.4em;
+
+                & > .sloganWrap {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.1em;
+
+                    & > .sloganTitle {
+                        margin: 0;
+                        font-size: 2.5em;
+                        line-height: 1.18;
+                        font-weight: 700;
+                        letter-spacing: -0.03em;
+                        color: #ffffff;
+                        word-break: keep-all;
+
+                        /* 포인트 그라디언트 텍스트 효과 */
+                        background: linear-gradient(135deg, #ffffff 40%, var(--modernPoint) 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+
+                    & > .brandGreeting {
+                        margin: 0;
+                        font-size: 1.05em;
+                        line-height: 1.65;
+                        color: rgba(255, 255, 255, 0.75);
+                        font-weight: 400;
+                        word-break: keep-all;
+                    }
+                }
+
+                /* 슬라이더 인디케이터 (VidPro 하단 pill 바) */
+                & > .sliderIndicator {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5em;
+
+                    & > .indBar {
+                        width: 2.2em;
+                        height: 0.32em;
+                        border-radius: 0.2em;
+                        background-color: var(--modernPoint);
+                        transition: width 0.3s;
+                    }
+
+                    & > .indDot {
+                        width: 0.35em;
+                        height: 0.35em;
+                        border-radius: 50%;
+                        background-color: rgba(255, 255, 255, 0.35);
+                    }
+                }
+            }
+
+            /* 하단 언어 선택 & 카피라이트 */
+            & > .heroFooter {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1em;
+                padding-top: 1.2em;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+                & > .cultureDrop {
+                    position: relative;
+
+                    & > header {
+                        padding: 0.35em 0.8em;
+                        font-size: 0.82em;
+                        border-radius: var(--roundBtn, 2em);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        background-color: rgba(255, 255, 255, 0.06);
+                        color: rgba(255, 255, 255, 0.85);
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.4em;
+                        white-space: nowrap;
+                        transition: all 0.2s;
+
+                        &:hover {
+                            background-color: rgba(255, 255, 255, 0.14);
+                            color: #ffffff;
+                        }
+                    }
+
+                    & > ul.up {
+                        border: 1px solid var(--aLight);
+                        border-radius: 0.6em;
+                        background-color: var(--bgColor);
+                        color: var(--txColor);
+                        box-shadow: 0 4px 16px var(--aDark);
+                    }
+                }
+
+                & > .copyright {
+                    font-size: 0.78em;
+                    color: rgba(255, 255, 255, 0.45);
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        /* 4. 우측 플로팅 인증 카드 섹션 */
+        & > .cardSection {
+            padding: 2.2em 2.4em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bgColor);
+            box-sizing: border-box;
+            position: relative;
+
+            & > .sectionHeader {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                flex: 0 0 auto;
+
+                & > .authNav {
+                    display: flex;
+                    align-items: center;
+                    gap: 1.1em;
+                    flex-wrap: wrap;
+
+                    & > .navLink {
+                        font-size: 0.88em;
+                        font-weight: 500;
+                        color: var(--txSub);
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.35em;
+                        padding: 0.3em 0.4em;
+                        transition: color 0.18s;
+
+                        & > i.fi {
+                            font-size: 1.05em;
+                            opacity: 0.85;
+                            transition: opacity 0.18s;
+                        }
+
+                        &:hover {
+                            color: var(--modernPoint);
+
+                            & > i.fi {
+                                opacity: 1;
+                            }
+                        }
+
+                        &:active {
+                            transform: scale(0.98);
+                        }
+                    }
+                }
+            }
+
+            & > .authCard {
+                width: 100%;
+                max-width: 27em;
+                margin: auto 0;
+                display: flex;
+                flex-direction: column;
+                gap: 1.6em;
+
+                & > .cardHeader {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.4em;
+
+                    & > .cardTitle {
+                        margin: 0;
+                        font-size: 1.85em;
+                        font-weight: 700;
+                        color: var(--txColor);
+                        letter-spacing: -0.02em;
+                    }
+
+                    & > .cardDesc {
+                        margin: 0;
+                        font-size: 0.9em;
+                        color: var(--txSub);
+                        line-height: 1.5;
+                    }
+                }
+
+                & > .cardBody {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.2em;
+
+                    /* 5. 계정 뷰 공통 폼 컴포넌트 ::deep 스타일링 */
+                    ::deep {
+                        form {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 1.1em;
+                            width: 100%;
+
+                            .inputGrid {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 0.9em;
+
+                                &.single {
+                                    grid-template-columns: 1fr;
+                                }
+
+                                .fieldCol {
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 0.4em;
+
+                                    label {
+                                        font-size: 0.82em;
+                                        font-weight: 600;
+                                        color: var(--txColor);
+                                        letter-spacing: 0.01em;
+                                    }
+
+                                    input[type="text"],
+                                    input[type="password"],
+                                    input[type="email"] {
+                                        width: 100%;
+                                        height: 2.85em;
+                                        min-height: 2.85em;
+                                        padding: 0 1em;
+                                        border: 1px solid var(--aLight);
+                                        border-radius: 0.65em;
+                                        background-color: var(--bgSub);
+                                        color: var(--txColor);
+                                        font-size: 0.92em;
+                                        box-sizing: border-box;
+                                        outline: none;
+                                        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+
+                                        &:focus {
+                                            border-color: var(--modernPoint);
+                                            background-color: var(--bgColor);
+                                            box-shadow: 0 0 0 3px var(--aLight);
+                                        }
+
+                                        &::placeholder {
+                                            color: var(--txLight);
+                                            opacity: 0.7;
+                                        }
+                                    }
+                                }
+
+                                small {
+                                    grid-column: 1 / -1;
+                                    font-size: 0.78em;
+                                    color: var(--txLight);
+                                    line-height: 1.4;
+                                }
+                            }
+
+                            /* 폼 하단 체크박스 및 비밀번호 찾기 */
+                            .formOptions {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                font-size: 0.85em;
+                                color: var(--txSub);
+                            }
+
+                            /* 메인 로그인 / 회원가입 제출 버튼 (알약 모양 VidPro 스타일) */
+                            button.submitBtn,
+                            button[type="submit"].submitBtn,
+                            button[type="submit"] {
+                                width: 100%;
+                                height: 2.85em;
+                                min-height: 2.85em;
+                                border-radius: var(--roundBtn, 2em);
+                                background: linear-gradient(135deg, var(--modernMain) 0%, var(--modernSub) 100%);
+                                color: #ffffff;
+                                border: 1px solid var(--aColor);
+                                font-size: 0.95em;
+                                font-weight: 600;
+                                cursor: pointer;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 0.4em;
+                                margin-top: 0.6em;
+                                transition: all 0.2s;
+                                box-shadow: 0 4px 14px var(--aLow);
+
+                                &:hover {
+                                    filter: brightness(1.15);
+                                    box-shadow: 0 4px 12px var(--aDark);
+                                }
+
+                                &:active {
+                                    transform: scale(0.98);
+                                }
+                            }
+
+                            /* 약관 동의 (.termsAgree) */
+                            section.termsAgree {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 0.6em;
+                                margin: 0.4em 0 0.8em;
+                                padding: 0.9em 1.1em;
+                                background-color: var(--bgSub);
+                                border: 1px solid var(--aLight);
+                                border-radius: 0.75em;
+                                box-sizing: border-box;
+
+                                &[hidden] {
+                                    display: none;
+                                }
+
+                                & > label.agreeAll {
+                                    font-size: 0.92em;
+                                    font-weight: 600;
+                                    color: var(--txColor);
+                                    padding-bottom: 0.6em;
+                                    margin-bottom: 0.2em;
+                                    border-bottom: 1px dashed var(--aLight);
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 0.4em;
+                                    cursor: pointer;
+
+                                    & > span {
+                                        color: var(--txColor);
+                                    }
+                                }
+
+                                & > ul {
+                                    list-style: none;
+                                    margin: 0;
+                                    padding: 0;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 0.5em;
+
+                                    & > li {
+                                        list-style: none;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: space-between;
+                                        gap: 0.8em;
+                                        margin: 0;
+                                        padding: 0.15em 0;
+
+                                        & > label.check {
+                                            font-size: 0.85em;
+                                            color: var(--txColor);
+                                            flex: 1 1 auto;
+                                            min-width: 0;
+                                            cursor: pointer;
+
+                                            & > span {
+                                                color: var(--txColor);
+                                                line-height: 1.4;
+
+                                                b, strong {
+                                                    color: var(--txColor);
+                                                    font-weight: 600;
+                                                }
+                                            }
+                                        }
+
+                                        & > button.termsBtn {
+                                            flex: 0 0 auto;
+                                            font-size: 0.78em;
+                                            padding: 0.25em 0.7em;
+                                            height: auto;
+                                            min-height: unset;
+                                            border-radius: var(--roundBtn, 2em);
+                                            border: 1px solid var(--aLight);
+                                            background-color: var(--bgColor);
+                                            color: var(--txSub);
+                                            font-weight: 500;
+                                            cursor: pointer;
+                                            line-height: 1.3;
+                                            margin: 0;
+                                            width: auto;
+                                            box-shadow: none;
+                                            transition: all 0.2s;
+
+                                            &:hover {
+                                                color: var(--modernPoint);
+                                                border-color: var(--modernPoint);
+                                                background-color: var(--aLow);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        /* 아이디 찾기 / 비밀번호 재설정 (.findAccount) 전용 스타일 */
+                        section.findAccount {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 1.2em;
+                            width: 100%;
+
+                            nav[role="tablist"] {
+                                display: flex;
+                                gap: 0.5em;
+
+                                span[role="tab"] {
+                                    padding: 0.45em 0.9em;
+                                    font-size: 0.85em;
+                                    font-weight: 600;
+                                    border-radius: var(--roundBtn, 2em);
+                                    cursor: pointer;
+                                    border: 1px solid var(--aLight);
+                                    background: var(--bgSub);
+                                    color: var(--txSub);
+                                    transition: all 0.2s;
+
+                                    &:hover {
+                                        border-color: var(--modernPoint);
+                                        color: var(--modernPoint);
+                                        box-shadow: 0 4px 12px var(--aDark);
+                                    }
+
+                                    &:active {
+                                        transform: scale(0.98);
+                                        box-shadow: inset 0 2px 4px var(--aHigh);
+                                    }
+
+                                    &[aria-selected="true"] {
+                                        background: var(--modernPoint);
+                                        color: var(--pointText, #ffffff);
+                                        border-color: var(--modernPoint);
+                                        box-shadow: 0 2px 8px var(--aDark);
+
+                                        &:hover {
+                                            color: var(--pointText, #ffffff);
+                                            background-color: var(--pointLight, var(--modernPoint));
+                                            box-shadow: 0 4px 14px var(--aDark);
+                                        }
+                                    }
+                                }
+                            }
+
+                            article[role="tabpanel"] {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 0.8em;
+
+                                &[hidden] {
+                                    display: none;
+                                }
+
+                                p {
+                                    font-size: 0.88em;
+                                    color: var(--txSub);
+                                    line-height: 1.5;
+                                    margin: 0 0 0.5em;
+                                }
+
+                                form {
+                                    margin-top: 0.2em;
+                                }
+                            }
+                        }
+
+                        /* 6. 외부 소셜 로그인 네비게이션 (_ExternalLogins) */
+                        nav.externalLogin {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.7em;
+                            margin-top: 0.5em;
+                            position: relative;
+
+                            /* "Or continue with:" 구분선 */
+                            & > span {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.8em;
+                                font-size: 0.78em;
+                                color: var(--txLight);
+                                text-align: center;
+                                margin: 0.4em 0;
+
+                                &::before,
+                                &::after {
+                                    content: "";
+                                    flex: 1;
+                                    height: 1px;
+                                    background-color: var(--aLight);
+                                }
+                            }
+
+                            & > a {
+                                width: 100%;
+                                height: 2.85em;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 0.6em;
+                                border-radius: var(--roundBtn, 2em);
+                                border: 1px solid var(--aLight);
+                                background-color: var(--bgColor);
+                                color: var(--txColor);
+                                text-decoration: none;
+                                font-size: 0.9em;
+                                font-weight: 500;
+                                transition: all 0.2s;
+
+                                &:hover {
+                                    background-color: var(--aLow);
+                                    border-color: var(--aColor);
+                                }
+
+                                & > img.brandIcon {
+                                    width: 1.25em;
+                                    height: 1.25em;
+                                    object-fit: contain;
+                                    flex-shrink: 0;
+                                }
+
+                                & > i.fi {
+                                    font-size: 1.15em;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                & > .cardFooter {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding-top: 0.6em;
+
+                    & > .securedBadge {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.4em;
+                        font-size: 0.76em;
+                        color: var(--txLight);
+
+                        & > i.fi {
+                            color: var(--modernPoint);
+                            font-size: 1.1em;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* ==========================================================================
+       모바일 및 태블릿 환경 반응형 최적화 (Mobile Responsive)
+       ========================================================================== */
+
+    /* 1. 태블릿 (1024px 이하) */
+    @@media (max-width: 1024px) {
+        padding: 1.2em;
+
+        & > .modernContainer {
+            grid-template-columns: 1fr 1fr;
+            min-height: min(42em, 95dvh);
+
+            & > .heroSection {
+                padding: 2.5em 2.2em;
+
+                & > .heroContent {
+                    margin: 2.5em 0 2em;
+
+                    & > .sloganWrap > .sloganTitle {
+                        font-size: 2em;
+                    }
+                }
+            }
+
+            & > .cardSection {
+                padding: 2em 1.8em;
+            }
+        }
+    }
+
+    /* 2. 모바일 표준 (860px 이하) - 단일 컬럼 세로 스택 전환 */
+    @@media (max-width: 860px) {
+        padding: 0 0 1em 0;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+
+        & > .modernContainer {
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+            min-height: 100dvh;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            background-color: transparent;
+
+            /* 상단 히어로: 모바일용 슬림 브랜드 바 */
+            & > .heroSection {
+                flex: 0 0 auto;
+                padding: 1.4em 1.4em 1em;
+                border-right: none;
+                border-bottom: none;
+                background: transparent;
+
+                & > .heroHeader {
+                    margin-bottom: 0.6em;
+                }
+
+                /* 모바일에서는 슬로건을 슬림하게 1~2줄로 압축 */
+                & > .heroContent {
+                    margin: 0.8em 0 0.6em;
+                    gap: 0.8em;
+
+                    & > .sloganWrap {
+                        gap: 0.4em;
+
+                        & > .sloganTitle {
+                            font-size: 1.35em;
+                            line-height: 1.25;
+                        }
+
+                        & > .brandGreeting {
+                            font-size: 0.85em;
+                            line-height: 1.5;
+                        }
+                    }
+
+                    & > .sliderIndicator {
+                        display: none; /* 모바일에서 인디케이터 숨김 */
+                    }
+                }
+
+                & > .heroFooter {
+                    padding-top: 0.8em;
+                    margin-top: 0.4em;
+                    border-top: none;
+
+                    & > .copyright {
+                        display: none; /* 모바일 헤더에서 카피라이트 숨김 */
+                    }
+                }
+            }
+
+            /* 하단 폼 카드: 좌/우/아래 1em씩 뒤쪽 배경이 보이도록 플로팅 카드화 */
+            & > .cardSection {
+                flex: 1 1 auto;
+                margin: 0 1em 1em 1em;
+                padding: 1.8em 1.4em max(1.8em, env(safe-area-inset-bottom, 1.8em));
+                align-items: flex-start;
+                background-color: var(--bgColor);
+                border-radius: 1.5em;
+                box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+                border: 1px solid var(--aLight);
+
+                & > .authCard {
+                    max-width: 100%;
+
+                    & > .cardHeader > .cardTitle {
+                        font-size: 1.5em;
+                    }
+
+                    & > .cardBody {
+                        ::deep {
+                            form {
+                                .inputGrid {
+                                    grid-template-columns: 1fr;
+                                    gap: 0.8em;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* 3. 소형 스마트폰 (480px 이하) - 콤팩트 최적화 */
+    @@media (max-width: 480px) {
+        padding: 0 0 1em 0;
+
+        & > .modernContainer {
+            & > .heroSection {
+                padding: 1.2em 1.2em 0.8em;
+
+                & > .heroContent > .sloganWrap {
+                    & > .sloganTitle {
+                        font-size: 1.2em;
+                    }
+                    & > .brandGreeting {
+                        font-size: 0.82em;
+                    }
+                }
+            }
+
+            & > .cardSection {
+                margin: 0 1em 1em 1em;
+                padding: 1.4em 1.2em max(1.6em, env(safe-area-inset-bottom, 1.6em));
+                border-radius: 1.3em;
+
+                & > .authCard {
+                    gap: 1.2em;
+
+                    & > .cardHeader {
+                        gap: 0.8em;
+
+                        & > .cardTitle {
+                            font-size: 1.35em;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

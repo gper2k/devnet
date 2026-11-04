@@ -1,0 +1,21 @@
+{
+  "key": "side",
+  "name": { "ko": "사이드 패널", "en": "Side panel" },
+  "categories": ["*", "side"],
+  "layout": {
+    "sections": [
+      {
+        "id": "map", "type": "Full",
+        "slots": {
+          "a": { "widget": "ContentMap", "title": {}, "settings": {} }
+        }
+      },
+      {
+        "id": "s1", "type": "Full",
+        "slots": {
+          "a": { "widget": "VerticalBanner", "title": {}, "settings": { "items": "/img/banners/side1.svg | /Account/SignUp | \n/img/banners/side2.svg | /content | \n/img/banners/side_coffee.svg | 7 | Buy Me a Coffee", "interval": 6, "height": 0 } }
+        }
+      }
+    ]
+  }
+}

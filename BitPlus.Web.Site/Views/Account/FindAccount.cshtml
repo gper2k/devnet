@@ -1,0 +1,99 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    this.SetTitle(this.Lang("FindAccount"));
+    this.SetPageKey("FindAccount");
+    var isPwTab = string.Equals(this.ViewData["ActiveTab"] as string, "pw", StringComparison.OrdinalIgnoreCase);
+}
+
+@* 아이디 찾기 / 비밀번호 재설정 요청: 탭(aria-selected) + 패널(hidden), 요청 후 결과 안내(입력한 메일 표시).
+   가입 여부를 드러내지 않도록 서버는 결과와 관계없이 같은 안내로 응답한다 *@
+<section class="findAccount">
+    <nav role="tablist">
+        <span role="tab" data-target="id" aria-selected="@(!isPwTab ? "true" : "false")">@this.Lang("FindId")</span>
+        <span role="tab" data-target="pw" aria-selected="@(isPwTab ? "true" : "false")">@this.Lang("ResetPassword")</span>
+    </nav>
+
+    <article role="tabpanel" data-panel="id" hidden="@isPwTab">
+        <p>@this.Lang("FindIdGuide")</p>
+        <form method="post" action="/api/account/find/id" novalidate>
+            <div class="inputGrid single">
+                <div class="fieldCol">
+                    <label>@this.Lang("Email")</label>
+                    <input type="email" name="email" placeholder="name@example.com" required autocomplete="email" />
+                </div>
+            </div>
+            <button type="submit" class="submitBtn">@this.Lang("FindId")</button>
+        </form>
+        <div hidden>
+            <b>&#10003;</b>
+            <p>@this.Lang("FindIdMailSent")</p>
+            <strong></strong>
+            <nav>
+                <a href="@this.LoginUrl" class="btn point">@this.Lang("GoToSignIn")</a>
+                <button type="button" data-target="pw">@this.Lang("ResetPassword")</button>
+            </nav>
+        </div>
+    </article>
+
+    <article role="tabpanel" data-panel="pw" hidden="@(!isPwTab)">
+        <p>@this.Lang("ResetPwGuide")</p>
+        <form method="post" action="/api/account/find/password" novalidate>
+            <div class="inputGrid single">
+                <div class="fieldCol">
+                    <label>@this.Lang("UserID")</label>
+                    <input type="text" name="uid" placeholder="@this.Lang("EnterUid")" required autocomplete="username" />
+                </div>
+            </div>
+            <div class="inputGrid single">
+                <div class="fieldCol">
+                    <label>@this.Lang("Email")</label>
+                    <input type="email" name="email" placeholder="name@example.com" required autocomplete="email" />
+                </div>
+            </div>
+            <button type="submit" class="submitBtn">@this.Lang("ResetPassword")</button>
+        </form>
+        <div hidden>
+            <b>&#10003;</b>
+            <p>@this.Lang("ResetPwMailSent")</p>
+            <strong></strong>
+            <nav>
+                <a href="@this.LoginUrl" class="btn point">@this.Lang("GoToSignIn")</a>
+            </nav>
+        </div>
+    </article>
+</section>
+
+@section Scripts {
+    <script type="module">
+        const root = document.querySelector('section.findAccount');
+
+        // 탭 전환: 탭 aria-selected, 패널 hidden 토글 후 첫 입력에 포커스
+        function switchTab(target) {
+            root.querySelectorAll('[role="tab"]').forEach(tab => tab.setAttribute('aria-selected', tab.dataset.target === target ? 'true' : 'false'));
+            root.querySelectorAll('[role="tabpanel"]').forEach(panel => panel.hidden = panel.dataset.panel !== target);
+            root.querySelector(`[data-panel="${target}"] form input`)?.focus();
+        }
+
+        // 탭/결과 안의 전환 버튼 (본문 위임)
+        root.addEventListener('click', e => {
+            const tab = e.target.closest('[data-target]');
+            if (tab) switchTab(tab.dataset.target);
+        });
+
+        // 요청 전송: 필수 입력 확인 → 성공하면 폼을 숨기고 결과(입력한 메일) 표시
+        root.querySelectorAll('[role="tabpanel"] > form').forEach(form => form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const empty = [...form.querySelectorAll('input[required]')].find(p => !p.value.trim());
+            if (empty) return empty.focus();
+
+            const res = await common.postSend(form.action, new FormData(form));
+            if (!res?.success) return;
+            const result = form.nextElementSibling;
+            result.querySelector('strong').textContent = form.querySelector('input[name="email"]').value.trim();
+            form.hidden = true;
+            result.hidden = false;
+        }));
+
+        switchTab(root.querySelector('[aria-selected="true"]').dataset.target);
+    </script>
+}

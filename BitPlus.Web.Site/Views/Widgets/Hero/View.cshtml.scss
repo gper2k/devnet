@@ -1,0 +1,211 @@
+@use "../Design" as design;
+
+/* 히어로 위젯 — 정면 노트북(화면 이미지) + 글 두 칸, 노트북 쪽 절반에서 틀 밖으로 나가는 큰 톤 원 + 글자 쪽 아래 겹치는 톤 원. reverse 면 좌우 바뀜, 780 미만은 위아래 */
+div.widgetHero {
+    font-size: 1rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    align-items: center;
+    gap: 2.5em;
+    padding: 2em 2em;
+    border-radius: var(--roundBox);
+    background-color: var(--main1);
+    overflow: hidden;
+    isolation: isolate;
+
+    &[data-reverse] {
+        grid-template-columns: 1fr 1.25fr;
+
+        & > figure {
+            order: 2;
+        }
+    }
+
+    /* 큰 배경 원 — 노트북 쪽 절반쯤에서 시작해 틀 밖으로 (넘친 부분은 잘림) */
+    &::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        right: 48%;
+        top: 50%;
+        width: 62%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background-color: var(--main2);
+        transform: translateY(-50%);
+    }
+
+    &[data-reverse]::after {
+        right: auto;
+        left: 48%;
+    }
+
+    & > figure {
+        position: relative;
+        margin: 0;
+        padding: 1em 0 1.5em;
+        z-index: 0;
+
+        /* 노트북 (정면) */
+        & > div {
+            width: 74%;
+            margin: 0 auto;
+            filter: drop-shadow(0 1.2em 1.5em var(--aColor));
+
+            /* 화면 (테두리 + 카메라) */
+            & > div {
+                position: relative;
+                padding: 0.9em 0.9em 1.1em;
+                border-radius: 1em 1em 0.3em 0.3em;
+                background-color: var(--main9);
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 0.35em;
+                    left: 50%;
+                    width: 0.3em;
+                    height: 0.3em;
+                    margin-left: -0.15em;
+                    border-radius: 50%;
+                    background-color: var(--main6);
+                }
+
+                & > img,
+                & > span {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    aspect-ratio: 16 / 10;
+                    object-fit: cover;
+                    object-position: top left;
+                    border-radius: 0.2em;
+                    background-color: var(--bgColor);
+                }
+
+                & > span > i {
+                    font-size: 4em;
+                    color: var(--main3);
+                }
+            }
+
+            /* 받침 (가운데 홈) */
+            & > span {
+                position: relative;
+                display: block;
+                width: 116%;
+                height: 0.9em;
+                margin-left: -8%;
+                border-radius: 0.15em 0.15em 1em 1em;
+                background: linear-gradient(var(--silver), var(--deco3));
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 50%;
+                    width: 16%;
+                    height: 0.35em;
+                    margin-left: -8%;
+                    border-radius: 0 0 0.6em 0.6em;
+                    background-color: var(--deco4);
+                }
+            }
+        }
+    }
+
+    & > div {
+        position: relative;
+        z-index: 0;
+
+        /* 글자 뒤쪽 톤 원 (글자 아래에 깔림, 틀 밖은 잘림) */
+        &::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            left: 30%;
+            top: 35%;
+            width: 75%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background-color: var(--main2);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1em;
+
+        /* 머리말 */
+        & > em {
+            @include design.label;
+            padding: 0.35em 0.9em;
+            border-radius: 2em;
+            background-color: var(--bgColor);
+        }
+
+        & > h2 {
+            margin: 0;
+            font-size: 2.4em;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.03em;
+            color: var(--txColor);
+
+            /* 형광펜 */
+            & > span {
+                background: linear-gradient(transparent 58%, var(--point3) 58%, var(--point3) 88%, transparent 88%);
+                -webkit-box-decoration-break: clone;
+                box-decoration-break: clone;
+            }
+        }
+
+        & > p {
+            margin: 0;
+            color: var(--txLight);
+            line-height: 1.75;
+            white-space: pre-line;
+        }
+
+        & > a {
+            margin-top: 0.4em;
+            text-decoration: none;
+        }
+    }
+
+    @media (max-width: 779.98px) {
+        grid-template-columns: 1fr;
+        gap: 1.5em;
+        padding: 2em 1.2em;
+
+        & > figure > div {
+            width: 84%;
+        }
+
+        /* 큰 원은 위쪽(노트북 뒤)에서 틀 밖으로 */
+        &::after,
+        &[data-reverse]::after {
+            left: 20%;
+            right: auto;
+            top: -10%;
+            width: 110%;
+            transform: none;
+        }
+
+        &[data-reverse] {
+            grid-template-columns: 1fr;
+
+            & > figure {
+                order: 0;
+            }
+        }
+
+        & > div > h2 {
+            font-size: 1.9em;
+        }
+    }
+}

@@ -1,0 +1,968 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<BitPlus.Web.Site.Models.LayoutThemeConfig>
+@using BitPlus.Web.Site.Models
+@{
+    var hasSavedSetting = this.Model != null;
+    var model = this.Model ?? new LayoutThemeConfig();
+    string T(string key, string fallback) {
+        var val = this.Lang(key);
+        return string.IsNullOrEmpty(val) || val == key ? fallback : val;
+    }
+}
+
+<div class="layoutConfigSide">
+    <header class="panelHeader">
+        <div class="titleWrap">
+            <i class="fi fiColor"></i>
+            <span>@T("LayoutSetting", "레이아웃 설정")</span>
+        </div>
+        <i class="fi fiDismiss btnClose" title="@T("Close", "닫기")" onclick="closeLayoutConfig()"></i>
+    </header>
+
+    <div class="panelBody">
+        <div class="themeTabs">
+            <span class="tabItem active" data-tab="light">
+                <i class="fi fiWeatherSunny"></i>
+                <span>@T("LightMode", "라이트 모드")</span>
+            </span>
+            <span class="tabItem" data-tab="dark">
+                <i class="fi fiWeatherMoon"></i>
+                <span>@T("DarkMode", "다크 모드")</span>
+            </span>
+        </div>
+
+        <div class="colorGrid">
+            <div class="colorCard active" data-color="main">
+                <div class="cardTop">
+                    <span class="colorKey">main</span>
+                    <span class="colorRole">@T("ColorMainRole", "주 색상")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#1f382c</span>
+                </div>
+            </div>
+
+            <div class="colorCard" data-color="sub">
+                <div class="cardTop">
+                    <span class="colorKey">sub</span>
+                    <span class="colorRole">@T("ColorSubRole", "보조 색상")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#5288b7</span>
+                </div>
+            </div>
+
+            <div class="colorCard" data-color="point">
+                <div class="cardTop">
+                    <span class="colorKey">point</span>
+                    <span class="colorRole">@T("ColorPointRole", "포인트")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#9be82e</span>
+                </div>
+            </div>
+
+            <div class="colorCard" data-color="deco">
+                <div class="cardTop">
+                    <span class="colorKey">deco</span>
+                    <span class="colorRole">@T("ColorDecoRole", "장식 색상")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#638791</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pickerArea">
+            <div class="satValBox">
+                <div class="satValCursor"></div>
+            </div>
+            <div class="hueRow">
+                <div class="hueSlider">
+                    <div class="hueThumb"></div>
+                </div>
+            </div>
+            <div class="inputRow">
+                <span class="curPreview"></span>
+                <div class="hexInputWrap">
+                    <span class="prefix">#</span>
+                    <input type="text" class="hexInput" maxlength="6" spellcheck="false" placeholder="1f382c" />
+                </div>
+                <i class="fi fiEyedropper btnEyedropper" title="스포이트"></i>
+            </div>
+            <div class="presetRow">
+                <span class="presetLabel">기본 팔레트</span>
+                <div class="presetSwatches">
+                    <span class="presetChip" data-hex="#1f382c" style="background:#1f382c" title="Forest Green"></span>
+                    <span class="presetChip" data-hex="#184a45" style="background:#184a45" title="Dark Pine"></span>
+                    <span class="presetChip" data-hex="#1e3a5f" style="background:#1e3a5f" title="Deep Navy"></span>
+                    <span class="presetChip" data-hex="#5288b7" style="background:#5288b7" title="Soft Blue"></span>
+                    <span class="presetChip" data-hex="#9be82e" style="background:#9be82e" title="Lime"></span>
+                    <span class="presetChip" data-hex="#2563eb" style="background:#2563eb" title="Royal Blue"></span>
+                    <span class="presetChip" data-hex="#7c3aed" style="background:#7c3aed" title="Purple"></span>
+                    <span class="presetChip" data-hex="#e11d48" style="background:#e11d48" title="Rose"></span>
+                    <span class="presetChip" data-hex="#ea580c" style="background:#ea580c" title="Orange"></span>
+                    <span class="presetChip" data-hex="#638791" style="background:#638791" title="Slate Gray"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="panelFooter">
+        <span class="btnReset" title="@(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "초기 기본 색상으로 복원" : "Reset to default colors")">
+            <i class="fi fiArrReset"></i>
+            <span>@(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "기본값 복원" : "Reset Defaults")</span>
+        </span>
+        <div class="rightBtns">
+            <span class="actCancel" onclick="closeLayoutConfig()">
+                @(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "취소" : "Cancel")
+            </span>
+            <span class="actSave">
+                <i class="fi fiCheckmark"></i>
+                <span>@(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "저장" : "Save")</span>
+            </span>
+        </div>
+    </footer>
+</div>
+
+<style>
+#layoutConfigPanel,
+aside.layoutConfigSidePanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 21.5em;
+    max-width: 100vw;
+    z-index: 99999;
+    background-color: var(--bgColor);
+    border-left: 1px solid var(--lineColor);
+    box-shadow: -4px 0 24px var(--aDark);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#layoutConfigPanel.open,
+aside.layoutConfigSidePanel.open {
+    transform: translateX(0);
+}
+.layoutConfigSide {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    user-select: none;
+}
+.layoutConfigSide * { box-sizing: border-box; }
+
+/* 1. 슬림하고 컴팩트한 타이틀 바 */
+.layoutConfigSide header.panelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background-color: var(--bgColor);
+    border-bottom: 1px solid var(--lineColor);
+    flex-shrink: 0;
+}
+.layoutConfigSide header.panelHeader .titleWrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-weight: 800;
+    font-size: 1em;
+    color: var(--main);
+}
+.layoutConfigSide header.panelHeader .titleWrap i {
+    font-size: 1.15em;
+}
+.layoutConfigSide header.panelHeader .btnClose {
+    cursor: pointer;
+    font-size: 1.25em;
+    color: var(--txLight);
+    padding: 0.2em;
+    line-height: 1;
+    transition: color 0.15s, transform 0.15s;
+}
+.layoutConfigSide header.panelHeader .btnClose:hover {
+    color: var(--txColor);
+    transform: scale(1.15);
+}
+
+/* 2. 본문 컨테이너 */
+.layoutConfigSide .panelBody {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0.9em 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+/* 3. 테마 전환 세그먼트 (span 기반) */
+.layoutConfigSide .themeTabs {
+    display: flex;
+    background-color: var(--bgSub);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBtn, 2em);
+    padding: 0.3em;
+    gap: 0.2em;
+    flex-shrink: 0;
+}
+.layoutConfigSide .themeTabs .tabItem {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+    padding: 0.45em 0.8em;
+    border-radius: var(--roundBtn, 2em);
+    font-size: 0.88em;
+    font-weight: 500;
+    color: var(--txLight);
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+.layoutConfigSide .themeTabs .tabItem:hover {
+    color: var(--txColor);
+}
+.layoutConfigSide .themeTabs .tabItem.active {
+    background-color: var(--bgColor);
+    color: var(--main);
+    font-weight: 600;
+    box-shadow: 0 1px 4px var(--aColor);
+}
+
+/* 4. 2x2 색상 선택 카드 그리드 */
+.layoutConfigSide .colorGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5em;
+    flex-shrink: 0;
+}
+.layoutConfigSide .colorCard {
+    background-color: var(--bgSub);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundSm, 0.45em);
+    padding: 0.55em 0.7em;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+}
+.layoutConfigSide .colorCard:hover {
+    transform: scale(1.04);
+}
+.layoutConfigSide .colorCard.active {
+    border-color: var(--aColor);
+    background-color: var(--bgColor);
+    box-shadow: 0.1em 0.1em 0.6em 0.1em var(--aColor);
+}
+.layoutConfigSide .colorCard .cardTop {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.3em;
+}
+.layoutConfigSide .colorCard .cardTop .colorKey {
+    font-size: 0.95em;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+}
+.layoutConfigSide .colorCard .cardTop .colorRole {
+    font-size: 0.72em;
+    color: var(--txLight);
+}
+.layoutConfigSide .colorCard .cardBottom {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+}
+.layoutConfigSide .colorCard .cardBottom .swatch {
+    width: 1.2em;
+    height: 1.2em;
+    border-radius: 50%;
+    border: 1px solid var(--aColor);
+    flex-shrink: 0;
+}
+.layoutConfigSide .colorCard .cardBottom .hexText {
+    font-size: 0.82em;
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--txSub);
+}
+
+/* 5. 컬러 팔레트 영역: 테두리 프레임 제거 및 자연스러운 배치 */
+.layoutConfigSide .pickerArea {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    flex-shrink: 0;
+    padding-top: 0.2em;
+}
+.layoutConfigSide .satValBox {
+    position: relative;
+    width: 100%;
+    height: 9em;
+    border-radius: var(--roundSm, 0.4em);
+    overflow: hidden;
+    cursor: crosshair;
+    background: linear-gradient(to bottom, transparent 0%, #000 100%),
+                linear-gradient(to right, #fff 0%, #ff0000 100%);
+    box-shadow: inset 0 0 0 1px var(--aColor);
+}
+.layoutConfigSide .satValCursor {
+    position: absolute;
+    width: 0.85em;
+    height: 0.85em;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.8);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+}
+.layoutConfigSide .hueRow {
+    width: 100%;
+}
+.layoutConfigSide .hueSlider {
+    position: relative;
+    width: 100%;
+    height: 0.75em;
+    border-radius: 0.4em;
+    cursor: pointer;
+    background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    box-shadow: inset 0 0 0 1px var(--aColor);
+}
+.layoutConfigSide .hueThumb {
+    position: absolute;
+    top: 50%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--aHigh);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    left: 0%;
+}
+.layoutConfigSide .inputRow {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+}
+.layoutConfigSide .curPreview {
+    width: 2.1em;
+    height: 2.1em;
+    border-radius: 50%;
+    border: 1px solid var(--aColor);
+    background-color: #1f382c;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px var(--aLow);
+}
+.layoutConfigSide .hexInputWrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: var(--bgSub);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBtn, 2em);
+    padding: 0 0.8em;
+    height: 2.1em;
+    gap: 0.2em;
+}
+.layoutConfigSide .hexInputWrap .prefix {
+    color: var(--txLight);
+    font-weight: 700;
+    font-family: monospace;
+}
+.layoutConfigSide .hexInputWrap .hexInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--txColor);
+    font-family: monospace;
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 0;
+    outline: none;
+    text-transform: lowercase;
+}
+.layoutConfigSide .btnEyedropper {
+    font-size: 1.2em;
+    color: var(--txLight);
+    cursor: pointer;
+    padding: 0.2em;
+    transition: color 0.15s, transform 0.15s;
+    flex-shrink: 0;
+}
+.layoutConfigSide .btnEyedropper:hover {
+    color: var(--main);
+    transform: scale(1.15);
+}
+.layoutConfigSide .presetRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+    margin-top: 0.2em;
+}
+.layoutConfigSide .presetLabel {
+    font-size: 0.72em;
+    color: var(--txLight);
+    font-weight: 500;
+}
+.layoutConfigSide .presetSwatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45em;
+}
+.layoutConfigSide .presetChip {
+    width: 1.25em;
+    height: 1.25em;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid var(--aColor);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.layoutConfigSide .presetChip:hover {
+    transform: scale(1.25);
+    box-shadow: 0 2px 6px var(--aDark);
+}
+
+/* 6. 슬림한 푸터 및 span 기반 액션 */
+.layoutConfigSide footer.panelFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65em 1em;
+    background-color: var(--bgColor);
+    border-top: 1px solid var(--lineColor);
+    flex-shrink: 0;
+    gap: 0.6em;
+}
+.layoutConfigSide footer.panelFooter .btnReset {
+    color: var(--txLight);
+    cursor: pointer;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    transition: color 0.15s;
+}
+.layoutConfigSide footer.panelFooter .btnReset:hover {
+    color: var(--txColor);
+}
+.layoutConfigSide footer.panelFooter .rightBtns {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+.layoutConfigSide footer.panelFooter .actCancel {
+    color: var(--txSub);
+    padding: 0.4em 0.8em;
+    border-radius: var(--roundBtn, 2em);
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: color 0.15s, background-color 0.15s;
+}
+.layoutConfigSide footer.panelFooter .actCancel:hover {
+    color: var(--txColor);
+    background-color: var(--aLow);
+}
+.layoutConfigSide footer.panelFooter .actSave {
+    background-color: var(--main);
+    border: 1px solid var(--aColor);
+    color: #fff;
+    padding: 0.4em 1.1em;
+    border-radius: var(--roundBtn, 2em);
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    transition: filter 0.15s;
+}
+.layoutConfigSide footer.panelFooter .actSave:hover {
+    filter: brightness(1.1);
+}
+</style>
+
+<script>
+window.initLayoutConfig = function(container, category, layoutName) {
+    const root = container.querySelector('.layoutConfigSide');
+    if (!root) return;
+
+    // 레이아웃 고유 원본 색상 (Layout.cshtml / SCSS 기본값)
+    const defaultColors = {
+        light: { main: '#1f4738', sub: '#5288b7', point: '#84cc16', deco: '#638791' },
+        dark: { main: '#367c63', sub: '#629ecf', point: '#6aa412', deco: '#789fa9' }
+    };
+
+    // 현재 설정 데이터 (초기값 보관)
+    const state = {
+        category: category,
+        layoutName: layoutName,
+        hasSavedSetting: @(hasSavedSetting ? "true" : "false"),
+        initialBodyTheme: document.body.dataset.theme || (document.documentElement.dataset.theme || 'light'),
+        isReset: false, // 초기화(원색상 복원) 상태 플래그
+        currentTab: 'light', // 'light' | 'dark'
+        currentColorKey: 'main', // 'main' | 'sub' | 'point' | 'deco'
+        colors: {
+            light: {
+                main: '@(model.Main)'.toLowerCase() || '#1f4738',
+                sub: '@(model.Sub)'.toLowerCase() || '#5288b7',
+                point: '@(model.Point)'.toLowerCase() || '#84cc16',
+                deco: '@(model.Deco)'.toLowerCase() || '#638791'
+            },
+            dark: {
+                main: '@(model.DarkMain)'.toLowerCase() || '#367c63',
+                sub: '@(model.DarkSub)'.toLowerCase() || '#629ecf',
+                point: '@(model.DarkPoint)'.toLowerCase() || '#6aa412',
+                deco: '@(model.DarkDeco)'.toLowerCase() || '#789fa9'
+            }
+        },
+        initialColors: null,
+        h: 0, s: 1, v: 1 // 현재 선택 색상의 HSV
+    };
+    state.initialColors = JSON.parse(JSON.stringify(state.colors));
+
+    // 색상 유틸리티
+    function hexToRgb(hex) {
+        hex = hex.replace('#', '').trim();
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length !== 6) return { r: 0, g: 0, b: 0 };
+        return {
+            r: parseInt(hex.substring(0, 2), 16),
+            g: parseInt(hex.substring(2, 4), 16),
+            b: parseInt(hex.substring(4, 6), 16)
+        };
+    }
+    function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')).join('');
+    }
+    function rgbToHsv(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const d = max - min;
+        let h = 0;
+        const s = max === 0 ? 0 : d / max;
+        const v = max;
+        if (max !== min) {
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: h * 360, s, v };
+    }
+    function hsvToRgb(h, s, v) {
+        h = (h % 360 + 360) % 360;
+        const c = v * s;
+        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        const m = v - c;
+        let r = 0, g = 0, b = 0;
+        if (h >= 0 && h < 60) { r = c; g = x; }
+        else if (h >= 60 && h < 120) { r = x; g = c; }
+        else if (h >= 120 && h < 180) { g = c; b = x; }
+        else if (h >= 180 && h < 240) { g = x; b = c; }
+        else if (h >= 240 && h < 300) { r = x; b = c; }
+        else { r = c; b = x; }
+        return { r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 };
+    }
+    function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s = 0, l = (max + min) / 2;
+        if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: h * 360, s: s * 100, l: l * 100 };
+    }
+    function hslToRgb(h, s, l) {
+        h = (h % 360 + 360) % 360 / 360;
+        s = Math.max(0, Math.min(100, s)) / 100;
+        l = Math.max(0, Math.min(100, l)) / 100;
+        if (s === 0) {
+            const v = l * 255;
+            return { r: v, g: v, b: v };
+        }
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        function hue2rgb(t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+        return {
+            r: hue2rgb(h + 1/3) * 255,
+            g: hue2rgb(h) * 255,
+            b: hue2rgb(h - 1/3) * 255
+        };
+    }
+
+    // 9단계 및 Light/Dark 계산 함수 (_Document.scss 일치)
+    function buildCssForColors(lightColors, darkColors) {
+        function generateVars(colors, isDark) {
+            let css = '';
+            const steps = [95, 90, 80, 70, 60, 50, 40, 30, 20, 10]; // 0~9
+            for (const [name, hex] of Object.entries(colors)) {
+                const rgb = hexToRgb(hex);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const baseH = hsl.h, baseS = hsl.s, baseL = hsl.l;
+                css += `  --${name}: ${hex};\n`;
+                const lightL = isDark ? Math.min(baseL + 12, 90) : Math.min(baseL + 15, 92);
+                const darkL = isDark ? Math.max(baseL - 15, 8) : Math.max(baseL - 12, 10);
+                const lightRgb = hslToRgb(baseH, baseS, lightL);
+                const darkRgb = hslToRgb(baseH, baseS, darkL);
+                css += `  --${name}Light: ${rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b)};\n`;
+                css += `  --${name}Dark: ${rgbToHex(darkRgb.r, darkRgb.g, darkRgb.b)};\n`;
+                const textRgb = baseL > 60 ? { r: 24, g: 24, b: 24 } : { r: 255, g: 255, b: 255 };
+                css += `  --${name}Text: ${rgbToHex(textRgb.r, textRgb.g, textRgb.b)};\n`;
+                for (let i = 0; i <= 9; i++) {
+                    let targetL = steps[i];
+                    if (isDark) targetL = 100 - targetL;
+                    const stepRgb = hslToRgb(baseH, Math.min(baseS, 85), targetL);
+                    css += `  --${name}${i}: ${rgbToHex(stepRgb.r, stepRgb.g, stepRgb.b)};\n`;
+                }
+            }
+            return css;
+        }
+        let result = ':root {\n' + generateVars(lightColors, false) + '}\n';
+        result += '[data-theme="dark"] {\n' + generateVars(darkColors, true) + '}\n';
+        return result;
+    }
+
+    // 실시간 본문 레이아웃 스타일 태그 업데이트
+    function applyLiveCss() {
+        let styleTag = document.getElementById('layoutThemeColors');
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'layoutThemeColors';
+            document.head.appendChild(styleTag);
+        }
+        if (state.isReset) {
+            // 초기화 상태: 커스텀 스타일 태그를 비워 레이아웃 고유 원색상을 100% 그대로 표현
+            styleTag.innerHTML = '';
+        } else {
+            styleTag.innerHTML = buildCssForColors(state.colors.light, state.colors.dark);
+        }
+    }
+
+    // UI 요소 쿼리
+    const tabItems = root.querySelectorAll('.themeTabs .tabItem');
+    const colorCards = root.querySelectorAll('.colorGrid .colorCard');
+    const satValBox = root.querySelector('.satValBox');
+    const satValCursor = root.querySelector('.satValCursor');
+    const hueSlider = root.querySelector('.hueSlider');
+    const hueThumb = root.querySelector('.hueThumb');
+    const curPreview = root.querySelector('.curPreview');
+    const hexInput = root.querySelector('.hexInput');
+    const btnEyedropper = root.querySelector('.btnEyedropper');
+    const btnReset = root.querySelector('.btnReset');
+    const actSave = root.querySelector('.actSave');
+    const presetChips = root.querySelectorAll('.presetChip');
+
+    // 현재 탭/키에 맞는 카드의 스와치 및 텍스트 갱신
+    function updateCardsUI() {
+        const set = state.colors[state.currentTab];
+        colorCards.forEach(card => {
+            const key = card.dataset.color;
+            const hex = set[key] || '#1f4738';
+            card.querySelector('.swatch').style.backgroundColor = hex;
+            card.querySelector('.hexText').textContent = hex;
+            card.classList.toggle('active', key === state.currentColorKey);
+        });
+    }
+
+    // 피커의 HSV 상태를 바탕으로 캔버스, 썸, 인풋 UI 동기화
+    function syncPickerUI() {
+        const rgb = hsvToRgb(state.h, state.s, state.v);
+        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+
+        // satValBox 배경: 순수 Hue 색상
+        const pureHueRgb = hsvToRgb(state.h, 1, 1);
+        const pureHueHex = rgbToHex(pureHueRgb.r, pureHueRgb.g, pureHueRgb.b);
+        satValBox.style.background = `linear-gradient(to bottom, transparent 0%, #000 100%), linear-gradient(to right, #fff 0%, ${pureHueHex} 100%)`;
+
+        // satVal 커서 위치
+        satValCursor.style.left = (state.s * 100) + '%';
+        satValCursor.style.top = ((1 - state.v) * 100) + '%';
+
+        // hue 썸 위치
+        hueThumb.style.left = ((state.h / 360) * 100) + '%';
+
+        // 카드 및 상태 업데이트
+        state.colors[state.currentTab][state.currentColorKey] = hex;
+        updateCardsUI();
+
+        // 사용자가 색상을 변경했으므로 초기화 모드 해제 및 실시간 스타일 반영
+        state.isReset = false;
+        applyLiveCss();
+    }
+
+    function setCurrentHex(hex) {
+        if (!hex.startsWith('#')) hex = '#' + hex;
+        const rgb = hexToRgb(hex);
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        state.h = hsv.h;
+        state.s = hsv.s;
+        state.v = hsv.v;
+        syncPickerUI();
+    }
+
+    function selectColorKey(key) {
+        state.currentColorKey = key;
+        const hex = state.colors[state.currentTab][key] || '#1f4738';
+        const rgb = hexToRgb(hex);
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        state.h = hsv.h;
+        state.s = hsv.s;
+        state.v = hsv.v;
+        
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+        const pureHueRgb = hsvToRgb(state.h, 1, 1);
+        const pureHueHex = rgbToHex(pureHueRgb.r, pureHueRgb.g, pureHueRgb.b);
+        satValBox.style.background = `linear-gradient(to bottom, transparent 0%, #000 100%), linear-gradient(to right, #fff 0%, ${pureHueHex} 100%)`;
+        satValCursor.style.left = (state.s * 100) + '%';
+        satValCursor.style.top = ((1 - state.v) * 100) + '%';
+        hueThumb.style.left = ((state.h / 360) * 100) + '%';
+        updateCardsUI();
+    }
+
+    // 탭 전환 (Light / Dark) 및 실제 본문 레이아웃 테마 실시간 동기화
+    function switchThemeTab(tabName) {
+        tabItems.forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+        state.currentTab = tabName;
+
+        // 실제 본문 화면의 data-theme 속성을 즉시 전환하여 다크/라이트 배색을 관찰 가능하도록 함!
+        document.body.dataset.theme = tabName;
+        document.documentElement.dataset.theme = tabName;
+
+        selectColorKey(state.currentColorKey);
+    }
+
+    tabItems.forEach(tab => {
+        tab.addEventListener('click', () => {
+            switchThemeTab(tab.dataset.tab);
+        });
+    });
+
+    // 색상 카드 선택
+    colorCards.forEach(card => {
+        card.addEventListener('click', () => {
+            selectColorKey(card.dataset.color);
+        });
+    });
+
+    // 드래그 유틸리티
+    function makeDraggable(element, onMove) {
+        let isDown = false;
+        function update(e) {
+            const rect = element.getBoundingClientRect();
+            const clientX = e.clientX ?? (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY ?? (e.touches ? e.touches[0].clientY : 0);
+            const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+            onMove(x, y);
+        }
+        element.addEventListener('mousedown', e => {
+            isDown = true;
+            update(e);
+            window.addEventListener('mousemove', onDrag);
+            window.addEventListener('mouseup', onUp);
+        });
+        element.addEventListener('touchstart', e => {
+            isDown = true;
+            update(e);
+            window.addEventListener('touchmove', onDrag);
+            window.addEventListener('touchend', onUp);
+        }, { passive: true });
+        function onDrag(e) {
+            if (!isDown) return;
+            update(e);
+        }
+        function onUp() {
+            isDown = false;
+            window.removeEventListener('mousemove', onDrag);
+            window.removeEventListener('mouseup', onUp);
+            window.removeEventListener('touchmove', onDrag);
+            window.removeEventListener('touchend', onUp);
+        }
+    }
+
+    // satVal 캔버스 드래그
+    makeDraggable(satValBox, (x, y) => {
+        state.s = x;
+        state.v = 1 - y;
+        syncPickerUI();
+    });
+
+    // hue 슬라이더 드래그
+    makeDraggable(hueSlider, (x) => {
+        state.h = x * 360;
+        syncPickerUI();
+    });
+
+    // HEX 입력
+    hexInput.addEventListener('input', () => {
+        const val = hexInput.value.replace(/[^0-9a-fA-F]/g, '');
+        if (val.length === 6) {
+            setCurrentHex('#' + val);
+        }
+    });
+
+    // 스포이트 (EyeDropper API)
+    if (window.EyeDropper) {
+        btnEyedropper.addEventListener('click', async () => {
+            try {
+                const eyeDropper = new EyeDropper();
+                const res = await eyeDropper.open();
+                if (res && res.sRGBHex) {
+                    setCurrentHex(res.sRGBHex);
+                }
+            } catch (err) {
+                // 취소 무시
+            }
+        });
+    } else {
+        btnEyedropper.style.display = 'none';
+    }
+
+    // 추천 프리셋 클릭
+    presetChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const hex = chip.dataset.hex;
+            if (hex) setCurrentHex(hex);
+        });
+    });
+
+    // 기본값 복원 (설정을 완전히 제거하여 레이아웃 본래 원색상 복원)
+    btnReset.addEventListener('click', () => {
+        state.isReset = true;
+        state.colors = JSON.parse(JSON.stringify(defaultColors));
+        // 커스텀 스타일 태그를 깨끗이 비워 원본 스타일 활성화
+        applyLiveCss();
+        updateCardsUI();
+        // 픽커 컨트롤은 기본 색상으로 맞춤
+        const hex = state.colors[state.currentTab][state.currentColorKey];
+        const rgb = hexToRgb(hex);
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        state.h = hsv.h; state.s = hsv.s; state.v = hsv.v;
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+        const pureHueRgb = hsvToRgb(state.h, 1, 1);
+        const pureHueHex = rgbToHex(pureHueRgb.r, pureHueRgb.g, pureHueRgb.b);
+        satValBox.style.background = `linear-gradient(to bottom, transparent 0%, #000 100%), linear-gradient(to right, #fff 0%, ${pureHueHex} 100%)`;
+        satValCursor.style.left = (state.s * 100) + '%';
+        satValCursor.style.top = ((1 - state.v) * 100) + '%';
+        hueThumb.style.left = ((state.h / 360) * 100) + '%';
+    });
+
+    // 저장
+    actSave.addEventListener('click', async () => {
+        try {
+            actSave.style.pointerEvents = 'none';
+            actSave.innerHTML = '<i class="fi fiSpinner"></i> <span>저장 중...</span>';
+
+            if (state.isReset) {
+                // 초기화 상태: 서버에서 설정을 완전히 삭제하여 영구적으로 레이아웃 원본으로 복원
+                const res = await fetch(`/api/config/layout/${state.category}/${state.layoutName}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                const result = await res.json();
+                if (result && result.success) {
+                    state.hasSavedSetting = false;
+                    const styleTag = document.getElementById('layoutThemeColors');
+                    if (styleTag) styleTag.innerHTML = '';
+                    common.info('레이아웃 설정이 원본으로 초기화되었습니다.');
+                    closeLayoutConfig(false); // 닫기
+                } else {
+                    common.alert(result.message || '초기화에 실패했습니다.', 'Error');
+                }
+            } else {
+                // 커스텀 색상 저장
+                const payload = {
+                    Main: state.colors.light.main,
+                    Sub: state.colors.light.sub,
+                    Point: state.colors.light.point,
+                    Deco: state.colors.light.deco,
+                    DarkMain: state.colors.dark.main,
+                    DarkSub: state.colors.dark.sub,
+                    DarkPoint: state.colors.dark.point,
+                    DarkDeco: state.colors.dark.deco
+                };
+                const res = await fetch(`/api/config/layout/${state.category}/${state.layoutName}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result && result.success) {
+                    state.hasSavedSetting = true;
+                    state.initialColors = JSON.parse(JSON.stringify(state.colors));
+                    common.info('레이아웃 설정이 저장되었습니다.');
+                    closeLayoutConfig(false); // 닫기 (원복 안 함)
+                } else {
+                    common.alert(result.message || '저장에 실패했습니다.', 'Error');
+                }
+            }
+        } catch (err) {
+            console.error('[Save LayoutConfig Error]', err);
+            common.alert('저장 중 네트워크 오류가 발생했습니다.', 'Error');
+        } finally {
+            actSave.style.pointerEvents = 'auto';
+            actSave.innerHTML = '<i class="fi fiCheckmark"></i> <span>' + @this.Js(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "저장" : "Save") + '</span>';
+        }
+    });
+
+    // 초기 상태 로드: 현재 접속 중인 화면의 테마(light/dark)에 맞춰 탭 및 색상 로드
+    const initialTab = state.initialBodyTheme === 'dark' ? 'dark' : 'light';
+    switchThemeTab(initialTab);
+
+    // 취소 시 원래 색상 및 테마 복원을 위한 hook
+    container._revertColors = function() {
+        // 원래 접속 중이던 화면의 테마로 복원
+        if (state.initialBodyTheme) {
+            document.body.dataset.theme = state.initialBodyTheme;
+            document.documentElement.dataset.theme = state.initialBodyTheme;
+        }
+        const styleTag = document.getElementById('layoutThemeColors');
+        if (!state.hasSavedSetting) {
+            if (styleTag) styleTag.innerHTML = '';
+        } else if (state.initialColors) {
+            state.colors = JSON.parse(JSON.stringify(state.initialColors));
+            state.isReset = false;
+            applyLiveCss();
+        }
+    };
+};
+</script>

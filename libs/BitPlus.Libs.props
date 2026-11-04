@@ -1,0 +1,33 @@
+<Project>
+  <!-- BitPlus 공용 라이브러리(BitPlus.dll, BitPlus.Web.dll)를 프로젝트 참조 대신 이 폴더의 dll 로 참조한다.
+       외부 원본 솔루션(BitPlusSourceDir) 경로가 지정되어 있고 빌드 결과가 있으면 빌드 전에 이 폴더로 동기화하고, 없으면 이 폴더의 기존 파일을 그대로 쓴다. -->
+  <PropertyGroup>
+    <BitPlusLibsDir>$(MSBuildThisFileDirectory)</BitPlusLibsDir>
+  </PropertyGroup>
+
+  <!-- BitPlus.dll 은 모든 프로젝트가 쓰므로 여기서 참조. dll 참조는 NuGet 의존성을 끌고 오지 않으므로 BitPlus.csproj 의 패키지를 같은 버전으로 둔다 -->
+  <ItemGroup>
+    <Reference Include="BitPlus">
+      <HintPath>$(BitPlusLibsDir)BitPlus.dll</HintPath>
+    </Reference>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.12" />
+    <PackageReference Include="StackExchange.Redis" Version="3.0.17" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+  </ItemGroup>
+
+  <Target Name="SyncBitPlusLibs" BeforeTargets="ResolveAssemblyReferences" Condition="'$(BitPlusSourceDir)' != '' and Exists('$(BitPlusSourceDir)')">
+    <!-- $(Configuration) 은 이 props 가 읽힐 때 아직 정해지지 않았을 수 있어 Target 안에서 계산 -->
+    <PropertyGroup>
+      <BitPlusSourceBin>$(BitPlusSourceDir)\BitPlus.Web\bin\$(Configuration)\net10.0</BitPlusSourceBin>
+    </PropertyGroup>
+    <ItemGroup Condition="Exists('$(BitPlusSourceBin)\BitPlus.Web.dll')">
+      <_BitPlusLib Include="$(BitPlusSourceBin)\BitPlus.dll;$(BitPlusSourceBin)\BitPlus.Web.dll;$(BitPlusSourceBin)\BitPlus.pdb;$(BitPlusSourceBin)\BitPlus.Web.pdb;$(BitPlusSourceBin)\BitPlus.xml;$(BitPlusSourceBin)\BitPlus.Web.xml;$(BitPlusSourceBin)\**\BitPlus*.resources.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_BitPlusLib)" DestinationFiles="@(_BitPlusLib->'$(BitPlusLibsDir)%(RecursiveDir)%(Filename)%(Extension)')" Condition="Exists('%(FullPath)')" SkipUnchangedFiles="true" Retries="3" />
+  </Target>
+</Project>

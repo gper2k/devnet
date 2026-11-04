@@ -1,0 +1,27 @@
+[
+  {
+    "name": "name",
+    "displayName": "@GroupName",
+    "filters": {
+      "required": [],
+      "minLength": [2],
+      "maxLength": [64]
+    }
+  },
+  {
+    "name": "dpNames",
+    "displayName": "@DpName",
+    "filters": {
+      "required": [],
+      "maxLength": [64]
+    },
+    "converter": "language"
+  },
+  {
+    "name": "grade",
+    "displayName": "@Grade",
+    "filters": {
+      "maxLength": [4]
+    }
+  }
+]

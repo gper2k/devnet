@@ -1,0 +1,13 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    // 지원 문화권 선택 (현재 문화권 먼저) — 약관/메일 템플릿의 문화권별 제목·본문 입력용
+    var current = System.Globalization.CultureInfo.CurrentUICulture.GetLastName();
+    var cultures = (this.Config?.Cultures ?? new[] { "ko", "en" }).OrderBy(p => p.NEqual(current) ? 0 : 1).ToArray();
+}
+<header>@this.Lang("Cult")</header>
+<select name="culture">
+    @foreach (var cult in cultures)
+    {
+        <option value="@cult">@(cult.ToCulture()?.NativeName ?? cult) (@cult)</option>
+    }
+</select>

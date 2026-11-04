@@ -1,0 +1,11 @@
+{
+  "key": "ContentMap",
+  "version": 4,
+  "name": { "ko": "컨텐츠맵", "en": "Content map" },
+  "description": {"ko": "사이드 패널 위쪽에 메뉴 트리를 보여 줍니다. 연결 메뉴가 있으면 그 하위 메뉴를, 없으면 컨텐츠맵의 하위 메뉴를 보여 줍니다. 사이드 패널에 하나만 놓을 수 있습니다.", "en": "Shows a menu tree at the top of the side panel. It lists the sub menus of the linked menu, or of the content map when there is no linked menu. Only one can be placed in a side panel."},
+  "categories": ["side"],
+  "single": true,
+  "frame": false,
+  "size": { "min": [1, 1], "max": [4, 4] },
+  "settings": []
+}

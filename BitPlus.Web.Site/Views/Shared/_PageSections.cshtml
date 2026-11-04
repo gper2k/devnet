@@ -1,0 +1,46 @@
+@model string
+@inject BitPlus.Web.Site.Widgets.PageSectionReader Reader
+@{
+    // 위젯 페이지의 영역들 — 모델 = 페이지 키(home, portal …). 영역마다 화면 폭별 grid CSS 와 슬롯(grid-area: s{키})을 그리고, 슬롯의 위젯은 공통 카드 틀 안에 위젯 출력 뷰로.
+    // 관리자에게는 편집 모드(영역 추가·순서·삭제, 위젯 추가·설정·삭제)를 함께 붙인다 (_PageSectionsEdit).
+    var sections = await Reader.ReadAsync(Model, this.Context);
+    var editable = this.Context.HasPolicy(WebConfig.ManagerPolicyName);
+}
+<div class="pageSections" data-page="@Model">
+    @foreach (var area in sections)
+    {
+        <style>@Html.Raw(area.Css)</style>
+        <section id="@area.ElementId" data-id="@area.Id" data-type="@area.Type" data-name="@area.TypeName">
+            @foreach (var slot in area.Slots)
+            {
+                <div style="grid-area: s@(slot.Key)" data-slot="@slot.Key" data-widget="@slot.Widget" data-missing="@(slot.Missing ? "true" : null)">
+                    @if (slot.Widget is not null && !slot.Missing && !slot.Frame)
+                    {
+                        @* 틀 없는 위젯(widget.json frame = false, 예: 사이드 컨텐츠맵): 위젯 출력 뷰가 자기 틀을 그림 *@
+                        <partial name="@($"~/Views/Widgets/{slot.Widget}/View.cshtml")" model="slot" />
+                    }
+                    else if (slot.Widget is not null && !slot.Missing)
+                    {
+                        <article class="card widget">
+                            @if (!string.IsNullOrEmpty(slot.Title))
+                            {
+                                <header>
+                                    <span>@slot.Title</span>
+                                    @if (slot.MoreUrl is { } more)
+                                    {
+                                        <a href="@more">@this.Lang("WidgetMore")</a>
+                                    }
+                                </header>
+                            }
+                            <partial name="@($"~/Views/Widgets/{slot.Widget}/View.cshtml")" model="slot" />
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    }
+    @if (editable)
+    {
+        <partial name="_PageSectionsEdit" model="Model" />
+    }
+</div>

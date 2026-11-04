@@ -1,0 +1,574 @@
+@model ContentPageModel
+@{
+    var post = Model.Post!;
+    var cultureOf = System.Globalization.CultureInfo.InvariantCulture;
+    // 목록에서 넘어온 목록 상태 쿼리(page, size, q, category, pending)를 그대로 이어받아 목록 버튼·이전/다음 글 주소에 다시 붙인다 (이전 목록 환경으로 돌아가기)
+    var listQuery = QueryString.Create(new[] { "page", "size", "q", "category", "pending" }.Where(k => !string.IsNullOrEmpty(this.Context.Request.Query[k])).Select(k => new KeyValuePair<string, string?>(k, this.Context.Request.Query[k].ToString()))).ToString();
+    var listUrl = $"/content/{Model.RuleNo}{listQuery}";
+    var useLike = Model.Option("UseLike");
+    var useShare = Model.Option("UseSnsShare");
+    var kakaoKey = SiteIntegration.Of(this.Config).KakaoJsKey; // 관리자 "시스템 설정 > 외부 연동" 의 카카오 JavaScript 키 (있을 때만 공유 메뉴에 카카오톡)
+    var useComment = Model.Option("AllowComment");
+    var useCommentLike = Model.Option("UseCommentLike");
+    var isSurvey = Model.Type == BitPlus.Data.Content.ContentTypes.Survey; // 설문: 본문(JSON) 대신 설문 패널(참여 폼 또는 결과)을 보여 준다
+    var isManual = Model.Type == BitPlus.Data.Content.ContentTypes.Manual; // 메뉴얼: 목록이 곧 왼쪽 목차라 목록 버튼이 없고, 새 글은 "그룹 쓰기", 답글은 "페이지 쓰기"이며 그룹 작성자·관리자는 하위 페이지의 순서를 바꿀 수 있다
+    var isForumTopic = BitPlus.Web.Data.Content.ForumContentHandler.UsesTopicComments(Model.Type) && !post.IsNotice;
+    var postButtonsInReplies = Model.InFeed && isForumTopic && Model.Option("AllowComment"); // 블로그 피드: 글 편집·삭제 버튼은 댓글 영역 제목줄 오른쪽(Forum/Replies.cshtml)에 있음 // 포럼 토픽·블로그 글(공지 제외): 댓글은 Forum/Replies.cshtml 의 댓글 흐름이고, 이전/다음 글은 없으며 마지막 활동 시각(UDate)을 보인다
+    // 다국어 게시판: 번역이 있으면 언어 선택 칩(원문 + 번역 언어, ?lang=), 보이는 번역이 AI 번역이거나 원문이 바뀐 뒤의 번역이면 제목 배지
+    var shownTranslation = post.Translations.Where(p => p.Culture.NEqual(post.Culture)).Select(p => (Found: true, p.IsMachine, p.Outdated)).FirstOrDefault();
+    string LangUrl(string culture) => $"{this.Context.Request.Path}{listQuery}{(listQuery.Length > 0 ? "&" : "?")}lang={Uri.EscapeDataString(culture)}";
+}
+
+@* 일반 형식의 글 보기(/content/{규칙}/view/{글 번호}, /content/view/{글 키}) — 제목줄(공지·카테고리·상태 배지), 글쓴이·등록일·조회수, 본문(샌드박스 프레임), 연관 링크, 태그, 좋아요·SNS 공유, 승인 현황·승인, 변경 기록, 댓글, 이전/다음 글, 목록·수정·삭제·답글·글쓰기 버튼.
+   접근 검사(PostAccessRule)와 조회수 처리는 컨트롤러가 하고, 좋아요·승인·변경 기록·댓글·삭제는 api/content 로 처리한다. 규칙의 기능 옵션(좋아요, SNS 공유, 댓글, 댓글 좋아요, 글 변경 기록, 삭제·답글 허용)이 꺼져 있으면 해당 영역은 그려지지 않는다. *@
+<script>window.contentGuestPassword = @this.Js(ViewData["GuestPassword"] as string ?? "");</script> @* 비밀번호 화면에서 확인한 비회원 글 비밀번호 (댓글 등 다른 부분 화면도 함께 보냄) *@
+<article class="contentPost flexCol">
+    @if (!Model.InFeed) @* 블로그 피드 안에서는 게시판 제목줄이 피드 위에 한 번만 있음 *@
+    {
+    <header class="@(isManual ? "withToc" : null)">
+        <span>
+        @if (!isManual) {<a href="@listUrl"> @Model.Title</a>}
+        </span>
+        @if (isManual)
+        {
+            @* 메뉴얼: 제목은 크고 굵게 왼쪽, 목차 메뉴는 반대편 끝 *@
+            <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
+        }
+    </header>
+    }
+    <div class="contentWrap">
+        <header>
+            <div class="title">
+                <div>
+                        @if (post.IsNotice)
+                        {
+                            <i class="badge sm main">@this.Lang("Notice")</i>
+                        }
+                        @if (!string.IsNullOrEmpty(post.Category))
+                        {
+                            <i class="badge sm deco">@post.Category</i>
+                        }
+                        @if (!post.IsPublished)
+                        {
+                            <i class="badge sm danger">@this.Lang("SaveDraft")</i>
+                        }
+                        @if (post.IsRejected)
+                        {
+                            <i class="badge sm danger">@this.Lang("ContentRejected")</i>
+                        }
+                        else if (!post.IsApproved)
+                        {
+                            <i class="badge sm warning">@this.Lang("ContentPendingApproval")</i>
+                        }
+                        <i class="badge sm warning" id="postOldBadge" hidden></i>
+                        @if (shownTranslation.Found && shownTranslation.IsMachine)
+                        {
+                            <i class="badge sm info"><i class="fi fiSparkle"></i> @this.Lang("TranslationMachine")</i>
+                        }
+                        @if (shownTranslation.Found && shownTranslation.Outdated)
+                        {
+                            <i class="badge sm warning" title="@this.Lang("TranslationOutdated")"><i class="fi fiWarning"></i> @this.Lang("Translation")</i>
+                        }
+                </div>
+                <span>@post.Title</span>
+            </div>
+            <div class="contentInfo">
+                <ul>
+                    @if (!string.IsNullOrEmpty(post.Writer))
+                    {
+                        @* 회원 글이면 로그인 사용자에게 작성자 메뉴(메시지 보내기·글 보기, 레이아웃의 userMenu) *@
+                        @* 댓글 작성자와 같은 모양: 이미지가 있으면 이름 앞에 작은 둥근 이미지, 이름 뒤에 활성 그룹·역할 *@
+                        <li class="writer"><strong data-user="@(this.IsAuthenticated ? post.WriterId : null)" data-name="@post.Writer">@if (!string.IsNullOrEmpty(post.WriterPhoto)) { <img src="@post.WriterPhoto" alt="" /> } else if (post.WriterId != null) { <i class="fi fiPerson fiFill"></i> }@post.Writer@if (post.WriterGroup is not null || post.WriterRole is not null) { <small>@string.Join(" · ", new[] { post.WriterGroup, post.WriterRole }.OfType<string>())</small> }</strong></li>
+                    }
+                </ul>
+                <ul>
+                    @if (!isForumTopic)
+                    {
+                        <li><i class="fi fiEye"></i> @post.ReadCount</li>
+                    }
+                    <li><i class="fi fiClock"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.CDate, DateTimeKind.Utc).ToString("o")">@post.CDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></li>
+                    @if (isForumTopic)
+                    {
+                        <li title="@this.Lang("ContentLastActivity")"><i class="fi fiArrSync"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.UDate, DateTimeKind.Utc).ToString("o")">@post.UDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></li>
+                    }
+                    @* 공유 *@
+                    @if (useShare && post.IsApproved)
+                    {
+                        <li id="postShare"><i class="fi fiShare"></i> @this.Lang("ContentShare")</li>
+                    }
+                    @* 컨텐츠 변경 기록 *@
+                    @if (post.CanHistory)
+                    {
+                        <li id="postHistory"><i class="fi fiHistory"></i> @this.Lang("History")</li>
+                    }
+                </ul>
+            </div>
+        </header>
+        @if (post.Translations.Count > 0)
+        {
+            @* 언어 전환: 제목줄 아래 작은 글자 (원문 + 번역 언어, 지금 보이는 언어가 활성) *@
+            <nav>
+                <i class="fi fiLocalLanguage"></i>
+                <a href="@LangUrl(post.OriginalCulture)" class="@(post.Culture.NEqual(post.OriginalCulture) ? "active" : null)">@(post.OriginalCulture.ToCulture()?.NativeName ?? post.OriginalCulture) · @this.Lang("Original")</a>
+                @foreach (var item in post.Translations)
+                {
+                    <a href="@LangUrl(item.Culture)" class="@(item.Culture.NEqual(post.Culture) ? "active" : null)" title="@(item.Outdated ? this.Lang("TranslationOutdated") : null)">@item.Name@if (item.IsMachine) { <i class="fi fiSparkle"></i> }@if (item.Outdated) { <i class="fi fiWarning"></i> }</a>
+                }
+            </nav>
+        }
+        @if (Model.Type == BitPlus.Data.Content.ContentTypes.Gallery)
+        {
+            @* 갤러리형: 첨부한 이미지를 캐러셀로 가장 크게 보여 준다 *@
+            <partial name="~/Views/Content/Gallery/Carousel.cshtml" model="Model" />
+        }
+        @if (shownTranslation.Found && shownTranslation.IsMachine)
+        {
+            @* AI 번역을 보고 있으면 본문 앞에 안내 (본문에 저장하지 않고 출력할 때 붙임 — 화면 언어 문구, 사람이 고쳐 저장하면 사라짐) *@
+            <p><i class="fi fiSparkle"></i> @this.Lang("TranslationMachineNotice")</p>
+        }
+        <section id="contentPostBody">
+            @if (isSurvey)
+            {
+                <partial name="~/Views/Content/Survey/Panel.cshtml" model="Model" />
+            }
+        </section>
+        <footer>
+            @if (post.Links.Count > 0)
+            {
+                <aside>
+                    <strong><i class="fi fiLink"></i> @this.Lang("RelatedLink")</strong>
+                    <ul>
+                        @foreach (var link in post.Links)
+                        {
+                            <li><a href="@link" target="_blank" rel="noopener noreferrer nofollow">@link</a></li>
+                        }
+                    </ul>
+                </aside>
+            }
+            @if (post.IsApproved && useLike)
+            {
+                @* 승인된 글: 좋아요(+1)·싫어요(-1) 합산 (공유는 위 정보줄의 변경 기록 옆, 승인전·반려 글은 승인 기록 항목에서 승인·반려) *@
+                <menu>
+                    @if (useLike)
+                    {
+                        <button type="button" id="postLike" data-vote="1" class="@(post.Vote == 1 ? "voted" : null)" disabled="@(!this.IsAuthenticated)"><i class="fi fiThumbLike"></i> @this.Lang("Like")</button>
+                        <b id="postPoint">@post.LikePoint</b>
+                        <button type="button" id="postDislike" data-vote="-1" class="@(post.Vote == -1 ? "voted" : null)" disabled="@(!this.IsAuthenticated)"><i class="fi fiThumbDislike"></i> @this.Lang("ContentDislike")</button>
+                    }
+                </menu>
+            }
+
+            <div class="viewExtend">
+                @if (post.Files.Count > 0)
+                {
+                    @* 내려받을 수 있는 첨부 파일만 (권한은 /system/down 과 같은 규칙), 태그와 비슷한 모양 *@
+                    <div class="files">
+                        <label>
+                            <i class="fi fiAttach"></i>
+                            @this.Lang("ContentFiles")
+                        </label>
+                        @foreach (var file in post.Files)
+                        {
+                            <a class="badge sm" href="@file.Url" download>@file.Name <i class="fi fiDownload"></i> @file.DownCount</a>
+                        }
+                    </div>
+                }
+                @if (post.Tags.Count > 0)
+                {
+                    <div class="tags">
+                        <label>
+                            <i class="fi fiTag"></i>
+                            Tags
+                        </label>
+                        @foreach (var tag in post.Tags)
+                        {
+                            <a class="badge sm" href="/content/@Model.RuleNo?q=@Uri.EscapeDataString(tag)">@tag</a>
+                        }
+                    </div>
+                }
+            </div>
+        </footer>
+        <div class="contentInfo">
+            <ul>
+                @* 게시 기간 *@
+                @if (post.Start is not null || post.End is not null)
+                {
+                    <li class="period">
+                        <i class="fi fiCalClock"></i>
+                        @if (post.Start is { } start)
+                        {
+                            <time data-local="datetime" datetime="@DateTime.SpecifyKind(start, DateTimeKind.Utc).ToString("o")">@start.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time>
+                        }
+                        ~
+                        @if (post.End is { } end)
+                        {
+                            <time data-local="datetime" datetime="@DateTime.SpecifyKind(end, DateTimeKind.Utc).ToString("o")">@end.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time>
+                        }
+                    </li>
+                }
+                @* 승인 및 기록 *@
+                @if (post.HasApprovals)
+                {
+                    <li id="postApprovers"><i class="fi fiTasksApp"></i> @this.Lang("ContentApprovalRecord")</li>
+                }
+            </ul>
+            <ul>
+                @* 작성자 IP 정보를 중간 3문자를 마스킹 해서 출력한다.  *@
+                @if (!string.IsNullOrEmpty(post.WriterIp))
+                {
+                    <li class="ip"><i class="fi fiGlobe"></i> @post.WriterIp</li>
+                }
+                @* 순서 변경 *@
+                @if (post.CanReorder)
+                {
+                    <li id="postReorder"><i class="fi fiSort"></i> @this.Lang("ManualReorder")</li>
+                }
+                @* 게시물 이동 *@
+                @if (post.MoveTargets.Count > 0)
+                {
+                    @* 같은 형식의 다른 게시판으로 이동 (관리자·글쓴이, 쓰기 권한이 있는 게시판만): 공용 드롭박스(.open/.active), 고르면 확인 후 이동 *@
+                    <li id="postMove">
+                        <i class="fi fiArrMove"></i> @this.Lang("Move")
+                        <ul class="dropBox right">
+                            @foreach (var target in post.MoveTargets)
+                            {
+                                <li data-rule="@target.RuleNo">@target.Title</li>
+                            }
+                        </ul>
+                    </li>
+                }
+                @* 요약글 다시 만들기 *@
+                @if (Model.Permission.IsAdmin && BitPlus.Web.Data.Content.DefaultContentHandler.UsesSummary(Model.Type) && this.Context.CanHandleEvent(BitPlus.Web.Services.ServiceEvents.ContentSummary))
+                {
+                    <li id="postSummary"><i class="fi fiArrSync"></i> @this.Lang("ContentSummaryRefresh")</li>
+                }
+                @* 신고 *@
+                @if (post.CanReport)
+                {
+                    <li id="postReport"><i class="fi fiFlag"></i> @this.Lang("Report")</li>
+                }
+            </ul>
+        </div>
+    </div>
+    @if (isManual)
+    {
+        @* 메뉴얼: 이전/다음 페이지를 양쪽으로 — 작은 "이전 글 / 다음 글" 글자 아래에 제목을 크게 *@
+        <nav class="manualNav">
+            @if (post.PreviousNo > 0)
+            {
+                <a class="prev" href="@(post.PreviousLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.PreviousNo}")" @(post.PreviousLocked ? "data-locked=\"true\"" : null)><b><i class="fi fiChevronLeft"></i> @this.Lang("ContentPrevious")</b><span>@post.PreviousTitle</span></a>
+            }
+            else
+            {
+
+                <span></span>
+            }
+            @if (post.NextNo > 0)
+            {
+                <a class="next" href="@(post.NextLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.NextNo}")" @(post.NextLocked ? "data-locked=\"true\"" : null)><b>@this.Lang("ContentNext") <i class="fi fiChevronRight"></i></b><span>@post.NextTitle</span></a>
+            }
+        </nav>
+    }
+
+    @if (isForumTopic)
+    {
+        if (useComment) {
+            <partial name="~/Views/Content/Forum/Replies.cshtml" model="Model" />
+        }
+    }
+    else if (useComment)
+    {
+        <article id="postComments" hidden>
+            <header><i class="fi fiComment"></i> @this.Lang("Comment"). <b>0</b></header>
+            <ul></ul>
+            <form hidden>
+                <textarea name="body" rows="3" maxlength="2000"></textarea>
+                <button type="submit" class="sub">@this.Lang("Save")</button>
+            </form>
+        </article>
+    }
+
+    @if (!isForumTopic && !isManual) // 메뉴얼은 위의 manualNav 가 이전/다음을 보여 줌
+    {
+    <nav>
+        @if (post.PreviousNo > 0)
+        {
+            <a href="@(post.PreviousLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.PreviousNo}{listQuery}")" @(post.PreviousLocked ? "data-locked=\"true\"" : null)><b><i class="fi fiChevronUp"></i> @this.Lang("ContentPrevious")</b><span>@post.PreviousTitle</span></a>
+        }
+        @if (post.NextNo > 0)
+        {
+            <a href="@(post.NextLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.NextNo}{listQuery}")" @(post.NextLocked ? "data-locked=\"true\"" : null)><b><i class="fi fiChevronDown"></i> @this.Lang("ContentNext")</b><span>@post.NextTitle</span></a>
+        }
+    </nav>
+    }
+
+    @if (!postButtonsInReplies || (post.NeedPassword && post.CanDelete)) @* 블로그 피드: 버튼이 모두 댓글 제목줄로 가 비면 버튼줄(과 그 구분선)을 그리지 않음 *@
+    {
+    <footer>
+        <div>
+            @if (!isManual && !Model.InFeed)
+            {
+                <button type="button" onclick="location.href='@listUrl'"><i class="fi fiList"></i> @this.Lang("ContentList")</button>
+            }
+            @if (post.NeedPassword && post.CanDelete)
+            {
+                <input type="password" id="postPassword" maxlength="64" autocomplete="off" placeholder="@this.Lang("Password")" />
+            }
+        </div>
+        <div>
+            @if (Model.Permission.CanWrite && !Model.InFeed)
+            {
+                <button type="button" class="deco" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiAdd"></i> @this.Lang(Model.Type == BitPlus.Data.Content.ContentTypes.Forum ? "NewTopic" : isManual ? "ManualNewGroup" : "ContentWrite")</button>
+            }
+            @if (isManual ? post.AddPageToNo > 0 : post.CanReply)
+            {
+                @* 메뉴얼: 그룹에서도, 그 그룹의 페이지에서도 같은 그룹에 새 페이지를 쓰는 화면으로 *@
+                <button type="button" class="primary" onclick="location.href='/content/@Model.RuleNo/write?reply=@(isManual ? post.AddPageToNo : post.ContentNo)'"><i class="fi fiArrReply"></i> @this.Lang(isManual ? "ManualNewPage" : "Answer")</button>
+            }
+            @if (post.CanEdit && !postButtonsInReplies)
+            {
+                <button type="button" class="info" id="postEdit" data-href="/content/@Model.RuleNo/write?no=@post.ContentNo"><i class="fi fiEdit"></i> @this.Lang("Edit")</button>
+            }
+            @if (post.CanDelete && !postButtonsInReplies)
+            {
+                <button type="button" class="danger" id="postDelete"><i class="fi fiTrash"></i> @this.Lang("Delete")</button>
+            }
+        </div>
+    </footer>
+    }
+</article>
+<script>
+{ // 블록으로 감싸 한 페이지에 이 화면이 여러 개(블로그 피드)여도 상수 이름이 겹치지 않게
+    const contentPostRoot = document.currentScript.previousElementSibling; // 이 글 보기 (블로그 피드는 한 페이지에 여러 개라 요소는 모두 이 안에서 찾음)
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = contentPostRoot;
+        const inFeed = @(Model.InFeed && !Model.SinglePost ? "true" : "false"); // 여러 글 블로그 피드 안: 삭제하면 피드를 다시 읽음 (글 하나만 보는 피드는 전체 피드로)
+        const ruleNo = @Model.RuleNo, contentNo = @post.ContentNo;
+        const base = { ruleNo, contentNo };
+        const isMember = @(this.IsAuthenticated ? "true" : "false");
+        const guestPassword = window.contentGuestPassword; // 비밀번호 화면에서 확인한 비회원 글 비밀번호 (모든 요청에 함께 보냄)
+        if (guestPassword) base.password = guestPassword;
+        const passwordInput = root.querySelector('#postPassword'); // 비회원 글(작성자 정보 없음)을 관리자가 아닌 사람이 지우거나 변경 기록을 볼 때의 본인 확인용
+        const send = (url, body, options) => common.postSend(url, common.makeFormData({ ...base, ...body }), options);
+        const quiet = { useLoading: false }; // 좋아요/싫어요는 배경에서 조용히 처리 (로딩 표시 없음)
+        const noReadText = @this.Js(this.Lang("ContentNoReadPermission"));
+        root.addEventListener('click', e => {
+            const a = e.target.closest('a[data-locked]');
+            if (a) {
+                e.preventDefault();
+                common.alert(noReadText);
+            }
+        });
+
+        // 본문은 서버가 정제한(저장할 때·내려줄 때) HTML 을 직접 출력한다 (common.renderContent: contain 상자, 링크 새 창)
+        if (!@(isSurvey ? "true" : "false")) common.renderContent(root.querySelector('#contentPostBody'), @this.Js(post.Body)); // 설문은 본문이 JSON 이라 설문 패널이 그린다
+
+        // 좋아요(+1)·싫어요(-1): 합산값을 보여 주고, 같은 표를 다시 누르면 취소·반대 표를 누르면 바뀐다 (로그인 사용자만, 승인된 글만 나타남)
+        const likeBtn = root.querySelector('#postLike'), dislikeBtn = root.querySelector('#postDislike'), point = root.querySelector('#postPoint');
+        const vote = async liked => {
+            const res = await send('/api/content/post/like', { liked }, quiet);
+            if (!res || !res.success) return;
+            likeBtn.classList.toggle('voted', res.data.vote === 1); // 색은 항상 deco(좋아요)·danger(싫어요), 내가 누른 표만 voted 로 또렷하게
+            dislikeBtn.classList.toggle('voted', res.data.vote === -1);
+            point.textContent = res.data.likePoint;
+        };
+        if (likeBtn) { likeBtn.onclick = () => vote(true); dislikeBtn.onclick = () => vote(false); }
+
+        // 작성자 이름: 작성자 메뉴(메시지 보내기·글 보기) — 로그인 사용자에게만 data-user 가 있음
+        const writerItem = root.querySelector('li.writer > strong[data-user]');
+        if (writerItem && window.userMenu) writerItem.onclick = () => window.userMenu(writerItem, writerItem.dataset.user, writerItem.dataset.name || @this.Js(post.Writer));
+
+        // 요약 갱신 (게시판 관리자만 보임): 요약 서비스에 다시 만들기 요청, 결과 안내는 공용 처리
+        const summaryItem = root.querySelector('#postSummary');
+        if (summaryItem) summaryItem.onclick = () => send('/api/content/post/summary', {});
+
+        // 카카오톡 공유: 처음 누를 때 카카오 SDK 를 불러와 키로 초기화하고, 글 주소의 미리보기(Open Graph)를 스크랩해 보낸다 (키의 앱에 사이트 도메인이 등록돼 있어야 함)
+        const kakaoKey = @this.Js(kakaoKey);
+        const shareKakao = async (url, title) => {
+            if (!window.Kakao) await new Promise((done, fail) => {
+                const script = document.createElement('script');
+                script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.6/kakao.min.js';
+                script.crossOrigin = 'anonymous';
+                script.onload = done;
+                script.onerror = fail;
+                document.head.appendChild(script);
+            }).catch(() => { });
+            if (!window.Kakao) return;
+            if (!Kakao.isInitialized()) Kakao.init(kakaoKey);
+
+            Kakao.Share.sendScrap({ requestUrl: url });
+        };
+
+        // SNS 공유: 브라우저 공유(지원하면), X, 페이스북, 카카오톡(키가 있으면), QR 코드
+        const shareBtn = root.querySelector('#postShare');
+        if (shareBtn) shareBtn.onclick = e => {
+            const url = location.origin + `/content/${ruleNo}/view/${contentNo}`, title = document.title;
+            const open = target => window.open(target, '_blank', 'noopener,noreferrer');
+            const items = [];
+            if (navigator.share) items.push({ text: @this.Js(this.Lang("ContentShare")), icon: 'fi fiShare', action: () => navigator.share({ title, url }).catch(() => { }) });
+            items.push({ text: 'X', icon: 'fi fiBrandX', action: () => open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`) });
+            items.push({ text: 'Facebook', icon: 'fi fiBrandFacebook', iconColor: 'info', action: () => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`) });
+            if (kakaoKey) items.push({ text: 'KakaoTalk', icon: 'fi fiChat', iconColor: 'warning', action: () => shareKakao(url, title) });
+            items.push({ text: @this.Js(this.Lang("QrCode")), icon: 'fi fiQrcode', action: () => window.showPageQr?.() }); // QR 코드 창 (사이트 레이아웃 _PageLayout 의 showPageQr — 주소 복사 버튼도 그 창에 있음)
+            common.popMenu(e.currentTarget, items, 'right', true); // 정보줄 오른쪽 항목이라 우측 끝 기준으로 펼침, 페이지 스크롤 영역과 함께 움직임
+        };
+
+        // 이동: 항목을 누르면 대상 게시판 드롭박스를 열고 닫는다(열 때 open + active — 공용 body 클릭 처리가 active 만 떼고, 다음 바깥 클릭에 닫음). 게시판을 고르면 확인 후 옮기고 옮긴 글로 간다
+        const moveBtn = root.querySelector('#postMove');
+        if (moveBtn) moveBtn.onclick = async e => {
+            const item = e.target.closest('ul.dropBox > li[data-rule]');
+            if (!item) {
+                const open = !moveBtn.classList.contains('open');
+                moveBtn.classList.toggle('open', open);
+                moveBtn.classList.toggle('active', open);
+                return;
+            }
+            moveBtn.classList.remove('open', 'active');
+            const moveMsg = @this.Js(this.Lang("ContentMoveMsg"));
+            if (!await common.confirm(moveMsg.replace('{0}', item.textContent.trim()))) return;
+            const res = await send('/api/content/post/move', { targetRuleNo: item.dataset.rule });
+            if (res && res.success) location.href = res.data.url;
+        };
+
+        // 수정: 비회원 글을 비밀번호로 열었다면 그 비밀번호를 수정 화면으로 한 번만 넘겨(sessionStorage) 다시 묻지 않게 한다
+        const editBtn = root.querySelector('#postEdit');
+        if (editBtn) editBtn.onclick = () => {
+            if (guestPassword) { try { sessionStorage.setItem(`contentPw_${ruleNo}_${contentNo}`, guestPassword); } catch { } }
+            location.href = editBtn.dataset.href;
+        };
+        if (guestPassword && passwordInput) passwordInput.hidden = true; // 이미 확인했으니 삭제용 비밀번호 입력은 숨김
+
+        // 삭제: 확인 후 삭제하고 목록으로 (비회원 글은 비밀번호도 함께 보냄)
+        const deleteBtn = root.querySelector('#postDelete');
+        if (deleteBtn) deleteBtn.onclick = async () => {
+            if (!await common.confirm(@this.Js(this.Lang("DeletePostMsg") + " " + this.Lang("DelWarning")))) return; // 게시물을 삭제합니다. 삭제된 정보는 복구할 수 없습니다.
+            const res = await common.netSend('/api/content/post', { method: 'DELETE', body: common.makeFormData({ ...base, password: passwordInput?.value || guestPassword || '' }) });
+            if (res && res.success) inFeed ? location.reload() : location.href = res.data.url;
+        };
+
+        // 승인 기록(관리자·승인자·글쓴이에게만, 승인 대기·반려 글이거나 승인된 기록이 있을 때 정보줄에 나옴): 누르면 드롭다운으로
+        // 승인한 승인자와 승인 시간, 지금 승인할 차례인 승인 대상자, 반려 사유를 보여 주고, 현재 사용자가 승인 대상자면 승인·반려 항목도 함께 나온다 (관리자 대리 승인은 규칙 옵션에 따름)
+        const approversBtn = root.querySelector('#postApprovers');
+        if (approversBtn) approversBtn.onclick = async () => {
+            const res = await common.getSend(`/api/content/post/approval?${new URLSearchParams(base)}`, { useLoading: false });
+            if (!res || !res.success) return;
+            const d = res.data, items = [];
+            d.steps.forEach(s => {
+                if (s.approved) items.push({ cols: s.at ? [s.name, common.localTime(s.at, true)] : [s.name], icon: 'fi fiCheckmark', muted: true }); // 이미 승인한 정보는 옅게
+                else if (s.target) items.push({ cols: [s.name, @this.Js(this.Lang("ContentCurrentApprover"))], icon: 'fi fiArrRight', iconColor: 'danger' }); // 지금 승인할 차례인 승인자 (이름·시간 열이 줄 사이에 정렬됨)
+            });
+            if (d.rejected) items.push({ text: `${@this.Js(this.Lang("ContentRejected"))} · ${d.rejectMessage ?? ''}`, icon: 'fi fiDismiss', danger: true });
+            if (d.canApprove) {
+                if (items.length) items.push({ divider: true });
+                items.push({ text: @this.Js(this.Lang("Approval")), icon: 'fi fiCheckmark', action: async () => {
+                    const r = await send('/api/content/post/approve');
+                    if (r && r.success) location.reload();
+                } });
+                items.push({ text: @this.Js(this.Lang("ContentRejected")), icon: 'fi fiDismiss', danger: true, action: async () => { // 반려는 모달에서 반려 의견(사유)을 입력받아 등록
+                    const message = await common.textInput('', { title: @this.Js(this.Lang("ContentRejected")), placeholder: @this.Js(this.Lang("RejectMessage")), required: true, danger: true, icon: 'fiDismiss' });
+                    if (message === null) return;
+                    const r = await send('/api/content/post/reject', { message });
+                    if (r && r.success) location.reload();
+                } });
+            }
+            common.popMenu(approversBtn, items, 'left', true);
+        };
+
+        // 변경 기록(변경 기록이 있을 때만 버튼이 그려짐): 누르면 변경 시각 목록이 드롭박스로 나오고, 고르면 지금 글을 그 시점의 이전 글로 바꿔 보여 준다 ("현재 글"로 되돌릴 수 있음)
+        root.querySelector('#postJumpLatest')?.addEventListener('click', () => root.querySelector('.forumReplies')?.dispatchEvent(new CustomEvent('forum:latest'))); // 포럼: 최신 댓글로 이동 (댓글 영역 Forum/Replies.cshtml 이 처리)
+        root.querySelector('#postReport')?.addEventListener('click', () => common.reportContent({ ruleNo, contentNo })); // 글 신고: 큰 입력 모달 → 신고 접수
+        root.querySelector('#postReorder')?.addEventListener('click', async () => { // 메뉴얼: 이 그룹의 페이지 순서 변경 모달 → 저장하면 새로고침
+            if (await common.modal.append('manualOrder', { ruleNo, groupNo: @post.GroupNo, category: @this.Js(Model.Categories.FirstOrDefault(p => p.Key == post.Category || p.Value == post.Category).Key ?? "") })) location.reload();
+        });
+        const historyBtn = root.querySelector('#postHistory');
+        if (historyBtn) {
+            const titleEl = root.querySelector('div.contentWrap > header > div.title > span:last-child'), badge = root.querySelector('#postOldBadge');
+            const currentTitle = titleEl.textContent, currentBody = @this.Js(post.Body);
+            let viewingOld = false;
+            const show = (title, body, label) => { // label 이 있으면 이전 글 표시
+                titleEl.textContent = title;
+                common.renderContent(root.querySelector('#contentPostBody'), body);
+                badge.hidden = !label;
+                badge.textContent = label ? `${@this.Js(this.Lang("ContentPrevious"))} · ${label}` : '';
+                viewingOld = !!label;
+            };
+            historyBtn.onclick = async () => {
+                const res = await send('/api/content/post/history');
+                if (!res || !res.success) return;
+                const items = res.data.items.map(v => ({
+                    text: common.localTime(v.cDate, true) + (v.culture ? ` · ${v.culture}` : ''), icon: 'fi fiHistory', action: async () => { // 번역 기록이면 그 언어 표시
+                        const one = await send('/api/content/post/history', { versionNo: v.versionNo });
+                        if (one && one.success) show(one.data.title, one.data.body, common.localTime(v.cDate, true));
+                    }
+                }));
+                if (viewingOld) items.unshift({ text: @this.Js(this.Lang("ContentCurrentPost")), icon: 'fi fiArrReply', action: () => show(currentTitle, currentBody, '') }, { divider: true });
+                common.popMenu(historyBtn, items, 'left', true); // 정보줄 왼쪽에 있는 항목이라 메뉴를 왼쪽 끝 기준으로 펼침(화면 밖으로 나가지 않게)
+            };
+        }
+
+        // 댓글: 목록·등록·수정·삭제·좋아요 (글쓰기는 로그인 + 댓글 권한이 있는 사람만 입력창이 보임)
+        const box = root.querySelector('#postComments');
+        if (box) {
+            const list = box.querySelector('ul'), form = box.querySelector('form'), count = box.querySelector('header b');
+            const scope = [...root.attributes].find(p => p.name.startsWith('b-'))?.name; // 이 화면의 격리 스타일(.cshtml.css)은 서버가 그린 요소에만 붙으므로 스크립트로 만드는 요소에도 같은 속성을 붙여 줌
+            const mk = (tag, text, cls) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (cls) el.className = cls; if (scope) el.setAttribute(scope, ''); return el; };
+            // 댓글 버튼은 button 이 아니라 span + onclick (디자인상 이유, btn 클래스는 일부러 붙이지 않음). 비활성(disabled 클래스)이면 눌러도 동작하지 않음
+            const iconBtn = (icon, text, onClick) => { const b = mk('span'); b.innerHTML = `<i class="fi ${icon}"></i> `; b.append(text); b.onclick = e => { if (!b.classList.contains('disabled')) onClick(e); }; return b; };
+            const load = async () => {
+                const res = await common.getSend(`/api/content/comments?${new URLSearchParams(base)}`, { useLoading: false });
+                if (!res || !res.success || !res.data.enabled) return;
+                box.hidden = false;
+                form.hidden = !res.data.canWrite;
+                count.textContent = res.data.items.length;
+                list.replaceChildren(...res.data.items.map(c => {
+                    const li = mk('li'), head = mk('div'), body = mk('p', c.body), tools = mk('div'), votes = mk('div'), actions = mk('div'); // 아래줄: 좋아요 묶음 / 편집·삭제 묶음
+                    tools.append(votes, actions);
+                    const writer = mk('strong', c.writer);
+                    if (c.writerPhoto) writer.prepend(Object.assign(mk('img'), { src: c.writerPhoto, alt: '' })); // 작성자 이미지가 있으면 이름 앞에 작은 둥근 이미지
+                    else if (c.writerId) { const icon = mk('i'); icon.className = 'fi fiPerson fiFill'; writer.prepend(icon); }
+                    if (c.writerId && window.userMenu) { writer.dataset.user = c.writerId; writer.onclick = () => window.userMenu(writer, c.writerId, c.writer); } // 작성자 메뉴 (로그인 사용자만)
+                    const badge = [c.writerGroup, c.writerRole].filter(Boolean).join(' · '); // 작성자 활성 그룹·역할
+                    if (badge) writer.append(mk('small', badge));
+                    head.append(writer,(t => { t.title = common.localTime(c.cDate, true); return t; })(mk('time', common.ago(c.cDate))));
+                    if (res.data.useLike) { // 댓글 좋아요(+1)·싫어요(-1) 합산: 글과 같이 색은 항상 deco(좋아요)·danger(싫어요), 내가 누른 표만 voted
+                        const vote = async liked => { const r = await send('/api/content/comment/like', { commentId: c.id, liked }, quiet); if (r && r.success) load(); };
+                        const up = iconBtn('fiThumbLike', '', () => vote(true)), down = iconBtn('fiThumbDislike', '', () => vote(false));
+                        up.classList.add('deco');
+                        down.classList.add('danger');
+                        up.dataset.vote = '1';
+                        down.dataset.vote = '-1';
+                        if (c.vote === 1) up.classList.add('voted'); // 내가 누른 표 강조
+                        if (c.vote === -1) down.classList.add('voted');
+                        if (!isMember) up.classList.add('disabled'), down.classList.add('disabled');
+                        votes.append(up, mk('b', c.likePoint), down);
+                    }
+                    if (c.canEdit) actions.appendChild(iconBtn('fiEdit', @this.Js(this.Lang("Edit")), () => {
+                        const area = mk('textarea'), save = iconBtn('fiSave', @this.Js(this.Lang("Save")), async () => {
+                            const r = await send('/api/content/comment', { commentId: c.id, body: area.value });
+                            if (r && r.success) load();
+                        }), cancel = iconBtn('fiDismiss', @this.Js(this.Lang("Cancel")), load);
+                        area.value = c.body; area.rows = 3; area.maxLength = 2000;
+                        body.replaceWith(area);
+                        actions.replaceChildren(save, cancel);
+                    }));
+                    if (c.canDelete) actions.appendChild(iconBtn('fiTrash', @this.Js(this.Lang("Delete")), async () => {
+                        if (!await common.confirm(@this.Js(this.Lang("DeleteCommentMsg") + " " + this.Lang("DelWarning")))) return;
+                        const r = await common.netSend('/api/content/comment', { method: 'DELETE', body: common.makeFormData({ ...base, commentId: c.id }) });
+                        if (r && r.success) load();
+                    }));
+                    if (isMember && !c.mine) actions.appendChild(iconBtn('fiFlag', @this.Js(this.Lang("Report")), () => common.reportContent({ ruleNo, contentNo, commentId: c.id }))); // 댓글 신고 (본인 댓글 제외)
+                    li.append(head, body, tools);
+                    return li;
+                }));
+            };
+            form.onsubmit = async e => {
+                e.preventDefault();
+                if (!form.body.value.trim()) return;
+                const res = await send('/api/content/comment', { body: form.body.value });
+                if (res && res.success) { form.body.value = ''; load(); }
+            };
+            load();
+        }
+    });
+}
+</script>

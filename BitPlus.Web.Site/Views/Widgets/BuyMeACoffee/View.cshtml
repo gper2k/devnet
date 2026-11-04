@@ -1,0 +1,24 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+@{
+    var url = Model.Text("url");
+    if (string.IsNullOrWhiteSpace(url)) url = "https://buymeacoffee.com";
+    var isBlank = Model.Bool("target", true);
+    var image = Model.Text("image");
+    if (string.IsNullOrWhiteSpace(image)) image = "/img/banners/side_coffee.svg";
+    var safeUrl = BitPlus.Web.Site.Widgets.SlotView.SafeUrl(url) ?? "https://buymeacoffee.com";
+    var svg = BitPlus.Web.Site.Widgets.SlotView.ThemeSvg(image, Env.WebRootPath, "aspect-ratio:3/2;width:100%;height:auto;display:block;", "Buy Me a Coffee");
+}
+@* 커피 후원(Buy Me a Coffee) 위젯 — 사이드 패널용 3:2 배너 링크 *@
+<div class="widgetCoffee">
+    <a href="@safeUrl" target="@(isBlank ? "_blank" : "_self")" rel="@(isBlank ? "noopener noreferrer" : null)" title="Buy Me a Coffee">
+        @if (svg is not null)
+        {
+            @Html.Raw(svg)
+        }
+        else
+        {
+            <img src="@image" alt="Buy Me a Coffee" style="aspect-ratio:3/2;width:100%;height:auto;display:block;" />
+        }
+    </a>
+</div>

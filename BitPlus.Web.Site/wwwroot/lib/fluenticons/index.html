@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fluent Icons Explorer - BitPlus</title>
+  <link rel="stylesheet" href="./fluenticons.min.css" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-hover: #334155;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --badge-bg: #0369a1;
+      --badge-text: #e0f2fe;
+      --toast-bg: rgba(15, 23, 42, 0.95);
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --badge-bg: #e0f2fe;
+      --badge-text: #0369a1;
+      --toast-bg: rgba(15, 23, 42, 0.9);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      padding: 1rem 1.5rem;
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .title-area h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .title-area p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      height: 2.6em;
+      border-radius: 2em;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      padding: 0 1rem 0 2.4rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+    .search-box .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .filter-group {
+      display: flex;
+      gap: 0.35rem;
+      background: var(--card-bg);
+      padding: 0.25rem;
+      border-radius: 2em;
+      border: 1px solid var(--border);
+    }
+    .filter-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 0.35rem 0.85rem;
+      font-size: 0.85rem;
+      border-radius: 1.5em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+    .theme-btn, .size-btn {
+      height: 2.6em;
+      padding: 0 0.9rem;
+      border-radius: 2em;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.2s;
+    }
+    .theme-btn:hover, .size-btn:hover {
+      background: var(--card-hover);
+    }
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    .status-bar {
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.85rem;
+    }
+    /* 목록 끝 감시용 (보이면 다음 묶음) */
+    .grid-sentinel { height: 1px; }
+    .icon-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, background-color 0.15s;
+      position: relative;
+      content-visibility: auto; /* 화면 밖 카드는 그리기 생략 */
+      contain-intrinsic-size: auto 150px;
+    }
+    .icon-card:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .icon-card:active {
+      transform: scale(0.97);
+    }
+    .icon-card .fi-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+    }
+    .icon-card .fi {
+      font-size: var(--icon-size, 48px);
+      transition: font-size 0.2s;
+    }
+    .icon-name {
+      font-size: 0.75rem;
+      text-align: center;
+      word-break: break-all;
+      color: var(--text);
+      max-width: 100%;
+      line-height: 1.2;
+    }
+    .fa-badge {
+      font-size: 0.65rem;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 0.15rem 0.45rem;
+      border-radius: 1em;
+      font-weight: 600;
+    }
+    .card-footer {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--toast-bg);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 2em;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      border: 1px solid var(--border);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <header>
+    <div class="header-inner">
+      <div class="top-bar">
+        <div class="title-area">
+          <h1><i class="fi fiSparkle"></i> Fluent Icons Explorer</h1>
+          <p id="totalDesc">Microsoft Fluent System Icons & FontAwesome Mappings</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="theme-btn" id="themeBtn" title="테마 변경"><i class="fi fiSun"></i> 테마</button>
+          <button class="size-btn" id="sizeBtn" title="크기 변경">크기: <span>48px</span></button>
+        </div>
+      </div>
+      <div class="controls-row">
+        <div class="search-box">
+          <i class="fi fiSearch search-icon"></i>
+          <input type="text" id="searchInput" placeholder="아이콘 검색 (예: plus, user, bell, arrow, upload, check...)" autofocus />
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">전체</button>
+          <button class="filter-btn" data-filter="fa">FA 별칭</button>
+          <button class="filter-btn" data-filter="filled">채움형(기본)</button>
+          <button class="filter-btn" data-filter="solid">솔리드형(solid)</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="status-bar">
+      <span id="resultCount">검색 중...</span>
+      <span>클릭 시 HTML 태그 클립보드 복사</span>
+    </div>
+    <div class="icon-grid" id="iconGrid"></div>
+    <div class="grid-sentinel" id="gridSentinel"></div>
+  </main>
+
+  <footer style="max-width:1200px;margin:2rem auto 1.5rem;padding:0 1rem;font-size:0.75rem;color:var(--text-muted);text-align:center;line-height:1.6;">
+    Icons: <a href="https://github.com/microsoft/fluentui-system-icons" target="_blank" rel="noopener" style="color:var(--accent);">Microsoft Fluent UI System Icons</a> — Copyright (c) 2020 Microsoft Corporation, MIT License (<a href="./LICENSE.txt" style="color:var(--accent);">LICENSE.txt</a>).<br />
+    Modified by BitPlus: optimized CSS mask stylesheet, camelCase class names and aliases.
+  </footer>
+
+  <div class="toast" id="toast">
+    <i class="fi fiCheck"></i>
+    <span id="toastMsg">복사되었습니다!</span>
+  </div>
+
+  <script src="./icons.data.js"></script>
+  <script>
+    let iconsData = [];
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let iconSize = 48;
+    const sizes = [28, 36, 48, 64];
+    let sizeIndex = 2;
+
+    // 아이콘은 CSS mask 라 아이콘 하나가 SVG 요청 하나다. 전체(최대 1,500개)를 한 번에 그리면 요청이 몰려 빈 칸으로 보이므로
+    // 카드는 BATCH 개씩 이어 붙이고(목록 끝이 보이면 다음 묶음), 아이콘 클래스는 카드가 화면 근처에 왔을 때만 붙인다.
+    const BATCH = 120;
+    let filteredItems = [];
+    let renderedCount = 0;
+    const iconObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const card = entry.target;
+        card.querySelector('i').className = 'fi ' + card.dataset.class;
+        iconObserver.unobserve(card);
+      });
+    }, { rootMargin: '200px 0px' });
+    const moreObserver = new IntersectionObserver(entries => {
+      if (entries.some(e => e.isIntersecting)) renderMore();
+    }, { rootMargin: '400px 0px' });
+
+    const iconGrid = document.getElementById('iconGrid');
+    const searchInput = document.getElementById('searchInput');
+    const resultCount = document.getElementById('resultCount');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const themeBtn = document.getElementById('themeBtn');
+    const sizeBtn = document.getElementById('sizeBtn');
+    moreObserver.observe(document.getElementById('gridSentinel'));
+
+    function initData(data) {
+      iconsData = data;
+      document.getElementById('totalDesc').innerText = `${iconsData.length.toLocaleString()}개 기본 아이콘 세트 (총 2,983개 SVG, 188개 FontAwesome 별칭 및 카멜케이스 완비)`;
+      renderIcons();
+    }
+
+    if (window.ICONS_DATA && Array.isArray(window.ICONS_DATA)) {
+      initData(window.ICONS_DATA);
+    } else {
+      fetch('./icons.json')
+        .then(r => r.json())
+        .then(data => initData(data))
+        .catch(err => {
+          console.error('Failed to load icons:', err);
+          resultCount.innerText = '아이콘 데이터를 불러오지 못했습니다.';
+        });
+    }
+
+    // Theme toggle
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      themeBtn.innerHTML = isDark ? '<i class="fi fiMoon"></i> 테마' : '<i class="fi fiSun"></i> 테마';
+    });
+
+    // Size toggle
+    sizeBtn.addEventListener('click', () => {
+      sizeIndex = (sizeIndex + 1) % sizes.length;
+      iconSize = sizes[sizeIndex];
+      document.documentElement.style.setProperty('--icon-size', iconSize + 'px');
+      sizeBtn.querySelector('span').innerText = iconSize + 'px';
+    });
+
+    // Filter clicks
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderIcons();
+      });
+    });
+
+    // Search input
+    let debounceTimer;
+    searchInput.addEventListener('input', e => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim().toLowerCase();
+        renderIcons();
+      }, 120);
+    });
+
+    function renderIcons() {
+      if (!iconsData.length) return;
+
+      const q = searchQuery;
+      const filtered = iconsData.filter(item => {
+        if (currentFilter === 'fa' && (!item.camelAliases || item.camelAliases.length === 0)) return false;
+        if (currentFilter === 'solid' && !item.regularId) return false;
+        if (currentFilter === 'filled' && !item.filledId) return false;
+
+        if (!q) return true;
+        // 공백으로 나눈 단어가 모두 이름·별칭 어딘가에 있어야 함 (예: "arrow down")
+        const key = [item.camelName, item.name, ...(item.camelAliases || []), ...(item.aliases || [])].join(' ').toLowerCase();
+        return q.split(/\s+/).every(term => key.includes(term));
+      });
+
+      resultCount.innerText = `총 ${filtered.length.toLocaleString()}개 표시됨`;
+
+      filteredItems = filtered;
+      renderedCount = 0;
+      iconObserver.disconnect();
+      iconGrid.innerHTML = '';
+      renderMore();
+    }
+
+    // 다음 묶음 카드 붙이기 (아이콘 클래스는 비워 두고 관찰만 — 보일 때 붙음)
+    function renderMore() {
+      if (renderedCount >= filteredItems.length) return;
+      const displayItems = filteredItems.slice(renderedCount, renderedCount + BATCH);
+      renderedCount += displayItems.length;
+
+      const isSolidMode = currentFilter === 'solid';
+
+      const html = displayItems.map(item => {
+        const primaryClass = (item.camelAliases && item.camelAliases.length > 0) ? item.camelAliases[0] : item.camelName;
+        const iconClasses = isSolidMode ? `${primaryClass} solid` : primaryClass;
+
+        let badges = '';
+        if (item.camelAliases && item.camelAliases.length > 0) {
+          badges = `<span class="fa-badge" title="별칭: ${item.camelAliases.join(', ')}">FA</span>`;
+        }
+
+        return `
+          <div class="icon-card" data-class="${iconClasses}" title="${item.camelName}${item.camelAliases?.length ? ' (별칭: ' + item.camelAliases.join(', ') + ')' : ''} - 클릭하여 복사">
+            <div class="fi-wrapper">
+              <i></i>
+            </div>
+            <div class="icon-name">${primaryClass}</div>
+            <div class="card-footer">
+              ${badges}
+              ${item.camelAliases?.length && primaryClass !== item.camelName ? `<span style="font-size:0.65rem;color:var(--text-muted);">${item.camelName}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      iconGrid.insertAdjacentHTML('beforeend', html);
+      iconGrid.querySelectorAll('.icon-card:not([data-seen])').forEach(card => {
+        card.dataset.seen = '1';
+        iconObserver.observe(card);
+      });
+    }
+
+    iconGrid.addEventListener('click', e => {
+      const card = e.target.closest('.icon-card');
+      if (!card) return;
+      const cls = card.getAttribute('data-class');
+      copyTag(`<i class="fi ${cls}"></i>`);
+    });
+
+    let toastTimer;
+    function copyTag(tag) {
+      navigator.clipboard.writeText(tag).then(() => {
+        toastMsg.innerText = `복사됨: ${tag}`;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>

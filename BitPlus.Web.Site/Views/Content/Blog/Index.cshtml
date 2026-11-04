@@ -1,0 +1,112 @@
+@model ContentPageModel
+
+@* 블로그형 첫 화면(/content/{규칙}, /content/{규칙}/list): 목록·보기 페이지 없이 글 보기를 최신 글부터 이어서 보이는 피드다. 한 페이지 5개(BlogContentHandler.FeedSize — 서버가 정함), 페이지 번호는 5개씩.
+   컨트롤러(ContentController.FillFeedAsync)가 목록 API 와 같은 처리로 이 쪽의 글을 고르고 글마다 글 보기 모델을 만들어 Model.Feed 에 담으면, 글마다 글 보기 화면(Blog/View → Default/View, InFeed)을 그대로 그린다:
+   본문·좋아요·공유·첨부·태그·연관 링크·수정·삭제·승인·변경 기록·이동·신고·포럼형 댓글을 모두 이 화면에서 처리하고, 글쓰기(새 글·수정)만 글쓰기 화면으로 간다.
+   글 주소(/content/{규칙}/view/{번호} — 통합 검색·알림 등)로 들어오면 그 글 하나만 담은 피드(SinglePost, 목록 버튼으로 전체 피드)를 보이고, 주소의 ?jump=댓글번호 면 댓글을 펼쳐 그 댓글로 이동한다.
+   열 수 없는 글은 제목과 잠금 표시만, 비회원 글은 비밀번호 확인 화면(글 보기 주소)으로 가는 제목 링크만 보인다. 검색·카테고리·페이지·미승인 보기는 주소 쿼리(page, q, category, pending)로 다시 읽는다. *@
+<article class="contentBlog">
+    <header>
+        <span>
+            @Model.Title
+            <i class="badge @(Model.Pending ? "warning" : "point")">All Items. <b>@Model.Total</b></i>
+            <small></small>
+        </span>
+    </header>
+    <div>
+        <header>
+            <div>
+                @if (Model.SinglePost)
+                {
+                    @* 글 주소로 들어와 그 글 하나만 보는 중: 전체 피드로 *@
+                    <button type="button" onclick="location.href='/content/@Model.RuleNo'"><i class="fi fiList"></i> @this.Lang("ContentList")</button>
+                }
+                @if (Model.Permission.CanWrite)
+                {
+                    <button type="button" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiEdit"></i> @this.Lang("ContentWrite")</button>
+                }
+                @if (Model.Pending || Model.PendingCount > 0)
+                {
+                    <button type="button" id="contentPendingView"><i class="fi fiShieldTask"></i> @(Model.Pending ? this.Lang("ContentNormalView") : this.Lang("ContentUnapprovedCount").Replace("{0}", Model.PendingCount.ToString()))</button>
+                }
+            </div>
+            <form id="contentSearch">
+                @if (Model.Categories.Count > 0)
+                {
+                    <div class="dropDown" id="contentCategory" data-val="*">
+                        <header>@this.Lang("All")</header>
+                        <ul class="dropBox">
+                            <li data-val="*" class="active">CATEGORY</li>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <li data-val="@category.Key">@category.Value</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="inputGroup inline sm">
+                    <input type="search" name="q" maxlength="100" autocomplete="off" placeholder="@this.Lang("Search")" />
+                    <button type="submit" class="deco"><i class="fi fiSearch"></i></button>
+                </div>
+            </form>
+        </header>
+        <ul>
+            @if (Model.Feed.Count == 0)
+            {
+                <li class="empty"><i class="fi fiAnimalDog"></i><br />@this.Lang("DataEmpty")</li>
+            }
+            @foreach (var item in Model.Feed)
+            {
+                if (item.Page is { } page)
+                {
+                    <li><partial name="~/Views/Content/Blog/View.cshtml" model="page" /></li>
+                }
+                else if (item.Gate)
+                {
+                    <li class="locked"><a href="/content/@Model.RuleNo/view/@item.No"><i class="fi fiLock"></i> @item.Title</a></li>
+                }
+                else
+                {
+                    <li class="locked"><span title="@this.Lang("ContentNoReadPermission")"><i class="fi fiLock"></i> @item.Title</span></li>
+                }
+            }
+        </ul>
+    </div>
+    <footer>
+        <ul class="pager" id="contentPager"></ul>
+    </footer>
+</article>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('article.contentBlog');
+        const form = root.querySelector('#contentSearch');
+        const categoryBox = root.querySelector('#contentCategory');
+        const params = new URLSearchParams(location.search);
+        /** 피드 상태(쪽·검색어·카테고리·미승인 보기)를 주소 쿼리로 바꿔 다시 연다 (기본값은 쿼리에서 뺌) */
+        const open = (page, q = params.get('q') ?? '', category = params.get('category') ?? '') => {
+            const p = new URLSearchParams();
+            if (page > 1) p.set('page', page);
+            if (q) p.set('q', q);
+            if (category && category !== '*') p.set('category', category);
+            if (params.get('pending') === '1') p.set('pending', '1');
+            location.assign(location.pathname + (p.size ? `?${p}` : ''));
+        };
+
+        form.q.value = params.get('q') ?? '';
+        form.onsubmit = e => { e.preventDefault(); open(1, form.q.value.trim()); };
+        const category = categoryBox && [...categoryBox.querySelectorAll('li')].find(li => li.dataset.val === params.get('category'));
+        if (category) {
+            categoryBox.dataset.val = category.dataset.val;
+            categoryBox.querySelector('header').textContent = category.textContent;
+            categoryBox.querySelectorAll('li').forEach(li => li.classList.toggle('active', li === category));
+        }
+        categoryBox?.addEventListener('change', () => open(1, form.q.value.trim(), categoryBox.dataset.val));
+        const pendingBtn = root.querySelector('#contentPendingView');
+        if (pendingBtn) pendingBtn.onclick = () => location.assign(params.get('pending') === '1' ? location.pathname : `${location.pathname}?pending=1`);
+
+        const feedSize = @BitPlus.Web.Data.Content.BlogContentHandler.FeedSize;
+        const pager = common.makePager(@Model.Page - 1, feedSize, @Model.PageCount * feedSize, 5).then(p => open(p + 1));
+        root.querySelector('#contentPager').replaceWith(pager);
+        pager.hidden = @Model.PageCount < 2;
+    });
+</script>

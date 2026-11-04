@@ -1,0 +1,66 @@
+{
+  "key": "portal",
+  "version": 1,
+  "name": {
+    "ko": "컨텐츠 포탈",
+    "en": "Content portal"
+  },
+  "categories": [
+    "*"
+  ],
+  "layout": {
+    "sections": [
+      {
+        "id": "top",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "Banner",
+            "title": {},
+            "settings": {
+              "items": "/img/sample/003.webp | /content | 자유로운 생각과 소통의 공간\n/img/sample/ComfyUI_00298_.webp | /content | 게시판으로 모이는 이야기\n/img/sample/flux_krea_00008_.webp | /content | 함께 나누는 아름다운 순간들",
+              "interval": 5,
+              "height": 260
+            }
+          }
+        }
+      },
+      {
+        "id": "boards",
+        "type": "Horizontal",
+        "repeat": 2,
+        "slots": {
+          "1": {
+            "widget": "LatestPosts",
+            "title": {
+              "ko": "자유게시판",
+              "en": "Free Board"
+            },
+            "settings": {
+              "ruleNos": [
+                "@free"
+              ],
+              "count": 6,
+              "summary": true,
+              "image": true
+            }
+          },
+          "2": {
+            "widget": "Gallery",
+            "title": {
+              "ko": "갤러리",
+              "en": "Gallery"
+            },
+            "settings": {
+              "ruleNos": [
+                "@gallery"
+              ],
+              "count": 6,
+              "columns": 3
+            }
+          }
+        }
+      }
+    ]
+  }
+}

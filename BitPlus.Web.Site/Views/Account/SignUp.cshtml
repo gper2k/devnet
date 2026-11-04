@@ -1,0 +1,201 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    // 외부 로그인 모드(AccountController.External): 비밀번호 없이 가입, 화면이 먼저 api/account/external 로 로그인·연결을 시도하고 연결된 계정이 없을 때만 양식을 보임
+    var external = ViewData["External"] is true;
+    this.SetTitle(this.Lang("CreateAccount"));
+    this.SetPageKey(external ? "External" : "SignUp");
+    // 관리 화면 "구성"에서 저장한 규칙 (설정 캐시 → DB → appsettings → 기본값, 저장 시 캐시가 지워져 다음 요청부터 반영)
+    var uidMinSize = (this.Config?.AccountRule ?? new BitPlus.Data.Account.AccountRule()).UidMinSize;
+    var pw = this.Context.GetService<Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Identity.IdentityOptions>>()?.Value.Password ?? new Microsoft.AspNetCore.Identity.PasswordOptions();
+    // 비밀번호 입력 아래 규칙 안내 (구성에서 요구하는 항목만)
+    var pwHint = string.Join(" · ", new[]
+    {
+        string.Format(this.Lang("MinCharsOf"), pw.RequiredLength),
+        pw.RequireDigit ? this.Lang("RequireDigit") : null,
+        pw.RequireLowercase ? this.Lang("RequireLowercase") : null,
+        pw.RequireUppercase ? this.Lang("RequireUppercase") : null,
+        pw.RequireNonAlphanumeric ? this.Lang("RequireNonAlphanumeric") : null,
+        pw.RequiredUniqueChars > 1 ? $"{this.Lang("RequiredUniqueChars")} {pw.RequiredUniqueChars}" : null
+    }.Where(p => p is not null));
+}
+
+@* 표시명은 현재 언어(문화권)의 표시명으로 저장한다 (사용자 관리의 다국어 표시명과 같은 항목) *@
+<form method="post" action="@(external ? "/api/account/external/join" : "/api/account/join")" novalidate hidden="@external">
+    @if (external)
+    {
+        <p class="termsSentence"></p>
+    }
+    <input type="hidden" name="returnUrl" value="@this.Context.Request.Query["ReturnUrl"]" />
+    <div class="inputGrid">
+        <div class="fieldCol">
+            <label>@this.Lang("UserID")</label>
+            <input type="text" name="uid" placeholder="@this.Lang("UidRule")" maxlength="32" required autofocus autocomplete="username" />
+        </div>
+        <div class="fieldCol">
+            <label>@this.Lang("Name")</label>
+            <input type="text" name="dpName" placeholder="@this.Lang("EnterName")" maxlength="64" required autocomplete="name" />
+        </div>
+    </div>
+
+    <div class="inputGrid single">
+        <div class="fieldCol">
+            <label>@this.Lang("Email")</label>
+            <input type="email" name="email" placeholder="name@example.com" maxlength="256" required autocomplete="email" />
+        </div>
+    </div>
+
+    @if (!external)
+    {
+        <div class="inputGrid">
+            <div class="fieldCol">
+                <label>@this.Lang("Password")</label>
+                <input type="password" name="password" placeholder="@this.Lang("CreatePassword")" maxlength="128" required autocomplete="new-password" />
+            </div>
+            <div class="fieldCol">
+                <label>@this.Lang("PasswordConfirm")</label>
+                <input type="password" name="passwordConfirm" placeholder="@this.Lang("EnterPasswordConfirm")" maxlength="128" required autocomplete="new-password" />
+            </div>
+            <small>※ @pwHint</small>
+        </div>
+    }
+
+    @* 약관 동의: 관리 화면에 등록한 약관(출력 순서) — 약관이 없으면 숨김 *@
+    <section class="termsAgree" hidden>
+        <label class="check main agreeAll">
+            <input type="checkbox" name="agreeAll" />
+            <span>@this.Lang("AgreeAllTerms")</span>
+        </label>
+        <ul></ul>
+    </section>
+
+    <button type="submit" class="submitBtn">@this.Lang("CreateAccount")</button>
+</form>
+
+<dialog id="termsModal" class="termsDialog">
+    <header>
+        <span class="termsTitle"></span>
+        <button type="button" class="closeBtn" title="@this.Lang("Close")"><i class="fi fiDismiss"></i></button>
+    </header>
+    <div class="termsContent"></div>
+    <footer>
+        <button type="button" class="confirmBtn"><i class="fi fiCheckmark"></i> @this.Lang("Confirm")</button>
+    </footer>
+</dialog>
+
+@section Scripts {
+    <script type="module">
+        (async function () {
+            const form = document.querySelector('form[method="post"]');
+            const external = @(external ? "true" : "false");
+            // 외부 로그인 모드: 연결된 계정이 있으면(또는 로그인 중이면 연결 후) 바로 이동, 없으면 서비스가 준 이름·메일을 채운 가입 양식
+            if (external) {
+                const res = await common.postSend('/api/account/external', new FormData(), { useLoading: false });
+                if (!res?.success) return location.href = '/Account/SignIn?external=failed';
+                if (res.data.redirect) {
+                    if (res.data.notice) await common.alert(res.data.notice);
+                    return location.href = res.data.redirect;
+                }
+                const joinInfo = @this.Js(this.Lang("ExternalJoinInfo"));
+                form.querySelector('p.termsSentence').textContent = joinInfo.replace('{0}', res.data.join.provider);
+                form.querySelector('[name="dpName"]').value = res.data.join.name;
+                form.querySelector('[name="email"]').value = res.data.join.email;
+                form.hidden = false;
+            }
+            const box = form.querySelector('section.termsAgree');
+            const list = box.querySelector(':scope > ul');
+            const all = box.querySelector('input[name="agreeAll"]');
+            const checks = () => [...list.querySelectorAll('input[name="terms"]')];
+            const agreeOf = @this.Js(this.Lang("AgreeOf"));
+            const required = @this.Js(this.Lang("Required"));
+            const viewText = @this.Js(this.Lang("View"));
+            const terms = {};
+
+            // 약관 목록 (현재 언어 제목/본문, 출력 순서)
+            const res = await common.getSend('/api/account/terms?withBody=true', { useLoading: false });
+            ((res && res.data) || []).forEach(item => {
+                terms[item.key] = item;
+                const li = document.createElement('li');
+                li.innerHTML = `<label class="check main"><input type="checkbox" name="terms" /><span></span></label><button type="button" class="termsBtn"></button>`;
+                li.querySelector('input').value = item.key;
+                li.querySelector('span').innerHTML = agreeOf.replace('{0}', '<b>' + item.text + '</b>') + (item.essential ? ` (${required})` : '');
+                li.querySelector('button').textContent = viewText;
+                li.querySelector('button').dataset.key = item.key;
+                list.appendChild(li);
+            });
+            box.hidden = !checks().length;
+
+            // 보기: 약관 본문을 고정 크기 스크롤 모달(termsDialog)로 표시
+            const termsDiag = document.getElementById('termsModal');
+            if (termsDiag) {
+                const close = () => {
+                    if (typeof termsDiag.close === 'function') termsDiag.close();
+                    else termsDiag.removeAttribute('open');
+                };
+                termsDiag.querySelector('.closeBtn').onclick = close;
+                termsDiag.querySelector('.confirmBtn').onclick = close;
+                termsDiag.onclick = e => { if (e.target === termsDiag) close(); };
+            }
+
+            list.addEventListener('click', e => {
+                const btn = e.target.closest('button[data-key]');
+                if (!btn || !termsDiag) return;
+                const item = terms[btn.dataset.key];
+                const body = /<[a-z][\s\S]*>/i.test(item.body) ? item.body : item.body.replace(/\n/g, '<br />');
+                termsDiag.querySelector('.termsTitle').textContent = item.text;
+                termsDiag.querySelector('.termsContent').innerHTML = body;
+                if (typeof termsDiag.showModal === 'function') termsDiag.showModal();
+                else termsDiag.setAttribute('open', '');
+            });
+
+            // 전체 동의 토글 ↔ 개별 체크 상태 동기화
+            all.addEventListener('change', () => checks().forEach(p => p.checked = all.checked));
+            list.addEventListener('change', () => all.checked = checks().every(p => p.checked));
+
+            // 구성(AccountRule.UidMinSize, Identity 비밀번호 규칙) 기반 검증 — 오류 문구는 규칙별로 구체적으로
+            const rule = { uidMin: @uidMinSize, length: @pw.RequiredLength, unique: @pw.RequiredUniqueChars, digit: @(pw.RequireDigit ? "true" : "false"), lower: @(pw.RequireLowercase ? "true" : "false"), upper: @(pw.RequireUppercase ? "true" : "false"), special: @(pw.RequireNonAlphanumeric ? "true" : "false") };
+            const text = {
+                minLength: @this.Js(this.Lang("ValidMinLength")), uid: @this.Js(this.Lang("UserID")), password: @this.Js(this.Lang("Password")),
+                needs: @this.Js(this.Lang("PasswordNeeds")), unique: @this.Js(this.Lang("PasswordUniqueChars")), mismatch: @this.Js(this.Lang("PasswordMismatch")),
+                digit: @this.Js(this.Lang("RequireDigit")), lower: @this.Js(this.Lang("RequireLowercase")), upper: @this.Js(this.Lang("RequireUppercase")), special: @this.Js(this.Lang("RequireNonAlphanumeric"))
+            };
+            const format = (tpl, ...args) => args.reduce((s, v, i) => s.replace(`{${i}}`, v), tpl);
+            function ruleErrors(v) {
+                const errors = {};
+                if (v.uid.length < rule.uidMin) errors.uid = format(text.minLength, text.uid, rule.uidMin);
+                const needs = [
+                    rule.digit && !/[0-9]/.test(v.password) && text.digit,
+                    rule.lower && !/[a-z]/.test(v.password) && text.lower,
+                    rule.upper && !/[A-Z]/.test(v.password) && text.upper,
+                    rule.special && !/[^A-Za-z0-9]/.test(v.password) && text.special
+                ].filter(Boolean);
+                if (external) return errors; // 외부 로그인 가입은 비밀번호 없음
+                if (v.password.length < rule.length) errors.password = format(text.minLength, text.password, rule.length);
+                else if (needs.length) errors.password = format(text.needs, needs.join(', '));
+                else if (new Set(v.password).size < rule.unique) errors.password = format(text.unique, rule.unique);
+                if (v.password !== v.passwordConfirm) errors.passwordConfirm = text.mismatch;
+                return errors;
+            }
+
+            // 입력 검증(ValidConfigs/SignUp + 구성 규칙), 필수 약관 확인 후 가입 API 호출 → 서버가 정한 주소(메일 인증 페이지 / 요청 페이지 / 홈)로 이동
+            let validator = null;
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                validator ??= new Validator((await common.getSend(`/api/system/valid?name=${external ? 'ExternalJoin' : 'SignUp'}`, { useLoading: false }))?.data);
+                ['uid', 'dpName', 'email'].forEach(name => {
+                    const input = form.querySelector(`[name="${name}"]`);
+                    if (input) input.value = input.value.trim();
+                });
+                const values = Object.fromEntries(['uid', 'dpName', 'email', ...(external ? [] : ['password', 'passwordConfirm'])].map(name => [name, form.querySelector(`[name="${name}"]`)?.value ?? '']));
+                const result = await validator.valid(values, form);
+                if (!result.success) { result.popover(5, 3).markErrors(form); return; }
+                const errors = ruleErrors(values);
+                if (Object.keys(errors).length) { new ValidResult(false, errors).popover(5, 3).markErrors(form); return; }
+                if (checks().some(p => terms[p.value].essential && !p.checked)) return common.alert(@this.Js(this.Lang("EssTermsRequired")));
+                const res = await common.postSend(form.action, new FormData(form));
+                if (!res?.success) return common.markServerErrors(res, form);
+                if (res.data.notice) await common.alert(res.data.notice);
+                location.href = res.data.redirect;
+            });
+        })();
+    </script>
+}

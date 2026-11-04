@@ -1,0 +1,92 @@
+import IModal from "../IModal.js";
+
+/** 대상 항목 (type: Role/Group/Groups/User) */
+export interface ITargetItem {
+    type: string;
+    key: string;
+    name: string;
+}
+
+/**
+ * 대상 편집 모달 인자 규격
+ */
+export interface ITargetEditArgs {
+    /** 대화상자 제목 */
+    title?: string;
+    /** 현재 대상 목록 */
+    items?: ITargetItem[];
+}
+
+/**
+ * 역할/그룹/하위 포함 그룹/사용자 대상을 추가·삭제하는 공용 대상 편집 모달 (읽기 권한 등 대상 목록 편집용).
+ * common.modal.append("targetEdit", args) 로 열며, 확인 시 대상 목록(ITargetItem[], 비어 있을 수 있음), 취소/Esc 시 null 로 닫힌다.
+ */
+export default class TargetEdit implements IModal {
+    private static readonly types = ["Role", "Group", "Groups", "User"];
+    private static readonly icons: Record<string, string> = { Role: "fiShieldAlt", Group: "fiUsers", Groups: "fiUsersGroup", User: "fiUser" };
+    private langs: Record<string, string>;
+
+    /**
+     * TargetEdit 기본 생성자
+     */
+    constructor() {
+        this.langs = {};
+    }
+
+    /**
+     * 모달 문구 다국어 사전 비동기 로드
+     */
+    async loadAsync(args: Record<string, any>): Promise<any> {
+        this.langs = await window["common"].getLangsAsync(`Cancel, Apply, ${TargetEdit.types.join(", ")}`);
+    }
+
+    /**
+     * 대화상자 DOM 생성 및 이벤트 바인딩
+     */
+    render(args: Record<string, any>): HTMLDialogElement {
+        const common = window["common"];
+        const l = this.langs;
+        const diag = document.createElement("dialog");
+        diag.className = "targetEdit";
+        diag.innerHTML = `
+            <header><i class="fi fiShieldKeyhole fiFill"></i> ${args["title"] ?? ""}</header>
+            <section>
+                <header>
+                    <div class="tools">
+                        <label>ADD</label>
+                        ${TargetEdit.types.map(p => `<span data-type="${p}"><i class="fi ${TargetEdit.icons[p]}"></i> ${l[p]}</span>`).join("")}
+                    </div>
+                </header>
+                <ul></ul>
+            </section>
+            <footer>
+                <button type="button" data-mode="cancel"><i class="fi fiProhibit"></i> ${l["Cancel"]}</button>
+                <button type="button" class="main" data-mode="apply"><i class="fi fiCheckmark"></i> ${l["Apply"]}</button>
+            </footer>
+        `;
+        const list = diag.querySelector<HTMLElement>("section > ul")!;
+        const add = (type: string, key: string, name: string) => {
+            if ([...list.children].some(li => (li as HTMLElement).dataset.type === type && (li as HTMLElement).dataset.key === key)) return;
+            const li = document.createElement("li");
+            li.dataset.type = type;
+            li.dataset.key = key;
+            li.innerHTML = `<i class="badge sm deco"></i><span></span><button type="button" class="danger"><i class="fi fiDismiss"></i></button>`;
+            li.querySelector(".badge")!.textContent = l[type] ?? type;
+            li.querySelector("span")!.textContent = name;
+            list.appendChild(li);
+        };
+        ((args["items"] ?? []) as ITargetItem[]).forEach(p => add(p.type, p.key, p.name));
+
+        diag.querySelectorAll<HTMLElement>("section > header .tools [data-type]").forEach(btn => btn.onclick = async () => {
+            const type = btn.dataset.type!;
+            const result = await common.modal.append((type === "Groups" ? "group" : type.toLowerCase()) + "Select", { max: 0 });
+            if (result && typeof result === "object") Object.entries<string>(result).forEach(([key, text]) => add(type, key, text));
+        });
+        list.onclick = e => (e.target as HTMLElement).closest("button")?.closest("li")?.remove();
+
+        diag.querySelector<HTMLElement>("[data-mode=\"cancel\"]")!.onclick = () => diag["closer"](null);
+        diag.querySelector<HTMLElement>("[data-mode=\"apply\"]")!.onclick = () =>
+            diag["closer"]([...list.children].map(li => ({ type: (li as HTMLElement).dataset.type!, key: (li as HTMLElement).dataset.key!, name: li.querySelector("span")!.textContent! })));
+        return diag;
+    }
+}

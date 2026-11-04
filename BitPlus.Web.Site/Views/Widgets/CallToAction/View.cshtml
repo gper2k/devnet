@@ -1,0 +1,21 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Site.Widgets
+@{
+    var url = SlotView.SafeUrl(Model.Text("buttonUrl"));
+}
+@* 행동 유도 위젯 — 옅은 테마색 상자 가운데에 제목·설명·버튼 *@
+<div class="widgetCta">
+    @if (Model.Text("label").Length > 0)
+    {
+        <em>@Model.Text("label")</em>
+    }
+    <h2>@Model.Text("title")</h2>
+    @if (Model.Text("text").Length > 0)
+    {
+        <p>@Model.Text("text")</p>
+    }
+    @if (url is not null && Model.Text("buttonText").Length > 0)
+    {
+        <a class="btn main" href="@url">@Model.Text("buttonText")</a>
+    }
+</div>

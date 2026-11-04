@@ -1,0 +1,11 @@
+{
+  "key": "Html",
+  "version": 1,
+  "name": { "ko": "HTML 블록", "en": "HTML block" },
+  "description": { "ko": "직접 쓴 HTML 을 보여 줍니다. 저장할 때 위험한 태그는 걸러 냅니다.", "en": "Shows your own HTML. Unsafe tags are removed on save." },
+  "categories": ["general"],
+  "size": { "min": [1, 1], "max": [4, 4] },
+  "settings": [
+    { "key": "html", "type": "html", "default": "" }
+  ]
+}

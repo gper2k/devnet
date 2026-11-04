@@ -1,0 +1,373 @@
+@charset "UTF-8";
+/* 내 정보(/user): 머리·탭 아래 2단 반응형 레이아웃(좌측: 기본 정보·그룹/역할·외부 로그인 / 우측: 활동 요약·최근 작성글) */
+.userInfo {
+  height: 100%;
+  flex: 1 1 auto;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.userInfo > * {
+  flex: 0 0 auto;
+}
+.userInfo > div {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(21em, 24.5em) minmax(0, 1fr);
+  align-content: start;
+  align-items: start;
+  gap: 1.2em;
+  padding: 0;
+  /* 좌측 컬럼: 개인 정보, 소속 그룹·역할, 외부 로그인 연결 */
+  /* 우측 컬럼: 활동 요약 지표 카드 + 최근 작성 게시물/댓글 피드 */
+}
+.userInfo > div > aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  min-width: 0;
+}
+.userInfo > div > aside > ul {
+  margin: 0;
+  /* 외부 로그인 연결 행: 브랜드 로고 + 서비스 이름 | 연결됨 뱃지 ... 연결/연결 해제 텍스트 링크(오른쪽 끝) */
+}
+.userInfo > div > aside > ul[hidden] {
+  display: none;
+}
+.userInfo > div > aside > ul > li[hidden] {
+  display: none;
+}
+.userInfo > div > aside > ul > li > h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  margin: 0;
+  color: var(--txColor);
+}
+.userInfo > div > aside > ul > li > h4 > i.fi {
+  color: var(--main);
+}
+.userInfo > div > aside > ul > li > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 1.6em;
+  white-space: pre-line;
+  word-break: break-word;
+}
+.userInfo > div > aside > ul > li > p {
+  margin: 0;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+.userInfo > div > aside > ul > li > footer {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0.35em;
+  padding-top: 0.3em;
+  /* 회원 탈퇴는 왼쪽 끝으로 떼어 둔다 */
+}
+.userInfo > div > aside > ul > li > footer > button {
+  padding: 0 0.65em;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+.userInfo > div > aside > ul > li > footer > button.danger {
+  margin-right: auto;
+}
+.userInfo > div > aside > ul[data-logins] > li.row {
+  align-items: center;
+  gap: 0.8em;
+  min-height: 2.2em;
+  padding-top: 0.6em;
+  border-top: 1px dashed var(--lineColor);
+}
+.userInfo > div > aside > ul[data-logins] > li.row > header {
+  display: flex;
+  align-items: center;
+  gap: 0.65em;
+  min-width: 8.5em;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--txColor);
+}
+.userInfo > div > aside > ul[data-logins] > li.row > header > img, .userInfo > div > aside > ul[data-logins] > li.row > header > i.fi {
+  flex: 0 0 auto;
+  width: 1.3em;
+  height: 1.3em;
+}
+.userInfo > div > aside > ul[data-logins] > li.row > header > img {
+  display: block;
+  object-fit: contain;
+}
+.userInfo > div > aside > ul[data-logins] > li.row > header > i.fi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  width: 1em;
+  height: 1em;
+  color: var(--txLight);
+}
+.userInfo > div > aside > ul[data-logins] > li.row > span {
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  min-height: 0;
+  line-height: 1;
+  /* 미연결: "계정 연결" 뱃지(누르면 연결) */
+  /* 연결됨: "연결 해제" 는 오른쪽 끝 작은 글자 */
+}
+.userInfo > div > aside > ul[data-logins] > li.row > span > a {
+  cursor: pointer;
+  white-space: nowrap;
+}
+.userInfo > div > aside > ul[data-logins] > li.row > span > a.badge:hover {
+  background-color: var(--mainDark);
+}
+.userInfo > div > aside > ul[data-logins] > li.row > span > a:not(.badge) {
+  margin-left: auto;
+  font-size: 0.75em;
+  color: var(--txLight);
+}
+.userInfo > div > aside > ul[data-logins] > li.row > span > a:not(.badge):hover {
+  color: var(--danger);
+  text-decoration: underline;
+}
+.userInfo > div > section {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  min-width: 0;
+  /* 상단 4열 활동 지표 요약 (중간 폭 이하에서는 2x2 대칭 격자로 전환) */
+  /* 최근 작성글/댓글 카드 */
+}
+.userInfo > div > section > nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8em;
+}
+.userInfo > div > section > nav > a {
+  display: flex;
+  align-items: center;
+  gap: 0.85em;
+  padding: 1em 1.1em;
+  background: var(--bgColor);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  color: var(--txColor);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.userInfo > div > section > nav > a:hover {
+  border-color: var(--main4);
+  box-shadow: 0 0.25em 0.75em var(--aDark);
+}
+.userInfo > div > section > nav > a > i.fi {
+  flex: 0 0 auto;
+  font-size: 1.75em;
+  color: var(--main);
+}
+.userInfo > div > section > nav > a:nth-child(2) > i.fi {
+  color: var(--sub);
+}
+.userInfo > div > section > nav > a:nth-child(3) > i.fi {
+  color: var(--warningDark);
+}
+.userInfo > div > section > nav > a:nth-child(4) > i.fi {
+  color: var(--info);
+}
+.userInfo > div > section > nav > a > span {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.7em;
+  height: 2.7em;
+  border-radius: 50%;
+  background: var(--main1);
+  color: var(--main);
+}
+.userInfo > div > section > nav > a > span > i.fi {
+  font-size: 1.3em;
+}
+.userInfo > div > section > nav > a:nth-child(2) > span {
+  background: var(--sub1);
+  color: var(--sub);
+}
+.userInfo > div > section > nav > a:nth-child(3) > span {
+  background: var(--warning1);
+  color: var(--warningDark);
+}
+.userInfo > div > section > nav > a:nth-child(4) > span {
+  background: var(--info1);
+  color: var(--info);
+}
+.userInfo > div > section > nav > a > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.15em;
+}
+.userInfo > div > section > nav > a > div > strong {
+  font-size: 1.35em;
+  line-height: 1.1;
+  color: var(--txColor);
+}
+.userInfo > div > section > nav > a > div > span {
+  font-size: 0.82em;
+  color: var(--txLight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.userInfo > div > section > article {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  padding: 1.2em;
+}
+.userInfo > div > section > article > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  padding-bottom: 0.75em;
+  border-bottom: 1px solid var(--lineColor);
+}
+.userInfo > div > section > article > header > h4 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  color: var(--txColor);
+}
+.userInfo > div > section > article > header > h4 > i.fi {
+  color: var(--main);
+}
+.userInfo > div > section > article > header > nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+}
+.userInfo > div > section > article > header > nav > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.35em 0.85em;
+  font-size: 0.88em;
+  cursor: pointer;
+  color: var(--txSub);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBtn);
+}
+.userInfo > div > section > article > header > nav > a:hover {
+  color: var(--main);
+  border-color: var(--main4);
+}
+.userInfo > div > section > article > header > nav > a.active {
+  color: var(--bgColor);
+  background: var(--main);
+  border-color: var(--main);
+}
+.userInfo > div > section > article > header > nav > a > b {
+  font-size: 0.85em;
+  font-weight: 600;
+}
+.userInfo > div > section > article > ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.userInfo > div > section > article > ul > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  padding: 0.75em 0.4em;
+  border-bottom: 1px dashed var(--lineColor);
+}
+.userInfo > div > section > article > ul > li:last-child {
+  border-bottom: none;
+}
+.userInfo > div > section > article > ul > li[data-empty] {
+  padding: 2.2em 0.5em;
+  text-align: center;
+  color: var(--txLight);
+}
+.userInfo > div > section > article > ul > li > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+  font-size: 0.82em;
+  color: var(--txLight);
+}
+.userInfo > div > section > article > ul > li > header > span {
+  padding: 0.22em 0.65em;
+  border-radius: var(--roundBtn);
+  background: var(--main1);
+  color: var(--main7);
+  border: 1px solid var(--main2);
+  font-weight: 500;
+  line-height: 1.2;
+}
+.userInfo > div > section > article > ul > li > a {
+  font-weight: 500;
+  color: var(--txColor);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.userInfo > div > section > article > ul > li > a:hover {
+  color: var(--main);
+}
+.userInfo > div > section > article > ul > li > p {
+  margin: 0;
+  font-size: 0.88em;
+  color: var(--txSub);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.userInfo > dialog {
+  width: 26em;
+  max-width: calc(100vw - 2em);
+}
+.userInfo > dialog > header {
+  color: var(--main);
+}
+.userInfo > dialog textarea {
+  width: 100%;
+}
+
+/* 중간 데스크톱/태블릿 (~ 1080px): 4개 활동 요약 카드를 3+1 대신 2x2 대칭 격자로 배치 */
+@media (width <= 1080px) {
+  .userInfo > div > section > nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* 태블릿 (~ 780px): 좌/우 2단 컬럼을 상/하 1단으로 전환 */
+@media (width <= 780px) {
+  .userInfo > div {
+    grid-template-columns: 1fr;
+  }
+}
+/* 모바일 (~ 520px): 활동 요약 카드를 2x2 격자로 전환 */
+@media (width <= 520px) {
+  .userInfo > div > section > nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6em;
+  }
+  .userInfo > div > section > nav > a {
+    padding: 0.85em;
+    gap: 0.65em;
+  }
+  .userInfo > div > section > article {
+    padding: 0.9em;
+  }
+}

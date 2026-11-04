@@ -1,0 +1,14 @@
+{
+  "key": "FeatureTabs",
+  "version": 2,
+  "name": { "ko": "기능 탭", "en": "Feature tabs" },
+  "description": { "ko": "왼쪽 기능 목록을 고르면 오른쪽 이미지가 바뀝니다. 한 줄에 '제목 | 설명 | 이미지 주소'.", "en": "Pick a feature on the left to switch the image on the right. One per line: title | text | image URL." },
+  "categories": ["design"],
+  "size": { "min": [4, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "label", "type": "text", "default": "" },
+    { "key": "title", "type": "text", "default": "" },
+    { "key": "text", "type": "lines", "default": "" },
+    { "key": "items", "type": "lines", "default": "" }
+  ]
+}

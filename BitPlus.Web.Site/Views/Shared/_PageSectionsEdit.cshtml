@@ -1,0 +1,565 @@
+@model string
+@{
+    // 위젯 페이지 편집 모드 (관리자만, _PageSections 가 붙임) — 모델 = 페이지 키.
+    // "편집"을 누르면 api/widget/catalog 로 지금 배치·영역·위젯 목록을 받아 페이지 위에 + (영역 추가), 영역 도구(위로·아래로·위젯 추가·삭제), 슬롯 도구(+ / 설정·삭제)를 붙인다.
+    // 영역 추가 = 영역 모달(화면 폭 4단계 썸네일·이름·설명·칸 정보, 가로형은 칸 수), 위젯 추가·설정 = 위젯 모달(칸 선택 → 위젯 선택 → 제목·설정 양식 /Manager/Widget/Edit/{키}).
+    // 바꿀 때마다 배치 전체를 api/widget/layout 으로 저장하고 다시 불러온다(편집 모드 유지는 sessionStorage).
+    var text = new Dictionary<string, string>
+    {
+        ["edit"] = this.Lang("WidgetEditMode"), ["done"] = this.Lang("WidgetEditDone"), ["sectionAdd"] = this.Lang("SectionAdd"), ["widgetAdd"] = this.Lang("WidgetAdd"),
+        ["slotCount"] = this.Lang("SlotCount"), ["slotsOf"] = this.Lang("SlotsOf"), ["sizeOf"] = this.Lang("WidgetSizeOf"), ["notFit"] = this.Lang("WidgetNotFit"), ["singleUsed"] = this.Lang("WidgetSingleUsed"),
+        ["sectionDelete"] = this.Lang("SectionDeleteMsg"), ["widgetDelete"] = this.Lang("WidgetDeleteMsg"), ["settings"] = this.Lang("WidgetSettings"),
+        ["up"] = this.Lang("MoveUp"), ["down"] = this.Lang("MoveDown"), ["delete"] = this.Lang("Delete"), ["add"] = this.Lang("Add"), ["missing"] = this.Lang("WidgetMissing"),
+        ["empty"] = this.Lang("SectionEmpty"), ["resetConfirm"] = this.Lang("WidgetLayoutResetMsg")
+    };
+    // 부르는 쪽이 view-data "Stack" = true 를 주면 쌓기형(사이드 패널): 편집 버튼 = 영역 위 톱니 아이콘(떠 있는 버튼 대신), 영역 추가·영역 도구 없이
+    // 위젯마다 전체 폭(Full) 영역 하나 — 맨 아래 "위젯 추가"로 몇 개든 추가, 위젯 도구는 위로·아래로·설정·삭제(삭제 = 그 영역째).
+    var stack = ViewData["Stack"] is true;
+    var cultures = (this.Config?.Cultures ?? ["ko", "en"]).Select(c => new
+    {
+        key = c.ToLowerInvariant(),
+        name = c.Equals("ko", StringComparison.OrdinalIgnoreCase) ? "한국어 (KO)" :
+               c.Equals("en", StringComparison.OrdinalIgnoreCase) ? "English (EN)" :
+               c.ToUpperInvariant()
+    }).ToList();
+    if (!cultures.Any(c => c.key == "ko")) cultures.Insert(0, new { key = "ko", name = "한국어 (KO)" });
+    if (!cultures.Any(c => c.key == "en")) cultures.Add(new { key = "en", name = "English (EN)" });
+}
+<div class="sectionEditor" data-page="@Model" data-stack="@(stack ? "true" : null)">
+    @if (stack)
+    {
+        <span data-mode="toggle" data-icon="true" title="@this.Lang("WidgetEditMode")"><i class="fi fiGear"></i><span hidden>@this.Lang("WidgetEditMode")</span></span>
+        @if (Model.Contains(BitPlus.Web.Site.Widgets.PageLayouts.VariantSeparator))
+        {
+            @* 변형 페이지(사이드 연결 메뉴별 배치): 편집 중일 때만 톱니 옆 리셋 아이콘 — 따로 저장한 배치를 지우고 전역 배치로 되돌림 *@
+            <span data-mode="reset" data-icon="true" hidden title="@this.LangOf("ResetOf", "WidgetLayout")"><i class="fi fiArrReset"></i></span>
+        }
+    }
+    else
+    {
+        <button type="button" class="main sm" data-mode="toggle"><i class="fi fiEdit"></i> <span>@this.Lang("WidgetEditMode")</span></button>
+        @if (Model.Contains(BitPlus.Web.Site.Widgets.PageLayouts.VariantSeparator))
+        {
+            @* 변형 페이지(메뉴별 포탈 배치): 편집 중일 때만 편집 버튼 위 리셋 버튼 — 따로 저장한 배치를 지우고 기본 배치로 되돌림 *@
+            <button type="button" class="sm" data-mode="reset" hidden><i class="fi fiArrReset"></i> <span>@this.LangOf("ResetOf", "WidgetLayout")</span></button>
+        }
+    }
+
+    @* 영역 추가 모달: 영역 종류마다 화면 폭 4단계 썸네일 + 이름·설명·칸 정보 (+ 가로형 칸 수), 추가 버튼 *@
+    <dialog id="sectionModal">
+        <header><i class="fi fiGrid"></i> @this.Lang("SectionAdd")</header>
+        <section><ul></ul></section>
+        <footer>
+            <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Close")</button>
+        </footer>
+    </dialog>
+
+    @* 위젯 모달: 1단계 칸 선택(영역 썸네일) + 위젯 선택(크기·페이지에 맞는 것만 고를 수 있음), 2단계 제목 + 위젯 설정 양식 *@
+    <dialog id="widgetModal">
+        <header><i class="fi fiApps"></i> <span></span></header>
+        <section>
+            <div data-step="pick">
+                <div>
+                    <h5>@this.Lang("SlotSelect")</h5>
+                    <div data-role="slots"></div>
+                </div>
+                <div>
+                    <h5>@this.Lang("WidgetSelect")</h5>
+                    <ul data-role="widgets"></ul>
+                </div>
+            </div>
+            <div data-step="settings" hidden>
+                <div class="langTabs" data-role="langTabs"></div>
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("WidgetTitle")</header>
+                        <input type="text" data-role="title" maxlength="100" autocomplete="off" />
+                    </li>
+                </ul>
+                <div data-role="form"></div>
+                @* 입력할 것이 없는 위젯(제목 없음 + 설정 항목 없음): 위젯 설명과 안내 *@
+                <div data-role="empty" hidden>
+                    <p></p>
+                    <small>@this.Lang("WidgetNoSettings")</small>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <button type="button" data-mode="back" hidden><i class="fi fiChevronLeft"></i> @this.Lang("WidgetSelect")</button>
+            <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+            <button type="button" class="main" data-mode="save" hidden><i class="fi fiSave"></i> @this.Lang("Save")</button>
+        </footer>
+    </dialog>
+</div>
+<script>
+    (function () {
+        const editor = document.currentScript.previousElementSibling;
+        const root = editor.closest('.pageSections');
+        const page = editor.dataset.page;
+        const stack = !!editor.dataset.stack;
+        const text = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(text));
+        const supportedCultures = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(cultures));
+        const culture = ((document.documentElement.lang || 'ko').toLowerCase().split('-')[0]) || 'ko';
+        const flag = `pageEdit:${page}`;
+        const sectionModal = editor.querySelector('#sectionModal');
+        const widgetModal = editor.querySelector('#widgetModal');
+        const toggle = editor.querySelector('[data-mode="toggle"]');
+        let catalog = null;
+        let layout = null;
+
+        // ---- 영역 격자 (서버 SectionGrid 와 같은 규칙) ----
+        const breakpoints = ['1024', '1023', '779', '519'];
+        const tokens = row => row.split(' ').filter(Boolean);
+        const wrap = (keys, perRow) => {
+            const rows = [];
+            for (let i = 0; i < keys.length; i += perRow) {
+                const row = keys.slice(i, i + perRow);
+                while (row.length < perRow) row.push(row.at(-1)); // 마지막 줄이 모자라면 마지막 칸이 남은 폭을 채움 (서버 SectionGrid 와 같음)
+                rows.push(row.join(' '));
+            }
+            return rows;
+        };
+        const repeatOf = (def, repeat) => Math.min(Math.max(repeat ?? def.repeat.default ?? def.repeat.min, def.repeat.min), def.repeat.max);
+        /** 화면 폭 단계별 영역 줄 (가로형은 칸 수로 만듦) */
+        const areasOf = (def, repeat) => {
+            if (def.repeat) {
+                const keys = Array.from({ length: repeatOf(def, repeat) }, (_, i) => String(i + 1));
+                return { '1024': [keys.join(' ')], '1023': [keys.join(' ')], '779': wrap(keys, Math.min(keys.length, 2)), '519': wrap(keys, 1) };
+            }
+            return Object.fromEntries(breakpoints.map(p => [p, def.layouts?.[p] ?? []]));
+        };
+        const slotKeys = areas => [...new Set((areas['1024'] ?? []).flatMap(tokens).filter(p => p !== '.'))];
+        /** 1024 이상 배치에서 슬롯이 차지하는 가로(4칸 격자 환산)·세로 */
+        const sizeOf = (areas, key) => {
+            const rows = (areas['1024'] ?? []).map(tokens);
+            const columns = Math.max(1, ...rows.map(r => r.length));
+            const cells = rows.flatMap((row, r) => row.map((k, c) => ({ k, r, c }))).filter(p => p.k === key);
+            if (cells.length === 0) return { w: 0, h: 0 };
+            const cs = cells.map(p => p.c), rs = cells.map(p => p.r);
+            return { w: (Math.max(...cs) - Math.min(...cs) + 1) * 4 / columns, h: Math.max(...rs) - Math.min(...rs) + 1 };
+        };
+        const unit = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
+        /** 영역 줄로 그린 썸네일 SVG — opts: filled(위젯 있는 칸), selected(고른 칸), click(칸을 누를 수 있음) */
+        const thumb = (rows, width, height, opts = {}) => {
+            const grid = rows.map(tokens), cols = Math.max(1, ...grid.map(r => r.length)), count = Math.max(1, grid.length), gap = 3;
+            const cw = (width - gap * (cols + 1)) / cols, ch = (height - gap * (count + 1)) / count;
+            const rects = [...new Set(grid.flat().filter(p => p !== '.'))].map(key => {
+                const cells = grid.flatMap((row, r) => row.map((k, c) => ({ k, r, c }))).filter(p => p.k === key);
+                const c0 = Math.min(...cells.map(p => p.c)), c1 = Math.max(...cells.map(p => p.c)), r0 = Math.min(...cells.map(p => p.r)), r1 = Math.max(...cells.map(p => p.r));
+                const x = gap + c0 * (cw + gap), y = gap + r0 * (ch + gap), w = (c1 - c0 + 1) * cw + (c1 - c0) * gap, h = (r1 - r0 + 1) * ch + (r1 - r0) * gap;
+                const state = opts.selected === key ? 'selected' : opts.filled?.has(key) ? 'filled' : '';
+                return `<g data-slot="${key}" class="${state}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>${opts.labels ? `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle">${opts.labels(key)}</text>` : ''}</g>`;
+            }).join('');
+            return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">${rects}</svg>`;
+        };
+
+        // ---- 저장 ----
+        const typeOf = key => catalog.sections.find(p => p.key === key);
+        const widgetOf = key => catalog.widgets.find(p => p.key === key);
+        const save = async () => {
+            if (stack) layout.sections = layout.sections.filter(p => Object.keys(p.slots ?? {}).length > 0); // 쌓기형: 위젯 없는 영역(추가하다 취소한 것)은 저장하지 않음
+            const res = await common.putSend('/api/widget/layout', common.makeFormData({ page, layout: JSON.stringify(layout) }), { useInfo: false });
+            if (!res || !res.success) return false;
+            sessionStorage.setItem(flag, '1');
+            location.reload();
+            return true;
+        };
+        const nextId = () => {
+            const used = new Set((layout.sections ?? []).map(p => p.id));
+            let n = used.size + 1;
+            while (used.has(`s${n}`)) n++;
+            return `s${n}`;
+        };
+
+        // ---- 영역 추가 모달 ----
+        const openSectionModal = at => {
+            const list = sectionModal.querySelector('ul');
+            list.innerHTML = '';
+            catalog.sections.forEach(type => {
+                const li = document.createElement('li');
+                const repeat = type.layout.repeat;
+                const draw = count => {
+                    const areas = areasOf(type.layout, count);
+                    li.querySelector('[data-role="thumbs"]').innerHTML = breakpoints.map((bp, i) => `<figure>${thumb(areas[bp], [96, 80, 60, 40].at(i), 56)}<figcaption>${['≥1024', '<1024', '<780', '<520'].at(i)}</figcaption></figure>`).join('');
+                    li.querySelector('small').textContent = `${text.slotsOf.replace('{0}', slotKeys(areas).length)} · ${slotKeys(areas).map(k => { const s = sizeOf(areas, k); return `${unit(s.w)}×${s.h}`; }).join(', ')}`;
+                };
+                li.innerHTML = `<div data-role="thumbs"></div><div><strong></strong><p></p><small></small>${repeat ? `<label>${text.slotCount} <select></select></label>` : ''}</div><button type="button" class="main sm"><i class="fi fiAdd"></i> ${text.add}</button>`;
+                li.querySelector('strong').textContent = type.name;
+                li.querySelector('p').textContent = type.description ?? '';
+                const select = li.querySelector('select');
+                if (select) {
+                    for (let n = repeat.min; n <= repeat.max; n++) select.add(new Option(n, n, false, n === repeatOf(type.layout)));
+                    select.onchange = () => draw(Number(select.value));
+                }
+                draw(select ? Number(select.value) : undefined);
+                li.querySelector('button').onclick = async () => {
+                    const section = { id: nextId(), type: type.key, slots: {} };
+                    if (select) section.repeat = Number(select.value);
+                    layout.sections.splice(at, 0, section);
+                    if (await save()) sectionModal.close();
+                };
+                list.append(li);
+            });
+            sectionModal.showModal();
+        };
+
+        // ---- 위젯 모달 및 다국어 지원 ----
+        let target = null; // { section, areas, slot, widget }
+        let currentLang = culture;
+        let titlesData = {}; // { ko: '...', en: '...' }
+        let settingsData = {}; // { [key]: { ko: '...', en: '...' } or value }
+
+        const pickStep = widgetModal.querySelector('[data-step="pick"]'), settingsStep = widgetModal.querySelector('[data-step="settings"]');
+        const backButton = widgetModal.querySelector('[data-mode="back"]'), saveButton = widgetModal.querySelector('[data-mode="save"]');
+        const langTabsBox = widgetModal.querySelector('[data-role="langTabs"]');
+        const titleInput = widgetModal.querySelector('[data-role="title"]');
+        const formBox = widgetModal.querySelector('[data-role="form"]');
+        const isTextType = type => type === 'text' || type === 'lines' || type === 'html';
+
+        const fits = (w, size) => size.w + 0.001 >= w.minWidth && size.w <= w.maxWidth + 0.001 && size.h >= w.minHeight && size.h <= w.maxHeight;
+        const showStep = step => {
+            pickStep.hidden = step !== 'pick';
+            settingsStep.hidden = step !== 'settings';
+            backButton.hidden = step !== 'settings';
+            saveButton.hidden = step !== 'settings';
+        };
+
+        const renderLangTabs = () => {
+            langTabsBox.innerHTML = '';
+            const widget = widgetOf(target.widget);
+            const hasText = widget.frame !== false || (widget.settings ?? []).some(s => isTextType(s.type));
+            langTabsBox.hidden = !hasText;
+            if (!hasText) return;
+
+            supportedCultures.forEach(c => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const isActive = c.key === currentLang;
+                btn.className = (isActive ? 'active main' : '') + ' sm';
+                btn.dataset.lang = c.key;
+                btn.innerHTML = (isActive ? '<i class="fi fiEdit"></i> ' : '') + c.name;
+                btn.onclick = () => {
+                    if (c.key === currentLang) return;
+                    flushForm(currentLang);
+                    currentLang = c.key;
+                    langTabsBox.querySelectorAll('button').forEach(b => {
+                        const active = b.dataset.lang === c.key;
+                        b.className = (active ? 'active main' : '') + ' sm';
+                        const curCulture = supportedCultures.find(sc => sc.key === b.dataset.lang);
+                        b.innerHTML = (active ? '<i class="fi fiEdit"></i> ' : '') + (curCulture ? curCulture.name : b.dataset.lang);
+                    });
+                    fillForm(currentLang);
+                };
+                langTabsBox.appendChild(btn);
+            });
+        };
+
+        const fillForm = lang => {
+            titleInput.value = titlesData[lang] ?? '';
+            const widget = widgetOf(target.widget);
+            (widget.settings ?? []).forEach(item => {
+                const el = formBox.querySelector(`[name="${item.key}"]`);
+                if (!el) return;
+                if (isTextType(item.type) || (typeof settingsData[item.key] === 'object' && settingsData[item.key] !== null && !Array.isArray(settingsData[item.key]))) {
+                    el.value = settingsData[item.key]?.[lang] ?? '';
+                } else if (item.type === 'bool') {
+                    el.checked = !!settingsData[item.key];
+                } else if (item.type === 'boards') {
+                    [...el.options].forEach(o => o.selected = (settingsData[item.key] ?? []).includes(Number(o.value)));
+                } else {
+                    const val = settingsData[item.key];
+                    el.value = typeof val === 'object' && val !== null ? (val[lang] ?? '') : (val ?? '');
+                }
+            });
+        };
+
+        const flushForm = lang => {
+            titlesData[lang] = titleInput.value.trim();
+            const widget = widgetOf(target.widget);
+            (widget.settings ?? []).forEach(item => {
+                const el = formBox.querySelector(`[name="${item.key}"]`);
+                if (!el) return;
+                if (isTextType(item.type) || (typeof settingsData[item.key] === 'object' && settingsData[item.key] !== null && !Array.isArray(settingsData[item.key]))) {
+                    if (!settingsData[item.key] || typeof settingsData[item.key] !== 'object' || Array.isArray(settingsData[item.key])) settingsData[item.key] = {};
+                    settingsData[item.key][lang] = el.value;
+                } else if (item.type === 'bool') {
+                    settingsData[item.key] = el.checked;
+                } else if (item.type === 'number') {
+                    settingsData[item.key] = Number(el.value);
+                } else if (item.type === 'boards') {
+                    settingsData[item.key] = [...el.selectedOptions].map(o => Number(o.value));
+                } else {
+                    settingsData[item.key] = el.value;
+                }
+            });
+        };
+
+        /** 1단계: 칸 썸네일(누르면 그 칸 선택) + 고른 칸 크기에 맞는 위젯만 고를 수 있는 목록 */
+        const renderPick = () => {
+            const filled = new Set(Object.keys(target.section.slots ?? {}));
+            const box = widgetModal.querySelector('[data-role="slots"]');
+            box.innerHTML = thumb(target.areas['1024'], 280, 150, { filled, selected: target.slot, labels: k => target.section.slots?.[k] ? (widgetOf(target.section.slots[k].widget)?.name ?? k) : '+' });
+            box.querySelectorAll('g[data-slot]').forEach(g => {
+                g.onclick = () => {
+                    target.slot = g.dataset.slot;
+                    renderPick();
+                };
+            });
+            const list = widgetModal.querySelector('[data-role="widgets"]');
+            list.innerHTML = '';
+            const size = target.slot ? sizeOf(target.areas, target.slot) : null;
+            // 한 배치에 하나만 놓는 위젯(single)이 다른 칸에 이미 있으면 고를 수 없음 (지금 칸의 위젯을 다시 고르는 것은 됨)
+            const placedElsewhere = key => layout.sections.some(s => Object.entries(s.slots ?? {}).some(([k, v]) => v?.widget === key && !(s === target.section && k === target.slot)));
+            catalog.widgets.forEach(w => {
+                const used = w.single && placedElsewhere(w.key);
+                const ok = size && fits(w, size) && !used;
+                const li = document.createElement('li');
+                li.className = ok ? '' : 'disabled';
+                li.innerHTML = `<strong></strong><p></p><small></small>`;
+                li.querySelector('strong').textContent = w.name;
+                li.querySelector('p').textContent = w.description ?? '';
+                li.querySelector('small').textContent = text.sizeOf.replace('{0}', `${unit(w.minWidth)}×${w.minHeight}`).replace('{1}', `${unit(w.maxWidth)}×${w.maxHeight}`) + (used ? ` · ${text.singleUsed}` : size && !ok ? ` · ${text.notFit}` : '');
+                if (ok) li.onclick = () => openSettings(w.key, null);
+                list.append(li);
+            });
+        };
+
+        /** 2단계: 제목 + 위젯 설정 양식(조각)을 붙이고 지금 값(없으면 기본값)을 채움 */
+        const openSettings = async (widgetKey, placed) => {
+            const widget = widgetOf(widgetKey);
+            const html = await fetch(`/Manager/Widget/Edit/${widgetKey}`, { cache: 'no-cache' }).then(r => r.ok ? r.text() : '');
+            formBox.innerHTML = html;
+            target.widget = widgetKey;
+
+            titleInput.closest('li').hidden = widget.frame === false; // 틀 없는 위젯(자기 머리줄을 그림)은 제목을 받지 않음
+            const empty = widgetModal.querySelector('[data-role="empty"]');
+            empty.hidden = widget.frame !== false || (widget.settings ?? []).length > 0 || formBox.textContent.trim() !== ''; // 입력할 것도 위젯 자체 안내(설정 조각)도 없으면 빈 화면 대신 설명·공용 안내
+            empty.querySelector('p').textContent = widget.description ?? '';
+
+            // 다국어 제목 데이터 초기화
+            titlesData = {};
+            supportedCultures.forEach(c => {
+                if (typeof placed?.title === 'object' && placed.title !== null) {
+                    titlesData[c.key] = placed.title[c.key] ?? '';
+                } else if (typeof placed?.title === 'string') {
+                    titlesData[c.key] = c.key === culture ? placed.title : '';
+                } else {
+                    titlesData[c.key] = placed ? '' : (c.key === culture ? widget.name : '');
+                }
+            });
+
+            // 설정값 데이터 초기화
+            settingsData = {};
+            (widget.settings ?? []).forEach(item => {
+                const rawVal = placed?.settings?.[item.key] ?? item.default;
+                if (isTextType(item.type) || (typeof rawVal === 'object' && rawVal !== null && !Array.isArray(rawVal))) {
+                    settingsData[item.key] = {};
+                    supportedCultures.forEach(c => {
+                        if (typeof rawVal === 'object' && rawVal !== null) {
+                            settingsData[item.key][c.key] = rawVal[c.key] ?? '';
+                        } else if (typeof rawVal === 'string') {
+                            settingsData[item.key][c.key] = c.key === culture ? rawVal : (rawVal ?? '');
+                        } else {
+                            settingsData[item.key][c.key] = '';
+                        }
+                    });
+                } else {
+                    settingsData[item.key] = rawVal;
+                }
+            });
+
+            currentLang = supportedCultures.some(c => c.key === culture) ? culture : supportedCultures[0].key;
+            renderLangTabs();
+            fillForm(currentLang);
+
+            widgetModal.querySelector(':scope > header > span').textContent = `${widget.name} · ${text.settings}`;
+            showStep('settings');
+        };
+
+        const openWidgetModal = (sectionIndex, slot, edit) => {
+            const section = layout.sections[sectionIndex];
+            target = { section, areas: areasOf(typeOf(section.type).layout, section.repeat), slot: slot ?? slotKeys(areasOf(typeOf(section.type).layout, section.repeat)).find(k => !section.slots?.[k]) ?? null, widget: null };
+            widgetModal.querySelector(':scope > header > span').textContent = text.widgetAdd;
+            showStep('pick');
+            renderPick();
+            widgetModal.showModal();
+            if (edit) openSettings(section.slots[slot].widget, section.slots[slot]);
+        };
+
+        backButton.onclick = () => {
+            widgetModal.querySelector(':scope > header > span').textContent = text.widgetAdd;
+            showStep('pick');
+            renderPick();
+        };
+
+        saveButton.onclick = async () => {
+            if (!target.slot) return;
+            flushForm(currentLang);
+
+            const widget = widgetOf(target.widget);
+            const title = {};
+            supportedCultures.forEach(c => {
+                const val = titlesData[c.key]?.trim();
+                if (val) title[c.key] = val;
+            });
+
+            const settings = {};
+            (widget.settings ?? []).forEach(item => {
+                if (isTextType(item.type)) {
+                    const map = {};
+                    let hasAny = false;
+                    supportedCultures.forEach(c => {
+                        const val = settingsData[item.key]?.[c.key];
+                        if (val !== undefined && val !== '') {
+                            map[c.key] = val;
+                            hasAny = true;
+                        }
+                    });
+                    settings[item.key] = hasAny ? map : item.default;
+                } else {
+                    settings[item.key] = settingsData[item.key] ?? item.default;
+                }
+            });
+
+            target.section.slots = {
+                ...(target.section.slots ?? {}),
+                [target.slot]: {
+                    widget: target.widget,
+                    title: widget.frame === false ? {} : title,
+                    settings
+                }
+            };
+            if (await save()) widgetModal.close();
+        };
+
+        // ---- 페이지 위 도구 ----
+        /** 편집 도구 = 작은 아이콘 하나(span, 이름은 title) */
+        const tool = (icon, title, action) => {
+            const span = document.createElement('span');
+            span.dataset.tool = '';
+            span.title = title;
+            span.innerHTML = `<i class="fi ${icon}"></i>`;
+            span.onclick = action;
+            return span;
+        };
+        const plusBar = at => {
+            const bar = document.createElement('div');
+            bar.className = 'sectionPlus';
+            bar.append(tool('fiAdd', text.sectionAdd, () => openSectionModal(at)));
+            return bar;
+        };
+        /** 쌓기형 편집 도구: 위젯마다 위로·아래로·설정·삭제(영역째), 맨 아래 편집기 줄 왼쪽에 위젯 추가(새 전체 폭 영역) */
+        const decorateStack = () => {
+            root.classList.add('editing', 'stack');
+            const move = async (index, step) => {
+                const to = index + step;
+                if (to < 0 || to >= layout.sections.length) return;
+                [layout.sections[to], layout.sections[index]] = [layout.sections[index], layout.sections[to]];
+                await save();
+            };
+            root.querySelectorAll(':scope > section[data-id]').forEach(el => {
+                const index = layout.sections.findIndex(p => p.id === el.dataset.id);
+                el.querySelectorAll(':scope > div[data-slot]').forEach(slotEl => {
+                    const key = slotEl.dataset.slot;
+                    if (!layout.sections[index].slots?.[key]) return;
+                    const slotTools = document.createElement('div');
+                    slotTools.className = 'slotTools';
+                    if (slotEl.dataset.missing) slotTools.innerHTML = `<span>${text.missing}</span>`;
+                    slotTools.append(tool('fiChevronUp', text.up, () => move(index, -1)), tool('fiChevronDown', text.down, () => move(index, 1)));
+                    if (!slotEl.dataset.missing) slotTools.append(tool('fiSettings', text.settings, () => openWidgetModal(index, key, true)));
+                    slotTools.append(tool('fiDelete', text.delete, async () => {
+                        if (!await common.confirm(text.widgetDelete)) return;
+                        layout.sections.splice(index, 1);
+                        await save();
+                    }));
+                    slotEl.prepend(slotTools);
+                });
+            });
+            const bar = document.createElement('div');
+            bar.className = 'sectionPlus';
+            const add = tool('fiAdd', text.widgetAdd, () => {
+                layout.sections = layout.sections.filter(p => Object.keys(p.slots ?? {}).length > 0);
+                layout.sections.push({ id: nextId(), type: 'Full', slots: {} });
+                openWidgetModal(layout.sections.length - 1, 'a', false);
+            });
+            bar.append(add);
+            editor.prepend(bar); // 편집기 줄 왼쪽 (오른쪽은 리셋·톱니)
+        };
+        const decorate = () => {
+            if (stack) return decorateStack();
+            root.classList.add('editing');
+            const elements = [...root.querySelectorAll(':scope > section[data-id]')];
+            root.insertBefore(plusBar(0), elements[0] ?? editor);
+            elements.forEach(el => {
+                const index = layout.sections.findIndex(p => p.id === el.dataset.id);
+                const tools = document.createElement('div');
+                tools.className = 'sectionTools';
+                tools.innerHTML = `<span></span>`;
+                tools.querySelector('span').textContent = el.dataset.name;
+                tools.append(
+                    tool('fiChevronUp', text.up, async () => {
+                        if (index <= 0) return;
+                        [layout.sections[index - 1], layout.sections[index]] = [layout.sections[index], layout.sections[index - 1]];
+                        await save();
+                    }),
+                    tool('fiChevronDown', text.down, async () => {
+                        if (index >= layout.sections.length - 1) return;
+                        [layout.sections[index + 1], layout.sections[index]] = [layout.sections[index], layout.sections[index + 1]];
+                        await save();
+                    }),
+                    tool('fiAddCircle', text.widgetAdd, () => openWidgetModal(index, null, false)),
+                    tool('fiDelete', text.delete, async () => {
+                        if (!await common.confirm(text.sectionDelete)) return;
+                        layout.sections.splice(index, 1);
+                        await save();
+                    }));
+                el.prepend(tools);
+                el.querySelectorAll(':scope > div[data-slot]').forEach(slotEl => {
+                    const key = slotEl.dataset.slot;
+                    const slotTools = document.createElement('div');
+                    slotTools.className = 'slotTools';
+                    if (layout.sections[index].slots?.[key]) {
+                        if (slotEl.dataset.missing) slotTools.innerHTML = `<span>${text.missing}</span>`;
+                        else slotTools.append(tool('fiSettings', text.settings, () => openWidgetModal(index, key, true)));
+                        slotTools.append(tool('fiDelete', text.delete, async () => {
+                            if (!await common.confirm(text.widgetDelete)) return;
+                            delete layout.sections[index].slots[key];
+                            await save();
+                        }));
+                    } else {
+                        slotTools.classList.add('empty');
+                        slotTools.append(tool('fiAdd', text.widgetAdd, () => openWidgetModal(index, key, false)));
+                    }
+                    slotEl.prepend(slotTools);
+                });
+                el.after(plusBar(index + 1));
+            });
+        };
+        const enter = async () => {
+            const res = await common.getSend(`/api/widget/catalog?page=${encodeURIComponent(page)}`);
+            if (!res || !res.success) return;
+            catalog = res.data;
+            layout = res.data.layout ?? { sections: [] };
+            layout.sections = layout.sections ?? [];
+            toggle.querySelector('span').textContent = text.done;
+            toggle.dataset.on = '1';
+            if (resetIcon) resetIcon.hidden = false;
+            decorate();
+        };
+        // 리셋(변형 페이지만): 확인 후 따로 저장한 배치를 지우고 전역 배치로 다시 불러옴 (편집 모드 유지)
+        const resetIcon = editor.querySelector('[data-mode="reset"]');
+        if (resetIcon) resetIcon.onclick = async () => {
+            if (!await common.confirm(text.resetConfirm)) return;
+            const res = await common.delSend(`/api/widget/layout?page=${encodeURIComponent(page)}`, { useInfo: false });
+            if (!res || !res.success) return;
+            sessionStorage.setItem(flag, '1');
+            location.reload();
+        };
+        toggle.onclick = () => {
+            if (!toggle.dataset.on) return enter();
+            sessionStorage.removeItem(flag);
+            location.reload();
+        };
+        if (sessionStorage.getItem(flag)) window.addEventListener('DOMContentLoaded', enter);
+    })();
+</script>

@@ -1,0 +1,82 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("ApiToken"));
+}
+
+@* 외부 API 접근 토큰 (api/apitoken) — 목록(행 끝 삭제, 수정 없음), 하단 추가 버튼 = 발급 모달(발급 직후 원문 1회 표시). 사용은 Authorization: Bearer {토큰} *@
+<div class="pageBox tokenBox">
+    <div class="inform">
+        <header><i class="fi fiKey"></i> @this.Lang("ApiToken")</header>
+        <p>@this.Lang("ApiTokenInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <section class="card line flexCol auto">
+            <div class="dataList auto">
+                <header>
+                    <span class="colName"><span>NAME</span></span>
+                    <span class="colUser"><span>USER</span></span>
+                    <span class="colDate"><span>EXPIRE</span></span>
+                    <span class="colDate"><span>LAST USED</span></span>
+                    <span class="colState"><span>STATUS</span></span>
+                    <span class="colAction"></span>
+                </header>
+                <ul></ul>
+            </div>
+        </section>
+
+        <footer class="pageFooter">
+            <span></span>
+            <button type="button" class="main" data-mode="add"><i class="fi fiPlus"></i> @this.LangOf("AddOf", "ApiToken")</button>
+        </footer>
+    </article>
+</div>
+
+<!-- 접근 토큰 발급 모달: 이름·사용자·만료 입력 → 발급하면 입력 대신 원문(1회)과 복사 버튼을 보여 줌 -->
+<dialog id="tokenModal">
+    <header><i class="fi fiKey fiFill"></i> @this.LangOf("AddOf", "ApiToken")</header>
+    <section>
+        <ul class="form" data-input>
+            <li>
+                <header>@this.Lang("Name") <small class="txDanger">*</small></header>
+                <input type="text" name="name" maxlength="64" autocomplete="off" />
+            </li>
+            <li>
+                <header>@this.Lang("User") <small>@this.Lang("ApiTokenUserInfo")</small></header>
+                <div class="inputGroup">
+                    <input type="text" name="userName" readonly />
+                    <input type="hidden" name="userId" />
+                    <button type="button" data-mode="user" title="@this.Lang("UserSelect")"><i class="fi fiSearch"></i></button>
+                </div>
+            </li>
+            <li>
+                <header>@this.Lang("ExpireDate")</header>
+                <select name="expireDays">
+                    @foreach (var days in new[] { 30, 90, 180, 365 })
+                    {
+                        <option value="@days" selected="@(days == 90)">@this.Lang("DaysOf").Formats(days.ToString())</option>
+                    }
+                    <option value="">@this.Lang("NoExpiry")</option>
+                </select>
+            </li>
+        </ul>
+        <ul class="form" data-issued hidden>
+            <li>
+                <header>@this.Lang("ApiTokenIssued")</header>
+                <div class="inputGroup">
+                    <input type="text" name="issuedToken" readonly />
+                    <button type="button" data-mode="copy" class="deco"><i class="fi fiCopy"></i> @this.Lang("Copy")</button>
+                </div>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Close")</button>
+        <button type="button" class="main" data-mode="issue"><i class="fi fiKey"></i> @this.Lang("Issue")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 External.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 External.cshtml 의 wireTokenPage() 가 담당한다.
+-->

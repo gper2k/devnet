@@ -1,0 +1,71 @@
+@charset "UTF-8";
+/* 배너·슬라이드 위젯 — 배너를 겹쳐 두고 active 만 보임, 아래 점으로 이동, 문구는 이미지 아래쪽에 겹침 */
+div.widgetBanner {
+  font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--roundBox);
+}
+div.widgetBanner > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+div.widgetBanner > ul > li {
+  grid-area: 1/1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s;
+}
+div.widgetBanner > ul > li.active {
+  opacity: 1;
+  visibility: visible;
+}
+div.widgetBanner > ul > li > a {
+  position: relative;
+  display: block;
+  color: white;
+  text-decoration: none;
+}
+div.widgetBanner > ul > li > a > img,
+div.widgetBanner > ul > li > a ::deep > svg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2/1;
+  object-fit: cover;
+}
+div.widgetBanner > ul > li > a > span {
+  position: absolute;
+  left: 1em;
+  bottom: 1em;
+  padding: 0.4em 0.8em;
+  border-radius: var(--roundBox);
+  background-color: var(--modalBg);
+  font-size: 1.2em;
+  font-weight: bold;
+}
+div.widgetBanner > ol {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.6em;
+  display: flex;
+  justify-content: center;
+  gap: 0.4em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+div.widgetBanner > ol > li {
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+  background-color: var(--bgColor);
+  opacity: 0.6;
+  cursor: pointer;
+}
+div.widgetBanner > ol > li.active {
+  opacity: 1;
+  background-color: var(--primary);
+}

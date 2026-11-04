@@ -1,0 +1,73 @@
+﻿@charset "UTF-8";
+div.pageWrap {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  gap: 1em;
+  overflow: visible;
+  /* 게시판 설정 사이드 구성 = 우측: 사이드 패널을 본문 오른쪽에 */
+}
+div.pageWrap.sideRight {
+  flex-direction: row-reverse;
+}
+div.pageWrap > div {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  overflow: visible;
+  padding: 0 0.5em;
+  /* 게시판 설정의 상단/하단 영역 HTML: 파샬뷰만 남는 높이를 채우고 이 영역은 내용 높이만 차지 */
+}
+div.pageWrap > div > header, div.pageWrap > div > footer {
+  flex: 0 0 auto;
+  display: block;
+  padding: 0 1em;
+}
+div.pageWrap > div ::deep > article {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 0;
+  gap: 0.5em;
+  overflow: visible;
+}
+div.pageWrap > div ::deep > article > header {
+  padding: 1em 0.5em;
+}
+div.pageWrap > div ::deep > article > header > span {
+  display: inline-block;
+  padding: 0;
+  font-size: 1.8em;
+  font-weight: bold;
+  text-transform: capitalize;
+  color: var(--main);
+}
+div.pageWrap > div ::deep > article > header > span > i.fi {
+  font-size: 1.1em;
+  margin: 0.05em 0 -0.05em 0;
+}
+div.pageWrap > div ::deep > article > header > span > .badge {
+  font-size: 0.4em;
+}
+div.pageWrap > div ::deep > article > header > span > small {
+  font-size: 0.7em;
+  color: var(--txLight);
+}
+div.pageWrap > div ::deep > article > header > span > small > i.fi {
+  color: var(--main);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+  div.pageWrap > div.auto {
+    padding: 0;
+  }
+}
+/* 타블렛 H 이하 (~ 780px) */
+/* 모바일 (~ 520px) */
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Index.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AAEA;;AACA;EAEI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;EACA;;;AAS5B;AACA;EAEQ;IACI;;;AAKZ;AAOA%22%7D */

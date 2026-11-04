@@ -1,0 +1,89 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("LanguageData"));
+    var cultures = this.Config?.Cultures ?? ["ko", "en"];
+}
+
+@* 시스템 설정 > 다국어 관리 탭 조각 — Languages 테이블을 키(범주 + 키) 기준으로 묶은 목록(검색·페이지, api/config/languages), 행 클릭·추가 = 편집 모달(범주·키·설명, 지원 문화권별 값).
+   초기화는 System.cshtml 의 wireLanguagePage() 가 맡는다. *@
+<div class="pageBox languageBox">
+    <div class="inform fix">
+        <header><i class="fi fiTranslate"></i> @this.Lang("LanguageData")</header>
+        <p>@this.Lang("LanguageDataInfo")</p>
+    </div>
+
+    <section class="card line flexCol auto">
+        <header class="fix">
+            <strong>
+                <i class="fi fiTranslate"></i>
+                @this.Lang("LanguageData")
+                <i class="badge deco">0</i>
+            </strong>
+            <div class="flexRow gapSm alignCenter">
+                <div class="inputGroup inline sm">
+                    <input type="text" name="search" placeholder="@this.Lang("Search")" autocomplete="off" />
+                    <button type="button" class="sub"><i class="fi fiSearch"></i></button>
+                </div>
+                <button type="button" class="sub sm" data-mode="add"><i class="fi fiAdd"></i> @this.Lang("Add")</button>
+            </div>
+        </header>
+
+        <div class="dataList auto">
+            <header>
+                <span class="colCategory"><span>CATEGORY</span></span>
+                <span class="colKey"><span>KEY</span></span>
+                <span class="colValue"><span>VALUES</span></span>
+                <span class="colDate"><span>DATE</span></span>
+            </header>
+            <ul></ul>
+        </div>
+
+        <footer class="fix">
+            <div class="pageSize">
+                <label>List Size</label>
+                <select name="pageSize">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <ul class="pager"></ul>
+        </footer>
+    </section>
+</div>
+
+<!-- 다국어 편집 모달: 범주·키(편집이면 고정)·설명, 지원 문화권마다 값(비우면 그 문화권은 저장 안 함), 하단 삭제(편집일 때만)·취소·저장 -->
+<dialog id="languageModal">
+    <header><i class="fi fiTranslate"></i> <span></span></header>
+    <section>
+        <ul class="form">
+            <li class="col2">
+                <div>
+                    <header>@this.Lang("ContentCategory")</header>
+                    <input type="text" name="category" maxlength="64" placeholder="Common" autocomplete="off" />
+                </div>
+                <div>
+                    <header>@this.Lang("Key") <small class="txDanger">*</small></header>
+                    <input type="text" name="key" maxlength="128" autocomplete="off" />
+                </div>
+            </li>
+            @foreach (var culture in cultures)
+            {
+                <li>
+                    <header>@System.Globalization.CultureInfo.GetCultureInfo(culture).NativeName <small>@culture</small></header>
+                    <textarea data-culture="@culture" rows="2"></textarea>
+                </li>
+            }
+            <li>
+                <header>@this.Lang("Description")</header>
+                <input type="text" name="description" maxlength="256" autocomplete="off" />
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <button type="button" class="danger" data-mode="delete" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>

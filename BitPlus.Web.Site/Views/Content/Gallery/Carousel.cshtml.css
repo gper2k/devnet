@@ -1,0 +1,140 @@
+﻿@charset "UTF-8";
+/* 갤러리형 글 보기의 이미지 캐러셀: 큰 이미지(가운데) + 이전/다음 버튼 + 아래 썸네일 줄 */
+.galleryViewer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 1em;
+  /* 큰 이미지 무대 */
+  /* 썸네일 줄 */
+}
+.galleryViewer > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 8em; /* 높이는 지금 보이는 이미지의 높이에 맞춰 달라진다 (이미지 안 불러졌을 때만 최소 높이) */
+  background-color: var(--bgColor);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  overflow: hidden;
+  /* 이전/다음 버튼: 무대 좌우 가장자리에 겹쳐 둔다 */
+  /* 현재 장 / 전체 장 */
+}
+.galleryViewer > div:fullscreen {
+  height: 100vh;
+  border: none;
+  border-radius: 0;
+}
+.galleryViewer > div:fullscreen > ul > li > img {
+  max-height: 100vh;
+}
+.galleryViewer > div > ul {
+  flex: 1 1 auto;
+  align-self: stretch;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+.galleryViewer > div > ul > li {
+  display: none;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  cursor: zoom-in;
+}
+.galleryViewer > div > ul > li.active {
+  display: flex;
+}
+.galleryViewer > div > ul > li > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(80vh, 48em); /* 너무 긴 이미지는 화면을 넘지 않게 제한 */
+  object-fit: cover;
+}
+.galleryViewer > div:fullscreen > ul > li {
+  cursor: zoom-out;
+}
+.galleryViewer > div > button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  width: 2.6em;
+  height: 2.6em;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+.galleryViewer > div > button:hover {
+  opacity: 1;
+}
+.galleryViewer > div > button:first-of-type {
+  left: 0.6em;
+}
+.galleryViewer > div > button:last-of-type {
+  right: 0.6em;
+}
+.galleryViewer > div > button[hidden] {
+  display: none;
+}
+.galleryViewer > div > span {
+  position: absolute;
+  right: 0.8em;
+  bottom: 0.6em;
+  padding: 0.2em 0.7em;
+  font-size: 0.85em;
+  color: var(--txLight);
+  background-color: var(--bgColor);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+}
+.galleryViewer > ol {
+  display: flex;
+  gap: 0.5em;
+  margin: 0;
+  padding: 0.2em 0;
+  list-style: none;
+  overflow-x: auto;
+}
+.galleryViewer > ol > li {
+  flex: 0 0 5.5em;
+  height: 4em;
+  border: 2px solid transparent;
+  border-radius: 0.4em;
+  overflow: hidden;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.galleryViewer > ol > li:hover {
+  opacity: 1;
+}
+.galleryViewer > ol > li.active {
+  opacity: 1;
+  border-color: var(--deco);
+}
+.galleryViewer > ol > li > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+  .galleryViewer > div > ul > li > img {
+    max-height: 70vh;
+  }
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Gallery/Carousel.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;EACA;EACA;EACA;AAEA;AAwGA;;AAvGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AA+CA;AAgCA;;AA7EA;EACI;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAKZ;EACI;;AAIJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAKR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAKR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;;;AAMhB;AACA;EACI;IACI%22%7D */

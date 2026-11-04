@@ -1,0 +1,30 @@
+/* 메뉴얼형 화면(Manual/View, Index) 전용 스타일: 글이 하나도 없을 때의 빈 화면 (글이 있으면 Default/View 가 그림) */
+.contentManual {
+    flex: 1 1 auto;
+    & > .manualEmpty {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8em;
+        padding-bottom: 2em;
+        color: var(--txLight);
+
+        /* 제목줄: 제목은 왼쪽, 목차 메뉴는 반대편 끝 */
+        & > header {
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0 0.3em 0;
+            border-bottom: 2px solid var(--aColor);
+            color: var(--txColor);
+
+            & > h2 {
+                margin: 0;
+                font-size: 1.5em;
+                font-weight: bold;
+            }
+        }
+    }
+}

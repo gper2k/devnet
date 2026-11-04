@@ -1,0 +1,246 @@
+{
+  "AccountFindIdBody": {
+    "en": "Hello, {#username}.\n\nYour account ID is:\n{#userid}\n\n{#domain}",
+    "ko": "{#username}님, 안녕하세요.\n\n회원님의 아이디는 아래와 같습니다:\n{#userid}\n\n{#domain}"
+  },
+  "AccountMailConfirmBody": {
+    "en": "Hello {#username},\n\nOpen the link below to verify your mail address.\n{#token}\n\n{#domain}",
+    "ko": "{#username}님, 안녕하세요.\n\n아래 링크를 눌러 메일 주소 인증을 완료해 주세요.\n{#token}\n\n{#domain}"
+  },
+  "AccountPwChangeBody": {
+    "en": "Hello, {#username}.\n\nPlease click the link below to reset your password.\n{#token}\n\nThis link is valid for 1 day. If you did not request this, please ignore this email.\n\n{#domain}",
+    "ko": "{#username}님, 안녕하세요.\n\n아래 링크를 눌러 새 비밀번호를 설정해 주세요.\n{#token}\n\n링크는 1일 동안 유효합니다. 본인이 요청하지 않은 경우 이 메일을 무시해 주세요.\n\n{#domain}"
+  },
+  "ActiveGroupInfo": {
+    "en": "★ marks the default (main) group and role; the highlighted ones are active now.",
+    "ko": "★ 표시는 기본(주 소속) 그룹·역할, 진하게 표시된 것은 지금 활성인 그룹·역할입니다."
+  },
+  "AiApiInfoContent": {
+    "en": "Connection details for AI services. Choose the request format (OpenAI compatible such as Ollama, Claude, Gemini) and enter the address, key and model. API keys are encrypted and are kept when left empty.",
+    "ko": "AI 서비스 접속 정보입니다. 요청 형식(OpenAI 호환·Ollama, Claude, Gemini)을 고르고 주소, 키, 모델을 입력합니다. API 키는 암호화되어 저장되며, 비워 두면 기존 값을 유지합니다."
+  },
+  "ApiTokenInfoContent": {
+    "en": "Tokens let external programs call this site's API directly with the header Authorization: Bearer {token}. A request acts as the token's user with that user's permissions. Only a hash is stored, so the token is shown once right after it is issued.",
+    "ko": "외부 프로그램이 Authorization: Bearer {토큰} 헤더로 이 사이트의 API 를 직접 호출할 때 씁니다. 요청은 토큰 사용자의 권한으로 처리됩니다. 해시만 저장하므로 토큰은 발급 직후 한 번만 보여 줍니다."
+  },
+  "BoardDeleteInfo": {
+    "en": "The board is disabled right away, and its posts, comments, attachments, reports, file rule and menu are permanently deleted in the background. Menus under the board menu are kept and moved up one level.",
+    "ko": "게시판은 바로 사용 안 함으로 바뀌고, 글·댓글·첨부 파일·신고·파일 규칙·게시판 메뉴는 내부에서 영구 삭제됩니다. 게시판 메뉴 아래의 메뉴는 한 단계 위로 옮겨 남깁니다."
+  },
+  "BoardDeleteStarted": {
+    "en": "The board has been disabled and is being deleted. A board with many posts may take a while to finish.",
+    "ko": "게시판을 사용 안 함으로 바꾸고 삭제를 시작했습니다. 글이 많으면 끝날 때까지 시간이 걸릴 수 있습니다."
+  },
+  "ConfigDataInfo": {
+    "en": "Edit the key-value settings stored in the database directly. A wrong value can break site features, so change values carefully. JSON values must stay valid JSON. The master key is not shown.",
+    "ko": "DB 에 저장된 키-값 설정을 직접 고칩니다. 값을 잘못 바꾸면 사이트 기능이 동작하지 않을 수 있으니 주의하세요. JSON 값은 올바른 JSON 이어야 저장됩니다. 마스터 키는 보이지 않습니다."
+  },
+  "ConfigDeleteMsg": {
+    "en": "Delete this setting? The site will use the default value (appsettings) if there is one.",
+    "ko": "이 설정을 삭제할까요? 기본값(appsettings)이 있으면 그 값으로 돌아갑니다."
+  },
+  "ConfigInfoContent": {
+    "en": "Manage the account rules applied across the site. Saved values take effect immediately. In the default password format, {0} is replaced with the user ID.",
+    "ko": "사이트 전체에 적용되는 계정 규칙을 관리합니다. 저장하면 즉시 반영되며, 기본 암호 서식의 {0}은 사용자 ID로 치환됩니다."
+  },
+  "ContentSummaryNoAi": {
+    "en": "There is no AI connection in use. Register one in External Services > AI API first.",
+    "ko": "사용 중인 AI 접속이 없습니다. 외부 서비스 > AI API 에서 먼저 등록하세요."
+  },
+  "ContentSummaryOff": {
+    "en": "The content summary service is off. Turn it on in Admin > Services.",
+    "ko": "컨텐츠 요약 서비스가 꺼져 있습니다. 관리자 > Services 에서 켜세요."
+  },
+  "ContentSummaryPlainLengthInfo": {
+    "en": "Posts up to this many characters are saved as plain text without AI (default 200, 0 = always AI)",
+    "ko": "이 글자 수 이하의 글은 AI 없이 HTML 만 뺀 글을 그대로 저장 (비우면 200, 0 이면 항상 AI)"
+  },
+  "ContentSummaryServiceInfo": {
+    "en": "Processes each post in order: AI review (when turned on) to hide spam, ads and abuse; then, only for posts that pass, a summary on general and forum boards. When a translation is saved, it summarizes that translation the same way. Everything runs in one queue so AI calls never overlap.",
+    "ko": "글마다 차례로 처리합니다: AI 글 검사(켠 경우)로 스팸·광고·욕설 등을 감추고, 문제 없는 일반·포럼 게시판 글은 요약합니다. 번역본이 저장되면 그 번역본도 같은 방식으로 요약합니다. 한 큐에서 차례로 처리해 AI 호출이 겹치지 않습니다."
+  },
+  "DelGroupMsg": {
+    "en": "Deletes the group. Users assigned to the group (and to child groups, if they are included) will lose that membership. Deleted information cannot be recovered.",
+    "ko": "그룹 정보를 삭제합니다. 그룹에 소속된 사용자 목록(하위 그룹 포함 삭제 시 하위 그룹의 소속 사용자 포함)도 함께 사라지며, 삭제된 정보는 복구할 수 없습니다."
+  },
+  "DelRoleMsg": {
+    "en": "Deletes the role. Its user and group assignments are deleted as well and cannot be recovered.",
+    "ko": "역할 정보를 삭제합니다. 이 역할이 부여된 사용자와 그룹의 연결도 함께 삭제되며 복구할 수 없습니다."
+  },
+  "DelUserMsg": {
+    "en": "Deletes the user. Group and role assignments are deleted as well and cannot be recovered.",
+    "ko": "사용자 정보를 삭제합니다. 소속 그룹과 역할 연결도 함께 삭제되며 복구할 수 없습니다."
+  },
+  "DevKitEmptyInfo": {
+    "en": "Select a sample from the catalog on the left to show it here in an iframe.",
+    "ko": "좌측 카탈로그에서 샘플을 선택하면 이 영역에 iframe으로 표시됩니다."
+  },
+  "ErrorAlertIntervalInfo": {
+    "en": "The same error is sent once within this time (default 10, 0 = every time)",
+    "ko": "같은 오류는 이 시간 안에 한 번만 보냄 (비우면 10, 0 이면 매번)"
+  },
+  "ErrorAlertNoSmtp": {
+    "en": "SMTP is not configured, so mail cannot be sent. Set it up in External Services > SMTP first.",
+    "ko": "SMTP 구성이 없어 메일을 보낼 수 없습니다. 외부 서비스 > SMTP 에서 먼저 설정하세요."
+  },
+  "ErrorAlertServiceInfo": {
+    "en": "When a request fails with an error, emails the system managers a summary with the severity and error details.",
+    "ko": "요청 처리 중 오류가 나면 최종 관리자에게 심각도와 오류 내용을 정리한 메일을 보냅니다."
+  },
+  "ExternalJoinInfo": {
+    "en": "This is your first sign-in with {0}. Choose an ID and name and agree to the terms to finish joining. If you are already a member, sign in first and link it from My Info.",
+    "ko": "{0} 계정으로 처음 로그인했습니다. 사용할 ID 와 이름을 정하고 약관에 동의하면 가입이 끝납니다. 이미 회원이면 먼저 로그인한 뒤 내 정보에서 연결하세요."
+  },
+  "FileRuleInfoContent": {
+    "en": "Manage file upload extension, size, count limits and configure upload/download access permissions per target (Role/Group/User).",
+    "ko": "파일 업로드 시 적용할 확장자, 크기 및 개수 제한을 설정하고 대상(역할/부서/사용자)별 업로드 및 다운로드 권한을 관리합니다."
+  },
+  "FindIdGuide": {
+    "en": "Enter your registered email address to find your User ID.",
+    "ko": "가입 시 등록한 이메일 주소를 입력하시면 일치하는 아이디를 안내해 드립니다."
+  },
+  "FindIdMailSent": {
+    "en": "If an account is registered with this email, we have sent your account ID to it. Please check your inbox.",
+    "ko": "입력하신 메일로 가입된 계정이 있으면 아이디 안내 메일을 보냈습니다. 메일함을 확인해 주세요."
+  },
+  "GaMeasurementIdInfo": {
+    "en": "When set, Google Analytics collects visits on every page except the admin console. Copy the ID (G-…) from the GA4 property's web data stream.",
+    "ko": "입력하면 관리자 화면을 뺀 모든 페이지의 방문을 Google Analytics 가 수집합니다. GA4 속성의 웹 데이터 스트림에서 측정 ID(G-…)를 복사해 넣으세요."
+  },
+  "IntegrationContent": {
+    "en": "Keys for external services used by the site. Only public keys sent to the browser are stored here.",
+    "ko": "사이트에서 쓰는 외부 서비스의 키입니다. 브라우저에 내려가는 공개용 키만 저장합니다."
+  },
+  "KakaoJsKeyInfo": {
+    "en": "When set, KakaoTalk appears in the post share menu. Register the site domain on the Kakao Developers app platform (Web).",
+    "ko": "입력하면 글 보기 공유 메뉴에 카카오톡이 나옵니다. 카카오 디벨로퍼스 앱의 플랫폼(Web)에 사이트 도메인을 등록해야 합니다."
+  },
+  "LanguageDataInfo": {
+    "en": "Translation data by key (category + key) with one value per supported language. Screen text looks in the resource files first and uses this table only for keys not found there.",
+    "ko": "키(범주 + 키) 기준의 다국어 데이터입니다. 지원 언어마다 값을 넣습니다. 화면 문구는 리소스 파일을 먼저 찾고, 거기 없는 키만 이 데이터를 씁니다."
+  },
+  "LogInfo": {
+    "en": "File logs by type and date. Pick a start time to jump near it in large files, and narrow down with level and keyword. Times are server time. Click a row to see the original record.",
+    "ko": "종류·날짜별 파일 로그입니다. 시작 시각을 주면 큰 파일도 그 근처부터 읽고, 수준과 검색어로 좁힐 수 있습니다. 시각은 서버 시간입니다. 행을 누르면 원본 기록을 봅니다."
+  },
+  "MailChangedVerify": {
+    "en": "Saved. We sent a verification mail to the new address. Please click the link in the mail to verify it.",
+    "ko": "저장했습니다. 새 메일 주소로 인증 메일을 보냈으니 메일의 링크를 눌러 인증해 주세요."
+  },
+  "MailNotYetVerified": {
+    "en": "Email verification is not yet complete. Please check the link in your email.",
+    "ko": "아직 메일 인증이 완료되지 않았습니다. 메일함의 링크를 먼저 확인해 주세요."
+  },
+  "ManagerProxyApprovalInfo": {
+    "en": "When there are approvers, whether a manager may approve a step on their behalf",
+    "ko": "승인자가 있는 경우. 관리자가 해당 단계의 승인을 대리 할수 있는지 여부"
+  },
+  "ManualGroupHasPages": {
+    "en": "A page group that has pages cannot be deleted. Delete its pages first.",
+    "ko": "페이지가 있는 페이지 그룹은 지울 수 없습니다. 먼저 페이지를 지워 주세요."
+  },
+  "MenuContentMapOnly": {
+    "en": "Menus under Content map can only be placed under Content map or its sub menus.",
+    "ko": "컨텐츠맵 이하 메뉴는 컨텐츠맵 또는 그 하위 메뉴 아래로만 옮길 수 있습니다."
+  },
+  "NoPasswordInfo": {
+    "en": "This account joined with an external login and has no password. To sign in with an ID and password too, set one with Find Password.",
+    "ko": "외부 로그인으로 가입해 비밀번호가 없는 계정입니다. ID 와 비밀번호로도 로그인하려면 비밀번호 찾기로 비밀번호를 만드세요."
+  },
+  "NoticeReviewHiddenWriter": {
+    "en": "Your post '{0}' was hidden by the review. Reason: {1} An administrator can make it visible again after checking it.",
+    "ko": "'{0}' 글이 검사에서 걸려 감춰졌습니다. 사유: {1} 관리자가 확인한 뒤 다시 보이게 할 수 있습니다."
+  },
+  "OAuthInfoContent": {
+    "en": "Sign-in services shown on the login page. Create an app in each service's developer console, register the callback URL shown after saving as its redirect URI, then enter the Client ID and Secret here. Changes apply right away. Members who sign in with a new external account choose an ID and agree to the terms; existing members link it from My Info.",
+    "ko": "로그인 화면에 보일 외부 로그인 서비스입니다. 각 서비스의 개발자 콘솔에서 앱을 만들고, 저장 후 보이는 콜백 주소를 리디렉션 URI 로 등록한 뒤 Client ID 와 Secret 을 넣으세요. 저장하면 바로 반영됩니다. 처음 들어온 외부 계정은 ID 를 정하고 약관에 동의해 가입하며, 기존 회원은 내 정보에서 연결합니다."
+  },
+  "RedisInfoContent": {
+    "en": "Use Redis when several servers share the cache. Leave the connection string empty to use the in-memory cache. Changes apply after the site restarts.",
+    "ko": "여러 서버가 캐시를 함께 쓸 때 Redis 를 사용합니다. 접속 문자열을 비우면 메모리 캐시를 씁니다. 바꾼 값은 사이트를 다시 시작하면 적용됩니다."
+  },
+  "ResetPwGuide": {
+    "en": "Enter your User ID and registered email address to receive a password reset link.",
+    "ko": "가입 시 등록한 아이디와 이메일 주소를 입력하시면 비밀번호 재설정 링크를 메일로 발송해 드립니다."
+  },
+  "ResetPwInvalidToken": {
+    "en": "The password reset link is invalid or has expired. Please try again.",
+    "ko": "유효하지 않거나 만료된 비밀번호 재설정 링크입니다. 다시 요청해 주세요."
+  },
+  "ResetPwMailSent": {
+    "en": "If the ID and email match an account, we have sent a password reset link. Please check your inbox.",
+    "ko": "입력하신 아이디와 메일이 일치하면 비밀번호 재설정 링크를 메일로 보냈습니다. 메일함을 확인해 주세요."
+  },
+  "RoleInfoContent": {
+    "en": "Manage by registering roles assigned to each function. \nPlease write the role name in 2 to 16 characters using a mix of English letters and numbers without spaces.",
+    "ko": "기능별로 지정된 역할을 등록하여 관리합니다. \n역할명은 공백없는 영문, 숫자를 혼용하여 2~16자 이내로 작성해 주십시요."
+  },
+  "ServiceInfoContent": {
+    "en": "Services react to site events such as sign-ups, posts, visits and errors. Services in the site's Services folder and DLLs in the Plugins/Services folder are listed here; turn one on to use it and click a row to change its settings. Plugins are read at startup, so restart the site after adding or removing one.",
+    "ko": "서비스는 회원 가입, 글 등록, 방문, 오류 같은 사이트 이벤트에 반응해 작업합니다. 사이트의 서비스 폴더와 Plugins/Services 폴더의 DLL 에 있는 서비스가 목록에 나오며, 켜야 동작하고 행을 누르면 설정을 바꿀 수 있습니다. 플러그인은 시작할 때 읽으므로 넣거나 뺀 뒤에는 사이트를 다시 시작하세요."
+  },
+  "ShowSummaryInfo": {
+    "en": "Shows the summaries made by the content summary service in the list (turn the service on in Admin > Services)",
+    "ko": "컨텐츠 요약 서비스가 만든 요약글을 목록에 표시 (서비스는 관리자 > Services 에서 켬)"
+  },
+  "SiteInfoContent": {
+    "en": "Basic site information shown in the page head (title, search keywords, description, favicon, share preview) and in the top/bottom of the site (logo, site name, company info, copyright).",
+    "ko": "문서 머리(제목·검색 키워드·설명·파비콘·공유 미리보기)와 사이트 상단·하단(로고·사이트명·회사 정보·카피라이트)에 쓰이는 기본 정보입니다."
+  },
+  "SmtpInfoContent": {
+    "en": "SMTP server used to send account mails (mail verification, password reset, etc.). The password is stored encrypted; leave it blank to keep the current value.",
+    "ko": "계정 안내 메일(메일 검증, 비밀번호 재발급 등) 발송에 사용할 SMTP 서버를 설정합니다. 비밀번호는 암호화되어 저장되며, 비워 두면 기존 값을 유지합니다."
+  },
+  "SmtpRequired": {
+    "en": "SMTP server and sender address are required for mail verification. Save them in System Settings > SMTP Settings first.",
+    "ko": "메일 검증을 사용하려면 먼저 시스템 설정 > SMTP 구성에서 SMTP 서버와 보내는 주소를 저장해 주세요."
+  },
+  "SurveyLocked": {
+    "en": "This survey already has participants, so existing items cannot be changed (you can only add new items).",
+    "ko": "이미 참여자가 있어 기존 설문 항목은 고칠 수 없습니다. 새 항목만 추가할 수 있습니다."
+  },
+  "SystemChangeWarning": {
+    "en": "Changes that are system-managed, or that include system-managed objects, cannot be processed.",
+    "ko": "시스템 관리 대상이거나, 시스템 관리 대상을 포함하는 변경은 처리 할 수 없습니다."
+  },
+  "TemplateInfoContent": {
+    "en": "Manage the email formats required for membership registration, password resets, and similar purposes.\nThe following predefined keywords may be used in the title and body.",
+    "ko": "회원 가입에 따른 메일 검증, 암호 재발급등에 필요한 메일 형식을 관리합니다.\n아래 사전 정의된 키워드를 제목과 본문에 사용할 수 있습니다."
+  },
+  "TermsInfoContent": {
+    "en": "Manage the terms of use displayed during user registration.\nThe terms key is used to identify the agreed-upon terms; please enter a password between 2 and 16 characters using letters and numbers.",
+    "ko": "사용자 회원 가입시 표시되는 약관을 관리합니다.\n약관키는 동의된 약관을 식별하기 위해 사용되며, 영문 및 숫자로  2~16자 이내로 작성해 주십시요. \n문화권 변경을 통해 다양한 언어로 약관 등록이 가능합니다."
+  },
+  "UsePrivateInfo": {
+    "en": "Writers can choose private (private posts are visible only to managers and the writer)",
+    "ko": "글쓰기에서 비공개를 고를 수 있음 (비공개 글은 관리자와 글쓴이만 열람)"
+  },
+  "VerifyMailCheckGuide": {
+    "en": "Please click the link in your email, then click <strong>[Confirm Verification]</strong> below.",
+    "ko": "수신된 메일의 인증 링크를 누른 후, 아래 <strong>[인증 완료 확인]</strong> 버튼을 클릭해 주세요."
+  },
+  "VerifyMailFailed": {
+    "en": "The verification link is invalid or has expired. Please send the mail again.",
+    "ko": "인증 링크가 올바르지 않거나 만료되었습니다. 인증 메일을 다시 보내 주세요."
+  },
+  "WithdrawInfo": {
+    "en": "After deleting your account you can no longer sign in with it, and this cannot be undone. The same ID and email can be used to sign up again. Enter your current password to confirm.",
+    "ko": "탈퇴하면 이 계정으로 다시 로그인할 수 없고 되돌릴 수 없습니다. 같은 ID 와 메일로 새로 가입할 수는 있습니다. 확인을 위해 현재 비밀번호를 입력하세요."
+  },
+  "TranslationMachineNotice": {
+    "en": "This post was translated by AI and may contain errors. Please check the original as well.",
+    "ko": "이 글은 AI 가 번역한 내용입니다. 정확하지 않을 수 있으니 원문도 함께 확인해 주세요."
+  },
+  "LogExcludeInfo": {
+    "en": "Logs matching a rule are not written. The category matches by its beginning (logger name, DataBase for SQL logs), only logs at or below the chosen level are skipped, and if text is given the message must contain it. Changes apply right away.",
+    "ko": "규칙에 맞는 로그는 기록하지 않습니다. 카테고리는 앞부분이 같으면 맞고(로거 이름, SQL 로그는 DataBase), 고른 수준 이하만 빼며, 포함 글자를 적으면 메시지에 그 글자가 있을 때만 뺍니다. 저장하면 바로 적용됩니다."
+  },
+  "PolicyInfoContent": {
+    "en": "Config file (appsettings.json) policies are the base and read-only. To change one, add a DB policy with the same name to override it; while the DB policy is disabled, the config file policy applies again. No targets means all users are allowed.",
+    "ko": "설정 파일(appsettings.json)의 정책이 기본이며 읽기 전용입니다. 바꾸려면 같은 이름의 DB 정책을 추가해 덮어쓰고, DB 정책을 비활성하면 다시 설정 파일 정책이 적용됩니다. 허용 대상이 없으면 모든 사용자를 허용합니다."
+  },
+  "PolicyLockOut": {
+    "en": "This change would remove your own access to the management console, so it was not applied.",
+    "ko": "이 변경을 적용하면 현재 계정이 관리자 화면 권한을 잃게 되어 적용하지 않았습니다."
+  }
+}

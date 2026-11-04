@@ -1,0 +1,320 @@
+@use "Document" as *;
+
+/* ==========================================================================
+   Util: 기타 유틸리티 및 로딩 마스크 레이어
+   ========================================================================== */
+
+/* 전체 화면 로딩 마스크 레이어 */
+div.loading[popover] {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    margin: 0;
+    padding: 0;
+    background-color: var(--modalBg, rgba(0, 0, 0, 0.4));
+    backdrop-filter: blur(0.2em);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+
+    &:popover-open {
+        display: flex;
+    }
+
+    & > .loadingWrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8em;
+        color: var(--txColor);
+
+        & > .loadingSvg {
+            width: 3.5em;
+            height: 3.5em;
+            animation: spin 1.4s linear infinite;
+
+            & > circle {
+                fill: none;
+                stroke: var(--main);
+                stroke-width: 6;
+                stroke-linecap: round;
+
+                &:first-child {
+                    stroke: var(--aLight);
+                }
+
+                &:last-child {
+                    stroke-dasharray: 120, 200;
+                    stroke-dashoffset: 0;
+                }
+            }
+        }
+
+        & > div {
+            font-size: 0.9em;
+            color: var(--txSub);
+            font-weight: 500;
+        }
+    }
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   유효성 검사 토스트 (ValidResult.popover) - 우하단 표시 후 자동 제거
+   ========================================================================== */
+div.validMsg[popover] {
+    color: var(--txColor);
+    background-color: var(--bgColor);
+    font-size: 1rem;
+    position: fixed;
+    inset: auto 1em 1em auto;
+    margin: 0;
+    padding: 1em;
+    max-width: min(24em, calc(100vw - 2em));
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundSize);
+    box-shadow: 0.1em 0.1em 0.6em 0.3em var(--aColor);
+    transition: opacity 0.3s ease, transform 0.3s ease, overlay 0.3s allow-discrete;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5em;
+
+    /* 등장: 아래에서 올라옴 */
+    @starting-style {
+        &:popover-open {
+            opacity: 0;
+            transform: translateY(0.6em);
+        }
+    }
+
+    /* 퇴장(hidePopover): 위로 올라가며 사라짐 */
+    &:not(:popover-open) {
+        opacity: 0;
+        transform: translateY(-1.2em);
+    }
+
+    & > i.fi {
+        font-size: 2.4em;
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.5em;
+
+        & > header {
+            font-size: 1.05em;
+            font-weight: bold;
+            line-height: 1em;
+        }
+
+        & > ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            font-size: 0.85em;
+            color: var(--txSub);
+            align-items: flex-start;
+            gap: 0.5em;
+
+            & > li {
+                width: 100%;
+                line-height: 1em;
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+            }
+        }
+    }
+
+    @each $color in $colors {
+        &.#{$color} {
+            & > div > header {
+                color: var(--#{$color}Dark);
+            }
+
+            & > i.fi {
+                color: var(--#{$color});
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   안내 박스 (.information) - 좌측 강조선 + 아이콘 헤더 + 본문 설명
+   ========================================================================== */
+.inform {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    padding: 0.8em 1em;
+    background-color: var(--aLow);
+    border: 1px solid var(--aLow);
+    border-left: 5px solid var(--aDark);
+    border-radius: var(--roundSize);
+    font-size: 0.88em;
+
+    & > header {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        font-weight: 700;
+        color: var(--aDeep);
+    }
+
+    & > p,
+    & > div {
+        margin: 0;
+        color: var(--txSub);
+    }
+
+    @each $color in $colors {
+        &.#{$color} {
+            border-color: var(--#{$color}2);
+            border-left-color: var(--#{$color});
+            background-color: var(--#{$color}1);
+
+            & > header {
+                color: var(--#{$color}Dark);
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   메일 인증 안내 줄 (.mailNotice) - 최상위 레이아웃 맨 위에 모든 페이지 공통으로 표시
+   ========================================================================== */
+.mailNotice {
+    font-size: 0.9em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    padding: 0.5em;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    background-color: var(--danger1);
+    border-bottom: 1px solid var(--danger2);
+    color: var(--dangerDark);
+
+    & > i.fi {
+        color: var(--danger);
+    }
+
+    & > a {
+        font-weight: 700;
+        text-decoration: underline;
+        color: inherit;
+    }
+}
+
+body:has(.mailNotice) {
+    padding-top: 2.3em;
+}
+
+/* ==========================================================================
+   인라인 배지 (.badge) - 치환 태그, 상태값 등 짧은 라벨 표시
+   ========================================================================== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.3em 0.6em;
+    font-size: 0.75rem;
+    font-weight: normal;
+    line-height: 1em;
+    background-color: var(--aColor);
+    border-radius: 1em;
+    color: var(--txColor);
+
+    & > code {
+        font-size: 0.95em;
+    }
+    /* display 지정이 hidden 속성(브라우저 기본 display:none)을 덮지 않도록 숨김 상태를 명시 */
+    &[hidden] {
+        display: none;
+    }
+
+    @each $color in $colors {
+        &.#{$color} {
+            background-color: var(--#{$color});
+            color: white;
+        }
+    }
+}
+
+/* ==========================================================================
+   표시 개수(List Size)
+   ========================================================================== */
+div.pageSize {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    font-size: 0.85em;
+    color: var(--txSub);
+
+    & > label {
+        font-size: 0.8em;
+        line-height: 1.2em;
+        text-transform:uppercase;
+        color: var(--txSub);
+    }
+
+    & > select {
+        font-size: 0.9em;
+    }
+}
+
+/* ==========================================================================
+   hidden 속성 숨김 보장
+   - 브라우저 기본 [hidden]{display:none} 은 작성자 스타일(button, .badge 등의 display)에 항상 밀리므로
+     파일 마지막에 같은 규칙을 두어 hidden 이 붙은 요소는 어떤 컴포넌트든 숨겨지도록 한다.
+   ========================================================================== */
+[hidden] {
+    display: none;
+}
+
+
+.nameLine {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--txColor);
+    font-weight:bold;
+    gap: 0.5em;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+
+    & > img {
+        width: 1.8em;
+        height: 1.8em;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--lineColor);
+    }
+
+    & > small {
+        font-size: 0.9em;
+        font-weight: normal;
+        color: var(--txLight);
+    }
+}

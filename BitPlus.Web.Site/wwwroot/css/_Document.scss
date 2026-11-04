@@ -1,0 +1,824 @@
+﻿/* ==========================================================================
+   Document: HTML 기본 태그들의 스타일 정의와 각종 CSS 변수
+   - BaseUI 표준 html, body, #app 스타일 및 a 태그 일반 글자색 매핑
+   - 9대 테마색 (main, sub, point, deco, primary, info, success, warning, danger)
+   - 각 색상별 Base, Dark, Light 및 0~9 밝기 단계 지원
+   - 다크/라이트 테마 오버라이드 및 레이아웃별 오버라이드 지원
+   - 이미지 무드 기반 버튼, 폼 입력필드, textarea, h1~h6 기본 스타일 완비
+   - em 단위 기반 버튼과 입력항의 동일 높이(2.6em) 보장 및 비례 스케일링
+   ========================================================================== */
+@use "sass:string";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+@function capitalize($s) {
+    @return string.to-upper-case(string.slice($s, 1, 1)) + string.slice($s, 2);
+}
+
+$colors: ("main", "sub", "point", "deco", "primary", "info", "success", "warning", "danger");
+$sizes: ("xxs", "xs", "sm", "md", "lg", "xl", "xxl");
+
+:root {
+    /* ----------------------------------------------------------------------
+       1. main (Forest Green - 주 색상 / Primary Brand Color)
+       ---------------------------------------------------------------------- */
+    --main: #1f382c;
+    --mainLight: #335947;
+    --mainDark: #14241d;
+    --main1: #eaf1ed;
+    --main2: #d4e3db;
+    --main3: #b0ccbd;
+    --main4: #85af9a;
+    --main5: #5c9177;
+    --main6: #3d735a;
+    --main7: #2d5542;
+    --main8: #1f382c;
+    --main9: #112019;
+    /* ----------------------------------------------------------------------
+       2. sub (Slate Sage)
+       ---------------------------------------------------------------------- */
+    --sub: #5288b7;
+    --subLight: #7da6c9;
+    --subDark: #3c6990;
+    --sub1: #f1f5f9;
+    --sub2: #cbdbe9;
+    --sub3: #a5c1da;
+    --sub4: #7fa7ca;
+    --sub5: #598dba;
+    --sub6: #41729d;
+    --sub7: #315777;
+    --sub8: #223b51;
+    --sub9: #121f2b;
+    /* ----------------------------------------------------------------------
+       3. point (Fresh Lime)
+       ---------------------------------------------------------------------- */
+    --point: #9be82e;
+    --pointLight: #b2f051;
+    --pointDark: #7ec71c;
+    --point1: #f3fde2;
+    --point2: #e3fac0;
+    --point3: #d1f79c;
+    --point4: #bdf274;
+    --point5: #9be82e;
+    --point6: #7ec71c;
+    --point7: #619e12;
+    --point8: #437009;
+    --point9: #254203;
+    /* ----------------------------------------------------------------------
+       4. deco (Muted Teal Slate)
+       ---------------------------------------------------------------------- */
+    --deco: #638791;
+    --decoLight: #85a4ac;
+    --decoDark: #4a656d;
+    --deco1: #f3f6f7;
+    --deco2: #d3dee1;
+    --deco3: #b3c6cb;
+    --deco4: #93aeb6;
+    --deco5: #7496a0;
+    --deco6: #5a7b84;
+    --deco7: #445d64;
+    --deco8: #2f3f44;
+    --deco9: #192224;
+    /* ----------------------------------------------------------------------
+       5. primary (Royal Blue)
+       ---------------------------------------------------------------------- */
+    --primary: #3175da;
+    --primaryLight: #6598e3;
+    --primaryDark: #1f59ae;
+    --primary1: #eef3fc;
+    --primary2: #c0d5f4;
+    --primary3: #93b7ec;
+    --primary4: #6698e3;
+    --primary5: #387adb;
+    --primary6: #2260bc;
+    --primary7: #1a498f;
+    --primary8: #113261;
+    --primary9: #091a34;
+    /* ----------------------------------------------------------------------
+       6. info (Sky Blue)
+       ---------------------------------------------------------------------- */
+    --info: #3a9acc;
+    --infoLight: #6bb3d9;
+    --infoDark: #2977a0;
+    --info1: #eff7fb;
+    --info2: #c4e1f0;
+    --info3: #9acbe5;
+    --info4: #6fb5da;
+    --info5: #459fcf;
+    --info6: #2e83b0;
+    --info7: #236486;
+    --info8: #18445b;
+    --info9: #0d2431;
+    /* ----------------------------------------------------------------------
+       7. success (Emerald Green)
+       ---------------------------------------------------------------------- */
+    --success: #1fa280;
+    --successLight: #29d5a9;
+    --successDark: #156f57;
+    --success1: #eefcf8;
+    --success2: #c1f3e6;
+    --success3: #94ebd4;
+    --success4: #67e2c2;
+    --success5: #3ad9b0;
+    --success6: #24ba93;
+    --success7: #1b8d70;
+    --success8: #12604c;
+    --success9: #0a3329;
+    /* ----------------------------------------------------------------------
+       8. warning (Amber Orange)
+       ---------------------------------------------------------------------- */
+    --warning: #e0b718;
+    --warningLight: #ecca4a;
+    --warningDark: #a98a12;
+    --warning1: #fdfaed;
+    --warning2: #f8ecbc;
+    --warning3: #f3de8c;
+    --warning4: #edd05b;
+    --warning5: #e8c22b;
+    --warning6: #c8a415;
+    --warning7: #987c10;
+    --warning8: #68550b;
+    --warning9: #372d06;
+    /* ----------------------------------------------------------------------
+       9. danger (Coral Red)
+       ---------------------------------------------------------------------- */
+    --danger: #e1553c;
+    --dangerLight: #e98371;
+    --dangerDark: #c2371e;
+    --danger1: #fcf0ed;
+    --danger2: #f5c7bf;
+    --danger3: #ee9f91;
+    --danger4: #e77662;
+    --danger5: #e04e34;
+    --danger6: #c0361e;
+    --danger7: #922916;
+    --danger8: #631c0f;
+    --danger9: #350f08;
+    /* ----------------------------------------------------------------------
+       표면 및 텍스트/경계선 색상 (대시보드 이미지 톤앤매너)
+       ---------------------------------------------------------------------- */
+    --bgColor: white;
+    --bgSub: #eaf1ed;
+    --txColor: #14241d;
+    --txSub: #586e63;
+    --txLight: #8fa59b;
+    --lineColor: #dbe6df;
+    --lineFocusColor: rgba(0, 0, 0, 0.15);
+    --modalBg: rgba(20, 36, 29, 0.5);
+    --silver: #cbd5e1;
+    --shwColor: rgba(20, 36, 29, 0.06);
+    /* Alpha Layers (검은색 반투명 계층 - 그림자 및 음영 효과 전용) */
+    --aLow: rgba(0, 0, 0, 0.04);
+    --aLight: rgba(0, 0, 0, 0.08);
+    --aColor: rgba(0, 0, 0, 0.12);
+    --aDark: rgba(0, 0, 0, 0.2);
+    --aHigh: rgba(0, 0, 0, 0.35);
+    --aDeep: rgba(0, 0, 0, 0.55);
+    /* 크기 및 라운딩 규격 */
+    --fontSize: 16px;
+    --roundSize: 0.6em;
+    --roundBtn: 0.5em;
+    --roundBox: 0.5em;
+    --xxs: 0.7rem;
+    --xs: 0.8rem;
+    --sm: 0.9rem;
+    --md: 1rem;
+    --lg: 1.2rem;
+    --xl: 1.6rem;
+    --xxl: 2.2rem;
+}
+
+/* ==========================================================================
+   다크 테마 오버라이드
+   ========================================================================== */
+[data-theme="dark"] {
+    /* ----------------------------------------------------------------------
+       다크 테마: 라이트 색상값을 기준으로 밝기(L)만 조정 — 색조·채도는 그대로 (같은 색으로 보임)
+       어두운 색은 조금 밝게, 밝은 색은 어둡게 모아 어두운 바탕에서 고르게 보이게 한다.
+       - 아주 어두운 값(L < 0.25, 예: main 기본): L' = 0.16 + L × 0.36 (살짝 올림)
+       - 중간 톤(L 0.25 ~ 0.6, 예: 하단 영역 deco7): L' = 0.25 + (L − 0.25) × 0.55 (낮춤)
+       - 바탕 틴트로 쓰는 아주 밝은 값(L > 0.6): L' = 0.4425 − (L − 0.6) × 0.75 (어두운 틴트로)
+       - 1~9 단계는 다크에서 어두운 톤 → 밝은 톤 (그 색의 기본색 색조, 밝기 15·20·26·33·40·48·56·65·75%) — 1 = 어두운 바탕 틴트, 9 = 밝은 글자용
+       ---------------------------------------------------------------------- */
+    --main: #3e7157;
+    --mainLight: #477b64;
+    --mainDark: #3a6955;
+    --main1: #1e2e26;
+    --main2: #293d33;
+    --main3: #2f5642;
+    --main4: #3c6d54;
+    --main5: #488465;
+    --main6: #579e7a;
+    --main7: #6eaf8e;
+    --main8: #8cc0a5;
+    --main9: #add2bf;
+    --sub: #3c688f;
+    --subLight: #3e6d95;
+    --subDark: #325778;
+    --sub1: #1b2731;
+    --sub2: #243442;
+    --sub3: #27445d;
+    --sub4: #325677;
+    --sub5: #3c6990;
+    --sub6: #487dac;
+    --sub7: #6192bd;
+    --sub8: #81a8ca;
+    --sub9: #a5c1d9;
+    --point: #78bd15;
+    --pointLight: #7fc511;
+    --pointDark: #65a016;
+    --point1: #2a3c11;
+    --point2: #385016;
+    --point3: #4c770d;
+    --point4: #609711;
+    --point5: #75b814;
+    --point6: #8cdc18;
+    --point7: #9fe935;
+    --point8: #b3ed5e;
+    --point9: #c8f28c;
+    --deco: #4f6b73;
+    --decoLight: #678e98;
+    --decoDark: #36494f;
+    --deco1: #161b1d;
+    --deco2: #21292c;
+    --deco3: #2c3b40;
+    --deco4: #3b4e55;
+    --deco5: #49626a;
+    --deco6: #5a7882;
+    --deco7: #6b8f9a;
+    --deco8: #86a4ac;
+    --deco9: #a4bbc1;
+    --primary: #1f58ad;
+    --primaryLight: #205bb1;
+    --primaryDark: #1a4a90;
+    --primary1: #142339;
+    --primary2: #1a2e4c;
+    --primary3: #143970;
+    --primary4: #1a498f;
+    --primary5: #1f58ad;
+    --primary6: #256ad0;
+    --primary7: #417fdd;
+    --primary8: #689ae4;
+    --primary9: #93b6ec;
+    --info: #2977a0;
+    --infoLight: #2b7da9;
+    --infoDark: #226386;
+    --info1: #162b36;
+    --info2: #1e3a48;
+    --info3: #1b4f6a;
+    --info4: #226486;
+    --info5: #2a79a2;
+    --info6: #3291c3;
+    --info7: #4ca3d1;
+    --info8: #71b6db;
+    --info9: #9acbe5;
+    --success: #1a896c;
+    --successLight: #20a583;
+    --successDark: #156d56;
+    --success1: #14382f;
+    --success2: #1b4b3f;
+    --success3: #156f58;
+    --success4: #1b8d70;
+    --success5: #21ab87;
+    --success6: #27cea2;
+    --success7: #42dbb3;
+    --success8: #69e3c3;
+    --success9: #94ebd4;
+    --warning: #af8f13;
+    --warningLight: #caa415;
+    --warningDark: #91760f;
+    --warning1: #3c3311;
+    --warning2: #504416;
+    --warning3: #78620d;
+    --warning4: #987c10;
+    --warning5: #b89614;
+    --warning6: #ddb418;
+    --warning7: #e9c435;
+    --warning8: #eed05e;
+    --warning9: #f3dd8c;
+    --danger: #ba341d;
+    --dangerLight: #a9301a;
+    --dangerDark: #9c2c18;
+    --danger1: #3a1813;
+    --danger2: #4d2119;
+    --danger3: #732012;
+    --danger4: #922917;
+    --danger5: #b0311c;
+    --danger6: #d43b21;
+    --danger7: #e1553d;
+    --danger8: #e77865;
+    --danger9: #ee9e91;
+    /* 표면 및 텍스트/경계선 (무채색 회색 톤, 바탕 #222) */
+    --bgColor: #222222;
+    --bgSub: #2a2a2a;
+    --txColor: #e4e4e4;
+    --txSub: #b0b0b0;
+    --txLight: #828282;
+    --lineColor: #3a3a3a;
+    --lineFocusColor: rgba(255, 255, 255, 0.18);
+    --modalBg: rgba(0, 0, 0, 0.6);
+    --shwColor: rgba(0, 0, 0, 0.5);
+    --silver: #4c4c4c;
+    /* Alpha Layers: 겹침·경계선용(aLow~aColor)은 흰색 반투명, 그림자용(aDark·aHigh)은 검은색, 글자용(aDeep)은 흰색 */
+    --aLow: rgba(255, 255, 255, 0.03);
+    --aLight: rgba(255, 255, 255, 0.06);
+    --aColor: rgba(255, 255, 255, 0.11);
+    --aDark: rgba(0, 0, 0, 0.45);
+    --aHigh: rgba(0, 0, 0, 0.6);
+    --aDeep: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================================================
+   레이아웃별 색상 오버라이드 훅
+   ========================================================================== */
+.pageLayout, [data-layout="page"] {
+    /* 일반 사용자 페이지 전용 테마 변수 오버라이드 가능 */
+}
+
+.adminLayout, [data-layout="admin"] {
+    /* 관리자 페이지 전용 테마 변수 오버라이드 가능 */
+}
+
+.accountLayout, [data-layout="account"] {
+    /* 회원 및 인증 페이지 전용 테마 변수 오버라이드 가능 */
+}
+
+/* ==========================================================================
+   HTML 문서 및 문서 기본 컨트롤 SCSS (BaseUI 표준 연동)
+   ========================================================================== */
+html {
+    font-size: var(--fontSize);
+
+    &,
+    & * {
+        font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+        resize: none;
+
+        &,
+        &:before,
+        &:after {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        /* 범용 얇고 투명한 스크롤바 */
+        scrollbar-width: thin;
+        scrollbar-color: var(--lineColor) transparent;
+
+        &::-webkit-scrollbar {
+            width: 0.28em;
+            height: 0.28em;
+            background-color: transparent;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--lineColor);
+            border-radius: 1em;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: var(--lineFocusColor);
+            }
+        }
+
+        &::-webkit-scrollbar-corner {
+            background-color: transparent;
+        }
+    }
+
+    &,
+    & > body {
+        color: var(--txColor);
+        background-color: var(--bgColor);
+    }
+
+    &,
+    & > body,
+    & > body > div#app,
+    #app {
+        display: block;
+        margin: 0;
+        padding: 0;
+        float: left;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    /* a 태그는 일반 텍스트와 동일한 글자색을 가지며 밑줄 제거 */
+    a {
+        color: var(--txColor);
+        text-decoration: none;
+    }
+}
+
+/* ==========================================================================
+   제목 및 본문 타이포그래피 (h1 ~ h6, p)
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 0.4em 0;
+    color: var(--txColor);
+    letter-spacing: -0.015em;
+    font-weight: 700;
+}
+
+h1 { font-size: var(--xxl); line-height: 1.2; }
+h2 { font-size: var(--xl);  line-height: 1.25; }
+h3 { font-size: var(--lg);  line-height: 1.3; }
+h4 { font-size: var(--md);  line-height: 1.35; font-weight: 600; }
+h5 { font-size: var(--sm);  line-height: 1.4;  font-weight: 600; }
+h6 { font-size: var(--xs);  line-height: 1.4;  font-weight: 600; color: var(--txSub); text-transform: uppercase; letter-spacing: 0.05em; }
+
+p {
+    margin: 0 0 0.8em 0;
+    line-height: 1.6;
+    color: var(--txColor);
+}
+
+b, strong {
+    font-weight: 700;
+}
+
+small {
+    font-weight: normal;
+    font-size: var(--xs);
+    color: var(--txSub);
+}
+
+hr {
+    margin: 1.5em 0;
+    border: 0;
+    border-top: 1px solid var(--lineColor);
+}
+
+/* 외부 위젯(에디터 .sun-editor/.jodit-container 와 Jodit 팝업·대화상자 안쪽)에는 아래 태그 기본 스타일을 적용하지 않음 — :where() 라 선택자 우선순위는 그대로 */
+$notEditor: ":where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *))";
+
+/* ==========================================================================
+   인터랙션 컨트롤 공통 기본 스타일 (button, .btn, input, select)
+   - 버튼과 폼 입력항이 나란히 배치될 때 100% 동일한 높이(2.6em), 라운딩, 패딩, 폰트사이즈 일치 보장
+   - 공통 disabled 상태 및 em 기반 사이즈 스케일링 일원화 (DRY 원칙)
+   ========================================================================== */
+button#{$notEditor},
+.btn,
+input#{$notEditor},
+select#{$notEditor} {
+    box-sizing: border-box;
+    vertical-align: middle;
+    height: 2.6em;
+    padding: 0.5em 0.8em;
+    font-size: 1em;
+    border-radius: var(--roundBtn);
+    border: 1px solid var(--lineColor);
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+    /* 비활성화 공통 상태 (disabled) */
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+        background-color: var(--bgSub);
+        border-color: var(--lineColor);
+        color: var(--txLight);
+        box-shadow: none;
+    }
+
+    /* 공통 사이즈 스케일링 (em 기반 비례 변동) */
+    @each $size in $sizes {
+        &.#{$size} { font-size: var(--#{$size}); }
+    }
+}
+
+/* ==========================================================================
+   버튼 컴포넌트 고유 스타일 (button, .btn)
+   - 클래스 없이 기본 태그만으로도 완성도 높은 디자인 적용
+   - 외곽선: aColor(블랙 반투명)로 기본 경계 구분 및 테마색 주입 시 자동 짙은 음영 테두리 형성
+   - 이동(translate) 없이 스케일(0.98)과 안쪽 그림자(inset)로 단정한 클릭 피드백
+   - 9대 테마 색상키 지원
+   ========================================================================== */
+button#{$notEditor},
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45em;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    cursor: pointer;
+    border-color: var(--aLight);
+    box-shadow: none;
+    transition: all .2s;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+    position: relative;
+    overflow: hidden;
+    outline: none;
+
+    & > svg,
+    & > i {
+        display: inline-block;
+        width: 1.15em;
+        height: 1.15em;
+        font-size: 1.15em;
+        flex-shrink: 0;
+    }
+    /* 평시 호버 효과 - 이동(translate) 없이 aColor 경계선 강화 및 반투명 그림자 */
+    &:hover {
+        box-shadow: 0.1em 0.1em 0.5em 0.1em var(--aDark);
+        transform: scale(1.01);
+    }
+    /* 액티브(눌림) 효과 - 이동(translate) 없이 스케일 및 안쪽 그림자로 눌림 피드백 */
+    &:active {
+        border-color: var(--aColor);
+        box-shadow: inset 0.1em 0.1em 0.5em 0.1em var(--aDark);
+        transform: scale(0.98);
+    }
+    /* 비활성화 버튼 고유 보정 */
+    &:disabled,
+    &.disabled {
+        border-color: var(--aLight);
+        transform: none;
+    }
+    /* 파일 업로드 버튼: 투명화된 input[type="file"]을 버튼 전체에 오버레이 */
+    & > input[type="file"] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0 !important;
+        cursor: pointer;
+        z-index: 1;
+        display: block;
+        margin: 0;
+        padding: 0;
+        border: none;
+
+        &:disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    }
+
+    &:has(> input[type="file"]:disabled) {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+        background-color: var(--bgSub);
+        border-color: var(--aLight);
+        color: var(--txLight);
+        box-shadow: none;
+        transform: none;
+    }
+    /* 9대 테마 색상키 지원 */
+    @each $color in $colors {
+        &.#{$color} {
+            background-color: var(--#{$color});
+            color: white;
+
+            &:hover {
+                background-color: var(--#{$color}Light);
+            }
+
+            &:active {
+                background-color: var(--#{$color}Dark);
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   파일 업로드 전용 래퍼 (.fileBtn)
+   - 일반 버튼을 감싸거나 단독 버튼 형태로 투명 input[type="file"] 오버레이 지원
+   ========================================================================== */
+.fileBtn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    overflow: hidden;
+    border-radius: var(--roundBtn);
+
+    & > input[type="file"] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+        display: block;
+        margin: 0;
+        padding: 0;
+        border: none;
+
+        &:disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    }
+
+    &:hover > button,
+    &:hover > .btn {
+        background-color: var(--bgSub);
+        box-shadow: 0.1em 0.1em 0.5em 0.1em var(--aDark);
+        transform: scale(1.01);
+    }
+
+    &:active > button,
+    &:active > .btn {
+        border-color: var(--aColor);
+        background-color: var(--lineColor);
+        box-shadow: inset 0.1em 0.1em 0.5em 0.1em var(--aDark);
+        transform: scale(0.98);
+    }
+}
+
+/* ==========================================================================
+   폼 입력 필드 공통 (input, select, textarea)
+   - 텍스트 입력 계열 공통 안쪽 음영, 플레이스홀더, 포커스 및 readonly 상태
+   ========================================================================== */
+input#{$notEditor},
+select#{$notEditor},
+textarea#{$notEditor} {
+    box-shadow: inset 0 1px 2px var(--aLow);
+
+    &::placeholder {
+        color: var(--txLight);
+        font-weight: 400;
+    }
+    /* 호버 상태 */
+    &:hover {
+        border-color: var(--lineFocusColor);
+    }
+    /* 포커스 상태 */
+    &:focus {
+        outline: none;
+        border-color: var(--lineFocusColor);
+        box-shadow: inset 0 0 0.3em 0.1em var(--aColor);
+        background-color: var(--bgColor);
+    }
+    /* 유효성 오류 상태 (ValidResult.markErrors 가 부여, 다시 입력하면 해제) */
+    &.error,
+    &.error:hover,
+    &.error:focus {
+        border-color: var(--danger);
+        background-color: var(--danger1);
+    }
+    /* 읽기 전용 상태 (readonly) */
+    &:read-only {
+        background-color: var(--bgSub);
+        border-color: var(--lineColor);
+        color: var(--txSub);
+        cursor: default;
+        box-shadow: none;
+        user-select: text;
+
+        &:focus {
+            border-color: var(--lineColor);
+            box-shadow: none;
+        }
+    }
+}
+
+/* 한 줄 텍스트 입력항 (input, select) */
+input#{$notEditor},
+select#{$notEditor} {
+    display: inline-block;
+    width: 100%;
+    line-height: normal;
+}
+
+select#{$notEditor} {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23586e63' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.1em center;
+    background-size: 0.85em;
+}
+
+/* 체크박스, 라디오, 레인지, 파일 등 비텍스트 입력항 스타일 무력화(리셋) */
+input[type="checkbox"]#{$notEditor},
+input[type="radio"]#{$notEditor},
+input[type="range"]#{$notEditor},
+input[type="file"]#{$notEditor},
+input[type="color"]#{$notEditor} {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    padding: initial;
+    background-color: transparent;
+    border: initial;
+    border-radius: initial;
+    box-shadow: none;
+    line-height: initial;
+    vertical-align: middle;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+        border-color: initial;
+        box-shadow: none;
+        background-color: transparent;
+        outline: revert;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        pointer-events: none;
+    }
+}
+
+/* ==========================================================================
+   여러 줄 텍스트 영역 (textarea)
+   ========================================================================== */
+textarea#{$notEditor} {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 5.5em;
+    padding: 0.8em 1.1em;
+    font-size: 1em;
+    line-height: 1.5;
+    color: var(--txColor);
+    background-color: var(--bgColor);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBox);
+    resize: vertical;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+        background-color: var(--bgSub);
+        border-color: var(--lineColor);
+        color: var(--txLight);
+        box-shadow: none;
+    }
+
+    @each $size in $sizes {
+        &.#{$size} { font-size: var(--#{$size}); }
+    }
+}
+/* ==========================================================================
+   전역 사이즈 유틸리티 (단독 클래스로도 적용 가능)
+   ========================================================================== */
+@each $size in $sizes {
+    .#{$size} { font-size: var(--#{$size}); }
+}
+
+
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+    html {
+        font-size: 15px;
+    }
+}
+
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+    html {
+        font-size: 14px;
+
+        & ul.form {
+            & li { 
+                &.col2,
+                &.col3, 
+                &.col4 {
+                    display: flex !important;
+                    flex-direction: column;
+                    gap: 1em;
+                }
+            }
+        }
+    }
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+    html {
+        font-size: 13px;
+    }
+}

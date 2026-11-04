@@ -1,0 +1,843 @@
+/* ==========================================================================
+   Controls: 개별 인터랙션 및 입력 컨트롤
+   - 드롭다운 트리거 컨트롤 (.dropDown)
+   - 플로팅 드롭박스 레이어 (.dropBox)
+   - 체크박스 (label.check, .check)
+   - 라디오 (label.radio, .radio)
+   - 토글 / 스위치 (label.toggle, label.switch)
+   - 테이블 체커 (.checker)
+   - 범용 툴바 및 액션바 (.toolBar, .toolbar) -> _ToolBar.scss
+   - 윈도우 탐색기 폴더 트리 (.treeView, .treeBox) -> _Tree.scss
+   - 페이지 이동 (ul.pager)
+   - 태그 목록 (ul.tags)
+   ========================================================================== */
+@use "Document" as *;
+@forward "ToolBar";
+@forward "Tree";
+
+/* 1. 드롭다운 트리거 래퍼 (.dropDown) */
+.dropDown {
+    position: relative;
+    display: inline-block;
+    font-size: 1rem;
+
+    & > header {
+        cursor: pointer;
+        width: 100%;
+        min-height: 2.6em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5em;
+        padding: 0.5em 0.8em;
+        border: 1px solid var(--aColor);
+        border-radius: var(--roundBtn);
+        background-color: var(--bgColor);
+        color: var(--txColor);
+        user-select: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+
+        &:after {
+            content: "";
+            display: inline-block;
+            width: 0.4em;
+            height: 0.4em;
+            border-right: 0.12em solid currentColor;
+            border-bottom: 0.12em solid currentColor;
+            transform: rotate(45deg);
+            margin-left: 0.3em;
+            margin-bottom: 0.15em;
+            transition: transform 0.15s;
+        }
+
+        &:hover {
+            border-color: var(--aDark);
+            box-shadow: 0 4px 12px var(--aDark);
+        }
+    }
+
+    &.open > header:after {
+        transform: rotate(225deg);
+        margin-bottom: -0.1em;
+    }
+}
+
+/* 2. 플로팅 드롭박스 팝업 (.dropBox 및 .dropDown 하위 ul / section) */
+.dropBox,
+.dropDown > ul,
+.dropDown > section,
+.dropDown > .dropBox {
+    font-size: 1rem;
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.1em);
+    bottom: auto;
+    left: 0;
+    right: auto;
+    min-width: 100%;
+    width: max-content;
+    background-color: var(--bgColor);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBox);
+    box-shadow: 0 0.5em 1.5em var(--aDark);
+    padding: 0.4em;
+    margin: 0;
+    z-index: 100;
+    overflow-y: auto;
+
+    /* 위치 방향 변형 */
+    &.up {
+        top: auto;
+        bottom: calc(100% + 0.3em);
+    }
+
+    &.right {
+        left: auto;
+        right: 0;
+    }
+
+    /* 활성화 상태 (자체 .opened 또는 부모 .open) */
+    &.opened {
+        display: block;
+        animation: dropBoxFly 0.15s ease-out forwards;
+    }
+}
+
+/* 부모 컨테이너 (.open)와 연동 */
+.open,
+.dropDown.open {
+    position: relative;
+
+    & > .dropBox,
+    & > ul,
+    & > section {
+        display: block;
+        animation: dropBoxFly 0.15s ease-out forwards;
+    }
+}
+
+/* 3. 메뉴 목록형 (ul.dropBox 및 .dropBox 내부 ul, .dropDown 내부 ul) */
+ul.dropBox,
+.dropBox > ul,
+.dropDown > ul {
+    list-style: none;
+    max-height: 20em;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.3em;
+
+    & > li {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        width: 100%;
+        padding: 0.5em 0.8em;
+        border-radius: var(--roundBtn);
+        cursor: pointer;
+        white-space: nowrap;
+        color: var(--txColor);
+        font-size: 0.95em;
+        user-select: none;
+        transition: background-color 0.12s, color 0.12s;
+        margin-top: 0.2em;
+
+        &:first-child {
+            margin: 0;
+        }
+
+        &:hover {
+            background-color: var(--aLight);
+        }
+
+        &.active {
+            background-color: var(--main);
+            color: white;
+            font-weight: 600;
+        }
+
+        &.disabled {
+            opacity: 0.45;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        &.divider {
+            display: block;
+            height: 1px;
+            padding: 0;
+            margin: 0.3em 0;
+            background-color: var(--aLight);
+            pointer-events: none;
+        }
+    }
+}
+
+@keyframes dropBoxFly {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   4. 체크 상자 (label.check, .check) 및 라디오 상자 (label.radio, .radio)
+   - BaseUI 호환: input 은 숨김 처리 후 span:before 또는 i.fi 마스크 아이콘으로 커스텀 렌더링
+   - 9대 테마 색상 및 크기 비례 스케일링 지원
+   ========================================================================== */
+
+label.check,
+label.radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    cursor: pointer;
+    user-select: none;
+    font-size: 1rem;
+    line-height: 1.4;
+    width: auto !important;
+
+    /* 크기 스케일링 */
+    &.sm { font-size: var(--sm); }
+    &.lg { font-size: var(--lg); }
+
+    & > input {
+        display: none;
+
+        /* 기본 마스크 아이콘 (span:before) */
+        & ~ span:before {
+            content: "";
+            font-size: 1.25em;
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.15em;
+            background-color: currentColor;
+            -webkit-mask: var(--i) no-repeat 50% 50% / 100% 100%;
+            mask: var(--i) no-repeat 50% 50% / 100% 100%;
+            flex-shrink: 0;
+            margin-right: 0.25em;
+            transition: color 0.15s;
+        }
+
+        /* i.fi 명시 시 i.fi 에 스타일 적용 및 span:before 중복 억제 */
+        & ~ i.fi {
+            font-size: 1.25em;
+            margin-right: 0.25em;
+            transition: color 0.15s;
+
+            & ~ span:before {
+                content: none;
+                display: none;
+            }
+        }
+    }
+
+    & > span {
+        font-size: 0.95em;
+        color: var(--txColor);
+    }
+
+    &[readonly],
+    &:has(> input[readonly]) {
+        pointer-events: none;
+    }
+
+    &[disabled],
+    &:has(> input:disabled) {
+        opacity: 0.45;
+        pointer-events: none;
+    }
+}
+
+/* 체크박스 아이콘 상태 매핑 */
+label.check > input {
+    & ~ span:before,
+    & ~ i.fi {
+        --i: url(/lib/fluenticons/i/633.svg);
+        color: var(--txLight);
+    }
+
+    &:checked ~ span:before,
+    &:checked ~ i.fi {
+        --i: url(/lib/fluenticons/i/628.svg);
+        color: var(--main);
+    }
+
+    &:indeterminate ~ span:before,
+    &:indeterminate ~ i.fi {
+        --i: url(/lib/fluenticons/i/630.svg);
+        color: var(--main);
+    }
+}
+
+/* 라디오 아이콘 상태 매핑 */
+label.radio > input {
+    & ~ span:before,
+    & ~ i.fi {
+        --i: url(/lib/fluenticons/i/659.svg);
+        color: var(--txLight);
+    }
+
+    &:checked ~ span:before,
+    &:checked ~ i.fi {
+        --i: url(/lib/fluenticons/i/640.svg);
+        color: var(--main);
+    }
+}
+
+/* 체크박스 & 라디오 9대 테마 색상 지원 */
+@each $color in $colors {
+    label.check.#{$color} > input:checked ~ span:before,
+    label.check.#{$color} > input:checked ~ i.fi,
+    label.radio.#{$color} > input:checked ~ span:before,
+    label.radio.#{$color} > input:checked ~ i.fi {
+        color: var(--#{$color});
+    }
+}
+
+/* ==========================================================================
+   5. 토글 / 스위치 컨트롤 (label.toggle)
+   - Pill 배경과 원형 노브(i) 슬라이딩 인터랙션
+   - 9대 테마 색상 및 크기 스케일링 (.sm, .lg)
+   ========================================================================== */
+
+label.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    cursor: pointer;
+    user-select: none;
+    font-size: 1rem;
+
+    & > input {
+        display: none;
+
+        &:checked ~ span:first-of-type {
+            background-color: var(--main);
+
+            & > i {
+                margin-left: 1.2em;
+            }
+        }
+    }
+    /* 슬라이더 트랙 */
+    & > span:first-of-type {
+        display: inline-block;
+        width: 2.8em;
+        height: 1.55em;
+        padding: 0.15em;
+        background-color: var(--aLow);
+        border: 1px solid var(--aLight);
+        border-radius: 1em;
+        transition: background-color 0.15s, border-color 0.15s;
+        cursor: pointer;
+        flex-shrink: 0;
+        /* 원형 노브 */
+        & > i {
+            display: block;
+            width: 1.15em;
+            height: 1.15em;
+            background-color: var(--bgColor);
+            border: 1px solid var(--aColor);
+            border-radius: 1em;
+            box-shadow: 0 1px 3px var(--aDark);
+            transition: margin-left 0.15s;
+        }
+    }
+    /* 라벨 텍스트 */
+    & > span:last-of-type:not(:first-of-type) {
+        font-size: 0.95em;
+        color: var(--txColor);
+    }
+
+    &[readonly],
+    &:has(> input[readonly]) {
+        pointer-events: none;
+    }
+
+    &[disabled],
+    &:has(> input:disabled) {
+        opacity: 0.45;
+        pointer-events: none;
+    }
+
+    @each $size in $sizes {
+        &.#{$size} {
+            font-size: calc(var(--#{$size}) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+        }
+    }
+    /* 토글 / 스위치 9대 테마 색상 지원 */
+    @each $color in $colors {
+        &.#{$color} > input:checked ~ span:first-of-type {
+            background-color: var(--#{$color});
+        }
+    }
+}
+
+
+/* ==========================================================================
+   6. 테이블 / 목록용 단독 체커 (.checker)
+   ========================================================================== */
+.checker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    opacity: 1;
+
+    & > i.fi {
+        font-size: 1.15rem;
+        cursor: pointer;
+        --i: url(/lib/fluenticons/i/633.svg);
+
+        &.checked {
+            --i: url(/lib/fluenticons/i/628.svg);
+            color: var(--main);
+        }
+    }
+}
+
+/* 페이지 이동 (ul.pager): li[data-page] 클릭 시 ul 에 "page" 이벤트(detail: 페이지 번호) 발생 — common.makePager 로 생성 */
+ul.pager {
+    display: flex;
+    gap: 0.3em;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    /* hidden 속성으로 감출 수 있게 (display: flex 가 기본 숨김을 덮음) */
+    &[hidden] {
+        display: none;
+    }
+
+    & > li {
+        min-width: 2em;
+        height: 2em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--lineColor);
+        border-radius: var(--roundSize);
+        font-size: 0.85em;
+        cursor: pointer;
+
+        &.disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        &.active {
+            background-color: var(--main);
+            border-color: var(--main);
+            color: white;
+            font-weight: 700;
+        }
+    }
+}
+
+/* 태그 목록 (ul.tags): li 태그 목록, 자식 li 에 입력항을 두면 쓰기 모드(테두리 상자 + 태그 삭제 버튼)
+   - 입력 후 엔터/change 시 입력항 li 앞에 태그 추가 후 입력 비움 (site.ts body 위임), ul 에 "tag" 이벤트(detail: { text, add }) 발생 */
+ul.tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3em;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    & > li {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2em;
+        height: 1.9em;
+        line-height: 1em;
+        padding: 0.2em 0.5em;
+        border: 1px solid var(--aColor);
+        border-radius: var(--roundBtn);
+        background-color: var(--main0);
+        font-size: 0.9em;
+        white-space: nowrap;
+
+        & > button {
+            width: 1.4em;
+            height: 1.4em;
+            margin-right: -0.4em;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            box-shadow: none;
+            color: var(--txSub);
+
+            &:hover {
+                color: var(--danger);
+            }
+        }
+
+        // 쓰기 입력항: 남은 폭을 채우는 테두리 없는 입력
+        &:has(> input) {
+            flex: 1 1 6em;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+
+            & > input {
+                height: 100%;
+                padding: 0 0.3em;
+                border: none;
+                background-color: transparent;
+                box-shadow: none;
+            }
+        }
+    }
+
+    // 쓰기 모드: 입력항과 같은 테두리 상자, 포커스 시 입력항 포커스와 같은 강조
+    &:has(> li > input) {
+        box-sizing: border-box;
+        min-height: 2.6em;
+        padding: 0.3em;
+        border: 1px solid var(--lineColor);
+        border-radius: var(--roundBtn);
+        background-color: var(--bgColor);
+        box-shadow: inset 0 1px 2px var(--aLow);
+        cursor: text;
+
+        &:focus-within {
+            border-color: var(--lineFocusColor);
+            box-shadow: inset 0 0 0.3em 0.1em var(--aColor);
+        }
+    }
+}
+
+/* ==========================================================================
+   에디터 높이 채우기 (common.makeEditor height "100%")
+   - 기본 높이. 세로 flex 부모 안에서 남는 높이를 차지하고(최소 200px), 에디터 편집 영역이 그 높이를 채운다 (내용이 넘치면 편집 영역 안에서 스크롤)
+   ========================================================================== */
+.editorFill {
+    flex: 1 1 auto;
+    min-height: 200px; /* 요청 사양: 에디터 최소 높이 200px */
+    display: flex;
+    flex-direction: column;
+
+    & > .sun-editor {
+        flex: 1 1 auto;
+        min-height: 0;
+        flex-direction: column;
+
+        & > .se-container {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+
+            & > .se-wrapper {
+                flex: 1 1 auto;
+                min-height: 0;
+            }
+        }
+    }
+}
+
+
+/* ==========================================================================
+   날짜·시간 입력 컨트롤 (.datePick, .timePick, .dateTimePick — 태그 선언만으로 사용, DateTimePick.ts)
+   - 트리거: 아이콘 + 선택한 값(없으면 안내 글자) + 화살표, 클릭하면 팝업(.pickPopup: 달력 / 시·분 스피너)
+   - dateTimePick 은 날짜와 시간을 나란히 둔 한 쌍
+   ========================================================================== */
+.datePick,
+.timePick {
+    position: relative;
+    display: inline-block;
+    font-size: 1rem;
+    min-width: 0;
+
+    & > .pickTrigger {
+        width: 100%;
+        justify-content: flex-start;
+        font-weight: normal;
+        color: var(--txColor);
+        background-color: var(--bgColor);
+        border-color: var(--lineColor);
+        box-shadow: none;
+        transform: none;
+
+        & > .pickText {
+            flex: 1 1 auto;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &.placeholder {
+                color: var(--txLight);
+            }
+        }
+
+        & > .pickArrow {
+            font-size: 0.8em;
+            color: var(--txLight);
+        }
+
+        & > i.fi:first-child {
+            color: var(--txLight);
+        }
+    }
+}
+
+.dateTimePick {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5em;
+    width: 100%;
+
+    & > .datePick {
+        flex: 1 1 auto;
+        min-width: 11em; /* 날짜 글자가 잘리지 않도록 */
+    }
+
+    & > .timePick {
+        flex: 0 0 auto;
+    }
+}
+
+/* 팝업: 최상위 레이어(popover)로 떠서 모달 안에서도 가려지지 않는다 */
+.pickPopup {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    z-index: 3000;
+    font-size: 0.9rem;
+    color: var(--txColor);
+    background-color: var(--bgColor);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBox);
+    box-shadow: 0 0.4em 1.2em var(--aDark);
+    padding: 0.8em;
+
+    & button {
+        height: auto;
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        color: inherit;
+        box-shadow: none;
+        transform: none;
+        font-weight: normal;
+    }
+
+    & footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.3em;
+        margin-top: 0.4em;
+
+        & > button {
+            width: 2em;
+            height: 2em;
+            border-radius: 50%;
+            color: var(--txLight);
+
+            &:hover {
+                background-color: var(--aLow);
+                color: var(--txColor);
+            }
+
+            &[data-apply] {
+                color: var(--main);
+            }
+        }
+    }
+}
+
+/* 달력 */
+.pickCalendar {
+    display: flex;
+    flex-direction: column;
+
+    & > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0 0.4em 0;
+
+        /* 년도·월(4자리 년 - 2자리 월)은 눌러서 년도/월 선택 화면으로 간다 */
+        & > strong {
+            display: flex;
+            align-items: center;
+            gap: 0.2em;
+            font-weight: 600;
+
+            & > button {
+                padding: 0.2em 0.45em;
+                border-radius: 0.5em;
+                font-weight: inherit;
+
+                &:hover {
+                    background-color: var(--aLow);
+                }
+            }
+        }
+
+        & > button {
+            width: 2em;
+            height: 2em;
+            border-radius: 50%;
+
+            &:hover {
+                background-color: var(--aLow);
+            }
+        }
+    }
+
+    /* 년도(10년 단위)·월 선택 화면: 12칸 */
+    & > .pickGrid {
+        flex: 1 1 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 1fr;
+        gap: 0.4em;
+        padding: 0.4em 0;
+
+        & > button {
+            border-radius: 0.7em;
+
+            &:hover:not(:disabled):not(.selected) {
+                background-color: var(--aLow);
+            }
+
+            &.other {
+                color: var(--txLight);
+                opacity: 0.6;
+            }
+
+            &.today {
+                background-color: color-mix(in srgb, var(--main) 14%, transparent);
+                color: var(--main);
+                font-weight: 600;
+            }
+
+            &.selected {
+                background-color: var(--main);
+                color: white;
+                opacity: 1;
+            }
+
+            &:disabled {
+                opacity: 0.25;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    & > .pickDays {
+        display: grid;
+        grid-template-columns: repeat(7, 2.4em);
+        gap: 0.1em;
+        justify-items: center;
+
+        & > span {
+            padding: 0.4em 0;
+            font-size: 0.85em;
+            color: var(--txLight);
+        }
+
+        & > button {
+            width: 2.4em;
+            height: 2.4em;
+            border-radius: 0.7em;
+
+            /* 선택된 날짜는 마우스를 올려도 색이 바뀌지 않는다 */
+            &:hover:not(:disabled):not(.selected) {
+                background-color: var(--aLow);
+            }
+
+            &.other {
+                color: var(--txLight);
+                opacity: 0.6;
+            }
+
+            /* 오늘: 선택 색보다 옅은 배경 */
+            &.today {
+                background-color: color-mix(in srgb, var(--main) 14%, transparent);
+                color: var(--main);
+                font-weight: 600;
+
+                /* 오늘에 마우스를 올리면 배경이 더 옅어지지 않고 한 단계 진해진다 */
+                &:hover:not(:disabled):not(.selected) {
+                    background-color: color-mix(in srgb, var(--main) 26%, transparent);
+                }
+            }
+
+            &.selected {
+                background-color: var(--main);
+                color: white;
+                opacity: 1;
+            }
+
+            &:disabled {
+                opacity: 0.25;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+/* 시간 스피너: 시 · 분 */
+.pickTime {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    column-gap: 1em;
+    padding: 0.6em 1.2em 0.4em;
+
+    & > b {
+        font-size: 1.6em;
+        padding-top: 1.4em;
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3em;
+
+        & > small {
+            color: var(--txLight);
+        }
+
+        & > button {
+            width: 2.4em;
+            height: 1.8em;
+            border-radius: 0.5em;
+            color: var(--txLight);
+
+            &:hover {
+                background-color: var(--aLow);
+                color: var(--txColor);
+            }
+        }
+
+        & > input {
+            width: 2.6em;
+            height: 2.2em;
+            padding: 0;
+            text-align: center;
+            font-size: 1.5em;
+        }
+    }
+
+    & > footer {
+        grid-column: 1 / -1;
+    }
+}
+
+/* 회사 로고 아이콘 (공유 메뉴 등): 글꼴 아이콘이 없는 X(트위터)·페이스북 로고를 다른 .fi 아이콘처럼 마스크로 그림 (색은 글자색, 필요하면 iconColor 로) */
+.fi.fiBrandX {
+    --f: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z'/%3E%3C/svg%3E");
+}
+
+.fi.fiBrandFacebook {
+    --f: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E");
+}

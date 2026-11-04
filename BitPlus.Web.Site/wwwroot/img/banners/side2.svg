@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" class="bannerContents">
+  <!-- 사이드 패널 세로형 배너 2: 컨텐츠 포탈 안내 — 색은 레이아웃 CSS 변수(main·deco·바탕·글자, 다크 테마는 변수 값이 바뀜), img 로 열면 괄호 안 기본색 (SlotView.ThemeSvg) -->
+  <style>
+    .bannerContents { --bannerBg1: var(--main1, #eaf1ed); --bannerBg2: var(--deco2, #cfe0e4); --bannerDeco: var(--deco, #638791); --bannerAccent: var(--main5, #5c9177); --bannerSurface: var(--bgColor, #ffffff); --bannerText: var(--txColor, #1f382c); --bannerSub: var(--txSub, #3e5c64); }
+    [data-theme="dark"] .bannerContents { --bannerDeco: var(--deco7); }
+  </style>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" style="stop-color: var(--bannerBg1)"/>
+      <stop offset="1" style="stop-color: var(--bannerBg2)"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <circle cx="560" cy="760" r="260" style="fill: var(--bannerDeco)" opacity="0.25"/>
+  <circle cx="40" cy="60" r="150" style="fill: var(--bannerSurface)" opacity="0.6"/>
+  <g transform="translate(330 470)" fill="none" style="stroke: var(--bannerDeco)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="0" y="0" width="200" height="150" rx="18" style="fill: var(--bannerSurface)"/>
+    <path d="M30 45h140M30 80h100M30 115h120"/>
+    <path d="M70 -40l40 40 40-40" style="stroke: var(--bannerAccent)"/>
+  </g>
+  <g font-family="'Noto Sans KR','Malgun Gothic',sans-serif" style="fill: var(--bannerText)">
+    <text x="60" y="150" font-size="30" font-weight="700" style="fill: var(--bannerDeco)" letter-spacing="4">CONTENTS</text>
+    <text x="60" y="250" font-size="62" font-weight="800">매일 새로운</text>
+    <text x="60" y="330" font-size="62" font-weight="800">이야기</text>
+    <text x="60" y="410" font-size="28" style="fill: var(--bannerSub)">게시판·갤러리·자료실의</text>
+    <text x="60" y="452" font-size="28" style="fill: var(--bannerSub)">새 글을 한곳에서.</text>
+  </g>
+  <rect x="60" y="680" width="230" height="72" rx="36" style="fill: var(--bannerDeco)"/>
+  <text x="175" y="727" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="28" font-weight="700" fill="#ffffff" text-anchor="middle">둘러보기 →</text>
+</svg>

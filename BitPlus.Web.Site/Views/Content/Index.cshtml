@@ -1,0 +1,24 @@
+@model ContentPageModel
+@{
+    this.SetTitle(Model.Title);
+    this.SetPageKey("Content");
+}
+@* 파샬뷰 위/아래에 게시판 설정에서 입력한 상단/하단 영역 HTML 을 그대로 출력한다 (저장할 때 서버가 정제함).
+   사이드 패널은 게시판 설정의 사이드 구성대로: 감춤이면 그리지 않고, 우측이면 본문 오른쪽(sideRight: 가로 순서만 뒤집음) *@
+<div class="@(Model.SideRight ? "pageWrap sideRight" : "pageWrap")">
+    @if (!Model.SideHidden)
+    {
+        <partial name="~/Views/Content/SidePanel.cshtml" view-data='new ViewDataDictionary(ViewData) { { "TreeColor", "deco" }, { "SideMenuKey", Model.SideMenuKey }, { "ContentArea", true } }' /> @* 컨텐츠 공통 사이드 패널(위젯: 컨텐츠맵 또는 연결 메뉴의 하위 메뉴 트리 …), 컨텐츠 페이지 영역 *@
+    }
+    <div>
+        @if (!string.IsNullOrEmpty(Model.TopHtml))
+        {
+            <header>@Html.Raw(Model.TopHtml)</header>
+        }
+        <partial name="@Model.ViewPath" model="Model" />
+        @if (!string.IsNullOrEmpty(Model.BottomHtml))
+        {
+            <footer>@Html.Raw(Model.BottomHtml)</footer>
+        }
+    </div>
+</div>

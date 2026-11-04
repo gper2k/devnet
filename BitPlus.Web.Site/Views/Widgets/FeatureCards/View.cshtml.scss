@@ -1,0 +1,140 @@
+@use "../Design" as design;
+
+/* 강점 카드 위젯 — 가운데 머리말·제목(붓 밑줄)·설명, 카드 격자(--cols, 780 미만 2열, 520 미만 1열). 카드 = 기운 아이콘 상자·큰 번호, 올리면 main 배경 */
+div.widgetCards {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8em;
+    padding: 2em 0.5em;
+    text-align: center;
+
+    & > em {
+        @include design.label;
+    }
+
+    & > h2 {
+        margin: 0;
+        font-size: 2em;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        text-align: center;
+        color: var(--txColor);
+        @include design.underline(var(--point5));
+    }
+
+    & > p {
+        margin: 0;
+        max-width: 40em;
+        color: var(--txLight);
+        line-height: 1.7;
+        white-space: pre-line;
+    }
+
+    & > ul {
+        list-style: none;
+        margin: 1.2em 0 0;
+        padding: 0;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+        gap: 1em;
+        counter-reset: card;
+
+        @media (max-width: 779.98px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (max-width: 519.98px) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        & > li {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.6em;
+            padding: 1.5em 1.3em 1.4em;
+            border: 1px solid var(--lineColor);
+            border-radius: var(--roundBox);
+            background-color: var(--bgColor);
+            text-align: left;
+            overflow: hidden;
+            counter-increment: card;
+            transition: background-color 0.25s, border-color 0.25s, transform 0.25s;
+
+            /* 큰 번호 (01, 02 …) */
+            &::after {
+                content: counter(card, decimal-leading-zero);
+                position: absolute;
+                top: 0.2em;
+                right: 0.4em;
+                font-size: 2.6em;
+                font-weight: 800;
+                line-height: 1;
+                color: var(--main1);
+                transition: color 0.25s;
+            }
+
+            /* 아이콘: 살짝 기운 둥근 네모 */
+            & > span {
+                position: relative;
+                z-index: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 3em;
+                height: 3em;
+                border-radius: 0.9em;
+                background-color: var(--point2);
+                transform: rotate(-6deg);
+                transition: background-color 0.25s, transform 0.25s;
+
+                & > i {
+                    color: var(--main);
+                    font-size: 1.45em;
+                }
+            }
+
+            & > strong {
+                position: relative;
+                margin-top: 0.3em;
+                font-size: 1.08em;
+                color: var(--txColor);
+            }
+
+            & > p {
+                position: relative;
+                margin: 0;
+                font-size: 0.88em;
+                color: var(--txLight);
+                line-height: 1.6;
+            }
+
+            &:hover {
+                transform: translateY(-0.25em);
+                background-color: var(--main);
+                border-color: var(--main);
+
+                &::after {
+                    color: var(--main7);
+                }
+
+                & > span {
+                    background-color: var(--point4);
+                    transform: rotate(0);
+                }
+
+                & > strong {
+                    color: white;
+                }
+
+                & > p {
+                    color: var(--main3);
+                }
+            }
+        }
+    }
+}

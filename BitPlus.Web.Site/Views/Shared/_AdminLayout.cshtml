@@ -1,0 +1,259 @@
+﻿@inherits BitPlus.Web.HTTP.View.LayoutBase<dynamic>
+@using BitPlus.Web.Data
+@using Microsoft.EntityFrameworkCore
+@{
+    Layout = "_Layout";
+    ViewData["UserTheme"] = true; // 회원 환경설정의 테마(Theme 쿠키)를 관리자 레이아웃에도 적용 (_Layout)
+    ViewData["NoAnalytics"] = true; // 관리자 화면은 Google Analytics 수집 안 함 (_Layout)
+    // 사이드바 메뉴: DB 의 "Manager" 메뉴 하위(사용 중 + 현재 사용자가 접근 가능) 를 정렬 순서대로 그린다
+    var menus = await MenuReader.ReadAsync(this.DbContext!, "Manager", this.CurrentUserAssets);
+    // 현재 메뉴: 현재 경로가 이동 경로와 같거나 그 하위인 메뉴 중 이동 경로가 가장 긴 것 (/Manager 는 정확히 일치할 때만)
+    var path = this.Context.Request.Path.Value?.TrimEnd('/') ?? string.Empty;
+    var activeKey = menus.Where(p => p.Action is { Length: > 0 } && (path.Equals(p.Action.TrimEnd('/'), StringComparison.OrdinalIgnoreCase) || path.StartsWith(p.Action.TrimEnd('/') + "/", StringComparison.OrdinalIgnoreCase)))
+        .OrderByDescending(p => p.Action!.Length).FirstOrDefault()?.Key;
+    // 오른쪽 위 뱃지: 확인하지 않은 알림 수, 안 읽은 받은 메시지 수
+    var db = (Microsoft.EntityFrameworkCore.DbContext)this.DbContext!;
+    var uid = this.CurrentUserId;
+    var unreadNotice = uid is null ? 0 : await db.Set<BitPlus.Data.Account.Model.AppUserNotice>().CountAsync(p => p.ReceiverId == uid && p.RDate == null);
+    var unreadMessage = uid is null ? 0 : await db.Set<BitPlus.Data.Account.Model.AppUserMessage>().CountAsync(p => p.ReceiverId == uid && p.RDate == null && !p.ReceiverDeleted);
+}
+<div id="app" class="adminLayout ready" data-class-bind="mgmt@Side">
+    <!-- 사이드바 네비게이션 -->
+    <aside>
+        <header>
+            <div>
+                <svg class="ham hamRotate ham7" viewBox="0 0 100 100" onclick="if(window.common) common.openedToggle(document.getElementById('app'), 'mgmt@Side'); else document.getElementById('app').classList.toggle('opened');">
+                    <path class="hamLine mainStroke top" d="m 70,33 h -40 c 0,0 -6,1.368796 -6,8.5 0,7.131204 6,8.5013 6,8.5013 l 20,-0.0013"></path>
+                    <path class="hamLine mainStroke middle" d="m 70,50 h -40"></path>
+                    <path class="hamLine mainStroke bottom" d="m 69.575405,67.073826 h -40 c -5.592752,0 -6.873604,-9.348582 1.371031,-9.348582 8.244634,0 19.053564,21.797129 19.053564,12.274756 l 0,-40"></path>
+                </svg>
+            </div>
+            <span></span>
+        </header>
+        <nav>
+            <ul>
+                @foreach (var menu in menus)
+                {
+                    <li class="@(menu.Key == activeKey ? "active" : "")" data-href="@(menu.Type == BitPlus.Data.SiteMap.LinkType.Move ? menu.Action : null)" onclick="if (this.dataset.href) location.href = this.dataset.href">
+                        <header>@(new Microsoft.AspNetCore.Html.HtmlString(menu.Icon ?? string.Empty))</header>
+                        <span>@this.Context.Request.DisplayName(menu.DpNames, menu.Key)</span>
+                    </li>
+                }
+            </ul>
+        </nav>
+        <footer>
+            <ul>
+            </ul>
+        </footer>
+    </aside>
+
+    <!-- 메인 관리자 아티클 영역 -->
+    <article>
+        <header>
+            <div>
+                <span class="logo" onclick="location.href='/Manager'">
+                    Bit<b>Plus</b>
+                </span>
+            </div>
+            @* 오른쪽: 사이트 홈(새 탭) · 알림 · 메시지(안 읽은 수 뱃지, 누르면 최근 안 읽은 목록 드롭다운 + 항목별 확인) *@
+            <div class="right">
+                <a href="/" target="_blank" rel="noopener" title="@this.Lang("SiteHome")"><i class="fi fiHome"></i></a>
+                <div data-kind="notice">
+                    <span role="button" tabindex="0" title="@this.Lang("Notification")"><i class="fi fiAlert"></i><b hidden="@(unreadNotice == 0)">@unreadNotice</b></span>
+                    <section class="dropBox right">
+                        <header><a href="/user/notice" target="_blank">@this.Lang("Notification")</a></header>
+                        <ul></ul>
+                    </section>
+                </div>
+                <div data-kind="message">
+                    <span role="button" tabindex="0" title="@this.Lang("Message")"><i class="fi fiComments"></i><b hidden="@(unreadMessage == 0)">@unreadMessage</b></span>
+                    <section class="dropBox right">
+                        <header><a href="/user/message" target="_blank">@this.Lang("Message")</a></header>
+                        <ul></ul>
+                    </section>
+                </div>
+            </div>
+        </header>
+
+        <main class="@this.AppClass">
+            <header>
+                <div class="left">
+                    <span>@this.Title</span>
+                    @if (!string.IsNullOrEmpty(this.Description))
+                    {
+                        <small>@this.Description</small>
+                    }
+                </div>
+            </header>
+            <section>
+                @RenderBody()
+            </section>
+        </main>
+    </article>
+    <partial name="_SitePopup" model="BitPlus.Data.Content.PopupArea.Manager" /> @* 사이트 팝업 — 관리자 화면 영역 *@
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            /* BaseUI Mgmt 테마 색상 재선언 */
+            --main: #606e7e;
+            --mainLight: #7e8d9d;
+            --mainDark: #46505b;
+            --main1: #f3f5f6;
+            --main2: #d5dadf;
+            --main3: #b7bfc8;
+            --main4: #98a4b1;
+            --main5: #7a899a;
+            --main6: #606e7e;
+            --main7: #495360;
+            --main8: #323941;
+            --main9: #1a1e23;
+            --point: #a5cc32;
+            --pointLight: #bbd963;
+            --pointDark: #7d9b26;
+            --point1: #f8fbef;
+            --point2: #e5f0c4;
+            --point3: #d2e699;
+            --point4: #c0db6e;
+            --point5: #add143;
+            --point6: #90b22c;
+            --point7: #6d8721;
+            --point8: #4b5c17;
+            --point9: #28310c;
+            --sub: #12b5af;
+            --subLight: #1ce8e1;
+            --subDark: #0c7d79;
+            --sub1: #ecfdfd;
+            --sub2: #bcf8f6;
+            --sub3: #8bf3f0;
+            --sub4: #5aefe9;
+            --sub5: #2aeae3;
+            --sub6: #14cac3;
+            --sub7: #0f9994;
+            --sub8: #0a6865;
+            --sub9: #063836;
+            --deco: #99a183;
+            --decoLight: #b6bba6;
+            --decoDark: #7b8364;
+            --deco1: #f5f6f3;
+            --deco2: #dcdfd5;
+            --deco3: #c3c8b6;
+            --deco4: #aab198;
+            --deco5: #919a7a;
+            --deco6: #767e60;
+            --deco7: #5a6049;
+            --deco8: #3d4131;
+            --deco9: #21231a;
+        }
+        /* 다크 테마: 이 레이아웃의 라이트 색상값을 기준으로 밝기만 조정 (규칙은 _Document.scss 다크 테마 주석) */
+        [data-theme="dark"] {
+            --main: #687788;
+            --mainLight: #798899;
+            --mainDark: #596774;
+            --main1: #23262a;
+            --main2: #2e3338;
+            --main3: #39424b;
+            --main4: #49535f;
+            --main5: #586574;
+            --main6: #6a798b;
+            --main7: #808e9e;
+            --main8: #9aa5b2;
+            --main9: #b7bfc8;
+            --point: #809e27;
+            --pointLight: #8eaf2b;
+            --pointDark: #6a8320;
+            --point1: #2e3616;
+            --point2: #3e491d;
+            --point3: #566a1a;
+            --point4: #6d8721;
+            --point5: #85a428;
+            --point6: #9fc430;
+            --point7: #b0d34b;
+            --point8: #c0dc70;
+            --point9: #d2e699;
+            --sub: #0f9893;
+            --subLight: #12b6b0;
+            --subDark: #0c7975;
+            --sub1: #103c3b;
+            --sub2: #16504e;
+            --sub3: #0c7975;
+            --sub4: #0f9994;
+            --sub5: #12bab4;
+            --sub6: #16dfd7;
+            --sub7: #33ebe4;
+            --sub8: #5defea;
+            --sub9: #8bf4f0;
+            --deco: #646b51;
+            --decoLight: #565b45;
+            --decoDark: #525843;
+            --deco1: #282a23;
+            --deco2: #35382e;
+            --deco3: #474b39;
+            --deco4: #5a6049;
+            --deco5: #6d7458;
+            --deco6: #828b69;
+            --deco7: #969e7f;
+            --deco8: #abb299;
+            --deco9: #c3c8b6;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+}
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        // 오른쪽 위 알림·메시지 드롭다운: 열 때마다 최근 안 읽은 목록을 다시 받고, 항목의 확인 버튼은 읽음 처리 후 목록에서 빼고 뱃지 수를 줄인다
+        (function() {
+            const confirmText = @this.Js(this.Lang("Confirm"));
+            const kinds = {
+                notice: { list: "/api/user/notice?unreadOnly=true", read: id => `/api/user/notice/read/${id}`, title: item => item.text, url: item => item.url, sub: () => "" },
+                message: { list: "/api/user/message/unread", read: id => `/api/user/message/read/${id}`, title: item => item.message, url: () => "/user/message", sub: item => item.name }
+            };
+
+            /** 목록 항목 하나: 제목(이동 주소가 있으면 새 탭 링크) · 보낸 사람 · 시각 + 확인 버튼 */
+            function rowOf(kind, item) {
+                const li = document.createElement("li");
+                li.dataset.id = item.id;
+                li.innerHTML = `<div><a target="_blank"></a><small></small></div><button type="button" class="xs main">${confirmText}</button>`;
+                const link = li.querySelector("a");
+                link.textContent = kind.title(item);
+                if (kind.url(item)) link.href = kind.url(item);
+                li.querySelector("small").textContent = [kind.sub(item), common.localTime(item.cDate, true)].filter(Boolean).join(" · ");
+                return li;
+            }
+
+            document.querySelectorAll("#app > article > header > .right > div[data-kind]").forEach(box => {
+                const kind = kinds[box.dataset.kind];
+                const list = box.querySelector("ul");
+                const badge = box.querySelector(":scope > span > b");
+                const setCount = count => { badge.textContent = count; badge.hidden = count <= 0; };
+
+                box.querySelector(":scope > span").addEventListener("click", async () => {
+                    const open = !box.classList.contains("open");
+                    box.classList.toggle("open", open);
+                    box.classList.toggle("active", open);
+                    if (!open) return;
+                    const res = await common.getSend(kind.list, { useLoading: false });
+                    const data = (res && res.data) || { items: [], unread: 0 };
+                    list.innerHTML = "";
+                    data.items.forEach(item => list.appendChild(rowOf(kind, item)));
+                    common.syncEmpty(list);
+                    setCount(data.unread);
+                });
+                box.querySelector(":scope > section").addEventListener("click", e => e.stopPropagation());
+                list.addEventListener("click", async e => {
+                    const btn = e.target.closest("button");
+                    if (!btn) return;
+                    const li = btn.closest("li");
+                    const res = await common.postSend(kind.read(li.dataset.id), new FormData(), { useLoading: false, useInfo: false });
+                    if (!res || !res.success) return;
+                    li.remove();
+                    common.syncEmpty(list);
+                    setCount(Number(badge.textContent) - 1);
+                });
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,59 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    this.SetTitle(this.Lang("SignIn"));
+    this.SetPageKey("SignIn");
+}
+
+<form method="post" action="/api/account/signin" novalidate>
+    <input type="hidden" name="returnUrl" value="@this.Context.Request.Query["ReturnUrl"]" />
+
+    <div class="inputGrid single">
+        <div class="fieldCol">
+            <label>@this.Lang("UidOrEmail")</label>
+            <input type="text" name="uid" placeholder="@this.Lang("EnterUidOrEmail")" required autofocus autocomplete="username" />
+        </div>
+    </div>
+
+    <div class="inputGrid single">
+        <div class="fieldCol">
+            <label>@this.Lang("Password")</label>
+            <input type="password" name="password" placeholder="@this.Lang("EnterPassword")" required autocomplete="current-password" />
+        </div>
+    </div>
+
+    <button type="submit" class="submitBtn">@this.Lang("SignIn")</button>
+</form>
+
+<partial name="_ExternalLogins" />
+
+@section Scripts {
+    <script type="module">
+        (function () {
+            const form = document.querySelector('form[action="/api/account/signin"]');
+            // 외부 로그인 실패·취소로 돌아온 경우 (OAuthLoginEvents.RemoteFailure)
+            if (new URLSearchParams(location.search).get('external') === 'failed') common.alert(@this.Js(this.Lang("ExternalFailed")));
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                const uidInput = form.querySelector('input[name="uid"]');
+                const pwInput = form.querySelector('input[name="password"]');
+                const uid = uidInput?.value.trim() ?? '';
+                const password = pwInput?.value ?? '';
+
+                if (!uid) {
+                    uidInput?.focus();
+                    return;
+                }
+                if (!password) {
+                    pwInput?.focus();
+                    return;
+                }
+
+                const res = await common.postSend(form.action, new FormData(form));
+                if (!res?.success) return;
+
+                if (res.data?.notice) await common.alert(res.data.notice);
+                location.href = res.data?.redirect || '/';
+            });
+        })();
+    </script>
+}

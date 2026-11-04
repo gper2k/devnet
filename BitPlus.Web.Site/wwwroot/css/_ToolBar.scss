@@ -1,0 +1,535 @@
+/* ==========================================================================
+   범용 툴바 컴포넌트 (_ToolBar.scss)
+   - 모던 플로팅 툴바 (.toolBar, .toolbar)
+   - 수평/수직 정렬, 세그먼트 일체형, 스택형 아이템, 액션 버튼, 디바이더
+   - 드롭다운/셀렉트 박스 결합 (.dropDown, .dropBox)
+   - 툴바 연계 컬러 팔레트 팝오버 (.toolPalette)
+   - 9대 테마 색상 및 비례 크기 스케일링 (.sm, 기본, .lg)
+   ========================================================================== */
+
+.toolBar,
+.toolbar {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.25em;
+    padding: 0.35em 0.5em;
+    margin: 0;
+    list-style: none;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: var(--bgColor);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBox, 0.8em);
+    box-shadow: 0 4px 16px var(--aLight), 0 1px 3px var(--aLow);
+    color: var(--txColor);
+    user-select: none;
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+
+    /* 1. 플로팅 필(Pill) 스타일 (.floating, .pill) */
+    &.floating,
+    &.pill {
+        border-radius: var(--roundBtn, 2em);
+        box-shadow: 0 8px 24px var(--aDark), 0 2px 6px var(--aLow);
+    }
+
+    /* 2. 플랫 스타일 (.flat - 그림자 없이 테두리/배경만 깔끔하게) */
+    &.flat {
+        box-shadow: none;
+        background-color: var(--bgSub);
+    }
+
+    /* 3. 수직 툴바 (.vertical) */
+    &.vertical {
+        flex-direction: column;
+        padding: 0.5em 0.35em;
+        width: max-content;
+
+        & > .divider,
+        & > li.divider {
+            min-width: 0;
+            min-height: 0;
+            width: 1.4em;
+            height: 1px;
+            margin: 0.35em auto;
+        }
+
+        & > .space,
+        & > li.space {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    /* 4. 세그먼트 / 일체형 툴바 (.segmented, .joined) */
+    &.segmented,
+    &.joined {
+        gap: 0;
+        padding: 0;
+        overflow: visible;
+        border-radius: 0.4em;
+
+        & > :first-child {
+            border-top-left-radius: inherit;
+            border-bottom-left-radius: inherit;
+        }
+
+        & > :last-child {
+            border-top-right-radius: inherit;
+            border-bottom-right-radius: inherit;
+        }
+
+        & > * + * {
+            border-left: 1px solid var(--lineColor);
+        }
+
+        & > button,
+        & > .item,
+        & > li {
+            border-radius: 0;
+            border: none;
+        }
+    }
+
+    /* 5. 툴바 내부 기본 아이템 (button, a, .item, li) */
+    & > button,
+    & > a,
+    & > .item,
+    & > li {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4em;
+        min-width: 2.2em;
+        height: 2.2em;
+        padding: 0.35em 0.55em;
+        font-size: 0.95em;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--txSub);
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--roundBtn, 0.4em);
+        cursor: pointer;
+        text-decoration: none;
+        box-sizing: border-box;
+        transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+
+        & > i.fi {
+            font-size: 1.25em;
+            flex-shrink: 0;
+        }
+
+        & > span {
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        &:hover {
+            color: var(--txColor);
+            background-color: var(--aLow);
+            border-color: var(--aColor);
+        }
+
+        &:active {
+            transform: scale(0.96);
+            background-color: var(--aColor);
+        }
+
+        /* 활성화 / 선택 상태 (.active) */
+        &.active {
+            color: white;
+            background-color: var(--main);
+            border-color: var(--aColor);
+            font-weight: 600;
+
+            & > i.fi {
+                color: currentColor;
+            }
+        }
+
+        /* 비활성 상태 */
+        &:disabled,
+        &.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* 아이콘 전용 원형/정사각형 버튼 */
+        &.iconOnly {
+            width: 2.2em;
+            padding: 0;
+        }
+
+        &.circle {
+            border-radius: 50%;
+        }
+
+        /* 상하 스택형 아이템 (.stacked) - 아이콘 위, 텍스트 아래 */
+        &.stacked {
+            flex-direction: column;
+            height: auto;
+            min-height: 3.2em;
+            padding: 0.4em 0.6em;
+            gap: 0.25em;
+
+            & > i.fi {
+                font-size: 1.35em;
+            }
+
+            & > span {
+                font-size: 0.72em;
+                font-weight: 500;
+            }
+        }
+    }
+
+    /* 6. 디바이더 구분선 (.divider, li.divider) */
+    & > .divider,
+    & > li.divider {
+        display: inline-block;
+        flex: 0 0 auto;
+        min-width: 0;
+        width: 1px;
+        height: 1.4em;
+        background-color: var(--lineColor);
+        margin: 0 0.35em;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        pointer-events: none;
+    }
+
+    /* 7. 여백 채움 (.space, li.space) */
+    & > .space,
+    & > li.space {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 0;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        border: none;
+        pointer-events: none;
+    }
+
+    /* 8. 상태 뱃지 및 라벨 (.label, .status, .badge) */
+    & > .label,
+    & > .status,
+    & > li.label,
+    & > li.status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35em;
+        padding: 0.3em 0.75em;
+        font-size: 0.82em;
+        font-weight: 600;
+        color: var(--txSub);
+        background-color: var(--bgSub);
+        border: 1px solid var(--aLow);
+        border-radius: var(--roundBtn, 1.2em);
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    /* 9. 액션 전용 버튼 (.actionBtn, button.main, button.point) */
+    & > button.actionBtn,
+    & > .actionBtn {
+        height: 2.2em;
+        padding: 0.35em 0.9em;
+        border-radius: var(--roundBtn, 2em);
+        color: #ffffff;
+        background-color: #1e2229;
+        border: 1px solid var(--aColor);
+        font-weight: 600;
+
+        &:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        &.point {
+            background-color: var(--point);
+            color: var(--pointText);
+            &:hover { background-color: var(--pointDark); }
+        }
+
+        &.main {
+            background-color: var(--main);
+            color: white;
+            &:hover { background-color: var(--mainDark); }
+        }
+    }
+
+    /* 10. 숫자 스텝퍼 / 입력 필드 (.stepper) */
+    & > .stepper {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2em;
+        padding: 0.2em 0.4em;
+        font-size: 0.9em;
+        font-weight: 600;
+        color: var(--txColor);
+
+        & > span {
+            min-width: 1.6em;
+            text-align: center;
+        }
+
+        & > .spinBtns {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 0.1em;
+            cursor: pointer;
+            font-size: 0.6em;
+            color: var(--txLight);
+        }
+    }
+
+    /* 11. 툴바 내 드롭다운 및 셀렉트 (.dropDown) */
+    & > .dropDown {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+
+        /* 기본 헤더 (셀렉트 트리거) */
+        & > header {
+            min-height: 2.2em;
+            height: 2.2em;
+            padding: 0.25em 0.65em;
+            font-size: 0.9em;
+            font-weight: 500;
+            gap: 0.4em;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: var(--roundBtn, 0.4em);
+            color: var(--txSub);
+            cursor: pointer;
+            user-select: none;
+            box-sizing: border-box;
+            transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+
+            & > span {
+                white-space: nowrap;
+            }
+
+            & > i.fi {
+                font-size: 1.15em;
+            }
+
+            &:after {
+                content: "";
+                display: inline-block;
+                width: 0.35em;
+                height: 0.35em;
+                border-right: 0.12em solid currentColor;
+                border-bottom: 0.12em solid currentColor;
+                transform: rotate(45deg);
+                margin-left: 0.4em;
+                margin-bottom: 0.12em;
+                transition: transform 0.15s;
+            }
+
+            &:hover {
+                color: var(--txColor);
+                background-color: var(--aLight);
+                border-color: var(--aColor);
+                box-shadow: none;
+            }
+        }
+
+        /* 아이콘/버튼 트리거로 열리는 경우 */
+        & > button.item {
+            &:after {
+                display: none;
+            }
+        }
+
+        /* 열린 상태 (.open) */
+        &.open {
+            & > header {
+                color: var(--txColor);
+                background-color: var(--aLight);
+                border-color: var(--aColor);
+
+                &:after {
+                    transform: rotate(225deg);
+                    margin-bottom: -0.1em;
+                }
+            }
+
+            & > button.item {
+                background-color: var(--aLight);
+                border-color: var(--aColor);
+                color: var(--txColor);
+            }
+        }
+
+        /* 드롭박스 팝업 (.dropBox, ul, section) */
+        & > .dropBox,
+        & > ul {
+            top: calc(100% + 0.35em);
+            bottom: auto;
+            left: 0;
+            right: auto;
+            min-width: 10em;
+            background-color: var(--bgColor);
+            border: 1px solid var(--aColor);
+            border-radius: var(--roundBox, 0.8em);
+            box-shadow: 0 8px 24px var(--aDark), 0 2px 6px var(--aLow);
+            z-index: 100;
+
+            &.up {
+                top: auto;
+                bottom: calc(100% + 0.35em);
+            }
+
+            &.right {
+                left: auto;
+                right: 0;
+            }
+
+            & > li {
+                padding: 0.4em 0.7em;
+                font-size: 0.9em;
+
+                &.divider {
+                    height: 1px;
+                    background-color: var(--lineColor);
+                    margin: 0.3em 0;
+                    padding: 0;
+                }
+            }
+        }
+
+        /* 부모 .dropDown 에 .up 또는 .right 가 지정된 경우도 포괄 지원 */
+        &.up {
+            & > .dropBox,
+            & > ul {
+                top: auto;
+                bottom: calc(100% + 0.35em);
+            }
+        }
+
+        &.right {
+            & > .dropBox,
+            & > ul {
+                left: auto;
+                right: 0;
+            }
+        }
+    }
+
+    /* 플로팅 / 필 툴바 내 드롭다운 */
+    &.floating,
+    &.pill {
+        & > .dropDown > header {
+            border-radius: var(--roundBtn, 2em);
+            background-color: var(--bgSub);
+            border-color: var(--aLow);
+
+            &:hover {
+                background-color: var(--aLight);
+                border-color: var(--aColor);
+            }
+        }
+    }
+
+    /* 세그먼트 / 일체형 툴바 내 드롭다운 */
+    &.segmented,
+    &.joined {
+        & > .dropDown {
+            & > header {
+                border-radius: 0;
+                border: none;
+                border-right: 1px solid var(--lineColor);
+            }
+        }
+    }
+
+    /* 12. 크기 변형 (.sm, .lg) */
+    &.sm {
+        font-size: var(--sm);
+        padding: 0.25em 0.4em;
+        gap: 0.2em;
+
+        & > button, & > .item, & > a {
+            min-width: 1.9em;
+            height: 1.9em;
+        }
+
+        & > .dropDown > header {
+            min-height: 1.9em;
+            height: 1.9em;
+            padding: 0.2em 0.5em;
+            font-size: 0.82em;
+        }
+    }
+
+    &.lg {
+        font-size: var(--lg);
+        padding: 0.45em 0.7em;
+        gap: 0.35em;
+
+        & > button, & > .item, & > a {
+            min-width: 2.6em;
+            height: 2.6em;
+        }
+
+        & > .dropDown > header {
+            min-height: 2.6em;
+            height: 2.6em;
+            padding: 0.35em 0.8em;
+            font-size: 1em;
+        }
+    }
+
+    /* 13. 9대 테마 색상 지원 */
+    @each $color in (main, sub, point, deco, primary, success, info, warning, danger) {
+        &.#{$color} {
+            border-color: var(--#{$color}Light, var(--aColor));
+
+            & > button.active,
+            & > .item.active,
+            & > li.active {
+                background-color: var(--#{$color});
+                color: var(--#{$color}Text);
+                border-color: var(--aColor);
+            }
+        }
+    }
+}
+
+/* 툴바 연계 컬러 팔레트 팝오버 (.toolPalette) */
+.toolPalette {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0.35em 0.65em;
+    background-color: var(--bgColor);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBtn, 2em);
+    box-shadow: 0 8px 24px var(--aDark), 0 2px 6px var(--aLow);
+    user-select: none;
+
+    & > .swatch {
+        display: inline-block;
+        width: 1.3em;
+        height: 1.3em;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: transform 0.12s, border-color 0.12s;
+
+        &:hover {
+            transform: scale(1.18);
+        }
+
+        &.active {
+            border-color: var(--txColor);
+            box-shadow: 0 0 0 2px var(--bgColor);
+        }
+    }
+}

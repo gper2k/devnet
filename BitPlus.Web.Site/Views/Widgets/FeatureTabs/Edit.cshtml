@@ -1,0 +1,12 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 기능 탭 위젯 설정 — title, text, items(한 줄에 제목 | 설명 | 이미지 주소) *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_DesignFields.cshtml" model='new[] { "heading" }' />
+    <li>
+        <header>@this.Lang("WidgetTabItems")</header>
+        <textarea name="items" rows="6" spellcheck="false" placeholder="@this.Lang("WidgetFeatureTabsSample")"></textarea>
+    </li>
+</ul>

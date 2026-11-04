@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" class="bannerJoin">
+  <!-- 사이드 패널 세로형 배너 1: 회원가입 안내 — 색은 레이아웃 CSS 변수(main·point, 다크 테마 별도), img 로 열면 괄호 안 기본색 (SlotView.ThemeSvg) -->
+  <style>
+    .bannerJoin { --bannerBg1: var(--mainLight, #335947); --bannerBg2: var(--main, #1f382c); --bannerDeco: var(--main5, #5c9177); --bannerPoint: var(--point, #9be82e); --bannerInk: var(--main9, #112019); }
+    [data-theme="dark"] .bannerJoin { --bannerBg1: var(--main3); --bannerBg2: var(--main2); --bannerInk: var(--main1); }
+  </style>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" style="stop-color: var(--bannerBg1)"/>
+      <stop offset="1" style="stop-color: var(--bannerBg2)"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <circle cx="520" cy="110" r="190" style="fill: var(--bannerDeco)" opacity="0.35"/>
+  <circle cx="80" cy="700" r="230" style="fill: var(--bannerDeco)" opacity="0.25"/>
+  <circle cx="470" cy="560" r="60" style="fill: var(--bannerPoint)" opacity="0.9"/>
+  <g font-family="'Noto Sans KR','Malgun Gothic',sans-serif" fill="#ffffff">
+    <text x="60" y="150" font-size="30" font-weight="700" style="fill: var(--bannerPoint)" letter-spacing="4">JOIN US</text>
+    <text x="60" y="250" font-size="64" font-weight="800">함께하면</text>
+    <text x="60" y="330" font-size="64" font-weight="800">더 즐거운</text>
+    <text x="60" y="410" font-size="64" font-weight="800">DevNet</text>
+    <text x="60" y="490" font-size="28" opacity="0.85">가입하고 글쓰기·메시지·알림을</text>
+    <text x="60" y="532" font-size="28" opacity="0.85">바로 시작하세요.</text>
+  </g>
+  <rect x="60" y="640" width="250" height="76" rx="38" style="fill: var(--bannerPoint)"/>
+  <text x="185" y="690" font-family="'Noto Sans KR','Malgun Gothic',sans-serif" font-size="30" font-weight="700" style="fill: var(--bannerInk)" text-anchor="middle">회원가입 →</text>
+</svg>

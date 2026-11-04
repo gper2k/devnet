@@ -1,0 +1,91 @@
+/* 작성글 보기: 머리 아래 게시물·댓글 탭 / 목록 */
+.userPosts {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    & > article {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        min-width: 0;
+        padding: 0;
+        /* 게시물·댓글 탭 (개수 포함) */
+        & > nav {
+            display: flex;
+            justify-content: right;
+            gap: 0.5em;
+
+            & > a {
+                padding: 0.4em 1em;
+                cursor: pointer;
+                color: var(--txLight);
+                border: 1px solid var(--lineColor);
+                border-radius: var(--roundBtn);
+
+                &.active {
+                    color: var(--bgColor);
+                    background: var(--main);
+                    border-color: var(--main);
+                }
+            }
+        }
+        /* 목록: 게시판 배지·시각 / 제목 / 댓글 내용 일부 */
+        & > ul {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            border-top: 2px solid var(--aColor);
+            list-style: none;
+
+            & > li {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2em;
+                padding: 0.5em;
+                border-bottom: 1px dashed var(--aColor);
+                color: var(--txLight);
+
+                & > header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 1em;
+                    font-size: 0.85em;
+
+                    & > span {
+                        padding: 0.3em 0.6em;
+                        border: 1px solid var(--lineColor);
+                        border-radius: var(--roundBtn);
+                        background-color: var(--main4);
+                        color: white;
+                        line-height: 1em;
+                    }
+                }
+
+                & > a {
+                    color: var(--txColor);
+
+                    &:hover {
+                        color: var(--main);
+                    }
+                }
+
+                & > p {
+                    margin: 0;
+                    font-size: 0.9em;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        & ::deep > ul.pager {
+            justify-content: center;
+            padding: 0.8em 0.5em;
+        }
+    }
+}

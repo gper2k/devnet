@@ -1,0 +1,66 @@
+@model ContentPageModel
+@{
+    // 현재 카테고리: 글 보기면 그 글의 카테고리, 아니면 주소의 category(규칙에 있는 값), 그 밖에는 첫 카테고리 ("전체"는 없음). 카테고리가 없는 규칙은 전체
+    var queryCategory = this.Context.Request.Query["category"].ToString();
+    var category = Model.Categories.Count == 0 ? string.Empty
+        : Model.Post is { } current && Model.Categories.FirstOrDefault(p => p.Key == current.Category || p.Value == current.Category) is { Key: not null } found ? found.Key
+        : Model.Categories.Any(p => p.Key == queryCategory) ? queryCategory : Model.Categories[0].Key;
+    var categoryName = Model.Categories.FirstOrDefault(p => p.Key == category).Value ?? string.Empty;
+}
+
+@* 메뉴얼 목차(왼쪽): 카테고리 선택(있을 때, "전체" 없이 첫 항목이 기본) + 이 게시판(선택한 카테고리)의 모든 페이지 그룹과 그 아래 페이지의 제목.
+   글은 api/content/list 가 한 번에(페이지 나누기 없이, 그룹 → 그 아래 페이지 순서로) 돌려주고, 레벨 0 이 그룹 제목줄, 레벨 1 이 그 그룹의 페이지다. 지금 보는 글은 강조한다. *@
+<nav class="manualToc">
+    @if (Model.Categories.Count > 0)
+    {
+        <div class="dropDown" id="manualCategory" data-val="@category">
+            <header>@categoryName</header>
+            <ul class="dropBox">
+                @foreach (var item in Model.Categories)
+                {
+                    <li data-val="@item.Key" class="@(item.Key == category ? "active" : null)">@item.Value</li>
+                }
+            </ul>
+        </div>
+    }
+    <ul id="manualTocList"></ul>
+</nav>
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const ruleNo = @Model.RuleNo, currentNo = @(Model.Post?.ContentNo ?? 0), category = @this.Js(category);
+        const nav = document.querySelector('nav.manualToc'), list = nav.querySelector('#manualTocList');
+        const categoryBox = nav.querySelector('#manualCategory');
+        const text = { draft: @this.Js(this.Lang("SaveDraft")), rejected: @this.Js(this.Lang("ContentRejected")), pending: @this.Js(this.Lang("ContentPendingApproval")), empty: @this.Js(this.Lang("ManualEmpty")), noRead: @this.Js(this.Lang("ContentNoReadPermission")) };
+
+        // 카테고리를 고르면 그 카테고리의 첫 글로 (서버가 첫 글 주소로 보냄, 글이 없으면 빈 목차)
+        categoryBox?.addEventListener('change', () => { location.href = `/content/${ruleNo}?category=${encodeURIComponent(categoryBox.dataset.val)}`; });
+
+        const badge = (cls, label) => common.html`<i class="badge sm ${cls}">${label}</i> `;
+        /** 제목 한 줄: 열 수 없는 글은 링크 없이 잠금 표시 */
+        const titleOf = i => common.html`
+            ${i.published === false ? badge('danger', text.draft) : ''}${i.approved ? '' : badge(i.state === 'rejected' ? 'danger' : 'warning', i.state === 'rejected' ? text.rejected : text.pending)}
+            ${i.gate ? common.html`<i class="fi fiLock"></i> ` : ''}${i.locked ? common.html`<a href="#" data-locked="true">${i.title}</a>` : common.html`<a href="/content/${ruleNo}/view/${i.contentNo}" class="${i.contentNo === currentNo ? 'active' : ''}">${i.title}</a>`}`;
+        const groupOf = g => common.html`
+            <li class="group">
+                <strong>${g.head ? titleOf(g.head) : ''}</strong>
+                <ol>${g.pages.map(p => common.html`<li>${titleOf(p)}</li>`)}</ol>
+            </li>`;
+
+        const res = await common.getSend(`/api/content/list?${new URLSearchParams({ ruleNo, category, size: 100000 })}`, { useLoading: false });
+        if (!res?.success) return;
+        const groups = []; // 목록은 그룹 → 그 아래 페이지 순서: 레벨 0 이 새 그룹, 레벨 1 은 바로 앞 그룹에 붙임 (그룹을 볼 수 없는 페이지는 제목 없는 그룹으로)
+        res.data.items.forEach(i => {
+            if (i.level === 0) groups.push({ head: i, pages: [] });
+            else { if (groups.length === 0) groups.push({ head: null, pages: [] }); groups.at(-1).pages.push(i); }
+        });
+        common.bindList(list, groups, groupOf, common.html`<li class="empty">${text.empty}</li>`);
+        list.addEventListener('click', e => {
+            const a = e.target.closest('a[data-locked]');
+            if (a) {
+                e.preventDefault();
+                common.alert(text.noRead);
+            }
+        });
+        list.querySelector('a.active')?.scrollIntoView({ block: 'nearest' });
+    });
+</script>

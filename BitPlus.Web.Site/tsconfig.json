@@ -1,0 +1,18 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "rootDir": "./wwwroot/ts",
+    "outDir": "./wwwroot/js",
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false
+  },
+  "include": [
+    "wwwroot/ts/**/*"
+  ]
+}

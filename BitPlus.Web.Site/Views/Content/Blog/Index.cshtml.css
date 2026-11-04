@@ -1,0 +1,79 @@
+@charset "UTF-8";
+/* 블로그형 첫 화면(Index/List) 전용 스타일: 글 보기 피드 */
+.contentBlog {
+  overflow: visible;
+}
+.contentBlog > div {
+  overflow: visible;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.8em;
+}
+.contentBlog > div > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  gap: 0.6em;
+}
+.contentBlog > div > header ::deep > form {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.contentBlog > div > header ::deep > form > .dropDown > header {
+  height: 2.6em;
+  min-height: 2.6em;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.9rem;
+}
+.contentBlog > div > header > div {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  gap: 0.5em;
+}
+.contentBlog > div > header > div > button {
+  font-size: 0.9rem;
+  padding: 0.65em 0.8em;
+  height: auto;
+}
+.contentBlog > div > ul {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contentBlog > div > ul > li {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.contentBlog > div > ul > li.empty {
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  border-bottom: none;
+  text-align: center;
+  padding: 3em 0;
+  color: var(--txLight);
+}
+.contentBlog > div > ul > li.locked {
+  font-size: 1.1em;
+  color: var(--txLight);
+}
+.contentBlog > div > ul > li.locked > a {
+  color: var(--txColor);
+  text-decoration: none;
+}
+.contentBlog > footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

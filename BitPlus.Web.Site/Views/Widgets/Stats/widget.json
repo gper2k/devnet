@@ -1,0 +1,16 @@
+{
+  "key": "Stats",
+  "version": 2,
+  "name": { "ko": "통계 띠", "en": "Statistics band" },
+  "description": { "ko": "테마색 띠 위에 둥근 이미지와 제목·설명, 막대그래프. 한 줄에 '이름 | 값(0~100)'. 띠 위쪽이 비스듬히 잘립니다.", "en": "A theme-colored band with a round image, title, text and bars. One per line: name | value (0-100)." },
+  "categories": ["design"],
+  "size": { "min": [4, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "label", "type": "text", "default": "" },
+    { "key": "title", "type": "text", "default": "" },
+    { "key": "text", "type": "lines", "default": "" },
+    { "key": "image", "type": "text", "default": "" },
+    { "key": "bars", "type": "lines", "default": "" },
+    { "key": "band", "type": "bool", "default": true }
+  ]
+}

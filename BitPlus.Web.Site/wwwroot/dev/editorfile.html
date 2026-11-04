@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>에디터 — BitPlus DevKit</title>
+    <link rel="stylesheet" href="/lib/fluenticons/fluenticons.min.css" />
+    <link rel="stylesheet" href="/css/site.min.css" />
+    <link rel="stylesheet" href="/dev/devkit.css" />
+    <script defer src="/dev/devkit.js"></script>
+</head>
+<body>
+    <div class="devPage">
+        <!-- ═══ 에디터 (공급자 2종: Jodit wwwroot/lib/jodit(사이트 기본), SunEditor 3.3.3 wwwroot/lib/suneditor) ═══ -->
+        <section class="devSection">
+            <h2>에디터</h2>
+
+            <!-- 1. 에디터 두 개 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>1. 에디터 (2개 인스턴스, 엔진 선택) <span class="tag js">common.makeEditor</span></h3>
+                    <p>소유자 키가 다른 에디터 두 개입니다. 사이트는 에디터 엔진을 <b>Jodit(기본)</b>, <b>SunEditor</b> 두 가지 중 고를 수 있고, 아래 선택 상자로 인스턴스마다 엔진을 바꿔 볼 수 있습니다(바꾸면 현재 본문을 유지한 채 다시 만듭니다). 어느 엔진이든 호출 코드와 업로드·복사 동작은 같습니다. A 는 SunEditor, B 는 Jodit 로 시작하므로 서로 다른 엔진 사이의 이미지 복사도 확인할 수 있습니다. 이미지는 <code>api/system/editor/file</code> 로 업로드되어 <code>/api/system/editor/file/{id}/{년월 hex}{MIME hex}</code> 경로로 들어갑니다(이미지 버튼, 파일 붙여넣기·끌어놓기 모두). 에디터 A 의 이미지를 복사해 B 에 붙여넣으면 서버에서 B 소유로 복사한 뒤 경로를 바꿔 넣습니다. 미디어(동영상/오디오/임베드) 기능은 뺐습니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="editorPair">
+                            <div class="demoCol">
+                                <small>에디터 A — ownerKey <code id="keyA"></code></small>
+                                <select id="engineA"><option value="suneditor">SunEditor</option><option value="jodit">Jodit</option></select>
+                                <textarea id="editorA"></textarea>
+                                <div class="demoRow">
+                                    <button type="button" class="sm" data-preview="A"><i class="fi fiEye"></i> 미리보기</button>
+                                    <button type="button" class="sm" data-html="A"><i class="fi fiCode"></i> HTML</button>
+                                </div>
+                            </div>
+                            <div class="demoCol">
+                                <small>에디터 B — ownerKey <code id="keyB"></code></small>
+                                <select id="engineB"><option value="suneditor">SunEditor</option><option value="jodit" selected>Jodit</option></select>
+                                <textarea id="editorB"></textarea>
+                                <div class="demoRow">
+                                    <button type="button" class="sm" data-preview="B"><i class="fi fiEye"></i> 미리보기</button>
+                                    <button type="button" class="sm" data-html="B"><i class="fi fiCode"></i> HTML</button>
+                                </div>
+                            </div>
+                        </div>
+                        <pre class="editorLog" id="editorLog">-</pre>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>// 에디터 파일(CSS/JS)은 common 이 공급자(new Site 의 editor/editorPath)에 맞게 알아서 로드한다
+// 업로드(이미지 버튼, 파일 붙여넣기·끌어놓기)와 다른 소유자 이미지 붙여넣기 복사를 처리하는 공용 에디터
+const editor = await common.makeEditor(textarea, {
+    ownerType: "Content",
+    ownerKey: contentId,
+    password: "",                // 비인증 등록 암호 (선택)
+    height: "20em",              // 기본 20em
+    onFiles: (kind, data) =&gt; {}, // "upload" | "copy" 결과 (선택)
+    siteCss: false,              // true: 편집 영역에 사이트 CSS 연결 (선택)
+    rawHtml: false,              // true: 걸러내기 끄기 (선택)
+    options: {},                 // 엔진 고유 옵션 (선택)
+});
+const html = editor.getHtml();   // setHtml(html), focus(), destroy(), native(엔진 원본)</code></pre>
+                </div>
+            </div>
+
+            <!-- 에디터 교체 방법 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>에디터 엔진 교체 <span class="tag js">new Site(options)</span></h3>
+                    <p>사이트 전체 에디터는 관리자 "시스템 설정 &gt; 사이트 정보" 의 주 에디터로 정합니다(레이아웃이 <code>new Site({ editor })</code> 로 넘김, 비었거나 모르는 이름이면 <code>site.ts</code> 생성자의 기본 <code>jodit</code>). 페이지마다 다르게 쓰려면 <code>new Site({ editor: "suneditor" })</code>, 경로만 바꿔도 되며(<code>editorPath: "/lib/jodit"</code> → 폴더 이름으로 공급자 선택), 새 엔진은 <code>IEditorProvider</code> 를 구현해 <code>registerEditor</code> 로 등록하면 됩니다. 에디터 UI 언어는 영어가 기본이고 현재 UI 문화권(ko 등)을 공급자가 지원하면 그 언어로 나옵니다.</p>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>const common = new Site();                                     // 기본: jodit
+const common = new Site({ editor: "suneditor" });              // 에디터 이름으로 선택 (경로는 공급자 기본 경로)
+const common = new Site({ editorPath: "/lib/suneditor" });     // 경로만 줘도 폴더 이름으로 공급자 선택
+
+// 새 엔진 추가: IEditorProvider(name, defaultPath, languages, assets, content, create) 구현 후 등록
+common.registerEditor(new MyEditorProvider());
+const common = new Site({ editor: "myeditor" });</code></pre>
+                </div>
+            </div>
+
+            <!-- 2. 본문 출력 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>2. 본문 샌드박스 출력 <span class="tag js">common.renderContent</span></h3>
+                    <p>미리보기 버튼으로 에디터 본문을 <code>allow-same-origin</code> 없는 샌드박스 iframe 에 출력합니다. 내용 높이에 맞춰 iframe 높이가 자동 조정되고, 본문 스크립트는 부모 페이지에 접근하지 못합니다. "스크립트 테스트" 는 스크립트가 든 HTML 을 출력해 차단 여부를 보여줍니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="demoRow">
+                            <button type="button" class="sm" id="btnScript">스크립트 테스트</button>
+                            <small id="renderInfo"></small>
+                        </div>
+                        <div class="editorRender" id="renderBox"></div>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>common.renderContent(document.getElementById("contentBody"), html);</code></pre>
+                </div>
+            </div>
+
+            <!-- 3. 이미지 조회 확인 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>3. 이미지 조회 확인 <span class="tag js">GET api/system/editor/file/{id}/{yyyyMM hex}{MIME hex}</span></h3>
+                    <p>에디터에 들어간 이미지 목록입니다. 항목을 누르면 응답 상태와 헤더(Content-Type, 캐시, nosniff, CSP)를 보여주고, "년월 변조"/"형식 변조(svg)" 는 링크의 년월·MIME 을 바꿔 404 가 오는지 확인합니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="demoRow">
+                            <button type="button" class="sm" id="btnImages">이미지 목록 갱신</button>
+                        </div>
+                        <ul class="editorFiles" id="imageList"></ul>
+                        <pre class="editorLog" id="viewLog">-</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API 참조 -->
+            <div class="refTable">
+                <table>
+                    <thead><tr><th>이름</th><th>유형</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr><td>POST api/system/editor/file</td><td>API</td><td>업로드. 쿼리 <code>ownerType</code>(32자), <code>ownerKey</code>(64자), 폼 <code>file</code>(여러 개), <code>password</code> → data <code>[{ url, name, size }]</code></td></tr>
+                        <tr><td>POST api/system/editor/file/copy</td><td>API</td><td>폼 <code>ownerType</code>, <code>ownerKey</code>, <code>ids</code>(반복), <code>password</code> → data 원본 Id → 새 URL</td></tr>
+                        <tr><td>GET api/system/editor/file/{id}/{info}</td><td>API</td><td>공개 조회. <code>{id}/{yyyyMM 16진수 5자리}{"image/" 뺀 MIME 16진수}</code></td></tr>
+                        <tr><td>EditorFile.SyncAsync</td><td>C#</td><td>글 저장 시 호출. 본문 참조 파일 등록, 미참조 파일 삭제 (<code>keepRegistered</code>: 이력 사용 규칙의 수정 저장)</td></tr>
+                        <tr><td>EditorFile.DeleteOwnerAsync</td><td>C#</td><td>글 삭제 시 소유자의 파일 전체 삭제</td></tr>
+                        <tr><td>new Site({ editor, editorPath })</td><td>option</td><td>에디터 엔진 선택. <code>editor</code>: 공급자 이름(<code>jodit</code>(기본), <code>suneditor</code>), <code>editorPath</code>: 엔진 파일 경로(생략 시 공급자 기본 경로)</td></tr>
+                        <tr><td>common.registerEditor(provider)</td><td>method</td><td>새 에디터 공급자(<code>IEditorProvider</code>) 등록</td></tr>
+                        <tr><td>common.editorName / editorPath</td><td>property</td><td>현재 에디터 공급자 이름 / 파일 경로 (이 샘플처럼 바꾼 뒤 makeEditor 호출하면 그 엔진으로 생성)</td></tr>
+                        <tr><td>common.makeEditor(textarea, option)</td><td>method</td><td>현재 공급자로 textarea 를 에디터로 바꿈 → <code>IEditor</code>(getHtml, setHtml, focus, destroy, native)</td></tr>
+                        <tr><td>common.renderContent(target, html)</td><td>method</td><td>샌드박스 iframe 출력 + 높이 자동 조정</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script type="module">
+        import { Site } from "/js/site.js";
+        const common = new Site();
+        const $id = id => document.getElementById(id);
+        const urlPattern = /(?:https?:\/\/[^\/"'\s]+)?\/api\/system\/editor\/file\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/[0-9a-f]{5}[0-9a-f]*/gi;
+        const log = text => $id("editorLog").textContent = text;
+
+        /** 공용 에디터 생성: 소유자 형식은 "Test", 소유자 키는 인스턴스마다 다르게 */
+        const makeEditor = (target, owner) => common.makeEditor(target, {
+            ownerType: "Test",
+            ownerKey: owner.key,
+            height: "16em",
+            onFiles: (kind, data) => log(`${kind === "upload" ? "업로드" : "붙여넣기 복사"}(${owner.name}): ${JSON.stringify(data, null, 2)}`),
+        });
+
+        /** 엔진 이름을 골라 에디터를 만든다 (사이트의 현재 공급자를 그 엔진으로 바꾼 뒤 생성, 엔진 파일은 처음 한 번만 로드) */
+        const create = async (engine, target, owner) => {
+            useEngine(engine);
+            return { engine, editor: await makeEditor(target, owner) };
+        };
+        const useEngine = engine => {
+            common.editorName = engine;
+            common.editorPath = common.editorProvider.defaultPath;
+        };
+
+        const owners = { A: { name: "A", key: crypto.randomUUID() }, B: { name: "B", key: crypto.randomUUID() } };
+        $id("keyA").textContent = owners.A.key;
+        $id("keyB").textContent = owners.B.key;
+        const slots = { A: await create($id("engineA").value, $id("editorA"), owners.A), B: await create($id("engineB").value, $id("editorB"), owners.B) };
+        const editors = new Proxy(slots, { get: (t, k) => t[k]?.editor, ownKeys: t => Reflect.ownKeys(t), getOwnPropertyDescriptor: (t, k) => ({ value: t[k]?.editor, enumerable: true, configurable: true }) });
+        window.devEditors = editors;
+
+        // 엔진 바꾸기: 본문을 보관하고 현재 에디터를 없앤 뒤 다른 엔진으로 다시 만든다
+        for (const key of ["A", "B"]) $id("engine" + key).addEventListener("change", async e => {
+            const html = slots[key].editor.getHtml();
+            slots[key].editor.destroy();
+            const target = $id("editor" + key);
+            target.value = html;
+            slots[key] = await create(e.target.value, target, owners[key]);
+            slots[key].editor.setHtml(html);
+            log(`에디터 ${key} 엔진: ${e.target.value}`);
+        });
+
+        const render = (html, key = "A") => {
+            useEngine(slots[key].engine); // 본문 스타일은 그 에디터 엔진의 것을 쓴다
+            const frame = common.renderContent($id("renderBox"), html);
+            new ResizeObserver(() => $id("renderInfo").textContent = `iframe 높이: ${frame.style.height}`).observe(frame);
+        };
+        document.querySelectorAll("[data-preview]").forEach(btn => btn.addEventListener("click", () => render(editors[btn.dataset.preview].getHtml(), btn.dataset.preview)));
+        document.querySelectorAll("[data-html]").forEach(btn => btn.addEventListener("click", () => log(editors[btn.dataset.html].getHtml())));
+        $id("btnScript").addEventListener("click", () => render(`<p>스크립트 테스트</p><script>try { parent.document.title = "탈출"; document.body.insertAdjacentHTML("beforeend", "<p>부모 접근 성공(문제)</p>"); } catch { document.body.insertAdjacentHTML("beforeend", "<p>부모 접근 차단됨(정상)</p>"); }<\/script>`));
+
+        const view = async url => {
+            const res = await fetch(url);
+            const head = ["content-type", "content-length", "cache-control", "x-content-type-options", "content-security-policy"]
+                .map(k => `${k}: ${res.headers.get(k) ?? "-"}`).join("\n");
+            $id("viewLog").textContent = `${url}\nHTTP ${res.status}\n${head}${res.ok ? "" : `\n\n${await res.text()}`}`;
+        };
+        $id("btnImages").addEventListener("click", () => {
+            const list = $id("imageList");
+            list.replaceChildren();
+            for (const [name, editor] of Object.entries(editors)) {
+                for (const m of editor.getHtml().matchAll(urlPattern)) {
+                    const url = m[0].replace(/^https?:\/\/[^\/]+/, "");
+                    const li = document.createElement("li");
+                    const img = document.createElement("img");
+                    img.src = url;
+                    const text = document.createElement("span");
+                    text.textContent = `${name}: ${url}`;
+                    // url = 접두사 + {id 36자}/{년월 5자리}{MIME hex}
+                    const at = url.indexOf("/file/") + 6 + 37;
+                    const ym = parseInt(url.slice(at, at + 5), 16);
+                    const tamper = (label, href) => {
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sm";
+                        btn.textContent = label;
+                        btn.addEventListener("click", e => {
+                            e.stopPropagation();
+                            view(href);
+                        });
+                        return btn;
+                    };
+                    const svgHex = [..."svg+xml"].map(c => c.charCodeAt(0).toString(16)).join("");
+                    li.append(img, text,
+                        tamper("년월 변조", url.slice(0, at) + (ym % 100 === 1 ? ym + 1 : ym - 1).toString(16).padStart(5, "0") + url.slice(at + 5)),
+                        tamper("형식 변조(svg)", url.slice(0, at + 5) + svgHex));
+                    li.addEventListener("click", () => view(url));
+                    list.append(li);
+                }
+            }
+            if (!list.children.length) $id("viewLog").textContent = "에디터에 업로드한 이미지가 없습니다.";
+        });
+    </script>
+</body>
+</html>

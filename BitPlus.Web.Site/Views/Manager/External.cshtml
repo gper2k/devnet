@@ -1,0 +1,297 @@
+﻿@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = "_AdminLayout";
+    this.SetTitle(this.Lang("ExternalServices"));
+    this.SetPageKey("External");
+    this.SetDescription(this.Lang("ExternalServicesInfo"));
+}
+
+@* 외부 서비스 설정 — 탭 하나 = 외부 서비스 하나. 탭 추가: ① 아래 header 에 a[data-tab] ② srcMap 에 조각 경로 ③ (필요 시) initTab 초기화 함수 ④ ManagerController 에 조각 뷰 액션 *@
+<div class="tabView">
+    <header class="frameTabs">
+        <a data-tab="smtp" href="#smtp"><i class="fi fiMail"></i> SMTP</a>
+        <a data-tab="integration" href="#integration"><i class="fi fiPuzzlePiece"></i> @this.Lang("Integration")</a>
+        <a data-tab="redis" href="#redis"><i class="fi fiServer"></i> Redis</a>
+        <a data-tab="ai" href="#ai"><i class="fi fiSparkle"></i> @this.Lang("AiApi")</a>
+        <a data-tab="token" href="#token"><i class="fi fiKey"></i> @this.Lang("ApiToken")</a>
+    </header>
+    <div class="frameBody">
+        <div id="externalContent"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const srcMap = {
+                smtp: '/Manager/External/Smtp',
+                integration: '/Manager/External/Integration',
+                redis: '/Manager/External/Redis',
+                ai: '/Manager/External/Ai',
+                token: '/Manager/External/Token'
+            };
+
+            // 외부 연동 — 현재 값을 입력칸(name)에 바인딩, 저장은 한 번에(api/config/integration)
+            function wireIntegrationPage() {
+                const form = document.querySelector('#externalContent article');
+                const inputs = [...form.querySelectorAll('input[name]')];
+                const load = async () => {
+                    const res = await common.getSend('/api/config/integration', { useLoading: false });
+                    if (res && res.success) inputs.forEach(el => el.value = res.data[el.name] ?? '');
+                };
+                form.querySelector('footer [data-mode="reset"]').onclick = load;
+                form.querySelector('footer [data-mode="save"]').onclick = async () => {
+                    const res = await common.putSend('/api/config/integration', common.makeFormData(Object.fromEntries(inputs.map(el => [el.name, el.value.trim()]))));
+                    if (res && res.success) load();
+                };
+                load();
+            }
+
+            // SMTP 구성 — 현재 값을 입력칸(name)에 바인딩, 비밀번호는 항상 빈칸(비우면 기존 값 유지), 자체 저장
+            function wireSmtpPage() {
+                const form = document.querySelector('#externalContent article');
+                const inputs = [...form.querySelectorAll('input[name]:not([name="testTo"])')];
+                const values = () => Object.fromEntries(inputs.map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value.trim()]));
+                let validator = null;
+
+                const load = async () => {
+                    const res = await common.getSend('/api/config/smtp', { useLoading: false });
+                    if (!res || !res.success) return;
+                    form.querySelectorAll('.error').forEach(p => p.classList.remove('error'));
+                    const data = { ...res.data, smtpPassword: '' };
+                    inputs.forEach(el => el.type === 'checkbox' ? el.checked = !!data[el.name] : el.value = data[el.name] ?? '');
+                };
+
+                form.querySelector('footer [data-mode="reset"]').onclick = load;
+                form.querySelector('footer button.main').onclick = async () => {
+                    const body = values();
+                    validator ??= new Validator((await common.getSend('/api/system/valid?name=SmtpSave', { useLoading: false }))?.data);
+                    const result = await validator.valid(body, form);
+                    if (!result.success) { result.popover(5, 3).markErrors(form); return; }
+
+                    const res = await common.putSend('/api/config/smtp', common.makeFormData(body));
+                    common.markServerErrors(res, form);
+                    if (res && res.success) load();
+                };
+
+                // 테스트 발송: 입력값(저장 전 포함)으로 보내고 결과는 공용 알림(성공 안내 / 실패 경고)으로 표시
+                form.querySelector('[data-mode="test"]').onclick = async () => {
+                    const body = { ...values(), testTo: form.querySelector('[name="testTo"]').value.trim() };
+                    validator ??= new Validator((await common.getSend('/api/system/valid?name=SmtpSave', { useLoading: false }))?.data);
+                    const result = await validator.valid(body, form);
+                    if (!result.success) { result.popover(5, 3).markErrors(form); return; }
+                    await common.postSend('/api/config/smtp/test', common.makeFormData(body));
+                };
+
+                load();
+            }
+
+            // Redis — 설치 결과 설정 파일 값 바인딩, 비밀번호는 항상 빈칸(비우면 기존 값 유지). 저장 후 재시작해야 적용, 테스트는 입력값(저장 전 포함)으로 PING
+            function wireRedisPage() {
+                const form = document.querySelector('#externalContent article');
+                const inputs = [...form.querySelectorAll('input[name]')];
+                const running = form.querySelector('output[name="redisRunning"]');
+                const values = () => Object.fromEntries(inputs.map(el => [el.name, el.value.trim()]));
+                const load = async () => {
+                    const res = await common.getSend('/api/config/redis', { useLoading: false });
+                    if (!res || !res.success) return;
+                    inputs.forEach(el => el.value = el.name === 'redisPassword' ? '' : res.data[el.name] ?? '');
+                    running.textContent = res.data.redisRunning ? 'Redis' : @this.Js(this.Lang("MemoryCache"));
+                };
+                form.querySelector('footer [data-mode="reset"]').onclick = load;
+                form.querySelector('footer [data-mode="save"]').onclick = async () => {
+                    const res = await common.putSend('/api/config/redis', common.makeFormData(values()));
+                    if (res && res.success) load();
+                };
+                form.querySelector('[data-mode="test"]').onclick = async () => {
+                    const { redisConnection, redisPassword } = values();
+                    await common.postSend('/api/config/redis/test', common.makeFormData({ redisConnection, redisPassword }));
+                };
+                load();
+            }
+
+            // AI API — 목록(행 클릭 = 편집 모달), 하단 추가 버튼 = 등록 모달. 모달 탭(접속 정보·옵션), 형식에 맞는 주소·모델 예시를 placeholder 로. 저장·삭제는 접속 하나씩
+            function wireAiPage() {
+                const root = document.querySelector('#externalContent');
+                const list = root.querySelector('.dataList > ul');
+                const modal = root.querySelector('#aiModal');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+                const inputs = [...modal.querySelectorAll('[name]')];
+                const numbers = ['temperature', 'topP', 'topK', 'maxTokens'];
+                const examples = {
+                    OpenAI: ['https://api.openai.com/v1 · http://localhost:11434/v1', 'gpt-4o-mini · llama3.1'],
+                    Claude: ['https://api.anthropic.com/v1', 'claude-sonnet-4-5'],
+                    Gemini: ['https://generativelanguage.googleapis.com/v1beta', 'gemini-2.5-flash']
+                };
+                const text = {
+                    add: @this.Js(this.LangOf("AddOf", "AiConnection")),
+                    edit: @this.Js(this.LangOf("EditOf", "AiConnection")),
+                    keep: @this.Js(this.Lang("KeepIfEmpty")),
+                    del: @this.Js(this.LangOf("DelMsg", "AiConnection") + " " + this.Lang("DelWarning")),
+                    enabler: @this.Js(this.Lang("Enabler")),
+                    notUsed: @this.Js(this.Lang("NotUsed")),
+                    defaultMark: @this.Js(this.Lang("DefaultMark"))
+                };
+                const badge = (value, color) => Object.assign(document.createElement('i'), { className: `badge sm ${color}`, textContent: value });
+                let editId = null;
+                const syncFormat = () => {
+                    const [endpoint, model] = examples[field('format').value];
+                    field('endpoint').placeholder = endpoint;
+                    field('model').placeholder = model;
+                };
+                field('format').onchange = syncFormat;
+
+                const load = async () => {
+                    const res = await common.getSend('/api/config/ai', { useLoading: false });
+                    if (!res || !res.success) return;
+                    list.replaceChildren(...res.data.map(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="colName"></span>
+                            <span class="colFormat"></span>
+                            <span class="colModel"></span>
+                            <span class="colFlag"></span>
+                            <span class="colFlag"></span>`;
+                        const cols = li.children;
+                        cols[0].textContent = item.name;
+                        cols[1].textContent = item.format;
+                        cols[2].textContent = cols[2].title = item.model;
+                        cols[3].append(item.enabler ? badge(text.enabler, 'point') : badge(text.notUsed, 'silver'));
+                        if (item.active) cols[4].append(badge(text.defaultMark, 'main'));
+                        li.onclick = () => openModal(item);
+                        return li;
+                    }));
+                };
+
+                // 모달 열기 (item 없으면 신규) — 열 때마다 첫 탭, API 키는 항상 빈칸(저장된 키가 있으면 "비워 두면 유지" 안내)
+                const openModal = (item = null) => {
+                    editId = item?.id ?? null;
+                    inputs.forEach(el => {
+                        const value = item?.[el.name];
+                        if (el.type === 'checkbox') el.checked = item ? !!value : el.name === 'enabler';
+                        else if (el.name === 'apiKey') el.value = '';
+                        else el.value = value ?? (el.tagName === 'SELECT' ? el.options[0].value : '');
+                    });
+                    field('apiKey').placeholder = item?.hasApiKey ? text.keep : '';
+                    modal.querySelector(':scope > header > span').textContent = item ? text.edit : text.add;
+                    modal.querySelector('[data-mode="delete"]').hidden = !item;
+                    modal.querySelector('.tabBox > header > span').click();
+                    syncFormat();
+                    modal.showModal();
+                };
+
+                // 모달 입력값 (숫자 칸이 비었으면 null = 서버 기본값)
+                const values = () => ({
+                    ...Object.fromEntries(inputs.map(el => {
+                        const value = el.type === 'checkbox' ? el.checked : el.value.trim();
+                        return [el.name, numbers.includes(el.name) && value === '' ? null : value];
+                    })),
+                    id: editId
+                });
+
+                root.querySelector('footer [data-mode="add"]').onclick = () => openModal();
+                modal.querySelector('[data-mode="test"]').onclick = () => common.postSend('/api/config/ai/test', common.makeFormData(values()));
+                modal.querySelector('[data-mode="save"]').onclick = async () => {
+                    const res = await common.putSend('/api/config/ai', common.makeFormData(values()));
+                    if (!res || !res.success) return;
+                    modal.close();
+                    load();
+                };
+                modal.querySelector('[data-mode="delete"]').onclick = async () => {
+                    if (!editId || !await common.confirm(text.del)) return;
+                    const res = await common.delSend(`/api/config/ai/${encodeURIComponent(editId)}`);
+                    if (!res || !res.success) return;
+                    modal.close();
+                    load();
+                };
+                load();
+            }
+
+            // 접근 토큰 — 목록(행 끝 삭제, 수정 없이 삭제 후 재발급), 하단 추가 버튼 = 발급 모달(발급 직후 원문 1회 표시)
+            function wireTokenPage() {
+                const root = document.querySelector('#externalContent');
+                const list = root.querySelector('.dataList > ul');
+                const modal = root.querySelector('#tokenModal');
+                const inputBox = modal.querySelector('[data-input]');
+                const issuedBox = modal.querySelector('[data-issued]');
+                const issueButton = modal.querySelector('[data-mode="issue"]');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+                const text = {
+                    noExpiry: @this.Js(this.Lang("NoExpiry")),
+                    expired: @this.Js(this.Lang("Expired")),
+                    valid: @this.Js(this.Lang("Enabler")),
+                    del: @this.Js(this.Lang("Delete")),
+                    delMsg: @this.Js(this.Lang("ApiTokenDeleteMsg")),
+                    copied: @this.Js(this.Lang("Copied"))
+                };
+
+                const load = async () => {
+                    const res = await common.getSend('/api/apitoken', { useLoading: false });
+                    if (!res || !res.success) return;
+                    list.replaceChildren(...res.data.map(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="colName"></span>
+                            <span class="colUser"></span>
+                            <span class="colDate"></span>
+                            <span class="colDate"></span>
+                            <span class="colState"></span>
+                            <span class="colAction"><button type="button" class="danger sm"><i class="fi fiDelete"></i></button></span>`;
+                        const cols = li.children;
+                        cols[0].textContent = item.name;
+                        cols[1].textContent = item.userName ?? '';
+                        cols[2].textContent = item.expire ? common.localTime(item.expire, false) : text.noExpiry;
+                        cols[3].textContent = item.lastUsed ? common.localTime(item.lastUsed, true) : '';
+                        cols[3].title = item.lastIP ?? '';
+                        cols[4].textContent = item.valid ? text.valid : text.expired;
+                        if (!item.valid) li.dataset.invalid = '';
+                        const button = cols[5].firstElementChild;
+                        button.title = text.del;
+                        button.onclick = async () => {
+                            if (!await common.confirm(text.delMsg)) return;
+                            const result = await common.delSend(`/api/apitoken/${item.id}`);
+                            if (result && result.success) load();
+                        };
+                        return li;
+                    }));
+                };
+
+                // 발급 모달 열기 — 입력 초기화(만료 기본 90일), 원문 표시 영역 숨김
+                root.querySelector('footer [data-mode="add"]').onclick = () => {
+                    ['name', 'userId', 'userName', 'issuedToken'].forEach(name => field(name).value = '');
+                    field('expireDays').value = '90';
+                    inputBox.hidden = false;
+                    issuedBox.hidden = true;
+                    issueButton.hidden = false;
+                    modal.showModal();
+                };
+                modal.querySelector('[data-mode="user"]').onclick = async () => {
+                    const result = await common.modal.append('userSelect', { max: 1 });
+                    if (!result || typeof result !== 'object') return;
+                    const [key, name] = Object.entries(result)[0] ?? ['', ''];
+                    field('userId').value = key;
+                    field('userName').value = name;
+                };
+                modal.querySelector('[data-mode="copy"]').onclick = async () => {
+                    await navigator.clipboard.writeText(field('issuedToken').value);
+                    common.info(text.copied);
+                };
+                issueButton.onclick = async () => {
+                    const body = Object.fromEntries(['name', 'userId', 'expireDays'].map(name => [name, field(name).value.trim()]));
+                    const res = await common.postSend('/api/apitoken', common.makeFormData(body), { useInfo: false });
+                    if (!res || !res.success) return;
+                    field('issuedToken').value = res.data.token;
+                    inputBox.hidden = true;
+                    issuedBox.hidden = false;
+                    issueButton.hidden = true;
+                    load();
+                };
+                load();
+            }
+
+            // 탭 연결 (공용 common.bindTabView — site.js 모듈이 준비된 뒤 실행)
+            const initTab = { smtp: wireSmtpPage, integration: wireIntegrationPage, redis: wireRedisPage, ai: wireAiPage, token: wireTokenPage };
+            window.addEventListener('DOMContentLoaded', () => common.bindTabView(document.querySelector('.tabView'), srcMap, initTab));
+        })();
+    </script>
+}

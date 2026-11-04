@@ -1,0 +1,1125 @@
+div#app.pageLayout {
+    --frameMax: 1280px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    font-size: 1rem;
+    min-height: 100vh;
+    transition: padding-right 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-sizing: border-box;
+
+    &.hasLayoutConfigSide {
+        padding-right: 21.5em;
+    }
+    //gap: 1em;
+
+    & > * {
+        flex: 0 0 auto;
+        min-height: 2em;
+    }
+
+    & > header {
+        background-color: var(--bgColor);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+
+        & > div {
+            width: 100%;
+            max-width: var(--frameMax);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 auto;
+            padding: 0.8em;
+            gap: 1em;
+
+            & > div {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+
+                & img.logo {
+                    height: 1.6em;
+                    vertical-align: bottom;
+                    will-change: transform;
+                    image-rendering: auto; /* 또는 -webkit-optimize-contrast */
+
+
+                    & + span.logo {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: baseline;
+                        font-size: 1.8em;
+                        line-height: 1em;
+                        cursor: pointer;
+                        color: var(--main);
+
+                        & > b {
+                            color: var(--point);
+                        }
+
+                        & > small {
+                            font-size: 0.7em;
+                            color: var(--silver);
+                        }
+                    }
+                }
+
+                &.left {
+                    gap: 0.4em;
+                    font-size: 1rem;
+
+                    & > span.menu {
+                        display: none;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 2em;
+                        margin-right: 0.5em;
+                        cursor: pointer;
+                    }
+
+                    & > i.fiSettings {
+                        margin-left: 0.3em;
+                        font-size: 1.1em;
+                        color: var(--txLight);
+                        cursor: pointer;
+                        transition: color 0.2s, transform 0.2s;
+
+                        &:hover {
+                            color: var(--main);
+                            transform: rotate(30deg) scale(1.1);
+                        }
+
+                        &:active {
+                            transform: rotate(30deg) scale(0.95);
+                        }
+                    }
+                }
+
+                &.right {
+                    flex: 1 1 auto;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 2em;
+
+                    & > ul,
+                    & > nav > ul {
+                        display: flex;
+                        flex-direction: row;
+                        padding: 0;
+                        margin: 0;
+                        list-style: none;
+                        gap: 0.5em;
+
+                        & > li {
+                            cursor: pointer;
+                            transition: all 0.2s;
+                        }
+                    }
+
+                    & > nav {
+                        flex: 1 1 auto;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transition: all .2s;
+
+                        & > ul {
+                            font-size: 0.95em;
+                            font-weight: bold;
+                            color: var(--txLight);
+                            text-transform: uppercase;
+                            gap: 2.2em;
+
+                            & > li {
+                                position: relative;
+
+                                & > span {
+                                    display: block;
+                                    transition: all 0.2s;
+
+                                    &:hover {
+                                        transform: scale(1.1);
+                                        color: var(--point);
+                                    }
+
+                                    &:active {
+                                        transform: scale(0.98);
+                                    }
+
+                                    /* 하위 메뉴 표시 화살표: 열리면 뒤집힘 */
+                                    & > i.fi {
+                                        font-size: 0.8em;
+                                        margin-left: 0.15em;
+                                        transition: transform 0.25s;
+                                    }
+                                }
+
+                                &.active > span,
+                                &:hover > span {
+                                    color: var(--point);
+                                }
+
+                                /* 2단 메뉴: 1단 아래 가운데에 좌우가 둥근 가로 바 — 마우스를 올리면(또는 키보드 포커스) 살짝 내려오며 나타남 */
+                                & > ul {
+                                    position: absolute;
+                                    top: 100%;
+                                    left: 50%;
+                                    display: flex;
+                                    flex-direction: row;
+                                    gap: 0.2em;
+                                    margin: 1.1em 0 0 0;
+                                    padding: 0.35em;
+                                    list-style: none;
+                                    white-space: nowrap;
+                                    font-size: 0.9em;
+                                    color: var(--txColor);
+                                    background-color: var(--bgColor);
+                                    border: 1px solid var(--lineColor);
+                                    border-radius: 2em;
+                                    box-shadow: 0 0.5em 1.5em var(--aColor);
+                                    opacity: 0;
+                                    visibility: hidden;
+                                    transform: translate(-50%, -0.6em) scale(0.96);
+                                    transform-origin: top center;
+                                    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.2s;
+
+                                    /* 1단과 바 사이 틈에서 마우스가 벗어나 닫히지 않도록 잇는 투명 다리 */
+                                    &::before {
+                                        content: "";
+                                        position: absolute;
+                                        left: 0;
+                                        right: 0;
+                                        bottom: 100%;
+                                        height: 1.3em;
+                                    }
+
+                                    & > li {
+                                        padding: 0.5em 1.1em;
+                                        border-radius: 2em;
+                                        cursor: pointer;
+                                        transition: all 0.2s;
+
+                                        &:hover {
+                                            color: var(--main);
+                                            background-color: var(--main1);
+                                        }
+
+                                        &.active {
+                                            color: var(--bgColor);
+                                            background-color: var(--main);
+                                        }
+                                    }
+                                }
+
+                                &:hover,
+                                &:focus-within {
+                                    & > ul {
+                                        opacity: 1;
+                                        visibility: visible;
+                                        transform: translate(-50%, 0) scale(1);
+                                    }
+
+                                    & > span > i.fi {
+                                        transform: rotate(180deg);
+                                    }
+                                }
+                            }
+                        }
+
+                        & > header,
+                        & > footer,
+                        & > span,
+                        & > a {
+                            display: none;
+                        }
+                    }
+
+                    & > ul {
+                        font-size: 0.85em;
+                        padding: 0.25em 0.4em;
+                        border: 1px solid var(--lineColor);
+                        border-radius: 2em;
+                        align-items: center;
+                        gap: 0;
+
+                        & > li {
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            padding: 0.3em 0.6em;
+                            text-transform: uppercase;
+                            gap: 0.4em;
+                            font-weight: bold;
+                            color: var(--main);
+                            border-radius: 2em;
+
+                            &:hover {
+                                color: var(--point);
+                            }
+
+                            /* 통합 검색: 옅은 메인색 둥근 바탕의 아이콘 — 옆 회원 항목과 구분 */
+                            &[data-search] {
+                                justify-content: center;
+                                width: 2.2em;
+                                height: 2.2em;
+                                padding: 0;
+                                margin-right: 0.3em;
+                                border-radius: 50%;
+                                background-color: var(--main2);
+
+                                &:hover {
+                                    color: var(--bgColor);
+                                    background-color: var(--main5);
+                                }
+                            }
+
+                            // 글자 항목(Log out / Join US): 작은 글씨 2단으로 쌓아 폭을 줄임
+                            &.stack {
+                                flex-direction: column;
+                                align-items: flex-start;
+                                justify-content: center;
+                                gap: 0;
+                                padding: 0 0.9em 0 0.6em;
+                                font-size: 0.72em;
+                                line-height: 1.05;
+                                letter-spacing: 0.02em;
+                            }
+
+                            // 회원 이름: 길어도 상자가 깨지지 않도록 최대 폭 + 말줄임 (전체 이름은 title)
+                            & > span.userName {
+                                display: block;
+                                max-width: 8em;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
+                            }
+
+                            &.bgMain {
+                                background-color: var(--main);
+                                color: var(--bgColor);
+                                border: 1px solid var(--aColor);
+                                padding-left: 0.4em;
+
+                                & > i {
+                                    width: 1.8em;
+                                    height: 1.8em;
+                                    padding: 0.15em;
+                                    border: 1px solid var(--aDark);
+                                    border-radius: 50%;
+                                    background-color: var(--mainLight);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+
+                                    &:has(img) {
+                                        padding: 0;
+                                        border: none;
+
+                                        & > img {
+                                            width: 100%;
+                                            height: 100%;
+                                            border-radius: 50%;
+                                            object-fit: cover;
+                                        }
+                                    }
+
+                                    & > i.fi {
+                                        font-size: 1.1em;
+                                    }
+                                }
+                            }
+                        }
+
+                        & + i.fi {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    & > div {
+        flex: 1 1 auto;
+        overflow: auto;
+        padding: 0.5em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        & > main {
+            flex: 1 1 auto;
+            /* 현 레이아웃을 전체 페이지 스크롤 형으로 작성함. */
+            //overflow: auto;
+        }
+    }
+    /* 창 높이 맞춤(화면이 AppClass = "fit"): 앱을 창 높이로 고정하고 main 이 남은 높이를 채우는 flex 열 — 화면 안 영역(예: 메시지 대화)이 먼저 줄고,
+       main 이 내용의 최소 높이(화면이 정한 min-height)에 닿으면 그때부터 본문 영역(> div)이 스크롤 */
+    &.fit {
+        height: 100vh;
+        height: 100dvh;
+
+        & > div {
+            min-height: 0;
+
+            & > main {
+                flex: 1 1 0;
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    }
+
+    & > div {
+
+        & > footer {
+            padding: 1.5em 2em;
+            color: white;
+            background-color: var(--decoDark); /* 하단 영역: 단계색(1~9)은 다크에서 밝기 순서가 뒤집히므로 테마와 상관없이 짙은 데코색 */
+            border-radius: var(--roundBox, 0.8em);
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 2em;
+
+            & > div.logoContainer {
+                flex: 0 0 17em;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                gap: 0.5em;
+
+                & > div {
+                    flex: 0 0 auto;
+                    display: flex;
+                    flex-direction: row;
+                    gap: 0.2em;
+
+                    & > img {
+                        height: 1.6em;
+                        vertical-align: bottom;
+                        margin: 0.2em 0 -0.2em 0
+                    }
+
+                    & > span.logo {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: baseline;
+                        font-size: 1.8rem;
+                        line-height: 1em;
+                        cursor: pointer;
+                        color: white;
+
+                        & > b {
+                            color: var(--pointLight);
+                        }
+
+                        & > small {
+                            font-size: 1.1rem;
+                            color: var(--silver);
+                        }
+                    }
+                }
+
+                & > p {
+                    flex: 1 1 auto;
+                    color: rgba(255,255,255, 0.35);
+                    font-size: 0.85rem;
+                    line-height: 1.6em;
+                }
+            }
+
+            & > div:not(.logoContainer) {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 2em;
+                height: 100%;
+            }
+
+            & > section,
+            & > div > section {
+                flex: 1 1 auto;
+                font-size: 0.9rem;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+                color: white;
+
+                & > header {
+                    font-weight: bold;
+                    font-size: 1em;
+                }
+
+                & > ul {
+                    list-style: none;
+                    margin: 0.3em 0 0 0;
+                    padding: 0;
+
+                    & > li {
+                        margin: 0.25em 0;
+
+                        &, & > a {
+                            font-size: 0.9em;
+                            color: rgba(255,255,255, 0.5);
+                            text-decoration: none;
+                            transition: all 0.2s;
+
+                            &:hover {
+                                color: var(--deco2);
+                                transform: scale(1.1) translateX(1em);
+                            }
+                        }
+                    }
+                }
+
+                &.page {
+                    flex: 0 0 auto;
+                    display: flex;
+                    flex-direction: column;
+                    flex-wrap: nowrap;
+                    height: 100%;
+
+                    & > div {
+                        flex: 1 1 auto;
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: nowrap;
+                        justify-content: flex-end;
+                        color: white;
+                        gap: 0.5em;
+
+                        & > i.fi {
+                            font-size: 2.8em;
+                        }
+
+                        & > header {
+                            font-size: 1.1em;
+
+                            & > small {
+                                display: block;
+                                font-size: 0.7em;
+                                color: rgba(255,255,255, 0.5);
+                            }
+                        }
+                    }
+
+                    & > small {
+                        flex: 0 0 auto;
+                        font-size: 0.7rem;
+                        color: rgba(255,255,255, 0.6);
+                    }
+                }
+            }
+        }
+    }
+
+    & > header > div > div.right > ul + i#pageMore.locked {
+        display: none !important;
+    }
+}
+
+div#app.pageLayout ::deep > div > * {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: var(--frameMax);
+    margin: 0 auto;
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+    div#app.pageLayout {
+        & > header {
+            border-bottom: 1px solid var(--aColor);
+            & > div {
+                & > div {
+                    &.left {
+                        & > span.menu {
+                            display: flex;
+                        }
+                    }
+
+                    &.right {
+                        justify-content: flex-end;
+                        gap: 1em;
+
+                        & > nav {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            bottom: 0;
+                            width: 20em;
+                            height: 100vh;
+                            height: 100dvh;
+                            max-height: 100dvh;
+                            box-sizing: border-box;
+                            padding: 1em 1em max(1em, env(safe-area-inset-bottom, 1em)) 1em;
+                            margin-left: -21em;
+                            color: var(--txColor);
+                            background-color: var(--bgColor);
+                            border-right: 1px solid var(--aDark);
+                            display: flex;
+                            flex-direction: column;
+                            flex-wrap: nowrap;
+                            justify-content: flex-start;
+                            align-items: initial;
+                            gap: 1em;
+                            overflow-y: auto;
+                            -webkit-overflow-scrolling: touch;
+
+                            & > header {
+                                flex: 0 0 auto;
+
+                                &, & > span {
+                                    display: flex;
+                                    flex-direction: row;
+                                    flex-wrap: nowrap;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    gap: 0.5em;
+
+                                    &.logoWrap {
+                                        font-size: 0.85em;
+                                    }
+
+                                    &.closer {
+                                        font-size: 1.6em;
+                                        cursor: pointer;
+                                        color: var(--mainLight);
+                                        transition: all .2s;
+
+                                        &:hover {
+                                            transform: scale(1.1);
+                                            color: var(--mainDark);
+                                        }
+
+                                        &:active {
+                                            color: var(--mainLight);
+                                            transform: scale(0.95);
+                                        }
+                                    }
+                                }
+                            }
+
+                            & > ul {
+                                flex: 0 1 auto;
+                                min-height: 0;
+                                overflow-y: auto;
+                                padding: 1em 0.5em;
+                                flex-direction: column;
+                                align-items: initial;
+                                gap: 0.5em;
+                                border-bottom: 1px solid var(--aColor);
+
+                                & > li {
+                                    font-size: 1.2em;
+
+                                    & > span {
+                                        display: inline-block;
+                                        width: auto;
+
+                                        /* 사이드 패널은 하위 메뉴가 늘 펼쳐져 있으므로 화살표 숨김 */
+                                        & > i.fi {
+                                            display: none;
+                                        }
+                                    }
+
+                                    /* 2단 메뉴(사이드 패널): 늘 펼쳐 보임 — 왼쪽 세로줄 아래 들여 쓴 둥근 항목, 지금 페이지는 메인색 바탕 */
+                                    & > ul {
+                                        position: static;
+                                        flex-direction: column;
+                                        gap: 0.1em;
+                                        margin: 0.4em 0 0 0.3em;
+                                        padding: 0 0 0 0.7em;
+                                        font-size: 0.75em;
+                                        font-weight: normal;
+                                        text-transform: none;
+                                        background-color: transparent;
+                                        border: none;
+                                        border-left: 2px solid var(--main2);
+                                        border-radius: 0;
+                                        box-shadow: none;
+                                        opacity: 1;
+                                        visibility: visible;
+                                        transform: none;
+                                        transition: none;
+
+                                        &::before {
+                                            display: none;
+                                        }
+
+                                        & > li {
+                                            padding: 0.45em 0.9em;
+                                        }
+                                    }
+
+                                    &:hover,
+                                    &:focus-within {
+                                        & > ul {
+                                            transform: none;
+                                        }
+                                    }
+                                }
+                            }
+
+                            /* 통합 검색 바로가기 (780 이하에서만 보임): 인증 상자 위 검색창 모양 — 둥근 아이콘 · 이름/안내 · 화살표 */
+                            & > a {
+                                flex: 0 0 auto;
+                                align-items: center;
+                                gap: 0.7em;
+                                padding: 0.45em 0.9em 0.45em 0.45em;
+                                color: var(--txColor);
+                                text-decoration: none;
+                                border: 1px solid var(--lineColor);
+                                border-radius: 2em;
+                                transition: all 0.2s;
+
+                                & > i:first-child {
+                                    flex: 0 0 auto;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 2.2em;
+                                    height: 2.2em;
+                                    border-radius: 50%;
+                                    color: var(--main);
+                                    background-color: var(--main2);
+                                    transition: all 0.2s;
+                                }
+
+                                & > span {
+                                    flex: 1 1 auto;
+                                    display: flex;
+                                    flex-direction: column;
+                                    font-size: 0.9em;
+                                    font-weight: bold;
+                                    line-height: 1.2em;
+
+                                    & > small {
+                                        font-weight: normal;
+                                        color: var(--txLight);
+                                    }
+                                }
+
+                                & > i.fi:last-child {
+                                    color: var(--txLight);
+                                    transition: transform 0.2s;
+                                }
+
+                                &:hover,
+                                &.active {
+                                    border-color: var(--main3);
+                                    background-color: var(--main1);
+
+                                    & > i:first-child {
+                                        color: var(--bgColor);
+                                        background-color: var(--main);
+                                    }
+
+                                    & > i.fi:last-child {
+                                        transform: translateX(0.2em);
+                                    }
+                                }
+                            }
+
+                            & > span.space {
+                                display: block;
+                                flex: 1 1 auto;
+                                min-height: 0.5em;
+                            }
+                        }
+
+                        & > i.fi {
+                            display: block !important;
+                            font-size: 2em;
+                            cursor: pointer;
+                        }
+                    }
+                }
+            }
+
+            &.open > div > div.right > nav {
+                margin-left: 0;
+                box-shadow: 0.1em 0.1em 0.6em 0.2em var(--aDark);
+            }
+        }
+
+
+
+        &.open ::deep #pageMenu {
+            margin-right: 0 !important;
+        }
+    }
+}
+
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+    div#app.pageLayout {
+        & > header {
+            & > div {
+                & > div.right {
+                    & > nav {
+                        & > footer {
+                            flex: 0 0 auto;
+                            padding: 0.5em;
+                            background-color: var(--main1);
+                            border: 1px solid var(--main2);
+                            border-radius: 2em; //var(--roundBox);
+                            display: flex;
+                            flex-direction: row;
+                            flex-wrap: nowrap;
+                            justify-content: space-between;
+                            gap: 1em;
+
+                            & > span {
+                                flex: 0 0 auto;
+                                width: 3em;
+                                height: 3em;
+                                border-radius: 1.5em;
+                                background-color: var(--main);
+                                color: white;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                cursor: pointer;
+
+                                &:has(img) {
+                                    border: 2px solid var(--main);
+                                    overflow: hidden;
+
+                                    & > img {
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: cover;
+                                    }
+                                }
+
+                                & > i.fi {
+                                    font-size: 2em;
+                                }
+                            }
+
+                            & > ul {
+                                flex: 1 1 auto;
+                                list-style: none;
+                                margin: 0;
+                                padding: 0;
+                                display: flex;
+                                flex-direction: column;
+                                flex-wrap: nowrap;
+                                gap: 0.2em;
+
+                                & > li {
+                                    line-height: 1em;
+                                    font-size: 0.85em;
+                                    font-weight: bold;
+                                    cursor: pointer;
+
+                                    &.name {
+                                        font-size: 1em;
+                                        cursor: default; /* 사용자 페이지 이동은 이미지만 */
+                                        font-weight: bold;
+                                        text-transform: capitalize;
+                                    }
+
+                                    &.userInfo {
+                                        line-height: 1.2em;
+                                        cursor: default;
+                                        font-size: 0.8em;
+                                        font-weight: normal;
+
+                                        & > i.fi {
+                                            cursor: pointer;
+                                            color: var(--main);
+                                            transition: all .2s;
+
+                                            &:hover {
+                                                transform: scale(1.3);
+                                            }
+
+                                            &:active {
+                                                transform: scale(1.1);
+                                            }
+                                        }
+                                    }
+
+                                    &.name[onclick] {
+                                        cursor: pointer;
+                                        color: var(--main);
+                                    }
+
+                                    /* 알림·메시지 수: 아이콘 + 숫자 링크 */
+                                    & > a {
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 0.2em;
+                                        margin-right: 0.8em;
+                                        color: var(--main);
+                                        text-decoration: none;
+                                        transition: all .2s;
+
+                                        &:hover {
+                                            color: var(--point);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    & > ul {
+                        display: none;
+                    }
+
+                    /* 회원 상자가 숨으므로 통합 검색은 사이드 패널 인증 상자 위 바로가기로 */
+                    & > nav > a {
+                        display: flex;
+                    }
+                }
+            }
+        }
+
+        & > div {
+            & > footer {
+                flex-direction: column;
+                justify-content: initial;
+                align-items: initial;
+
+                & > * {
+                    flex: 0 0 auto !important;
+                    height: auto !important;
+
+                    &.page {
+                        height: 6em !important;
+
+                        & > small {
+                            text-align: right;
+                            font-size: 0.9rem;
+                        }
+                    }
+                }
+
+                & > div:not(.logoContainer) {
+                    gap: 0.5em;
+                }
+            }
+        }
+    }
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+    div#app.pageLayout {
+
+    }
+}
+
+/* 하단 "GET QR CODE" 모달: QR 이미지 가운데, 그 아래 주소 입력 그룹(읽기 전용 + 복사 버튼), 확인 버튼은 가운데 */
+dialog.qrDialog {
+    width: 22em;
+
+    & > section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8em;
+
+        & > img {
+            width: 14em;
+            height: 14em;
+        }
+
+        & > .inputGroup {
+            width: 100%;
+
+            & > input {
+                font-size: 0.85em;
+            }
+        }
+    }
+
+    & > footer {
+        justify-content: center;
+    }
+}
+
+/* 메시지 보내기 창 (dialog#messageDialog): 받는 사람 제목 / 내용 입력 / 취소·보내기 */
+dialog.messageDialog {
+    width: 28em;
+
+    & > section > textarea {
+        width: 100%;
+        resize: vertical;
+    }
+}
+
+/* 상단 회원 정보 상자 (li#userBox): 버튼(이미지·ID·안 읽은 메시지 수) / 누르면 드롭박스(이미지·이름·ID, 그룹·역할·메시지, 그룹 변경·내 정보) */
+#userBox {
+    cursor: pointer;
+
+    & > i > img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    & > section {
+        width: 18em;
+        padding: 1em;
+        cursor: default;
+        text-transform: none;
+        font-weight: normal;
+        color: var(--txColor);
+
+        & > header {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.8em;
+            padding-bottom: 0.8em;
+            border-bottom: 1px solid var(--lineColor);
+
+            & > div.pic {
+                flex: 0 0 auto;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 3.2em;
+                height: 3.2em;
+                border-radius: 50%;
+                overflow: hidden;
+                color: var(--deco);
+                border: 0.15em solid var(--lineColor);
+
+                & > i.fi {
+                    font-size: 1.8em;
+                }
+
+                & > img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+
+            & > div:last-child {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                gap: 0.4em;
+                color: var(--txColor);
+
+                & > span {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    line-height: 1em;
+                    gap: 0.3em;
+
+                    & > strong {
+                        color: var(--main);
+                        overflow: hidden;
+                        font-size: 1.1em;
+                        text-overflow: ellipsis;
+                    }
+
+                    & > small {
+                        color: var(--silver);
+                        font-size: 0.9em;
+                        text-transform: capitalize;
+                    }
+
+                    &:last-child {
+                        font-size: 0.85em;
+                        color: var(--txLight);
+
+                        & > i.fi {
+                            cursor: pointer;
+                            color: var(--main);
+                            transition: all .2s;
+
+                            &:hover {
+                                transform: scale(1.3);
+                            }
+
+                            &:active {
+                                transform: scale(1.1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        & > ul {
+            max-height: none;
+            padding: 0.6em 0;
+
+            & > li {
+                display: flex;
+                justify-content: space-between;
+                gap: 1em;
+                padding: 0.3em 0.5em;
+                background-color: transparent;
+                cursor: default;
+
+                & > label {
+                    color: var(--txLight);
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5em;
+
+                    & > i.fi {
+                        font-size: 1.2em;
+                    }
+                }
+
+                & > a {
+                    color: var(--main);
+                    font-weight: bold;
+                }
+            }
+        }
+
+        & > footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.4em;
+            padding-top: 0.8em;
+            border-top: 1px solid var(--lineColor);
+        }
+    }
+}
+
+aside.layoutConfigSidePanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 21.5em;
+    max-width: 100vw;
+    z-index: 10000;
+    background-color: var(--bgColor);
+    border-left: 1px solid var(--lineColor);
+    box-shadow: -4px 0 20px var(--aColor);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    &.open {
+        transform: translateX(0);
+    }
+}
+

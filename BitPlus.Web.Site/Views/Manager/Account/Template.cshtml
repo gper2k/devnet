@@ -1,0 +1,60 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@using BitPlus.Web.Site.Controllers.API
+@{
+    Layout = null;
+    this.SetTitle(this.LangOf("TemplateOf", "Mail"));
+}
+
+<div class="pageBox">
+    <div class="flexRow alignStretch gapMd auto">
+        @* 좌측: 고정 템플릿 목록 (MembershipController.TemplateItems, 첫 항목 자동 선택) *@
+        <aside class="asideList flexCol gapSm">
+            <ul class="selectList main auto">
+                @foreach (var item in MembershipController.TemplateItems)
+                {
+                    <li data-key="@item.Key">
+                        <header><i class="fi fiMail"></i><span>@this.Lang(item.Name)</span></header>
+                        <p>@this.Lang(item.Detail)</p>
+                    </li>
+                }
+            </ul>
+        </aside>
+
+        @* 우측: 안내(치환 태그) + 문화권별 메일 제목/본문 *@
+        <article class="auto flexCol gapMd">
+            <div class="inform">
+                <header><i class="fi fiInfo fiFill"></i> @this.Lang("TemplateInfoTitle")</header>
+                <p>@this.Lang("TemplateInfoContent")</p>
+                <p>
+                    <code>{#domain}</code> @this.LangOf("DomainOf", "Site") ·
+                    <code>{#userid}</code> @this.Lang("UserID") ·
+                    <code>{#username}</code> @this.Lang("UserName") ·
+                    <code>{#usermail}</code> @this.Lang("Email") ·
+                    <code>{#token}</code> @this.Lang("TemplateTokenInfo")
+                </p>
+            </div>
+
+            <ul class="form auto" style="overflow: auto;">
+                <li class="col2">
+                    <div>
+                        <partial name="~/Views/Manager/Account/_CultureSelect.cshtml" />
+                    </div>
+                    <div></div>
+                </li>
+                <li>
+                    <header>@this.LangOf("TitleOf", "Mail")</header>
+                    <input type="text" name="titles" maxlength="256" autocomplete="off" />
+                </li>
+                <li class="auto flexCol">
+                    <header class="fix">@this.LangOf("BodyOf", "Mail")</header>
+                    <textarea name="bodies" rows="12"></textarea>
+                </li>
+            </ul>
+
+            <footer class="pageFooter">
+                <span></span>
+                <button type="button" class="main"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+            </footer>
+        </article>
+    </div>
+</div>

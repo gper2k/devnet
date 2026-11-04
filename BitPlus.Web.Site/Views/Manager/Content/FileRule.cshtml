@@ -1,0 +1,175 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("FileRule"));
+}
+
+<div class="pageBox fileRuleBox">
+    <div class="inform">
+        <header><i class="fi fiInfo fiFill"></i> @this.Lang("FileRuleInfoTitle")</header>
+        <p>@this.Lang("FileRuleInfoContent")</p>
+    </div>
+
+    <!-- 파일 규칙 목록 카드 -->
+    <section class="card line flexCol auto">
+        <header class="fix">
+            <strong>
+                <i class="fi fiFolder"></i>
+                @this.Lang("FileRules")
+                <i id="ruleCounter" class="badge deco">3</i>
+            </strong>
+            <div class="flexRow gapSm alignCenter">
+                <div class="inputGroup inline sm">
+                    <input type="text" name="ruleSearch" placeholder="@this.Lang("Search")" autocomplete="off" />
+                    <button type="button" class="sub"><i class="fi fiSearch"></i></button>
+                </div>
+                <button type="button" class="sub sm" id="addFileRuleBtn">
+                    <i class="fi fiAdd"></i> @this.Lang("Add")
+                </button>
+            </div>
+        </header>
+
+        <div class="dataList auto">
+            <header>
+                <span class="colName"><span>NAME</span></span>
+                <span class="colWeb"><span>WEB ROOT</span></span>
+                <span class="colExt"><span>EXTENSIONS</span></span>
+                <span class="colCount"><span>COUNT</span></span>
+                <span class="colSize"><span>FILE SIZE</span></span>
+                <span class="colTotal"><span>TOTAL SIZE</span></span>
+                <span class="colDate"><span>DATE</span></span>
+            </header>
+            <ul id="fileRuleList"></ul>
+        </div>
+
+        <footer class="fix">
+            <div class="pageSize">
+                <label>List Size</label>
+                <select name="pageSize">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <ul class="pager">
+                <li class="active"><button type="button">1</button></li>
+            </ul>
+        </footer>
+    </section>
+</div>
+
+<!-- 파일 규칙 등록/수정 모달 (계정 관리 사용자/그룹 모달처럼 탭 구조) -->
+<dialog id="fileRuleModal">
+    <header><i class="fi fiFolder fiFill"></i> @this.Lang("FileRule") <span class="badge" hidden>SYS</span></header>
+    <section class="tabBox">
+        <header>
+            <span data-for="#fileRuleTabBasic" class="active">@this.Lang("BasicInfo")</span>
+            <span data-for="#fileRuleTabAccess">@this.Lang("FileAccessRule")</span>
+        </header>
+        <section>
+            <!-- 기본 정보 탭 -->
+            <div id="fileRuleTabBasic" class="active">
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("Name") <small class="txDanger">*</small></header>
+                        <input type="text" name="name" maxlength="64" placeholder="@this.Lang("ExampleOf").Formats("BoardAttachment")" autocomplete="off" />
+                    </li>
+                    <li>
+                        <header>@this.Lang("RegistWebRoot") <small class="txDanger">*</small></header>
+                        <input type="text" name="registWebRoot" maxlength="256" placeholder="@this.Lang("ExampleOf").Formats("/uploads/board")" autocomplete="off" />
+                    </li>
+                    <li>
+                        <header>@this.Lang("AllowExtensions")</header>
+                        <input type="text" name="allowExtensions" maxlength="512" placeholder="jpg, png, gif, pdf, zip (@this.Lang("SiteKeywordsInfo"))" autocomplete="off" />
+                    </li>
+                    <li class="col3">
+                        <div>
+                            <header>@this.Lang("AllowCount")</header>
+                            <input type="number" name="allowCount" min="-1" value="5" placeholder="-1: @this.Lang("Unlimited")" />
+                        </div>
+                        <div>
+                            <header>@this.Lang("AllowSize")</header>
+                            <input type="number" name="allowSize" min="-1" value="10485760" placeholder="Byte (-1: @this.Lang("Unlimited"))" />
+                        </div>
+                        <div>
+                            <header>@this.Lang("AllowTotalSize")</header>
+                            <input type="number" name="allowTotalSize" min="-1" value="52428800" placeholder="Byte (-1: @this.Lang("Unlimited"))" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 권한 규칙 탭 (UpFileAccessRule 목록 및 추가 버튼) -->
+            <div id="fileRuleTabAccess">
+                <div class="accessToolbar">
+                    <button type="button" class="xs info" id="addAccessRuleBtn">
+                        <i class="fi fiAdd"></i> @this.Lang("Add")
+                    </button>
+                </div>
+                <div class="accessRuleBox">
+                    <ul id="accessRuleItems"></ul>
+                </div>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <button type="button" class="danger" data-mode="delete" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" id="fileRuleSaveBtn"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!-- UpFileAccessRule 편집용 서브 모달창 -->
+<dialog id="fileAccessRuleModal">
+    <header><i class="fi fiShieldKeyhole fiFill"></i> @this.Lang("FileAccessRule")</header>
+    <section>
+        <ul class="form">
+            <li>
+                <header>@this.Lang("AccessMode")</header>
+                <div class="flexRow gapMd">
+                    <label class="radio main">
+                        <input type="radio" name="accessMode" value="Upload" checked />
+                        <span>@this.Lang("Upload")</span>
+                    </label>
+                    <label class="radio main">
+                        <input type="radio" name="accessMode" value="Download" />
+                        <span>@this.Lang("Download")</span>
+                    </label>
+                </div>
+            </li>
+            <li>
+                <header>@this.Lang("TargetType")</header>
+                <div class="flexRow gapMd flexWrap">
+                    <label class="radio main">
+                        <input type="radio" name="targetType" value="Role" checked />
+                        <span>@this.Lang("Role")</span>
+                    </label>
+                    <label class="radio main">
+                        <input type="radio" name="targetType" value="Group" />
+                        <span>@this.Lang("Group")</span>
+                    </label>
+                    <label class="radio main">
+                        <input type="radio" name="targetType" value="Groups" />
+                        <span>@this.Lang("Groups")</span>
+                    </label>
+                    <label class="radio main">
+                        <input type="radio" name="targetType" value="User" />
+                        <span>@this.Lang("User")</span>
+                    </label>
+                </div>
+            </li>
+            <li>
+                <header>@this.Lang("TargetSelect")</header>
+                <div class="inputGroup">
+                    <input type="text" name="targetName" placeholder="@this.Lang("TargetSelect")" readonly />
+                    <input type="hidden" name="targetKey" />
+                    <button type="button" id="searchTargetBtn"><i class="fi fiSearch"></i> @this.Lang("Search")</button>
+                </div>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" id="applyAccessRuleBtn"><i class="fi fiCheck"></i> @this.Lang("Apply")</button>
+    </footer>
+</dialog>

@@ -1,0 +1,54 @@
+div.mainBanner {
+    background: url(/img/sampleBg.jpg);
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 20em;
+    border-radius: var(--roundBox, 0.8em);
+
+    & > span {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        font-size: 6em;
+        font-weight: 900;
+        color: #ffffff;
+        text-shadow: 0.1em 0.1em 0.3em #000000;
+    }
+}
+
+div.pageWrap {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 0 0 2em 0;
+    gap: 2em;
+
+    & > header {
+        & > b {
+            display: inline-block;
+            color: var(--primary);
+        }
+        & > span {
+            display: block;
+            font-size: 1.6em;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--txColor);
+        }
+
+        & > p {
+            margin: 1em 0;
+            padding: 0.3em;
+            background-color: var(--aColor);
+            border-radius: 0.5em;
+            width: 70%;
+
+            &.short {
+                width: 40%;
+            }
+        }
+    }
+}

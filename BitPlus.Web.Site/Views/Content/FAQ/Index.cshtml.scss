@@ -1,0 +1,169 @@
+/* FAQ형 목록(FAQ/Index) 전용 스타일: 가운데 제목·검색바·카테고리 목록 아래에 질문(Q)·답변(A) 카드 */
+.contentFaq {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    width: 100%;
+    max-width: 56em;
+    margin-inline: auto;
+
+    & > header {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+        padding: 1em 0 0.5em 0;
+
+        & > h1 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* 검색바: 카테고리 위쪽 가운데 */
+        & > form {
+            width: min(26em, 100%);
+        }
+
+        /* 카테고리 목록: 태그처럼 늘어놓고 누르면 그 카테고리만, 한눈에 찾을 수 있는 크기 */
+        & > ul.faqCategory {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.4em 1.4em;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            & > li > span {
+                display: inline-block;
+                padding: 0.4em 0.1em;
+                border-bottom: 3px solid transparent;
+                color: var(--txLight);
+                font-size: 1.1em;
+                cursor: pointer;
+                user-select: none;
+                transition: color 0.15s;
+
+                &:hover {
+                    color: var(--txColor);
+                }
+
+                &.active {
+                    border-bottom-color: var(--primary);
+                    color: var(--txColor);
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+    & > .faqBar {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* 질문·답변 카드 (JS 로 그린 요소라 ::deep) */
+    & > ul.faqList {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        & ::deep li {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9em;
+            padding: 1.2em 1.4em;
+            border-radius: var(--roundBox);
+            background-color: var(--aLow);
+
+            &.empty {
+                align-items: center;
+                color: var(--txLight);
+            }
+
+            & > .q,
+            & > .a {
+                display: flex;
+                gap: 0.8em;
+
+                & > b {
+                    flex: 0 0 auto;
+                    font-size: 1.25em;
+                    font-weight: normal;
+                    font-family: serif;
+                    color: var(--txLight);
+                }
+            }
+
+            & > .q {
+                align-items: baseline;
+                padding-bottom: 0.9em;
+                border-bottom: 1px dashed var(--lineColor);
+
+                & > strong {
+                    font-size: 1.15em;
+                    overflow-wrap: anywhere;
+                }
+            }
+
+            & > .a > .body {
+                min-width: 0;
+                line-height: 1.7;
+                overflow-wrap: anywhere;
+            }
+
+            /* 수정·삭제: 카드 아래 오른쪽, 평소에는 글자 */
+            & > footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 0.3em;
+                font-size: 0.85em;
+
+                & > span {
+                    padding: 0.2em 0.8em;
+                    border-radius: 2em;
+                    color: var(--txLight);
+                    cursor: pointer;
+                    user-select: none;
+
+                    &:hover {
+                        background-color: var(--aColor);
+                        color: var(--txColor);
+                    }
+
+                    &.danger:hover {
+                        color: var(--danger1);
+                    }
+                }
+            }
+        }
+    }
+
+    & > footer {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        padding: 0.4em 0.8em;
+
+        & > div {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            flex: 1 1 auto;
+            justify-content: flex-end;
+
+            &:first-child {
+                justify-content: flex-start;
+            }
+        }
+    }
+}

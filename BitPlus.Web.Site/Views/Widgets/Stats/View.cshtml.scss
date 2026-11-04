@@ -1,0 +1,201 @@
+@use "../Design" as design;
+
+/* 통계 띠 위젯 — 배경에 이미지 쪽 밝은 원·반대쪽 짙은 원·글자 위쪽 옅은 원(틀 밖으로), band 면 main 띠·밝은 글자·위쪽 사선, 왼쪽 둥근 이미지, 오른쪽 제목·설명·막대(이름 왼쪽, 값 오른쪽, 아래 막대 = --value 폭) */
+div.widgetStats {
+    font-size: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    align-items: center;
+    gap: 3em;
+    padding: 4.5em 2em 3em;
+    position: relative;
+    border-radius: var(--roundBox);
+    color: var(--txColor);
+    overflow: hidden;
+    isolation: isolate;
+
+    /* 배경 톤 원 — 이미지 쪽 밝은 큰 원 + 반대쪽 아래 짙은 큰 원, 둘 다 틀 밖으로 */
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        aspect-ratio: 1;
+        border-radius: 50%;
+    }
+
+    &::before {
+        left: -10%;
+        top: -10%;
+        width: 46%;
+        background-color: var(--main1);
+    }
+
+    &::after {
+        right: -14%;
+        top: 45%;
+        width: 50%;
+        background-color: var(--main2);
+    }
+
+    &[data-band] {
+        background-color: var(--main);
+        color: white;
+        clip-path: polygon(0 18%, 100% 0, 100% 100%, 0 100%);
+
+        &::before {
+            background-color: var(--main7);
+        }
+
+        &::after {
+            background-color: var(--main9);
+            opacity: 0.5;
+        }
+
+        & > div > h2 {
+            color: white;
+        }
+
+        & > div > em {
+            color: var(--point4);
+        }
+
+        & > div > p {
+            color: var(--main1);
+        }
+
+        & > div > ul > li {
+            & > i {
+                background-color: var(--main6);
+
+                &::after {
+                    background-color: var(--point4);
+                }
+            }
+        }
+    }
+
+    & > figure {
+        position: relative;
+        z-index: 0;
+        margin: 0 auto;
+        width: min(14em, 100%);
+        aspect-ratio: 1;
+
+        & > img,
+        & > span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: top;
+            background-color: var(--main1);
+        }
+
+        & > span > i {
+            font-size: 3.5em;
+            color: var(--main4);
+        }
+    }
+
+    & > div {
+        position: relative;
+        z-index: 0;
+
+        /* 글자 뒤쪽 톤 원 (글자 아래에 깔림, 틀 밖은 잘림) */
+        &::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            right: -12%;
+            top: -55%;
+            width: 48%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background-color: var(--main6);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.8em;
+
+        & > em {
+            @include design.label;
+        }
+
+        & > h2 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        & > p {
+            margin: 0;
+            color: var(--txLight);
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        & > ul {
+            list-style: none;
+            margin: 0.5em 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9em;
+
+            & > li {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                row-gap: 0.35em;
+                font-size: 0.92em;
+
+                & > i {
+                    grid-column: 1 / -1;
+                    position: relative;
+                    height: 0.45em;
+                    border-radius: 1em;
+                    background-color: var(--main1);
+                    overflow: hidden;
+
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        inset: 0 auto 0 0;
+                        width: var(--value, 0%);
+                        border-radius: 1em;
+                        background-color: var(--main);
+                    }
+                }
+            }
+        }
+    }
+
+    @media (max-width: 779.98px) {
+        grid-template-columns: 1fr;
+        gap: 2em;
+
+        & > figure {
+            width: min(10em, 60%);
+        }
+
+        /* 밝은 원은 위쪽 이미지 둘레, 짙은 원은 아래 오른쪽 */
+        &::before {
+            left: 25%;
+            top: -12%;
+            width: 70%;
+        }
+
+        &::after {
+            right: -25%;
+            top: 60%;
+            width: 75%;
+        }
+    }
+}

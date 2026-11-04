@@ -1,0 +1,242 @@
+{
+  "key": "home",
+  "version": 6,
+  "name": {
+    "ko": "홈",
+    "en": "Home"
+  },
+  "categories": [
+    "*"
+  ],
+  "layout": {
+    "version": 6,
+    "sections": [
+      {
+        "id": "s1",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "Hero",
+            "title": {},
+            "settings": {
+              "label": {
+                "ko": "Enterprise Web Solution",
+                "en": "Enterprise Web Solution"
+              },
+              "title": {
+                "ko": "유연하고 안정적인 웹 플랫폼",
+                "en": "Flexible and Reliable Web Platform"
+              },
+              "text": {
+                "ko": ".NET 10 기반으로 조직도 관리, 보안 인가 체계, 대용량 파일 전송 기능을 충실히 제공합니다.\nLinux와 Windows 등 다양한 환경에서 간결하고 안정적으로 운영할 수 있습니다.",
+                "en": "Built on .NET 10 with organizational hierarchy, policy-based authorization, and high-volume file transfer.\nOperates cleanly and reliably across Linux, Windows, and container environments."
+              },
+              "image": "/img/banners/dashboard.jpg",
+              "buttonText": {
+                "ko": "시스템 기능 둘러보기",
+                "en": "Explore Features"
+              },
+              "buttonUrl": "/content",
+              "reverse": true
+            }
+          }
+        }
+      },
+      {
+        "id": "s2",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "FeatureCards",
+            "title": {},
+            "settings": {
+              "label": {
+                "ko": "Key Features",
+                "en": "Key Features"
+              },
+              "title": {
+                "ko": "서비스 운영을 돕는 주요 기능",
+                "en": "Core Capabilities for Web Operations"
+              },
+              "text": {
+                "ko": "비즈니스 환경에 적합한 기본 구조와 유용한 운영 기능들을 제공합니다.",
+                "en": "Provides a robust architecture and essential operational features for business environments."
+              },
+              "items": {
+                "ko": "fiServer | 크로스 플랫폼 지원 | .NET 10 기반으로 Windows와 Linux, 컨테이너 환경 모두에서 안정적으로 실행됩니다.\nfiPeople | 조직도 및 계정 관리 | 부서 계층 구조와 다중 소속 지원으로 일반 웹사이트부터 사내 업무 시스템까지 유연하게 구성할 수 있습니다.\nfiArrUpload | 대용량 파일 분할 전송 | 청크 스트리밍 방식을 적용하여 대용량 파일과 첨부 미디어도 끊김 없이 안전하게 전송합니다.\nfiDbLink | 캐시 및 API 연계 | 유연한 다계층 캐시와 표준 OpenAPI 규격을 내장하여 시스템 연계와 원활한 운영을 돕습니다.",
+                "en": "fiServer | Cross-Platform Support | Runs reliably across Windows, Linux, and container environments on .NET 10.\nfiPeople | Organization & Accounts | Supports departmental hierarchies and multi-affiliations for both web and intranet apps.\nfiArrUpload | Large File Chunk Upload | Employs chunked streaming to transfer high-volume media and attachments securely without interruptions.\nfiDbLink | Cache & API Integration | Incorporates multi-tier caching and OpenAPI specifications for seamless external integration."
+              },
+              "columns": 4
+            }
+          }
+        }
+      },
+      {
+        "id": "s3",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "Showcase",
+            "title": {},
+            "settings": {
+              "label": {
+                "ko": "Security & Organization",
+                "en": "Security & Organization"
+              },
+              "title": {
+                "ko": "체계적인 조직 관리와 접근 제어",
+                "en": "Structured Organization & Access Control"
+              },
+              "text": {
+                "ko": "부서 계층과 직책에 맞춘 다중 소속 체계를 지원하며, 역할과 세부 정책을 조합하여 명확하고 안전하게 접근 권한을 관리할 수 있습니다.",
+                "en": "Supports multi-affiliation hierarchies tailored to departments and roles, managing clear and secure access control through policy combinations."
+              },
+              "image": "/img/sample/ComfyUI_00300_.webp",
+              "buttonText": {
+                "ko": "컨텐츠 둘러보기",
+                "en": "Explore Content"
+              },
+              "buttonUrl": "/content",
+              "reverse": false,
+              "band": true
+            }
+          }
+        }
+      },
+      {
+        "id": "s4",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "FeatureTabs",
+            "title": {},
+            "settings": {
+              "label": {
+                "ko": "System Details",
+                "en": "System Details"
+              },
+              "title": {
+                "ko": "실무 환경을 고려한 상세 구성",
+                "en": "Detailed Architecture for Production"
+              },
+              "text": {
+                "ko": "업무 포털 및 커뮤니티 운영에 필요한 기능들을 균형 있게 구성했습니다.",
+                "en": "Balanced feature set essential for managing business portals and digital communities."
+              },
+              "items": {
+                "ko": "조직도 기반 부서 및 겸직 체계 | 부서 계층과 겸직 관리를 지원하여, 여러 업무 권한이 필요한 경우에도 원활하게 소속을 전환하며 작업할 수 있습니다. | /img/sample/003.webp\nAI 지원 및 이벤트 자동 처리 | 필요에 따라 언어 모델과 연동하여 콘텐츠 검수를 돕고, 주요 시스템 이벤트에 따른 연계 작업을 간결하게 처리합니다. | /img/sample/001.webp\n다양한 데이터베이스와 속성 확장 | MS-SQL, MariaDB, MySQL 등을 지원하며, 기본 테이블 변경 없이도 유연하게 추가 속성을 저장하고 활용할 수 있습니다. | /img/sample/007.webp\n대용량 분할 전송과 다국어 환경 | 대용량 첨부 파일을 안전하게 전송할 수 있는 분할 업로드와 글로벌 서비스 확장을 위한 다국어 기능을 갖추고 있습니다. | /img/sample/011.webp",
+                "en": "Organization & Affiliations | Departmental hierarchy and dual-role support allow smooth team transitions and multi-permission operations. | /img/sample/003.webp\nAI & Event Automation | Connect with language models for content review and execute background workflows on key system events. | /img/sample/001.webp\nFlexible Databases & Properties | Supports MS-SQL, MariaDB, and MySQL with schema-free property fields for dynamic attribute extension. | /img/sample/007.webp\nChunk Upload & Localization | Secure chunked streaming for high-volume uploads and 4-tier language detection for global deployments. | /img/sample/011.webp"
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "s5",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "Stats",
+            "title": {},
+            "settings": {
+              "label": {
+                "ko": "Platform Highlights",
+                "en": "Platform Highlights"
+              },
+              "title": {
+                "ko": "안정적인 운영을 위한 주요 지표",
+                "en": "Key Metrics for Stable Operations"
+              },
+              "text": {
+                "ko": "시스템 아키텍처의 성능과 안정성을 고려하여 주요 구성 요소들을 최적화했습니다.",
+                "en": "Core components optimized for high performance and dependable architecture stability."
+              },
+              "image": "/img/sample/011.webp",
+              "bars": {
+                "ko": "런타임 응답 성능 | 98\n캐시 가용성 및 전환 | 99\n파일 분할 전송 신뢰도 | 98\n데이터베이스 연동 유연성 | 95",
+                "en": "Runtime Response Performance | 98\nCache Failover & Availability | 99\nChunk Upload Reliability | 98\nDatabase Integration Flexibility | 95"
+              },
+              "band": true
+            }
+          }
+        }
+      },
+      {
+        "id": "s6",
+        "type": "Grid2x2",
+        "slots": {
+          "a": {
+            "widget": "LatestPosts",
+            "title": {
+              "ko": "최신 소식 & 안내",
+              "en": "Latest Updates"
+            },
+            "settings": {
+              "ruleNos": [
+                "@free"
+              ],
+              "count": 5,
+              "summary": true,
+              "image": true
+            }
+          },
+          "b": {
+            "widget": "Notice",
+            "title": {
+              "ko": "공지사항",
+              "en": "Notices"
+            },
+            "settings": {
+              "ruleNos": [],
+              "count": 2,
+              "image": false
+            }
+          },
+          "c": {
+            "widget": "CallToAction",
+            "title": {},
+            "settings": {
+              "label": {
+                "ko": "Start with BitPlus",
+                "en": "Start with BitPlus"
+              },
+              "title": {
+                "ko": "BitPlus와 함께 서비스를 시작해 보세요",
+                "en": "Launch Your Service with BitPlus"
+              },
+              "text": {
+                "ko": "조직도 기반 사용자 관리, 테마 전환, 파일 전송 등 주요 기능들을 간편하게 사용해 보실 수 있습니다.",
+                "en": "Get started easily with organization-based user management, live theme controls, and high-volume file transfers."
+              },
+              "buttonText": {
+                "ko": "계정 만들기",
+                "en": "Create Account"
+              },
+              "buttonUrl": "/Account/SignUp"
+            }
+          }
+        }
+      },
+      {
+        "id": "s7",
+        "type": "Full",
+        "slots": {
+          "a": {
+            "widget": "Gallery",
+            "title": {
+              "ko": "미디어 갤러리",
+              "en": "Gallery"
+            },
+            "settings": {
+              "ruleNos": [
+                "@gallery"
+              ],
+              "count": 8,
+              "columns": 4
+            }
+          }
+        }
+      }
+    ]
+  }
+}

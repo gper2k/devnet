@@ -1,0 +1,44 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Integration"));
+}
+
+@* 외부 서비스 연동 (설정 "SiteIntegration") — 서비스별 카드 하나. 저장은 한 번에(api/config/integration). 화면에 내려가는 공개용 키만 둔다 *@
+<div class="pageBox siteIntegration">
+    <div class="inform">
+        <header><i class="fi fiPuzzlePiece"></i> @this.Lang("Integration")</header>
+        <p>@this.Lang("IntegrationContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <div class="cardGrid auto">
+            <ul class="form card line">
+                <li><h4><i class="fi fiChat"></i> Kakao</h4></li>
+                <li>
+                    <header>@this.Lang("KakaoJsKey") <small>@this.Lang("KakaoJsKeyInfo")</small></header>
+                    <input type="text" name="kakaoJsKey" maxlength="64" autocomplete="off" />
+                </li>
+            </ul>
+            <ul class="form card line">
+                <li><h4><i class="fi fiChartColumn"></i> Google Analytics</h4></li>
+                <li>
+                    <header>@this.Lang("GaMeasurementId") <small>@this.Lang("GaMeasurementIdInfo")</small></header>
+                    <input type="text" name="gaMeasurementId" maxlength="32" autocomplete="off" placeholder="G-XXXXXXXXXX" />
+                </li>
+            </ul>
+        </div>
+
+        <footer class="pageFooter">
+            <span></span>
+            <div class="flexRow gapSm">
+                <button type="button" data-mode="reset"><i class="fi fiArrowsRotate"></i> @this.Lang("Reset")</button>
+                <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+            </div>
+        </footer>
+    </article>
+</div>
+
+<!--
+    주의: 이 뷰는 External.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 External.cshtml 의 wireIntegrationPage() 가 담당한다.
+-->

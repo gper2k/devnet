@@ -1,0 +1,630 @@
+[
+  {
+    "outputFile": "wwwroot/css/Site.css",
+    "inputFile": "wwwroot/css/Site.scss",
+    "minify": {
+      "enabled": false
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "wwwroot/css/site.min.css",
+    "inputFile": "wwwroot/css/Site.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Shared/_PageLayout.cshtml.css",
+    "inputFile": "Views/Shared/_PageLayout.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Shared/_AdminLayout.cshtml.css",
+    "inputFile": "Views/Shared/_AdminLayout.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Shared/_AccountLayout.cshtml.css",
+    "inputFile": "Views/Shared/_AccountLayout.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Layouts/General/Default/Layout.cshtml.css",
+    "inputFile": "Views/Layouts/General/Default/Layout.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Layouts/Account/Default/Layout.cshtml.css",
+    "inputFile": "Views/Layouts/Account/Default/Layout.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Home/Index.cshtml.css",
+    "inputFile": "Views/Home/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Home/Sample.cshtml.css",
+    "inputFile": "Views/Home/Sample.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Account/Users.cshtml.css",
+    "inputFile": "Views/Manager/Account/Users.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Account/FindAccount.cshtml.css",
+    "inputFile": "Views/Account/FindAccount.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Account/ResetPassword.cshtml.css",
+    "inputFile": "Views/Account/ResetPassword.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Account/VerifyMail.cshtml.css",
+    "inputFile": "Views/Account/VerifyMail.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Content/FileRule.cshtml.css",
+    "inputFile": "Views/Manager/Content/FileRule.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Default/Index.cshtml.css",
+    "inputFile": "Views/Content/Default/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Default/Write.cshtml.css",
+    "inputFile": "Views/Content/Default/Write.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Blog/Index.cshtml.css",
+    "inputFile": "Views/Content/Blog/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Gallery/Index.cshtml.css",
+    "inputFile": "Views/Content/Gallery/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Manual/View.cshtml.css",
+    "inputFile": "Views/Content/Manual/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Default/PostPassword.cshtml.css",
+    "inputFile": "Views/Content/Default/PostPassword.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Survey/Editor.cshtml.css",
+    "inputFile": "Views/Content/Survey/Editor.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Survey/Panel.cshtml.css",
+    "inputFile": "Views/Content/Survey/Panel.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/FAQ/Index.cshtml.css",
+    "inputFile": "Views/Content/FAQ/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/FAQ/Write.cshtml.css",
+    "inputFile": "Views/Content/FAQ/Write.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Manual/TocMenu.cshtml.css",
+    "inputFile": "Views/Content/Manual/TocMenu.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Manual/Toc.cshtml.css",
+    "inputFile": "Views/Content/Manual/Toc.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/User/_UserHead.cshtml.css",
+    "inputFile": "Views/User/_UserHead.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/User/Notice.cshtml.css",
+    "inputFile": "Views/User/Notice.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/User/Index.cshtml.css",
+    "inputFile": "Views/User/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/User/Message.cshtml.css",
+    "inputFile": "Views/User/Message.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/User/Posts.cshtml.css",
+    "inputFile": "Views/User/Posts.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/User/Setting.cshtml.css",
+    "inputFile": "Views/User/Setting.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Forum/Replies.cshtml.css",
+    "inputFile": "Views/Content/Forum/Replies.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Gallery/Carousel.cshtml.css",
+    "inputFile": "Views/Content/Gallery/Carousel.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Default/View.cshtml.css",
+    "inputFile": "Views/Content/Default/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Default/Manage.cshtml.css",
+    "inputFile": "Views/Content/Default/Manage.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Portal.cshtml.css",
+    "inputFile": "Views/Content/Portal.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/SidePanel.cshtml.css",
+    "inputFile": "Views/Content/SidePanel.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/System/Language.cshtml.css",
+    "inputFile": "Views/Manager/System/Language.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Account/Config.cshtml.css",
+    "inputFile": "Views/Manager/Account/Config.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Shared/_PageSections.cshtml.css",
+    "inputFile": "Views/Shared/_PageSections.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Shared/_PageSectionsEdit.cshtml.css",
+    "inputFile": "Views/Shared/_PageSectionsEdit.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/ContentMap/View.cshtml.css",
+    "inputFile": "Views/Widgets/ContentMap/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Banner/View.cshtml.css",
+    "inputFile": "Views/Widgets/Banner/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/LatestPosts/View.cshtml.css",
+    "inputFile": "Views/Widgets/LatestPosts/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Notice/View.cshtml.css",
+    "inputFile": "Views/Widgets/Notice/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Gallery/View.cshtml.css",
+    "inputFile": "Views/Widgets/Gallery/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Html/View.cshtml.css",
+    "inputFile": "Views/Widgets/Html/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Hero/View.cshtml.css",
+    "inputFile": "Views/Widgets/Hero/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/FeatureCards/View.cshtml.css",
+    "inputFile": "Views/Widgets/FeatureCards/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Showcase/View.cshtml.css",
+    "inputFile": "Views/Widgets/Showcase/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/FeatureTabs/View.cshtml.css",
+    "inputFile": "Views/Widgets/FeatureTabs/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/Stats/View.cshtml.css",
+    "inputFile": "Views/Widgets/Stats/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/CallToAction/View.cshtml.css",
+    "inputFile": "Views/Widgets/CallToAction/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Widgets/BuyMeACoffee/View.cshtml.css",
+    "inputFile": "Views/Widgets/BuyMeACoffee/View.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Search/Index.cshtml.css",
+    "inputFile": "Views/Search/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/System/Log.cshtml.css",
+    "inputFile": "Views/Manager/System/Log.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/System/Config.cshtml.css",
+    "inputFile": "Views/Manager/System/Config.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Service/Menu.cshtml.css",
+    "inputFile": "Views/Manager/Service/Menu.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Account/_ExternalLogins.cshtml.css",
+    "inputFile": "Views/Account/_ExternalLogins.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Account/OAuth.cshtml.css",
+    "inputFile": "Views/Manager/Account/OAuth.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Account/Policy.cshtml.css",
+    "inputFile": "Views/Manager/Account/Policy.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/External/Ai.cshtml.css",
+    "inputFile": "Views/Manager/External/Ai.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Service/List.cshtml.css",
+    "inputFile": "Views/Manager/Service/List.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/External/Token.cshtml.css",
+    "inputFile": "Views/Manager/External/Token.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Service/Popup.cshtml.css",
+    "inputFile": "Views/Manager/Service/Popup.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Shared/_SitePopup.cshtml.css",
+    "inputFile": "Views/Shared/_SitePopup.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Content.cshtml.css",
+    "inputFile": "Views/Manager/Content.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Content/Board.cshtml.css",
+    "inputFile": "Views/Manager/Content/Board.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Content/Page.cshtml.css",
+    "inputFile": "Views/Manager/Content/Page.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "wwwroot/css/setup.css",
+    "inputFile": "wwwroot/css/Setup.scss",
+    "minify": {
+      "enabled": false
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "wwwroot/css/setup.min.css",
+    "inputFile": "wwwroot/css/Setup.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/View/_Body.cshtml.css",
+    "inputFile": "Views/View/_Body.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/View/Index.cshtml.css",
+    "inputFile": "Views/View/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Content/Index.cshtml.css",
+    "inputFile": "Views/Content/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Home/Icons.cshtml.css",
+    "inputFile": "Views/Home/Icons.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Home/Color.cshtml.css",
+    "inputFile": "Views/Home/Color.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Manager/Index.cshtml.css",
+    "inputFile": "Views/Manager/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFile": "Views/Layouts/Account/Modern/Layout.cshtml.css",
+    "inputFile": "Views/Layouts/Account/Modern/Layout.cshtml.scss"
+  }
+]

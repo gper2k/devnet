@@ -1,0 +1,12 @@
+/* HTML 블록 위젯 — 본문 글자 크기·줄 간격만, 안쪽 HTML 은 ::deep (저장한 HTML 은 범위 특성이 없음) */
+div.widgetHtml {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--txColor);
+    word-break: keep-all;
+
+    & ::deep img {
+        max-width: 100%;
+        height: auto;
+    }
+}

@@ -1,0 +1,109 @@
+﻿@charset "UTF-8";
+/* 설문 패널(Survey/Panel) 전용 스타일: 소개문, 참여 폼 또는 결과 (JS 로 그린 요소라 ::deep) */
+.surveyPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 1em 0;
+}
+.surveyPanel ::deep p.intro {
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.surveyPanel ::deep p.stat {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--txLight);
+}
+.surveyPanel ::deep p.notice {
+  margin: 0;
+  color: var(--txLight);
+}
+.surveyPanel ::deep .toggle {
+  align-self: flex-start;
+  padding: 0.3em 0.9em;
+  border-radius: 2em;
+  color: var(--txLight);
+  cursor: pointer;
+  user-select: none;
+}
+.surveyPanel ::deep .toggle:hover {
+  background-color: var(--aColor);
+  color: var(--txColor);
+}
+.surveyPanel ::deep .questions {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.surveyPanel ::deep .questions > section.question {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  padding: 1em 1.2em;
+  border-radius: var(--roundBox);
+  background-color: var(--aLow);
+  /* 결과: 옵션 이름·득표수 줄과 비율 막대 */
+}
+.surveyPanel ::deep .questions > section.question > .head {
+  display: inline-block;
+  font-weight: bold;
+}
+.surveyPanel ::deep .questions > section.question > .head > em {
+  padding: 0 0 0 0.5em;
+  font-style: normal;
+  font-size: 0.8em;
+  font-weight: normal;
+  color: var(--txLight);
+}
+.surveyPanel ::deep .questions > section.question > ul, .surveyPanel ::deep .questions > section.question > ol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.surveyPanel ::deep .questions > section.question > ol.result {
+  padding-left: 2em;
+  list-style: lower-alpha;
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li {
+  display: list-item; /* flex 로 두면 번호가 나오지 않음 */
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li > .line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  font-size: 0.95em;
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li > .line > .num {
+  flex: 0 0 auto;
+  color: var(--txLight);
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li > .bar {
+  margin-top: 0.25em;
+  height: 0.6em;
+  border-radius: 1em;
+  background-color: var(--aColor);
+  overflow: hidden;
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li > .bar > i {
+  display: block;
+  height: 100%;
+  background-color: var(--main);
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li.mine > .line > .name {
+  font-weight: bold;
+  color: var(--pointDark);
+}
+.surveyPanel ::deep .questions > section.question > ol.result > li.mine > .bar > i {
+  background-color: var(--point);
+}
+.surveyPanel > ::deep button {
+  align-self: center;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Survey/Panel.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AA6BA;;AA3BA;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAIR;EAEI;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAIR;EACI;EACA;;AAGJ;EACI;;AAMhB;EACI%22%7D */

@@ -1,0 +1,13 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 통계 띠 위젯 설정 — title, text, image, bars(한 줄에 이름 | 값 0~100), band(색 띠 배경) *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_DesignFields.cshtml" model='new[] { "heading", "image" }' />
+    <li>
+        <header>@this.Lang("WidgetBarItems")</header>
+        <textarea name="bars" rows="5" spellcheck="false" placeholder="@this.Lang("WidgetStatsSample")"></textarea>
+    </li>
+    <partial name="~/Views/Widgets/_DesignFields.cshtml" model='new[] { "band" }' />
+</ul>

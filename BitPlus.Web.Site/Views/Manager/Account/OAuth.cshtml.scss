@@ -1,0 +1,61 @@
+/* 계정 관리 > OAuth 구성 전용 스타일. 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.oauthBox > article > section.card {
+    padding: 0;
+    overflow: hidden;
+
+    & > div.dataList ::deep {
+        padding: 0.5em;
+        overflow-y: auto;
+
+        & > header,
+        & > ul > li {
+            & > .colName {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            & > .colKind {
+                flex: 0 0 9em;
+                justify-content: center;
+                white-space: nowrap;
+            }
+
+            & > .colClient {
+                flex: 0 0 16em;
+                min-width: 0;
+                display: block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            & > .colFlag {
+                flex: 0 0 6em;
+                justify-content: center;
+            }
+        }
+
+        & > ul > li {
+            cursor: pointer;
+        }
+    }
+}
+
+dialog#oauthModal {
+    width: 36em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    /* 종류별 항목(발급자 주소)·콜백 주소 숨김 — 공용 ul.form > li 의 display 가 [hidden] 보다 우선하므로 다시 지정 */
+    & li[hidden] {
+        display: none;
+    }
+
+    /* 하단: 왼쪽에 사용 체크, 오른쪽 끝에 (수정이면 삭제)·취소·저장 */
+    & > footer > label.check {
+        width: auto;
+        margin-right: auto;
+    }
+}

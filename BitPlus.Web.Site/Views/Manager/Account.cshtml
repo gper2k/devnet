@@ -1,0 +1,1162 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = "_AdminLayout";
+    this.SetTitle(this.Lang("UserAndGroup"));
+    this.SetPageKey("Account");
+    this.SetDescription(this.Lang("AccountManageInfo"));
+}
+
+<div class="tabView">
+    <!-- 네비게이션 탭 — 독립된 라운드 박스 -->
+    <header class="frameTabs">
+        <a data-tab="users" href="#users"><i class="fi fiPerson"></i> @this.Lang("Account")</a>
+        <a data-tab="role" href="#role"><i class="fi fiShield"></i> @this.Lang("Role")</a>
+        <a data-tab="policy" href="#policy"><i class="fi fiShieldKeyhole"></i> @this.Lang("Policy")</a>
+        <a data-tab="terms" href="#terms"><i class="fi fiDocOnePage solid"></i> @this.Lang("Terms")</a>
+        <a data-tab="template" href="#template"><i class="fi fiMail"></i> @this.Lang("Template")</a>
+        <a data-tab="config" href="#config"><i class="fi fiLockClosed"></i> @this.Lang("Config")</a>
+        <a data-tab="oauth" href="#oauth"><i class="fi fiKey"></i> @this.Lang("OAuthConfig")</a>
+    </header>
+
+    <!-- 본문 — iframe 대신 fetch 로 받아온 조각 HTML 을 그대로 꽂는다(같은 문서, 같은 JS 컨텍스트) -->
+    <div class="frameBody">
+        <div id="accountContent"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const srcMap = {
+                users: '/Manager/Account/Users',
+                role: '/Manager/Account/Role',
+                policy: '/Manager/Account/Policy',
+                terms: '/Manager/Account/Terms',
+                template: '/Manager/Account/Template',
+                config: '/Manager/Account/Config',
+                oauth: '/Manager/Account/OAuth'
+            };
+
+            // 저장 폼 검증 설정 캐시 — 이름별로 한 번만 조회(탭 재방문 포함)
+            const validators = {};
+
+            /**
+             * 저장 폼 검증기를 이름별로 한 번만 조회해 돌려준다.
+             * @@param {string} name 검증 설정 이름 (예: GroupSave, UserSave)
+             */
+            async function getValidator(name) {
+                if (validators[name]) return validators[name];
+                const res = await common.getSend(`/api/system/valid?name=${name}`);
+                return validators[name] = new Validator(res && res.data);
+            }
+
+            /**
+             * 편집 모달을 첫 탭(기본 정보)으로 연다. 탭 활성 상태는 모달 DOM 에 남으므로 열 때마다 초기화한다(body click 탭 전환 재사용).
+             * @@param {HTMLDialogElement} modal 편집 모달
+             */
+            function showEditModal(modal) {
+                modal.querySelector('.tabBox > header > :first-child').click();
+                modal.showModal();
+            }
+
+            /**
+             * 시스템 항목 편집 제한을 모달에 반영한다: 헤더 시스템 배지 표시, 변경 불가 입력칸 비활성, 변경 불가 목록(chipBox 등) 잠금(inert).
+             * 서버도 같은 기준으로 무시/거부하므로 화면 표시는 안내 목적이다.
+             * @@param {HTMLDialogElement} modal 편집 모달
+             * @@param {boolean} isSystem 시스템 항목 여부
+             * @@param {string[]} names 변경 불가 입력칸 name 목록
+             * @@param {Element[]} boxes 변경 불가 목록 영역
+             */
+            function lockSystem(modal, isSystem, names, boxes) {
+                modal.querySelector(':scope > header > .badge').hidden = !isSystem;
+                names.forEach(name => modal.querySelectorAll(`[name="${name}"]`).forEach(el => el.disabled = isSystem));
+                boxes.forEach(box => box.inert = isSystem);
+            }
+
+            // 역할 관리 화면 상태: 검색어, 현재 페이지(0부터), 편집 중인 역할 키(없으면 신규 모드)
+            const roleState = { keyword: '', page: 0, editKey: null };
+
+            /**
+             * 역할 목록을 조회해 왼쪽 목록과 페이저(common.makePager)를 다시 그린다. 페이지 크기는 목록 공용 값(listPageSize)을 따른다.
+             * @@param {number} page 페이지 번호 (0부터, 생략 시 현재 페이지)
+             */
+            async function loadRoles(page = roleState.page) {
+                const root = document.getElementById('accountContent');
+                const list = root.querySelector('aside.asideList > ul.selectList');
+                if (!list) return;
+
+                roleState.page = page;
+                const pageSize = common.getPageSize(10);
+                const query = `keyword=${encodeURIComponent(roleState.keyword)}&page=${page + 1}&pageSize=${pageSize}&includeHidden=true`;
+                const res = await common.getSend(`/api/membership/role/list?${query}`, { useLoading: false });
+                const data = (res && res.data) || { items: [], total: 0 };
+                list.innerHTML = '';
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.dataset.key = item.key;
+                    li.classList.toggle('active', item.key === roleState.editKey);
+                    li.innerHTML = `<header><i class="fi ${item.system ? 'fiShieldKeyhole' : 'fiShield'}"></i><span></span></header><p></p>`;
+                    li.querySelector('header > span').innerHTML = item.text !== item.sub ? item.text + '<small>' + item.sub + '</small>' : item.text;
+                    li.querySelector('p').textContent = item.description || item.sub;
+                    list.appendChild(li);
+                });
+                common.syncEmpty(list);
+                root.querySelector('aside.asideList > ul.pager').replaceWith(common.makePager(page, pageSize, data.total).then(loadRoles));
+            }
+
+            /**
+             * 역할 폼을 신규 모드(role 없음) 또는 편집 모드(role 있음)로 바인딩하고, 모드별 버튼과 시스템 역할 잠금을 반영한다.
+             * 시스템 역할은 표시명/정렬 코드/설명만 수정 가능 — 표시 체크 잠금, 삭제 버튼 숨김.
+             * @@param {object|null} role 편집할 역할 (없으면 신규)
+             */
+            function bindRoleForm(role) {
+                const root = document.getElementById('accountContent');
+                const form = root.querySelector('article');
+                const field = name => form.querySelector(`[name="${name}"]`);
+                const isEdit = !!role;
+
+                roleState.editKey = role?.id ?? null;
+                ValidResultClear(form);
+                field('name').value = role?.name ?? '';
+                field('name').readOnly = isEdit; // 역할명은 생성 후 변경 불가
+                field('grade').value = role?.grade ?? '';
+                field('description').value = role?.description ?? '';
+                field('visible').checked = role?.visible ?? true;
+                common.setLang(field('dpNames'), role?.dpNames ?? {});
+
+                form.querySelector('.inform .badge').hidden = !role?.isSystem;
+                form.querySelectorAll('footer [data-mode]').forEach(btn => btn.hidden = btn.dataset.mode !== (isEdit ? 'edit' : 'new'));
+                if (role?.isSystem) form.querySelector('footer button.danger').hidden = true;
+                root.querySelectorAll('aside.asideList > ul.selectList > li').forEach(li => li.classList.toggle('active', li.dataset.key === roleState.editKey));
+            }
+
+            /** 폼 영역의 유효성 오류 표시를 지운다. */
+            const ValidResultClear = form => form.querySelectorAll('.error').forEach(p => p.classList.remove('error'));
+
+            // 역할 관리 화면 — 검색, 목록 선택(편집/선택 해제), 저장/삭제/취소/초기화 연결
+            function wireRolePage() {
+                const root = document.getElementById('accountContent');
+                const form = root.querySelector('article');
+                const list = root.querySelector('aside.asideList > ul.selectList');
+                const search = root.querySelector('input[name="roleSearch"]');
+                const runSearch = () => {
+                    roleState.keyword = search.value.trim();
+                    loadRoles(0);
+                };
+                search.onkeydown = e => { if (e.key === 'Enter') runSearch(); };
+                search.nextElementSibling.onclick = runSearch;
+
+                // 목록 클릭: 선택 → 편집 모드, 선택된 항목을 다시 누르면 선택 해제 → 신규 모드
+                list.onclick = async e => {
+                    const li = e.target.closest('li[data-key]');
+                    if (!li) return;
+                    if (li.dataset.key === roleState.editKey) return bindRoleForm(null);
+                    const res = await common.getSend(`/api/membership/role/${li.dataset.key}`);
+                    if (res && res.success) bindRoleForm(res.data);
+                };
+
+                const [delBtn] = form.querySelectorAll('footer button.danger');
+                form.querySelectorAll('footer [data-mode="edit"]:not(.danger), footer [data-mode="new"]').forEach(btn => btn.onclick = () => bindRoleForm(null));
+
+                delBtn.onclick = async () => {
+                    if (!await common.checkConfirm('@@DelRoleMsg', {}, [], '@@Delete')) return;
+                    const res = await common.delSend(`/api/membership/role/${roleState.editKey}`);
+                    if (!res || !res.success) return;
+                    bindRoleForm(null);
+                    loadRoles();
+                };
+
+                form.querySelector('footer button.main').onclick = async () => {
+                    const field = name => form.querySelector(`[name="${name}"]`);
+                    const body = {
+                        name: field('name').value.trim(),
+                        grade: field('grade').value.trim() || null,
+                        description: field('description').value.trim(),
+                        visible: field('visible').checked,
+                        dpNames: common.getLang(field('dpNames'))
+                    };
+                    const validator = await getValidator('RoleSave');
+                    const result = await validator.valid(body, form);
+                    if (!result.success) { result.popover(5, 3).markErrors(form); return; }
+
+                    const res = roleState.editKey
+                        ? await common.putSend(`/api/membership/role/${roleState.editKey}`, common.makeFormData(body))
+                        : await common.postSend('/api/membership/role', common.makeFormData(body));
+                    common.markServerErrors(res, form);
+                    if (!res || !res.success) return;
+
+                    // 완료: 입력 초기화(신규 모드) 후 현재 페이지 목록 갱신
+                    bindRoleForm(null);
+                    loadRoles();
+                };
+
+                bindRoleForm(null);
+            }
+
+            /**
+             * 문화권 선택 + 제목(titles)/본문(bodies) 입력을 문화권별 값으로 다룬다 (약관/메일 템플릿 공용).
+             * 문화권을 바꾸면 이전 문화권 입력값을 보관하고 선택 문화권 값을 표시한다.
+             * @@param {HTMLElement} form [name=culture], [name=titles], [name=bodies] 를 포함한 폼
+             * @@param {any} [editor] 본문을 편집하는 에디터(common.makeEditor 결과, IEditor). 있으면 본문 값을 textarea 대신 에디터로 읽고 쓴다.
+             * @@returns {{ bind: (titles: object, bodies: object) => void, values: () => { titles: string, bodies: string } }}
+             */
+            function makeCultureFields(form, editor) {
+                const [select, title, body] = ['culture', 'titles', 'bodies'].map(name => form.querySelector(`[name="${name}"]`));
+                const state = { titles: {}, bodies: {}, culture: '' };
+                // 에디터의 빈 본문(<p><br></p> 등)은 빈 값으로 본다
+                const getBody = () => {
+                    if (!editor) return body.value.trim();
+                    const html = editor.getHtml();
+                    return /<img|[^\s]/i.test(html.replace(/<(?!img)[^>]*>|&nbsp;/gi, '')) ? html : '';
+                };
+                // 예전에 저장한 일반 텍스트 본문은 줄 단위 문단으로 바꿔 에디터에 넣는다
+                const toHtml = text => /<[a-z][\s\S]*>/i.test(text) ? text
+                    : text.split(/\r?\n/).map(line => `<p>${line.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`) || '<br>'}</p>`).join('');
+                const setBody = value => editor ? editor.setHtml(toHtml(value)) : body.value = value;
+                const keep = () => {
+                    state.titles[state.culture] = title.value.trim();
+                    state.bodies[state.culture] = getBody();
+                };
+                const show = () => {
+                    state.culture = select.value;
+                    title.value = state.titles[state.culture] ?? '';
+                    setBody(state.bodies[state.culture] ?? '');
+                };
+                select.onchange = () => { keep(); show(); };
+                return {
+                    bind(titles, bodies) {
+                        Object.assign(state, { titles: { ...(titles ?? {}) }, bodies: { ...(bodies ?? {}) } });
+                        select.selectedIndex = 0;
+                        show();
+                    },
+                    values() {
+                        keep();
+                        return { titles: JSON.stringify(state.titles), bodies: JSON.stringify(state.bodies) };
+                    }
+                };
+            }
+
+            // 약관 관리 화면 상태: 편집 중인 약관 키(없으면 신규 모드), 신규 작성 중 에디터 이미지 임시 소유자 키(저장 시 약관 키로 이전), 문화권별 제목/본문 입력(makeCultureFields)
+            const termsState = { editKey: null, draftKey: null, fields: null };
+
+            /** 약관 목록을 출력 순서대로 다시 그린다 (드래그로 순서 변경 가능). */
+            async function loadTerms() {
+                const list = document.querySelector('#accountContent aside.asideList > ul.selectList');
+                if (!list) return;
+
+                const res = await common.getSend('/api/membership/terms/list', { useLoading: false });
+                list.innerHTML = '';
+                ((res && res.data) || []).forEach(item => {
+                    const li = document.createElement('li');
+                    li.dataset.key = item.key;
+                    li.draggable = true;
+                    li.classList.toggle('active', item.key === termsState.editKey);
+                    li.innerHTML = `<header><i class="fi fiReOrderDotsVert"></i><span></span></header><p></p>`;
+                    li.querySelector('header > span').textContent = item.text;
+                    li.querySelector('p').textContent = `${item.essential ? @this.Js(this.Lang("EssTerms")) + ' · ' : ''}${item.key}`;
+                    list.appendChild(li);
+                });
+                common.syncEmpty(list);
+            }
+
+            /**
+             * 약관 폼을 신규 모드(terms 없음) 또는 편집 모드(terms 있음)로 바인딩한다. 식별키는 생성 후 변경 불가.
+             * @@param {object|null} terms 편집할 약관 (key/essential/titles/bodies)
+             */
+            function bindTermsForm(terms) {
+                const root = document.getElementById('accountContent');
+                const form = root.querySelector('article');
+                const isEdit = !!terms;
+
+                termsState.editKey = terms?.key ?? null;
+                termsState.draftKey = isEdit ? null : crypto.randomUUID();
+                ValidResultClear(form);
+                form.querySelector('[name="key"]').value = terms?.key ?? '';
+                form.querySelector('[name="key"]').readOnly = isEdit;
+                form.querySelector('[name="essential"]').checked = terms?.essential ?? true;
+                termsState.fields.bind(terms?.titles, terms?.bodies);
+
+                form.querySelectorAll('footer [data-mode]').forEach(btn => btn.hidden = btn.dataset.mode !== (isEdit ? 'edit' : 'new'));
+                root.querySelectorAll('aside.asideList > ul.selectList > li').forEach(li => li.classList.toggle('active', li.dataset.key === termsState.editKey));
+            }
+
+            /**
+             * 목록 항목 드래그로 순서를 바꾸고, 놓았을 때 순서가 달라졌으면 서버에 저장한다.
+             * @@param {HTMLUListElement} list 약관 목록
+             */
+            function wireTermsDrag(list) {
+                let dragged = null;
+                let before = '';
+                const order = () => [...list.querySelectorAll(':scope > li[data-key]')].map(li => li.dataset.key);
+
+                list.ondragstart = e => {
+                    dragged = e.target.closest('li[data-key]');
+                    before = order().join();
+                    e.dataTransfer.effectAllowed = 'move';
+                    dragged.style.opacity = '0.4';
+                };
+                list.ondragover = e => {
+                    if (!dragged) return;
+                    e.preventDefault();
+                    const over = e.target.closest('li[data-key]');
+                    if (!over || over === dragged) return;
+                    const rect = over.getBoundingClientRect();
+                    list.insertBefore(dragged, e.clientY < rect.top + rect.height / 2 ? over : over.nextSibling);
+                };
+                list.ondrop = e => e.preventDefault();
+                list.ondragend = async () => {
+                    if (!dragged) return;
+                    dragged.style.opacity = '';
+                    dragged = null;
+                    const keys = order();
+                    if (keys.join() === before) return;
+                    const res = await common.putSend('/api/membership/terms/order', common.makeFormData({ keys }), { useLoading: false });
+                    if (!res || !res.success) loadTerms(); // 실패 시 서버 순서로 되돌림
+                };
+            }
+
+            // 약관 관리 화면 — 목록 선택(편집/선택 해제), 드래그 정렬, 문화권 전환, 저장/삭제/취소/초기화 연결
+            async function wireTermsPage() {
+                const root = document.getElementById('accountContent');
+                const form = root.querySelector('article');
+                const list = root.querySelector('aside.asideList > ul.selectList');
+
+                // 목록 클릭: 선택 → 편집 모드, 선택된 항목을 다시 누르면 선택 해제 → 신규 모드
+                list.onclick = async e => {
+                    const li = e.target.closest('li[data-key]');
+                    if (!li) return;
+                    if (li.dataset.key === termsState.editKey) return bindTermsForm(null);
+                    const res = await common.getSend(`/api/membership/terms/${encodeURIComponent(li.dataset.key)}`);
+                    if (res && res.success) bindTermsForm(res.data);
+                };
+                wireTermsDrag(list);
+
+                // 본문 에디터: 이미지 소유자 = account.terms / 약관 키 (신규 작성 중엔 임시 키)
+                const editor = await common.makeEditor(form.querySelector('[name="bodies"]'), {
+                    ownerType: 'account.terms',
+                    get ownerKey() { return termsState.editKey ?? termsState.draftKey; }
+                });
+                termsState.fields = makeCultureFields(form, editor);
+                form.querySelectorAll('footer [data-mode="edit"]:not(.danger), footer [data-mode="new"]').forEach(btn => btn.onclick = () => bindTermsForm(null));
+
+                form.querySelector('footer button.danger').onclick = async () => {
+                    if (!await common.checkConfirm(@this.Js(this.LangOf("DelMsg", "Terms") + " " + this.Lang("DelWarning")), {}, [], '@@Delete')) return;
+                    const res = await common.delSend(`/api/membership/terms/${encodeURIComponent(termsState.editKey)}`);
+                    if (!res || !res.success) return;
+                    bindTermsForm(null);
+                    loadTerms();
+                };
+
+                form.querySelector('footer button.main').onclick = async () => {
+                    const body = {
+                        key: form.querySelector('[name="key"]').value.trim(),
+                        essential: form.querySelector('[name="essential"]').checked,
+                        ...termsState.fields.values()
+                    };
+                    if (!termsState.editKey) body.draftKey = termsState.draftKey;
+                    const validator = await getValidator('TermsSave');
+                    const result = await validator.valid(body, form);
+                    if (!result.success) { result.popover(5, 3).markErrors(form); return; }
+
+                    const res = termsState.editKey
+                        ? await common.putSend(`/api/membership/terms/${encodeURIComponent(termsState.editKey)}`, common.makeFormData(body))
+                        : await common.postSend('/api/membership/terms', common.makeFormData(body));
+                    common.markServerErrors(res, form);
+                    if (!res || !res.success) return;
+
+                    // 완료: 입력 초기화(신규 모드) 후 목록 갱신
+                    bindTermsForm(null);
+                    loadTerms();
+                };
+
+                bindTermsForm(null);
+            }
+
+            // 메일 템플릿 화면 — 고정 목록 선택(첫 항목 자동 선택), 문화권별 제목/본문 편집(본문은 에디터, 이미지 소유자 = account.templet/템플릿 키), 저장
+            async function wireTemplatePage() {
+                const root = document.getElementById('accountContent');
+                const form = root.querySelector('article');
+                const list = root.querySelector('aside.asideList > ul.selectList');
+                let currentKey = null;
+                const editor = await common.makeEditor(form.querySelector('[name="bodies"]'), {
+                    ownerType: 'account.templet',
+                    get ownerKey() { return currentKey; },
+                    // 상단 안내와 같은 치환 태그 (툴바 버튼으로 본문에 삽입)
+                    tagTitle: @this.Js(this.LangOf("AddOf", "Tag")),
+                    tags: [
+                        { tag: '{#domain}', name: @this.Js(this.LangOf("DomainOf", "Site")) },
+                        { tag: '{#userid}', name: @this.Js(this.Lang("UserID")) },
+                        { tag: '{#username}', name: @this.Js(this.Lang("UserName")) },
+                        { tag: '{#usermail}', name: @this.Js(this.Lang("Email")) },
+                        { tag: '{#token}', name: @this.Js(this.Lang("TemplateTokenInfo")) }
+                    ]
+                });
+                const fields = makeCultureFields(form, editor);
+
+                /** 템플릿을 조회해 폼에 바인딩하고 목록 선택 표시를 맞춘다. */
+                const select = async key => {
+                    const res = await common.getSend(`/api/membership/template/${encodeURIComponent(key)}`);
+                    if (!res || !res.success) return;
+                    currentKey = key;
+                    fields.bind(res.data.titles, res.data.bodies);
+                    list.querySelectorAll(':scope > li').forEach(li => li.classList.toggle('active', li.dataset.key === key));
+                };
+
+                list.onclick = e => {
+                    const li = e.target.closest('li[data-key]');
+                    if (li && li.dataset.key !== currentKey) select(li.dataset.key);
+                };
+
+                form.querySelector('footer button.main').onclick = async () => {
+                    if (!currentKey) return;
+                    await common.putSend(`/api/membership/template/${encodeURIComponent(currentKey)}`, common.makeFormData(fields.values()));
+                };
+
+                const first = list.querySelector(':scope > li[data-key]');
+                if (first) select(first.dataset.key);
+            }
+
+            // 계정 구성 화면 — 현재 AccountRule + 비밀번호/잠금 규칙을 입력칸(name = 속성의 camelCase)에 바인딩하고, 저장 시 한 번에 저장
+            function wireConfigPage() {
+                const form = document.querySelector('#accountContent article');
+                const inputs = [...form.querySelectorAll('input[name], select[name]')].filter(el => !el.closest('.chipBox'));
+                const groupBox = document.querySelector('#joinGroupModal .chipBox');
+                const roleBox = document.querySelector('#joinRoleModal .chipBox');
+                // 기본 정보 카드의 버튼은 data-dialog 의 모달(가입 기본 그룹/역할 칩 목록)을 연다. 칩 변경은 하단 저장으로 함께 저장
+                form.querySelectorAll('button[data-dialog]').forEach(btn => btn.onclick = () => document.getElementById(btn.dataset.dialog).showModal());
+                /** 현재 적용 중인 규칙을 조회해 입력칸에 채운다 (초기화 = 저장된 값으로 되돌리기). */
+                const load = async () => {
+                    const res = await common.getSend('/api/membership/rule', { useLoading: false });
+                    if (!res || !res.success) return;
+                    ValidResultClear(form);
+                    const data = { ...res.data.rule, ...res.data.password, ...res.data.lockout };
+                    inputs.forEach(el => el.type === 'checkbox' ? el.checked = !!data[el.name] : el.value = data[el.name] ?? '');
+                    common.setChips(groupBox, res.data.groups ?? {}, res.data.defaultGroupId);
+                    common.setChips(roleBox, res.data.roles ?? {}, res.data.defaultRoleId);
+                };
+
+                form.querySelector('footer [data-mode="reset"]').onclick = load;
+                form.querySelector('footer button.main').onclick = async () => {
+                    const body = Object.fromEntries(inputs.map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value.trim()]));
+                    const groups = common.getChips(groupBox);
+                    body.defaultGroups = groups.keys;
+                    body.defaultGroupId = groups.defaultKey ?? '';
+                    const roles = common.getChips(roleBox);
+                    body.defaultRoles = roles.keys;
+                    body.defaultRoleId = roles.defaultKey ?? '';
+                    const validator = await getValidator('AccountRuleSave');
+                    const result = await validator.valid(body, form);
+                    if (!result.success) { result.popover(5, 3).markErrors(form); return; }
+
+                    const res = await common.putSend('/api/membership/rule', common.makeFormData(body));
+                    common.markServerErrors(res, form);
+                };
+
+                load();
+            }
+
+            // 외부 로그인(OAuth) 구성 — 목록(행 클릭 = 편집), 모달 저장·삭제는 서비스 하나씩(api/membership/oauth). Secret 은 항상 빈칸(저장돼 있으면 "비워 두면 유지")
+            function wireOAuthPage() {
+                const root = document.getElementById('accountContent');
+                const list = root.querySelector('.dataList > ul');
+                const modal = root.querySelector('#oauthModal');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+                const inputs = [...modal.querySelectorAll('[name]')].filter(el => el.name !== 'callbackUrl');
+                const text = {
+                    add: @this.Js(this.LangOf("AddOf", "OAuthProvider")),
+                    edit: @this.Js(this.LangOf("EditOf", "OAuthProvider")),
+                    keep: @this.Js(this.Lang("KeepIfEmpty")),
+                    del: @this.Js(this.LangOf("DelMsg", "OAuthProvider") + " " + this.Lang("DelWarning")),
+                    enabler: @this.Js(this.Lang("Enabler")),
+                    notUsed: @this.Js(this.Lang("NotUsed")),
+                    copied: @this.Js(this.Lang("Copied"))
+                };
+                const kinds = Object.fromEntries([...field('kind').options].map(o => [o.value, o.textContent]));
+                const badge = (value, color) => Object.assign(document.createElement('i'), { className: `badge sm ${color}`, textContent: value });
+                let editId = null;
+                const syncKind = () => modal.querySelector('li[data-kind]').hidden = field('kind').value !== 'Oidc';
+                field('kind').onchange = () => {
+                    syncKind();
+                    if (!field('name').value.trim()) field('name').value = kinds[field('kind').value];
+                };
+
+                const load = async () => {
+                    const res = await common.getSend('/api/membership/oauth', { useLoading: false });
+                    if (!res || !res.success) return;
+                    list.replaceChildren(...res.data.map(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="colName"></span>
+                            <span class="colKind"></span>
+                            <span class="colClient"></span>
+                            <span class="colFlag"></span>`;
+                        const cols = li.children;
+                        cols[0].textContent = item.name;
+                        cols[1].textContent = kinds[item.kind] ?? item.kind;
+                        cols[2].textContent = cols[2].title = item.clientId;
+                        cols[3].append(item.enabler ? badge(text.enabler, 'point') : badge(text.notUsed, 'silver'));
+                        li.onclick = () => openModal(item);
+                        return li;
+                    }));
+                    common.syncEmpty(list);
+                    return res.data;
+                };
+
+                // 모달 열기 (item 없으면 신규) — 콜백 주소는 저장된 서비스만 (식별키가 주소에 들어감)
+                const openModal = (item = null) => {
+                    editId = item?.id ?? null;
+                    inputs.forEach(el => {
+                        const value = item?.[el.name];
+                        if (el.type === 'checkbox') el.checked = item ? !!value : true;
+                        else if (el.name === 'clientSecret') el.value = '';
+                        else el.value = value ?? (el.tagName === 'SELECT' ? el.options[0].value : el.name === 'sort' ? '0' : '');
+                    });
+                    if (!item) field('name').value = kinds[field('kind').value];
+                    field('clientSecret').placeholder = item?.hasSecret ? text.keep : '';
+                    field('callbackUrl').value = item?.callbackUrl ?? '';
+                    modal.querySelector('li[data-callback]').hidden = !item;
+                    modal.querySelector(':scope > header > span').textContent = item ? text.edit : text.add;
+                    modal.querySelector('[data-mode="delete"]').hidden = !item;
+                    syncKind();
+                    modal.showModal();
+                };
+
+                root.querySelector('footer [data-mode="add"]').onclick = () => openModal();
+                modal.querySelector('li[data-callback] button').onclick = async () => {
+                    await navigator.clipboard.writeText(field('callbackUrl').value);
+                    common.info(text.copied);
+                };
+                modal.querySelector('[data-mode="save"]').onclick = async () => {
+                    const body = { ...Object.fromEntries(inputs.map(el => [el.name, el.type === 'checkbox' ? el.checked : el.value.trim()])), id: editId };
+                    const res = await common.putSend('/api/membership/oauth', common.makeFormData(body));
+                    if (!res || !res.success) return;
+                    // 새 서비스는 콜백 주소를 바로 보여 주도록 저장한 항목으로 다시 연다
+                    const saved = (await load())?.find(p => p.id === res.data);
+                    if (!editId && saved) openModal(saved);
+                    else modal.close();
+                };
+                modal.querySelector('[data-mode="delete"]').onclick = async () => {
+                    if (!editId || !await common.confirm(text.del)) return;
+                    const res = await common.delSend(`/api/membership/oauth/${encodeURIComponent(editId)}`);
+                    if (!res || !res.success) return;
+                    modal.close();
+                    load();
+                };
+                load();
+            }
+
+            // 권한 정책 — 구성 파일 정책(읽기 전용)과 DB 정책을 이름별로 병합한 목록(행 클릭 = 편집, DB 정책 활성 토글 즉시 저장), 모달 저장·삭제는 DB 정책 하나씩(api/membership/policy).
+            // 구성 파일 정책을 고치려면 같은 이름의 DB 정책을 만든다(덮어쓰기). DB 정책이 비활성이면 구성 파일 정책이 적용된다.
+            function wirePolicyPage() {
+                const root = document.getElementById('accountContent');
+                const list = root.querySelector('.dataList > ul');
+                const modal = root.querySelector('#policyModal');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+                const text = {
+                    add: @this.Js(this.LangOf("AddOf", "Policy")),
+                    edit: @this.Js(this.LangOf("EditOf", "Policy")),
+                    override: @this.Js(this.Lang("Override")),
+                    config: @this.Js(this.Lang("Config")),
+                    fallback: @this.Js(this.Lang("PolicyFallback")),
+                    target: @this.Js(this.Lang("AllowTarget")),
+                    all: @this.Js(this.Lang("AllUsers")),
+                    notUsed: @this.Js(this.Lang("NotUsed")),
+                    period: @this.Js(this.Lang("ValidPeriod")),
+                    del: @this.Js(this.LangOf("DelMsg", "Policy") + " " + this.Lang("DelWarning"))
+                };
+                const badge = (value, color) => Object.assign(document.createElement('i'), { className: `badge sm ${color}`, textContent: value });
+                const periodOf = (start, end) => start || end ? `${start ? common.localTime(start, true) : ''} ~ ${end ? common.localTime(end, true) : ''}` : '';
+                // 편집 상태: DB 정책 식별키(없으면 신규 등록), 유효 기간, 허용 대상 [{type, key, name}]
+                const state = { id: null, start: null, end: null, targets: [] };
+
+                const load = async () => {
+                    const res = await common.getSend('/api/membership/policy/list', { useLoading: false });
+                    if (!res || !res.success) return;
+                    list.replaceChildren(...res.data.map(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="colName"><span></span><small></small></span>
+                            <span class="colSource"></span>
+                            <span class="colTarget"></span>
+                            <span class="colPeriod"></span>
+                            <span class="colFlag"></span>`;
+                        const cols = li.children;
+                        cols[0].querySelector('span').textContent = item.name;
+                        cols[0].querySelector('small').textContent = item.description ?? '';
+                        // 출처 배지: 구성 파일 / DB(덮어쓰기), 실제 적용 중인 쪽만 색으로 강조 — 덮어쓴 DB 정책이 비활성이면 구성 파일 값 적용
+                        if (item.source !== 'Db') cols[1].append(badge(text.config, item.applied === 'Config' ? 'info' : 'silver'));
+                        if (item.source !== 'Config') cols[1].append(badge(item.source === 'Override' ? text.override : 'DB', item.applied === 'Db' ? 'point' : 'silver'));
+                        if (item.source === 'Override' && item.applied === 'Config') cols[1].title = text.fallback;
+                        cols[2].textContent = cols[2].title = item.targets.length ? item.targets.join(', ') : text.all;
+                        cols[3].textContent = periodOf(item.validFrom, item.validTo);
+                        if (item.id) cols[4].innerHTML = `<label class="toggle xs point"><input type="checkbox" name="enabler"${item.enabler ? ' checked' : ''} /><span><i></i></span></label>`;
+                        li.dataset.name = item.name;
+                        li.dataset.id = item.id ?? '';
+                        return li;
+                    }));
+                    common.syncEmpty(list);
+                };
+
+                // DB 정책 활성 토글은 바로 저장하고(실패하면 되돌림), 적용 출처 표시가 바뀌므로 목록을 다시 그린다
+                list.onchange = async e => {
+                    const input = e.target;
+                    const res = await common.patchSend(`/api/membership/policy/${input.closest('li').dataset.id}/enabler`, common.makeFormData({ enabler: input.checked }));
+                    if (!res || !res.success) input.checked = !input.checked;
+                    else load();
+                };
+                list.onclick = e => {
+                    const li = e.target.closest('li[data-name]');
+                    if (li && !e.target.closest('label.toggle')) openModal(li.dataset.name);
+                };
+
+                const syncSummary = () => {
+                    field('periodText').value = periodOf(state.start, state.end);
+                    field('targetText').value = state.targets.map(p => p.name).join(', ');
+                };
+
+                /** 구성 파일 정책 읽기 전용 요약 (설명 · 대상 · 기간 · 사용 안 함) */
+                const configSummary = config => [
+                    config.description,
+                    `${text.target}: ${config.targets.length ? config.targets.map(p => p.name).join(', ') : text.all}`,
+                    config.validFrom || config.validTo ? `${text.period}: ${periodOf(config.validFrom, config.validTo)}` : '',
+                    config.enabler ? '' : text.notUsed
+                ].filter(Boolean).join('\n');
+
+                // 모달 열기: name 없으면 신규, DB 정책이 있으면 그 값으로 편집, 구성 파일 정책만 있으면 그 값을 초기값으로 한 덮어쓰기 등록(대상은 식별키를 찾은 것만)
+                const openModal = async (name = null) => {
+                    let data = null;
+                    if (name) {
+                        const res = await common.getSend(`/api/membership/policy/item?name=${encodeURIComponent(name)}`);
+                        if (!res || !res.success) return;
+                        data = res.data;
+                    }
+                    const source = data?.db ?? data?.config;
+                    Object.assign(state, {
+                        id: data?.db?.id ?? null, start: source?.validFrom ?? null, end: source?.validTo ?? null,
+                        targets: (source?.targets ?? []).filter(p => p.key)
+                    });
+                    field('name').value = data?.name ?? '';
+                    field('name').readOnly = !!data;
+                    field('description').value = source?.description ?? '';
+                    field('enabler').checked = data?.db ? data.db.enabler : true;
+                    syncSummary();
+
+                    const configBox = modal.querySelector('li[data-config]');
+                    configBox.hidden = !data?.config;
+                    if (data?.config) configBox.querySelector('p').textContent = configSummary(data.config);
+                    modal.querySelector(':scope > header > span').textContent = !data ? text.add : data.db ? text.edit : `${text.override} · ${data.name}`;
+                    const sourceBadge = modal.querySelector(':scope > header > .badge');
+                    sourceBadge.hidden = !data?.config || !data?.db;
+                    sourceBadge.textContent = text.override;
+                    modal.querySelector('[data-mode="delete"]').hidden = !state.id || !!data?.db?.isSystem;
+                    modal.showModal();
+                };
+
+                modal.querySelector('[data-act="period"]').onclick = async () => {
+                    const result = await common.periodEdit(state.start, state.end);
+                    if (result) { Object.assign(state, result); syncSummary(); }
+                };
+                modal.querySelector('[data-act="target"]').onclick = async () => {
+                    const result = await common.modal.append('targetEdit', { title: text.target, items: state.targets });
+                    if (result) { state.targets = result; syncSummary(); }
+                };
+                root.querySelector('footer [data-mode="add"]').onclick = () => openModal();
+                modal.querySelector('[data-mode="save"]').onclick = async () => {
+                    const body = {
+                        name: field('name').value.trim(),
+                        description: field('description').value.trim(),
+                        start: state.start ?? '', end: state.end ?? '',
+                        targets: JSON.stringify(state.targets.map(p => ({ type: p.type, key: p.key }))),
+                        enabler: field('enabler').checked
+                    };
+                    const res = state.id
+                        ? await common.putSend(`/api/membership/policy/${state.id}`, common.makeFormData(body))
+                        : await common.postSend('/api/membership/policy', common.makeFormData(body));
+                    if (!res || !res.success) return;
+                    modal.close();
+                    load();
+                };
+                modal.querySelector('[data-mode="delete"]').onclick = async () => {
+                    if (!state.id || !await common.confirm(text.del)) return;
+                    const res = await common.delSend(`/api/membership/policy/${state.id}`);
+                    if (!res || !res.success) return;
+                    modal.close();
+                    load();
+                };
+                load();
+            }
+
+            // 우측 구성원 목록 상태:선택 그룹(-1 = 전체 사용자, '' = 선택 없음 → 최상위 그룹 + 미소속 사용자), 검색어, 현재 페이지(0부터)
+            const memberState = { groupKey: '-1', keyword: '', page: 0 };
+
+            /**
+             * 구성원 목록(선택 그룹의 하위 그룹 + 소속 사용자)을 조회해 다시 그리고 페이저(common.makePager)를 교체한다.
+             * @@param {number} page 페이지 번호 (0부터, 생략 시 현재 페이지)
+             */
+            async function loadMembers(page = memberState.page) {
+                const root = document.getElementById('accountContent');
+                const list = root.querySelector('.dataList > ul');
+                if (!list) return;
+
+                memberState.page = page;
+                const counter = document.getElementById("pageCounter")
+                const pageSize = Number(root.querySelector('select[name="pageSize"]').value);
+                const groupId = memberState.groupKey === '' ? '&root=true' : memberState.groupKey !== '-1' ? `&groupId=${memberState.groupKey}` : '';
+                const query = `keyword=${encodeURIComponent(memberState.keyword)}&page=${page}&pageSize=${pageSize}${groupId}`;
+                const res = await common.getSend(`/api/membership/member/list?${query}`, { useLoading: false });
+                const data = (res && res.data) || { items: [], total: 0 };
+
+                list.innerHTML = '';
+                data.items.forEach(item => list.appendChild(makeMemberRow(item)));
+                common.syncEmpty(list);
+                counter.innerHTML = data.total;
+                root.querySelector('ul.pager').replaceWith(common.makePager(page, pageSize, data.total).then(loadMembers));
+            }
+
+            /**
+             * 구성원 목록 행을 만든다. 그룹은 표시 토글만, 사용자는 표시/활성화 토글을 가진다.
+             * @@param {object} item 구성원 항목 (type/key/text/sub/visible/enabler/cDate)
+             */
+            function makeMemberRow(item) {
+                const isGroup = item.type === 'group';
+                const toggle = (name, checked) => `<label class="toggle xs point"><input type="checkbox" name="${name}"${checked ? ' checked' : ''} /><span><i></i></span></label>`;
+                const li = document.createElement('li');
+                li.className = 'memberRow';
+                li.dataset.type = item.type;
+                li.dataset.key = item.key;
+                li.innerHTML = `
+                    <span class="colName"><i class="fi ${isGroup ? 'fiFolder' : 'fiPerson'} fiFill"></i><span></span><small></small></span>
+                    <span class="colFlag">${toggle('visible', item.visible)}</span>
+                    <span class="colFlag">${isGroup ? '' : toggle('enabler', item.enabler)}</span>
+                    <span class="colDate">${common.localTime(item.cDate)}</span>`;
+                    //<button type="button" class="sm colAction"><i class="fi fiEdit"></i></button>`;
+                li.querySelector('.colName > span').textContent = item.text;
+                li.querySelector('.colName > small').textContent = item.sub;
+                return li;
+            }
+
+            // 구성원 목록 — 검색/표시 개수/토글 즉시 저장/행 클릭 편집 연결
+            function wireMemberList() {
+                const root = document.getElementById('accountContent');
+                const list = root.querySelector('.dataList > ul');
+                const search = root.querySelector('input[name="search"]');
+                const runSearch = () => {
+                    memberState.keyword = search.value.trim();
+                    loadMembers(0);
+                };
+
+                search.onkeydown = e => { if (e.key === 'Enter') runSearch(); };
+                search.nextElementSibling.onclick = runSearch;
+                // 표시 개수: 세션에 보관된 공용 값을 먼저 반영하고, 바꾸면 0페이지부터 다시 조회 (보관은 site.ts body 위임)
+                common.applyPageSize(root.querySelector('select[name="pageSize"]'));
+                root.querySelector('select[name="pageSize"]').onchange = () => loadMembers(0);
+
+                // 표시/활성화 토글은 바로 저장하고, 실패하면 원래 값으로 되돌린다.
+                list.onchange = async e => {
+                    const input = e.target;
+                    const row = input.closest('li.memberRow');
+                    const url = row.dataset.type === 'group'
+                        ? `/api/membership/group/${row.dataset.key}/visible`
+                        : `/api/membership/user/${row.dataset.key}/${input.name}`;
+                    const res = await common.patchSend(url, common.makeFormData({ [input.name]: input.checked }));
+                    if (!res || !res.success) input.checked = !input.checked;
+                };
+
+                // 행 클릭 → 편집 모달 (토글 영역 제외)
+                list.onclick = e => {
+                    const row = e.target.closest('li.memberRow > span.colName');
+                    //if (!row || e.target.closest('label.toggle')) return;
+                    if(row) {
+                        if (row.parentElement.dataset.type === 'group') openGroupModal(row.parentElement.dataset.key);
+                        else openUserModal(row.parentElement.dataset.key);
+                    }
+                };
+            }
+
+            // 그룹 등록/수정 모달 — 저장(검증 후 API 호출) 연결. 다국어 표시명 입력/팝업은 site.ts 의 [data-lang] 전역 처리가 담당.
+            // 책임자 "찾기", 속성/역할 탭은 현재 버튼만 존재(추후 구현).
+            function wireGroupModal() {
+                const modal = document.getElementById('groupModal');
+                const dpInput = modal.querySelector('input[name="dpNames"]');
+                if (!modal || !dpInput) return;
+
+                // 상위 그룹 "찾기" → 공용 그룹 선택 모달(단일 선택). 수정 중이면 자기 자신과 하위 그룹은 선택 불가(순환 방지).
+                // 아무것도 선택하지 않고 확인하면 최상위로 지정한다.
+                modal.querySelector('input[name="parentName"] + button').onclick = async () => {
+                    const parentId = modal.dataset.parentId;
+                    const result = await common.modal.append('groupSelect', {
+                        max: 1,
+                        selectedKeys: parentId ? [parentId] : [],
+                        disableKeys: modal.dataset.editId ? [modal.dataset.editId] : [],
+                        disableChildren: true
+                    });
+                    if (!result || typeof result !== 'object') return;
+                    const [key, text] = Object.entries(result)[0] ?? ['', ''];
+                    modal.dataset.parentId = key;
+                    modal.querySelector('input[name="parentName"]').value = text;
+                };
+
+                // 담당자 "찾기" → 공용 사용자 선택 모달(최대 1명, 현재 담당자 선택 상태). 아무것도 선택하지 않고 확인하면 담당자 해제.
+                modal.querySelector('input[name="managerName"] + button').onclick = async () => {
+                    const managerId = modal.dataset.managerId;
+                    const managerName = modal.querySelector('input[name="managerName"]').value;
+                    const result = await common.modal.append('userSelect', {
+                        max: 1,
+                        selected: managerId ? { [managerId]: managerName } : {}
+                    });
+                    if (!result || typeof result !== 'object') return;
+                    const [key, text] = Object.entries(result)[0] ?? ['', ''];
+                    modal.dataset.managerId = key;
+                    modal.querySelector('input[name="managerName"]').value = text;
+                };
+
+                // 편집 중인 그룹 삭제 (일반 그룹 편집 시에만 표시)
+                modal.querySelector(':scope > footer > button.danger').onclick = async () => {
+                    if (await deleteGroup(modal.dataset.editId)) modal.close();
+                };
+
+                document.getElementById('groupSaveBtn').onclick = async () => {
+                    const name = modal.querySelector('input[name="name"]').value.trim();
+                    const grade = modal.querySelector('input[name="grade"]').value.trim() || null;
+                    const description = modal.querySelector('textarea[name="description"]').value.trim();
+                    const inherit = modal.querySelector('input[name="inherit"]').checked;
+                    const visible = modal.querySelector('input[name="visible"]').checked;
+
+                    const validator = await getValidator('GroupSave');
+                    const result = await validator.valid({ name, grade, dpNames: common.getLang(dpInput) });
+                    if (!result.success) { result.popover(5, 3).markErrors(modal); return; }
+
+                    // 상위 그룹/담당자는 화면에서 직접 고르지 않으므로 openGroupModal 이 dataset 에 담아둔 값을 그대로 보낸다.
+                    const parentId = modal.dataset.parentId || null;
+                    const managerId = modal.dataset.managerId || null;
+                    const body = { name, grade, description, inherit, visible, parentId, managerId, dpNames: common.getLang(dpInput), properties: common.getProps(modal.querySelector('.keyValueBox')) };
+                    const roles = common.getChips(modal.querySelector('.chipBox'));
+                    Object.assign(body, { roles: roles.keys, defaultRoleId: roles.defaultKey });
+                    const editId = modal.dataset.editId;
+                    const res = editId
+                        ? await common.putSend(`/api/membership/group/${editId}`, common.makeFormData(body))
+                        : await common.postSend('/api/membership/group', common.makeFormData(body));
+
+                    common.markServerErrors(res, modal);
+                    // 서버가 돌려준 트리 노드로 추가/수정/상위 변경(이동)을 한 번에 반영
+                    if (res && res.success) {
+                        modal.close();
+                        orgTree.upsert(treeNode(res.data), res.data.parentId);
+                        loadMembers();
+                    }
+                };
+            }
+
+            /**
+             * 그룹 모달을 연다. editKey 가 있으면 해당 그룹을 조회해 수정 모드로 바인딩하고,
+             * 없으면 parentKey(전체 사용자 -1 제외)를 상위 그룹으로 하는 신규 모드로 초기화한다.
+             * @@param {string|null} editKey 수정할 그룹 키
+             * @@param {string|null} parentKey 신규 생성 시 상위 그룹 키
+             */
+            async function openGroupModal(editKey, parentKey) {
+                const modal = document.getElementById('groupModal');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+
+                let group = null;
+                if (editKey) {
+                    const res = await common.getSend(`/api/membership/group/${editKey}`);
+                    if (!res || !res.success) return;
+                    group = res.data;
+                }
+
+                const parentId = group ? group.parentId : (parentKey && parentKey !== '-1' ? parentKey : null);
+                modal.dataset.editId = group?.id ?? '';
+                modal.dataset.parentId = parentId ?? '';
+                modal.dataset.managerId = group?.managerId ?? '';
+
+                field('parentName').value = parentId ? getOrgTreeText(parentId) : '';
+                field('managerName').value = group?.managerId ? await getUserText(group.managerId) : '';
+                field('name').value = group?.name ?? '';
+                field('name').readOnly = !!group; // 그룹명은 생성 후 변경 불가 (표시명만 수정)
+                field('grade').value = group?.grade ?? '';
+                field('description').value = group?.description ?? '';
+                field('inherit').checked = group?.inherit ?? true;
+                field('visible').checked = group?.visible ?? true;
+
+                common.setLang(field('dpNames'), group?.dpNames ?? {});
+                common.setProps(modal.querySelector('.keyValueBox'), group?.properties ?? {});
+                common.setChips(modal.querySelector('.chipBox'), group?.roles ?? {}, group?.defaultRoleId);
+
+                modal.querySelector(':scope > footer > button.danger').hidden = !group || !!group.isSystem;
+
+                // 시스템 그룹: 담당자/표시명/정렬 코드/설명/일반 속성만 변경 가능 — 상위 그룹 찾기, 표시/상속, 역할 잠금
+                lockSystem(modal, !!group?.isSystem, ['inherit'],
+                    [modal.querySelector('input[name="parentName"] + button'), modal.querySelector('.chipBox')]);
+
+                showEditModal(modal);
+            }
+            window.openGroupModal = openGroupModal;
+
+            /**
+             * 사용자 모달을 연다. editKey 가 있으면 해당 사용자를 조회해 수정 모드로 바인딩하고(사용자 ID 변경 불가),
+             * 없으면 계정 구성의 가입 기본 그룹/역할과 groupKey(전체 사용자 -1 제외)를 넣은 신규 모드로 초기화한다. 신규 비밀번호는 서버가 기본 규칙으로 설정한다.
+             * @@param {string|null} editKey 수정할 사용자 키
+             * @@param {string|null} groupKey 신규 생성 시 기본 소속 그룹 키
+             */
+            async function openUserModal(editKey, groupKey) {
+                const modal = document.getElementById('userModal');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+
+                let user = null;
+                let join = null; // 신규: 계정 구성의 가입 기본 그룹/역할(회원가입과 같은 값)을 미리 넣는다
+                if (editKey) {
+                    const res = await common.getSend(`/api/membership/user/${editKey}`);
+                    if (!res || !res.success) return;
+                    user = res.data;
+                } else {
+                    const res = await common.getSend('/api/membership/rule', { useLoading: false });
+                    join = res?.success ? res.data : null;
+                }
+
+                const groups = user ? user.groups : {
+                    ...(join?.groups ?? {}),
+                    ...(groupKey && groupKey !== '-1' ? { [groupKey]: getOrgTreeText(groupKey) } : {})
+                };
+                modal.dataset.editId = user?.id ?? '';
+                field('userName').value = user?.userName ?? '';
+                field('userName').readOnly = !!user; // 사용자 ID 는 생성 후 변경 불가
+                field('email').value = user?.email ?? '';
+                field('phoneNumber').value = user?.phoneNumber ?? '';
+                field('description').value = user?.description ?? '';
+                field('visible').checked = user?.visible ?? true;
+                field('enabler').checked = user?.enabler ?? true;
+
+                common.setLang(field('dpNames'), user?.dpNames ?? {});
+                common.setProps(modal.querySelector('.keyValueBox'), user?.properties ?? {});
+                common.setChips(modal.querySelector('#userTabGroups > .chipBox'), groups, user ? user.defaultGroupId : join?.defaultGroupId);
+                common.setChips(modal.querySelector('#userTabRoles > .chipBox'), (user ? user.roles : join?.roles) ?? {}, user ? user.defaultRoleId : join?.defaultRoleId);
+
+                modal.querySelector(':scope > footer > button.danger').hidden = !user || !!user.isSystem;
+
+                // 시스템 사용자: 표시명/이메일/전화번호/설명/일반 속성/소속 그룹만 변경 가능 — 표시/활성화, 역할 잠금
+                lockSystem(modal, !!user?.isSystem, ['enabler'], [modal.querySelector('#userTabRoles > .chipBox')]);
+                showEditModal(modal);
+            }
+            window.openUserModal = openUserModal;
+
+            // 사용자 등록/수정 모달 — 검증 후 저장, 저장 성공 시 구성원 목록 재조회
+            function wireUserModal() {
+                const modal = document.getElementById('userModal');
+                if (!modal) return;
+
+                // 편집 중인 사용자 삭제 (일반 사용자 편집 시에만 표시)
+                modal.querySelector(':scope > footer > button.danger').onclick = async () => {
+                    if (await deleteUser(modal.dataset.editId)) modal.close();
+                };
+
+                document.getElementById('userSaveBtn').onclick = async () => {
+                    const field = name => modal.querySelector(`[name="${name}"]`);
+                    const userName = field('userName').value.trim();
+                    const email = field('email').value.trim();
+                    const phoneNumber = field('phoneNumber').value.trim();
+
+                    const validator = await getValidator('UserSave');
+                    const result = await validator.valid({ userName, email, phoneNumber, dpNames: common.getLang(field('dpNames')) }, modal);
+                    if (!result.success) { result.popover(5, 3).markErrors(modal); return; }
+
+                    const groups = common.getChips(modal.querySelector('#userTabGroups > .chipBox'));
+                    const roles = common.getChips(modal.querySelector('#userTabRoles > .chipBox'));
+                    const body = {
+                        userName, email, phoneNumber,
+                        description: field('description').value.trim(),
+                        visible: field('visible').checked,
+                        enabler: field('enabler').checked,
+                        dpNames: common.getLang(field('dpNames')),
+                        properties: common.getProps(modal.querySelector('.keyValueBox')),
+                        groups: groups.keys, defaultGroupId: groups.defaultKey,
+                        roles: roles.keys, defaultRoleId: roles.defaultKey
+                    };
+                    const editId = modal.dataset.editId;
+                    const res = editId
+                        ? await common.putSend(`/api/membership/user/${editId}`, common.makeFormData(body))
+                        : await common.postSend('/api/membership/user', common.makeFormData(body));
+                    common.markServerErrors(res, modal);
+
+                    if (res && res.success) {
+                        modal.close();
+                        loadOrgTree(); // 그룹별 사용자 수 갱신
+                        loadMembers();
+                    }
+                };
+            }
+
+            /**
+             * 그룹 삭제: 추가 확인 경고창(하위 그룹 포함 여부 체크)으로 확인한 뒤 삭제한다.
+             * 하위 포함이면 트리에서 노드째 지우고, 미포함이면 하위 그룹이 상위로 올라가므로 트리를 다시 불러온다.
+             * @@param {string} key 삭제할 그룹 키
+             * @@returns {Promise<boolean>} 삭제 여부
+             */
+            async function deleteGroup(key) {
+                const checked = await common.checkConfirm('@@DelGroupMsg', { withChild: { text: '@@DelWithChildGroup', checked: true } }, [], '@@Delete');
+                if (!checked) return false;
+
+                const withChild = checked.includes('withChild');
+                const res = await common.delSend(`/api/membership/group/${key}?withChild=${withChild}`);
+                if (!res || !res.success) return false;
+
+                if (withChild) orgTree.remove(key);
+                else await loadOrgTree();
+
+                // 선택 중이던 그룹(또는 그 하위)이 사라졌으면 "전체 사용자"로 되돌린다
+                if (!orgTree.getSelect()) {
+                    orgTree.select('-1');
+                    memberState.groupKey = '-1';
+                    loadMembers(0);
+                }
+                else loadMembers();
+                return true;
+            }
+
+            /**
+             * 사용자 삭제: 추가 확인 경고창으로 확인한 뒤 삭제하고 구성원 목록을 다시 불러온다. (시스템 사용자는 서버가 거부)
+             * @@param {string} key 삭제할 사용자 키
+             * @@returns {Promise<boolean>} 삭제 여부
+             */
+            async function deleteUser(key) {
+                if (!await common.checkConfirm('@@DelUserMsg', {}, [], '@@Delete')) return false;
+                const res = await common.delSend(`/api/membership/user/${key}`);
+                if (!res || !res.success) return false;
+                loadOrgTree(); // 그룹별 사용자 수 갱신
+                loadMembers();
+                return true;
+            }
+
+            /**
+             * 그룹 이동: 그룹 선택 모달로 새 상위 그룹을 고른 뒤, 기존 값은 그대로 두고 상위 그룹만 바꿔 수정 API(PUT)로 저장한다.
+             * 하위 그룹 Location 갱신/순환 방지/캐시 제거는 서버 수정 로직이, 트리 반영은 upsert 가 담당한다.
+             * 자기 자신과 하위 그룹은 선택 불가, 아무것도 고르지 않으면 최상위로, 현재 상위 그룹과 같으면 요청하지 않는다.
+             * @@param {string} key 이동할 그룹 키
+             */
+            async function moveGroup(key) {
+                const res = await common.getSend(`/api/membership/group/${key}`);
+                if (!res || !res.success) return;
+                const group = res.data;
+
+                const result = await common.modal.append('groupSelect', {
+                    max: 1,
+                    selectedKeys: group.parentId ? [group.parentId] : [],
+                    disableKeys: [key],
+                    disableChildren: true
+                });
+                if (!result || typeof result !== 'object') return;
+
+                const parentId = Object.keys(result)[0] ?? null;
+                if (parentId === (group.parentId ?? null)) return;
+
+                const body = {
+                    name: group.name, grade: group.grade ?? null, description: group.description ?? '',
+                    inherit: group.inherit, visible: group.visible, parentId, managerId: group.managerId ?? null,
+                    dpNames: group.dpNames ?? {},
+                    properties: Object.fromEntries(Object.entries(group.properties ?? {}).filter(([k]) => !k.startsWith('@@'))),
+                    roles: Object.keys(group.roles ?? {}), defaultRoleId: group.defaultRoleId ?? null
+                };
+                const saved = await common.putSend(`/api/membership/group/${key}`, common.makeFormData(body)); 
+                if (saved && saved.success) {
+                    orgTree.upsert(treeNode(saved.data), saved.data.parentId);
+                    loadMembers();
+                }
+            }
+
+            /**
+             * 사용자 표시 텍스트(서버가 다국어 출력 기본 규칙으로 고른 값)를 조회한다. 담당자 입력칸 표시용.
+             * @@param {string} key 사용자 키
+             */
+            async function getUserText(key) {
+                const res = await common.getSend(`/api/membership/user/${key}`, { useLoading: false });
+                return res && res.success ? res.data.text : '';
+            }
+
+            /** 조직도 트리 항목의 순수 이름(뱃지 제외)을 키로 찾는다. */
+            const getOrgTreeText = key => { const node = orgTree.getNode(key); return node ? (node.name ?? node.text) : ''; };
+
+            /**
+             * 서버 트리 노드를 표시용으로 편집한다: text = 이름(이스케이프) + 사용자 수 뱃지, name = 순수 이름 (하위 노드 포함).
+             * 사용자 수가 없는 노드(가상 항목 등)는 이름만 그대로 둔다.
+             * @@param {object} node 서버 트리 노드 (text/userCount/child)
+             */
+            const treeNode = node => {
+                if (node.userCount === undefined) return node;
+                const label = document.createElement('span');
+                label.textContent = node.text;
+                const badge = `<span class="badge deco">${node.userCount}</span>`;
+                return { ...node, name: node.text, text: label.innerHTML + badge, child: node.child?.map(treeNode) };
+            };
+
+            /**
+             * 그룹 조직도 트리를 API 실데이터로 (재)바인딩한다. 다시 호출해도 열림/선택 상태는 TreeBox 가 유지한다.
+             * 형제 정렬은 서버(group/tree)가 정렬 등급 코드 순(없으면 맨 아래)으로 내려준다.
+             * 개별 추가/수정/이동/삭제는 전체 재조회 없이 orgTree.upsert / orgTree.remove 로 반영한다.
+             */
+            async function loadOrgTree() {
+                const res = await common.getSend('/api/membership/group/tree');
+                // 맨 위 "전체 사용자"는 실제 그룹이 아닌 가상 항목(키 -1)으로, 최상위 그룹과 같은 레벨에 둔다.
+                orgTree.render('#orgTree', [{ key: '-1', text: @this.Js(this.Lang("AllUsers")) }, ...((res && res.data) || []).map(treeNode)]);
+            }
+
+            // 탭별 콘텐츠 교체 직후 실행할 초기화 로직.
+            // innerHTML 로 꽂힌 <script> 는 브라우저가 실행하지 않으므로,
+            // 각 조각(fragment)이 필요로 하는 JS 는 전부 여기 모아두고 직접 호출한다.
+            const initTab = {
+                users: function () {
+                    window.orgTree = common.makeTree({
+                        openSaveKey: 'orgTreeOpen',
+                        noMenuKeys: ['-1'],
+                        selectedKeys: ['-1'],
+                        menus: [
+                            {
+                                text: @this.Js(this.LangOf("AddOf", "Group")), icon: 'fi fiFolderPlus', action: (node) => openGroupModal(null, node.key)
+                            },
+                            {
+                                text: @this.Js(this.LangOf("AddOf", "User")), icon: 'fi fiPersonAdd', action: (node) => openUserModal(null, node.key)
+                            },
+                            {
+                                text: @this.Js(this.Lang("Edit")), icon: 'fi fiEdit', action: (node) => openGroupModal(node.key)
+                            },
+                            {
+                                text: @this.Js(this.Lang("Move")), icon: 'fi fiArrMove', hidden: (node) => node.system, action: (node) => moveGroup(node.key)
+                            },
+                            { divider: true },
+                            {
+                                text: @this.Js(this.Lang("Delete")), icon: 'fi fiDelete', danger: true, hidden: (node) => node.system, action: (node) => deleteGroup(node.key)
+                            }
+                        ],
+                        // 그룹 선택 → 우측 구성원 목록 재조회 (선택 해제 시 최상위 그룹 + 미소속 사용자)
+                        onSelect: (mode, key) => {
+                            memberState.groupKey = mode === 'select' ? key : '';
+                            loadMembers(0);
+                        }
+                    });
+                    loadOrgTree();
+                    wireGroupModal();
+                    wireUserModal();
+                    wireMemberList();
+                    memberState.groupKey = '-1';
+                    loadMembers(0);                }
+                ,
+                role: function () {
+                    wireRolePage();
+                    roleState.keyword = '';
+                    loadRoles(0);
+                }
+                ,
+                terms: async function () {
+                    await wireTermsPage();
+                    loadTerms();
+                }
+                ,
+                policy: wirePolicyPage,
+                template: wireTemplatePage,
+                config: wireConfigPage,
+                oauth: wireOAuthPage
+            };
+
+            // 탭 연결 (공용 common.bindTabView — site.js 모듈이 준비된 뒤 실행)
+            window.addEventListener('DOMContentLoaded', () => common.bindTabView(document.querySelector('.tabView'), srcMap, initTab));
+        })();
+    </script>
+}

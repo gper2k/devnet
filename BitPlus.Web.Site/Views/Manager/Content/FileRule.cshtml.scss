@@ -1,0 +1,284 @@
+/* 파일 규칙 관리 페이지 전용 스타일 */
+div.fileRuleBox {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    & > section.card {
+        padding: 0;
+        overflow: hidden;
+
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1em;
+            padding: 0.6em 0.8em;
+            border-bottom: 1px solid var(--lineColor);
+
+            & > strong {
+                display: flex;
+                align-items: center;
+                gap: 0.5em;
+                font-size: 1.05em;
+                color: var(--txColor);
+
+                & > i.fi {
+                    font-size: 1.3em;
+                    color: var(--main);
+                }
+            }
+
+            & .inputGroup {
+                width: 14em;
+            }
+        }
+
+        & > div.dataList {
+            overflow-y: auto;
+
+            & > header {
+                background-color: var(--aLow);
+
+                & > span {
+                    font-weight: 600;
+                    color: var(--txColor);
+                    opacity: 0.9;
+                }
+            }
+
+            & > header,
+            & > ul ::deep > li {
+                display: flex;
+                align-items: center;
+                padding: 0.5em 0.8em;
+                gap: 0.6em;
+
+                & > .colName {
+                    flex: 0 0 12em;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6em;
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                & > .colWeb {
+                    flex: 1 1 auto;
+                    font-family: monospace;
+                    font-size: 0.9em;
+                    color: var(--txSub);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                & > .colExt {
+                    flex: 0 0 12em;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                & > .colCount {
+                    flex: 0 0 5em;
+                    justify-content: center;
+                }
+
+                & > .colSize {
+                    flex: 0 0 6em;
+                    justify-content: center;
+                }
+
+                & > .colTotal {
+                    flex: 0 0 7em;
+                    justify-content: center;
+                }
+
+                & > .colDate {
+                    flex: 0 0 8em;
+                    justify-content: center;
+                    color: var(--txSub);
+                }
+            }
+
+            & > ul > li {
+                border-bottom: 1px solid var(--aLow);
+                cursor: pointer;
+                transition: background-color 0.15s ease;
+
+                &:hover {
+                    background-color: var(--aLow);
+                }
+            }
+        }
+
+        & > footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5em 0.8em;
+            border-top: 1px solid var(--lineColor);
+        }
+    }
+}
+
+/* 파일 규칙 등록/수정 모달 */
+dialog#fileRuleModal ::deep {
+    width: 28em;
+
+    & > header {
+        color: var(--main);
+
+        & > span.badge {
+            background-color: var(--danger);
+            color: white;
+        }
+    }
+
+    & .tabBox > section {
+        height: 21em;
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    & .tabBox ul.form {
+        padding: 0 0.5em;
+    }
+
+    & #fileRuleTabAccess {
+        display: none;
+        flex-direction: column;
+        gap: 0.5em;
+        padding: 0;
+        height: 100%;
+        overflow-y: auto;
+
+        &.active {
+            display: flex;
+        }
+
+        & > .accessToolbar {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 0.5em;
+
+            & > button {
+                padding: 0.4em 0.6em;
+                height:auto;
+            }
+        }
+
+        & > .accessRuleBox {
+            flex: 1 1 auto;
+            border: 1px solid var(--lineColor);
+            border-radius: var(--roundSm, 0.4em);
+            overflow-y: auto;
+
+            /* 빈 목록: li.empty 를 박스 가운데에 */
+            & > ul:has(> li.empty) {
+                height: 100%;
+            }
+
+            & > ul {
+                margin: 0;
+                padding: 0.5em;
+
+                &> li {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 0.5em;
+                    padding: 0.5em;
+                    border-bottom: 1px dashed var(--aColor);
+                    transition: background-color 0.15s ease;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    & > .modeBox {
+                        flex: 0 0 5em;
+                        padding: 0;
+                        font-weight: bold;
+                        line-height: 1em;
+                        text-transform: uppercase;
+
+                        &.upload {
+                            color: var(--primary);
+                        }
+
+                        &.download {
+                            color: var(--warning);
+                        }
+                    }
+
+                    & > .targetBox {
+                        flex: 1 1 auto;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.6em;
+
+                        & > .badge {
+                            font-size: 0.78em;
+                            padding: 0.2em 0.5em;
+                        }
+
+                        & > .name {
+                            font-size: 0.95em;
+                            color: var(--txColor);
+                            font-weight: 500;
+                        }
+                    }
+
+                    & > .delRuleBtn {
+                        width: 1.8em;
+                        height: 1.8em;
+                        min-width: 1.8em;
+                        min-height: 1.8em;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: var(--roundSm, 0.3em);
+                        background-color: var(--danger);
+                        color: white;
+                        border: none;
+                        cursor: pointer;
+                        padding: 0;
+                        font-size: 0.85em;
+                        transition: opacity 0.15s ease, transform 0.1s ease;
+
+                        &:hover {
+                            opacity: 0.85;
+                        }
+
+                        &:active {
+                            transform: scale(0.95);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    & > footer > button.danger {
+        margin-right: auto;
+    }
+}
+
+/* UpFileAccessRule 편집 서브 모달 */
+dialog#fileAccessRuleModal {
+    width: 28em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & > section {
+        padding: 0.8em 0.5em;
+    }
+}

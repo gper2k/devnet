@@ -1,0 +1,96 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Log"));
+}
+
+@* 시스템 설정 > 로그 탭 조각 — 파일 로그(api/log)를 종류·날짜로 고르고 시간 범위·수준·검색어로 걸러 시간순으로 본다.
+   큰 파일은 조건에 맞는 항목을 조금씩 읽고(더 보기 = 이어 읽기), 시작 시각을 주면 그 근처로 바로 이동한다. 행을 누르면 원본 JSON(로그마다 구조가 다름)을 모달로 보여 준다.
+   기록하지 않을 로그는 "로그 제외 규칙"(api/log/exclude)으로 관리하고, 상세 모달에서 그 종류를 바로 규칙에 넣을 수 있다. 초기화는 System.cshtml 의 wireLogPage() 가 맡는다. *@
+<div class="pageBox logBox">
+    <div class="inform fix">
+        <header><i class="fi fiInfo fiFill"></i> @this.Lang("Log")</header>
+        <p>@this.Lang("LogInfo")</p>
+    </div>
+
+    <section class="card line flexCol auto">
+        <header class="fix">
+            <strong>
+                <i class="fi fiDocText"></i>
+                @this.Lang("Log")
+                <i class="badge deco">0</i>
+            </strong>
+            <div class="flexRow gapSm alignCenter">
+                <select name="kind" title="@this.Lang("LogKind")"></select>
+                <select name="date" title="@this.Lang("Date")"></select>
+                <input type="time" name="from" step="1" title="@this.Lang("Time")" />
+                <span>~</span>
+                <input type="time" name="to" step="1" title="@this.Lang("Time")" />
+                <select name="level" title="@this.Lang("LogLevel")">
+                    <option value="">@this.Lang("All")</option>
+                    <option value="Debug">Debug</option>
+                    <option value="Information">Information</option>
+                    <option value="Warning">Warning</option>
+                    <option value="Error">Error</option>
+                    <option value="Critical">Critical</option>
+                </select>
+                <div class="inputGroup inline sm">
+                    <input type="text" name="search" placeholder="@this.Lang("Search")" autocomplete="off" />
+                    <button type="button" class="sub"><i class="fi fiSearch"></i></button>
+                </div>
+                <button type="button" class="sm" data-mode="exclude" title="@this.Lang("LogExclude")"><i class="fi fiFilter"></i> @this.Lang("LogExclude")</button>
+            </div>
+        </header>
+
+        <div class="dataList auto">
+            <header>
+                <span class="colTime"><span>TIME</span></span>
+                <span class="colLevel"><span>LEVEL</span></span>
+                <span class="colSummary"><span>SUMMARY</span></span>
+                <span class="colDuration"><span>MS</span></span>
+            </header>
+            <ul></ul>
+        </div>
+
+        <footer class="fix">
+            <span></span>
+            <button type="button" class="sm" data-mode="more" hidden><i class="fi fiChevronDown"></i> @this.Lang("LoadMore")</button>
+        </footer>
+    </section>
+</div>
+
+<!-- 로그 상세 모달: 원본 JSON 을 들여쓰기해 보여 준다 -->
+<dialog id="logModal">
+    <header><i class="fi fiDocText"></i> <span></span></header>
+    <section>
+        <pre></pre>
+    </section>
+    <footer>
+        <button type="button" data-mode="excludeThis"><i class="fi fiFilter"></i> @this.LangOf("AddOf", "LogExclude")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Close")</button>
+    </footer>
+</dialog>
+
+<!-- 로그 제외 규칙 모달: 규칙(카테고리 앞부분 · 이 수준 이하 · 포함 글자)을 줄마다 고치고 저장하면 바로 적용된다. 줄 모양은 template 을 복제(격리 스타일 속성 유지) -->
+<dialog id="logExcludeModal">
+    <header><i class="fi fiFilter"></i> <span>@this.Lang("LogExclude")</span></header>
+    <section>
+        <p>@this.Lang("LogExcludeInfo")</p>
+        <ul></ul>
+        <template>
+            <li>
+                <input type="text" name="category" maxlength="256" placeholder="@this.Lang("LogKind")" autocomplete="off" />
+                <select name="maxLevel" title="@this.Lang("LogExcludeLevel")"><option value="Trace">Trace</option><option value="Debug">Debug</option><option value="Information">Information</option><option value="Warning">Warning</option><option value="Error">Error</option><option value="Critical">Critical</option></select>
+                <input type="text" name="contains" maxlength="256" placeholder="@this.Lang("LogContains")" autocomplete="off" />
+                <span data-remove title="@this.Lang("Delete")"><i class="fi fiDismiss"></i></span>
+            </li>
+        </template>
+    </section>
+    <footer>
+        <button type="button" data-mode="current"><i class="fi fiFilter"></i> @this.Lang("LogExcludeCurrent")</button>
+        <button type="button" data-mode="add"><i class="fi fiAddCircle"></i> @this.LangOf("AddOf", "LogExclude")</button>
+        <button type="button" data-mode="defaults"><i class="fi fiArrowsRotate"></i> @this.LangOf("ResetOf", "LogExclude")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>

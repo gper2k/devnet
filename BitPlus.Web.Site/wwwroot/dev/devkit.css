@@ -1,0 +1,50 @@
+/* DevKit shared consolidated from dev pages */
+.devPage { padding: 2em; display: flex; flex-direction: column; gap: 2.5em; min-width:700px; width: 1280px; max-width:100%; margin: 0; align-items: flex-start; }
+.devHeader { display: flex; align-items: center; gap: 0.8em; padding: 1.4em 1.6em; background: var(--bgColor); border: 1px solid var(--lineColor); border-radius: var(--roundBox); }
+.devHeader > i.fi { font-size: 1.8em; color: var(--main); }
+.devHeader > div > h1 { margin: 0; font-size: 1.1em; font-weight: 700; }
+.devHeader > div > p { margin: 0.2em 0 0; font-size: 0.82em; color: var(--txSub); }
+.devSection { display: flex; flex-direction: column; gap: 1.5em; width: 100%; }
+.devSection > h2 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--txSub); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--lineColor); padding-bottom: 0.5em; }
+.devBlock { background: var(--bgColor); border: 1px solid var(--lineColor); border-radius: var(--roundBox); overflow: hidden; }
+.blockHead { padding: 1em 1.4em; border-bottom: 1px solid var(--aLight); }
+.blockHead > h3 { margin: 0 0 0.25em; font-size: 0.95em; font-weight: 700; display: flex; align-items: center; gap: 0.5em; }
+.blockHead > p { margin: 0; font-size: 0.82em; color: var(--txSub); }
+.blockHead > ol { margin: 0.5em 0 0; padding-left: 1.4em; font-size: 0.82em; color: var(--txSub); }
+.demoCol > select { align-self: flex-start; }
+.tag { display: inline-block; padding: 0.1em 0.55em; border-radius: var(--roundBtn); font-size: 0.72em; font-weight: 700; background: var(--main0, #eef2ff); color: var(--main); border: 1px solid var(--main); line-height: 1.5; }
+.tag.js { background: #fefce8; color: #92400e; border-color: #fbbf24; }
+.tag.css { background: var(--primary0, #eff6ff); color: var(--primary); border-color: var(--primary); }
+.blockDemo { padding: 1.4em; background: var(--bgSub); }
+.blockCode { position: relative; border-top: 1px solid var(--aLight); }
+.blockCode > pre { margin: 0; padding: 1em 1.4em; overflow-x: auto; font-size: 0.8em; line-height: 1.6; background: #0f172a; color: #e2e8f0; width: 100%; white-space: pre-wrap;word-wrap: break-word; }
+.blockCode > pre > code { font-family: 'D2Coding', 'Consolas', monospace; }
+.copyBtn { position: absolute; top: 0.5em; right: 0.5em; padding: 0.25em 0.6em; font-size: 0.75em; border: 1px solid var(--aColor); border-radius: var(--roundSm); background: var(--bgColor); color: var(--txSub); cursor: pointer; }
+.copyBtn:hover { background: var(--aLight); }
+.refTable { background: var(--bgColor); border: 1px solid var(--lineColor); border-radius: var(--roundBox); overflow: hidden; }
+.refTable > table { width: 100%; border-collapse: collapse; font-size: 0.82em; }
+.refTable > table > thead > tr > th { padding: 0.6em 1em; background: var(--bgSub); text-align: left; font-weight: 700; color: var(--txSub); border-bottom: 1px solid var(--lineColor); }
+.refTable > table > tbody > tr > td { padding: 0.55em 1em; border-bottom: 1px solid var(--aLow); vertical-align: top; }
+.refTable > table > tbody > tr:last-child > td { border-bottom: none; }
+.refTable > table > tbody > tr > td:first-child { font-family: monospace; color: var(--main); font-weight: 600; white-space: nowrap; }
+.refTable > table > tbody > tr > td code { font-family: monospace; background: var(--aLow); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.95em; }
+
+/* Demo layout helpers */
+.demoRow { display: flex; gap: 0.6em; align-items: center; flex-wrap: wrap; }
+.demoCol { display: flex; flex-direction: column; gap: 0.6em; }
+
+/* Common controls/helpers */
+.demoToolbar { display: flex; gap: 0.5em; margin-bottom: 0.8em; flex-wrap: wrap; }
+.selInfo { margin-top: 0.8em; font-size: 0.82em; color: var(--txSub); padding: 0.4em 0.8em; background: var(--bgColor); border-radius: var(--roundSm); border: 1px solid var(--lineColor); }
+.statesRow { display: flex; gap: 1.5em; flex-wrap: wrap; align-items: flex-start; }
+.stateItem { display: flex; flex-direction: column; align-items: center; gap: 0.4em; font-size: 0.78em; color: var(--txSub); }
+
+
+/* 에디터 파일 샘플 (editorfile.html) */
+.editorFiles { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4em; }
+.editorFiles > li { display: flex; align-items: center; gap: 0.8em; padding: 0.4em; background: var(--bgColor); border: 1px solid var(--lineColor); border-radius: var(--roundSm); cursor: pointer; font-size: 0.82em; word-break: break-all; }
+.editorFiles > li > img { width: 4em; height: 4em; object-fit: cover; border-radius: var(--roundSm); flex-shrink: 0; }
+.editorLog { margin: 0; padding: 0.8em; background: var(--bgColor); border: 1px solid var(--lineColor); border-radius: var(--roundSm); font-size: 0.8em; white-space: pre-wrap; word-break: break-all; }
+.editorRender { background: var(--bgColor); border: 1px dashed var(--aColor); padding: 0.8em; }
+.editorPair { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; width: 100%; }
+.editorPair > .demoCol { min-width: 0; }

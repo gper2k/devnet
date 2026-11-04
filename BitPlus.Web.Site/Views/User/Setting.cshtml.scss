@@ -1,0 +1,12 @@
+/* 내 환경설정: 머리·탭 아래 설정 카드 한 장 */
+.userSetting {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    & > div {
+        max-width: 36em;
+        padding: 0;
+    }
+}

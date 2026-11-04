@@ -1,0 +1,31 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Site.Widgets
+@{
+    var image = SlotView.SafeUrl(Model.Text("image"));
+    var url = SlotView.SafeUrl(Model.Text("buttonUrl"));
+}
+@* 소개 띠 위젯 — (설정 시) 테마색 띠 위에 둥근 이미지와 장식 원, 옆에 제목·설명·외곽선 버튼. 띠 아래쪽 사선 *@
+<div class="widgetShowcase" data-band="@(Model.Bool("band", true) ? "true" : null)" data-reverse="@(Model.Bool("reverse", false) ? "true" : null)">
+    <figure>
+        @if (image is not null)
+        {
+            <img src="@image" alt="" />
+        }
+        else
+        {
+            <span><i class="fi fiImage"></i></span>
+        }
+    </figure>
+    <div>
+        @if (Model.Text("label").Length > 0)
+        {
+            <em>@Model.Text("label")</em>
+        }
+        <h2>@Model.Text("title")</h2>
+        <p>@Model.Text("text")</p>
+        @if (url is not null && Model.Text("buttonText").Length > 0)
+        {
+            <a class="btn" href="@url">@Model.Text("buttonText")</a>
+        }
+    </div>
+</div>

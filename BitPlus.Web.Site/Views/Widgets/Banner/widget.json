@@ -1,0 +1,13 @@
+{
+  "key": "Banner",
+  "version": 2,
+  "name": { "ko": "배너·슬라이드", "en": "Banner slider" },
+  "description": { "ko": "이미지 배너를 차례로 넘겨 보여 줍니다. 한 줄에 '이미지 주소 | 링크 | 문구'.", "en": "Rotating image banners. One per line: image URL | link | caption." },
+  "categories": ["general"],
+  "size": { "min": [2, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "items", "type": "lines", "default": "" },
+    { "key": "interval", "type": "number", "default": 5, "min": 0, "max": 60 },
+    { "key": "height", "type": "number", "default": 0, "min": 0, "max": 1200 }
+  ]
+}

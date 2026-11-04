@@ -1,0 +1,11 @@
+@model ContentPortalModel
+
+<div class="flexRow alignStart">
+    @* 컨텐츠 공통 사이드 패널(위젯: 컨텐츠맵 트리 …) — /content/menu/{메뉴 키} 면 그 메뉴를 연결 메뉴로(트리 루트·사이드 위젯 side@{메뉴 키}), 컨텐츠 페이지 영역 *@
+    <partial name="~/Views/Content/SidePanel.cshtml" view-data='new ViewDataDictionary(ViewData) { { "TreeColor", "deco" }, { "SideMenuKey", Model.MenuKey }, { "ContentArea", true } }' />
+    @* 컨텐츠 포탈 — 위젯 페이지 "portal"(모든 위젯): 배치는 설정 PageLayout.portal, 없으면 Views/Sections/_Pages/portal.json.
+       /content/menu/{메뉴 키} 는 "portal@{메뉴 키}" — 메뉴별 포탈 배치(PageLayout.portal@{메뉴 키}), 따로 저장한 적 없으면 기본 포탈(/content) 배치를 씀 *@
+    <div class="auto">
+        <partial name="_PageSections" model="@(Model.MenuKey is null ? "portal" : "portal@" + Model.MenuKey)" />
+    </div>
+</div>

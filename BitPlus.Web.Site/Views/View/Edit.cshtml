@@ -1,0 +1,14 @@
+@model ContentEditModel
+@{
+    this.SetTitle(Model.IsNew ? this.LangOf("AddOf", "ContentManage") : this.LangOf("EditOf", "ContentManage"));
+    this.SetPageKey("View");
+}
+
+@section Styles {
+    <style>
+        .contentEdit { height: 100%; }
+    </style>
+}
+
+@* 컨텐츠 작성(/view/edit) / 수정(/view/edit/{글 번호}) — 관리자 전용. 폼은 관리자 콘솔과 같이 쓰는 파샬뷰(EditForm.cshtml) *@
+<partial name="~/Views/View/EditForm.cshtml" model="Model" />

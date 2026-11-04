@@ -1,0 +1,7 @@
+/* 계정 레이아웃 ::deep 에서 일괄 처리됨 */
+nav.externalLogin > a > img.brandIcon {
+    width: 1.25em;
+    height: 1.25em;
+    object-fit: contain;
+    flex-shrink: 0;
+}

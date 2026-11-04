@@ -1,0 +1,1223 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<BitPlus.Web.Site.Models.LayoutThemeConfig>
+@using BitPlus.Web.Site.Models
+@{
+    var hasSavedSetting = this.Model != null;
+    var model = this.Model ?? new LayoutThemeConfig
+    {
+        Main = "#182134",
+        Sub = "#707b90",
+        Point = "#538fa8",
+        Deco = "#184957",
+        DarkMain = "#182134",
+        DarkSub = "#707b90",
+        DarkPoint = "#538fa8",
+        DarkDeco = "#184957"
+    };
+    var cultures = this.Config?.Cultures ?? new[] { "ko", "en" };
+    var currentCult = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    string GetNativeName(string code)
+    {
+        try { return System.Globalization.CultureInfo.GetCultureInfo(code).NativeName; }
+        catch { return code; }
+    }
+    string T(string key, string fallback) {
+        var val = this.Lang(key);
+        return string.IsNullOrEmpty(val) || val == key ? fallback : val;
+    }
+}
+
+<div class="layoutConfigSide">
+    <header class="panelHeader">
+        <div class="titleWrap">
+            <i class="fi fiColor"></i>
+            <span>@T("LayoutSetting", "레이아웃 설정")</span>
+        </div>
+        <i class="fi fiDismiss btnClose" title="@T("Close", "닫기")" onclick="closeLayoutConfig()"></i>
+    </header>
+
+    <div class="panelBody">
+        <div class="themeTabs">
+            <span class="tabItem active" data-tab="light">
+                <i class="fi fiWeatherSunny"></i>
+                <span>@T("LightMode", "라이트 모드")</span>
+            </span>
+            <span class="tabItem" data-tab="dark">
+                <i class="fi fiWeatherMoon"></i>
+                <span>@T("DarkMode", "다크 모드")</span>
+            </span>
+        </div>
+
+        <div class="colorGrid">
+            <div class="colorCard active" data-color="main">
+                <div class="cardTop">
+                    <span class="colorKey">main</span>
+                    <span class="colorRole">@T("ColorMainRole", "주 색상")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#182134</span>
+                </div>
+            </div>
+
+            <div class="colorCard" data-color="sub">
+                <div class="cardTop">
+                    <span class="colorKey">sub</span>
+                    <span class="colorRole">@T("ColorSubRole", "보조 색상")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#707b90</span>
+                </div>
+            </div>
+
+            <div class="colorCard" data-color="point">
+                <div class="cardTop">
+                    <span class="colorKey">point</span>
+                    <span class="colorRole">@T("ColorPointRole", "포인트")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#538fa8</span>
+                </div>
+            </div>
+
+            <div class="colorCard" data-color="deco">
+                <div class="cardTop">
+                    <span class="colorKey">deco</span>
+                    <span class="colorRole">@T("ColorDecoRole", "장식 색상")</span>
+                </div>
+                <div class="cardBottom">
+                    <span class="swatch"></span>
+                    <span class="hexText">#184957</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pickerArea">
+            <div class="satValBox">
+                <div class="satValCursor"></div>
+            </div>
+            <div class="hueRow">
+                <div class="hueSlider">
+                    <div class="hueThumb"></div>
+                </div>
+            </div>
+            <div class="inputRow">
+                <span class="curPreview"></span>
+                <div class="hexInputWrap">
+                    <span class="prefix">#</span>
+                    <input type="text" class="hexInput" maxlength="6" spellcheck="false" placeholder="182134" />
+                </div>
+                <i class="fi fiEyedropper btnEyedropper" title="스포이트"></i>
+            </div>
+            <div class="presetRow">
+                <span class="presetLabel">모던 추천 팔레트</span>
+                <div class="presetSwatches">
+                    <span class="presetChip" data-hex="#182134" style="background:#182134" title="Dark Navy"></span>
+                    <span class="presetChip" data-hex="#707b90" style="background:#707b90" title="Cool Grey"></span>
+                    <span class="presetChip" data-hex="#538fa8" style="background:#538fa8" title="Steel Blue"></span>
+                    <span class="presetChip" data-hex="#184957" style="background:#184957" title="Deep Teal"></span>
+                    <span class="presetChip" data-hex="#2563eb" style="background:#2563eb" title="Royal Blue"></span>
+                    <span class="presetChip" data-hex="#0284c7" style="background:#0284c7" title="Ocean Cyan"></span>
+                    <span class="presetChip" data-hex="#10b981" style="background:#10b981" title="Emerald"></span>
+                    <span class="presetChip" data-hex="#7c3aed" style="background:#7c3aed" title="Purple"></span>
+                    <span class="presetChip" data-hex="#e11d48" style="background:#e11d48" title="Rose"></span>
+                    <span class="presetChip" data-hex="#ea580c" style="background:#ea580c" title="Orange"></span>
+                    <span class="presetChip" data-hex="#346472" style="background:#346472" title="Teal Slate"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 좌측 히어로 패널 다국어 인사말 설정 -->
+        <div class="greetingSection">
+            <div class="greetingHeader">
+                <div class="sectionTitle">
+                    <i class="fi fiChat"></i>
+                    <span>@T("GreetingSetting", "좌측 패널 인사말")</span>
+                </div>
+                <div class="dropDown greetingLangDrop" id="greetingLangDrop" data-val="@currentCult">
+                    <header>
+                        <i class="fi fiGlobe"></i>
+                        <span class="curLangName">@GetNativeName(currentCult) <small>(@currentCult.ToUpper())</small></span>
+                    </header>
+                    <ul class="down">
+                        @foreach (var cult in cultures)
+                        {
+                            <li data-val="@cult" class="@(cult.Equals(currentCult, StringComparison.OrdinalIgnoreCase) ? "selected" : "")">@GetNativeName(cult) <small>(@cult.ToUpper())</small></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="greetingPanels">
+                @foreach (var cult in cultures)
+                {
+                    var textVal = model.Greetings?.GetValueOrDefault(cult) ?? "";
+                    var placeholder = cult.StartsWith("ko", StringComparison.OrdinalIgnoreCase)
+                        ? "방문해 주셔서 감사합니다.\r\n더 편리하고 안전한 서비스를 경험해 보세요."
+                        : "Welcome to our platform.\r\nExperience faster, smarter and safer tools.";
+                    <div class="greetingPanel @(cult.Equals(currentCult, StringComparison.OrdinalIgnoreCase) ? "active" : "")" data-lang="@cult">
+                        <textarea class="greetingText" data-lang="@cult" rows="4" maxlength="300" placeholder="@placeholder">@textVal</textarea>
+                        <div class="greetingFooter">
+                            <span class="hint">@T("GreetingLineBreakHint", "줄바꿈(Enter)은 <br>로 적용됩니다.")</span>
+                            <span class="charCount">@(textVal.Length)/300</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <footer class="panelFooter">
+        <span class="btnReset" title="@(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "초기 기본 색상으로 복원" : "Reset to default colors")">
+            <i class="fi fiArrReset"></i>
+            <span>@(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "기본값 복원" : "Reset Defaults")</span>
+        </span>
+        <div class="rightBtns">
+            <span class="actCancel" onclick="closeLayoutConfig()">
+                @(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "취소" : "Cancel")
+            </span>
+            <span class="actSave">
+                <i class="fi fiCheckmark"></i>
+                <span>@(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "저장" : "Save")</span>
+            </span>
+        </div>
+    </footer>
+</div>
+
+<style>
+#layoutConfigPanel,
+aside.layoutConfigSidePanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 21.5em;
+    max-width: 100vw;
+    z-index: 99999;
+    background-color: var(--bgColor);
+    border-left: 1px solid var(--lineColor);
+    box-shadow: -4px 0 24px var(--aDark);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#layoutConfigPanel.open,
+aside.layoutConfigSidePanel.open {
+    transform: translateX(0);
+}
+.layoutConfigSide {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    user-select: none;
+}
+.layoutConfigSide * { box-sizing: border-box; }
+
+.layoutConfigSide header.panelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background-color: var(--bgColor);
+    border-bottom: 1px solid var(--lineColor);
+    flex-shrink: 0;
+}
+.layoutConfigSide header.panelHeader .titleWrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-weight: 800;
+    font-size: 1em;
+    color: var(--main);
+}
+.layoutConfigSide header.panelHeader .titleWrap i {
+    font-size: 1.15em;
+}
+.layoutConfigSide header.panelHeader .btnClose {
+    cursor: pointer;
+    font-size: 1.25em;
+    color: var(--txLight);
+    padding: 0.2em;
+    line-height: 1;
+    transition: color 0.15s, transform 0.15s;
+}
+.layoutConfigSide header.panelHeader .btnClose:hover {
+    color: var(--txColor);
+    transform: scale(1.15);
+}
+
+.layoutConfigSide .panelBody {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0.9em 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.layoutConfigSide .themeTabs {
+    display: flex;
+    background-color: var(--bgSub);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBtn, 2em);
+    padding: 0.3em;
+    gap: 0.2em;
+    flex-shrink: 0;
+}
+.layoutConfigSide .themeTabs .tabItem {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+    padding: 0.45em 0.8em;
+    border-radius: var(--roundBtn, 2em);
+    font-size: 0.88em;
+    font-weight: 500;
+    color: var(--txLight);
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+.layoutConfigSide .themeTabs .tabItem:hover {
+    color: var(--txColor);
+}
+.layoutConfigSide .themeTabs .tabItem.active {
+    background-color: var(--bgColor);
+    color: var(--main);
+    font-weight: 600;
+    box-shadow: 0 1px 4px var(--aColor);
+}
+
+.layoutConfigSide .colorGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5em;
+    flex-shrink: 0;
+}
+.layoutConfigSide .colorCard {
+    background-color: var(--bgSub);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundSm, 0.45em);
+    padding: 0.55em 0.7em;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+}
+.layoutConfigSide .colorCard:hover {
+    transform: scale(1.04);
+}
+.layoutConfigSide .colorCard.active {
+    border-color: var(--aColor);
+    background-color: var(--bgColor);
+    box-shadow: 0.1em 0.1em 0.6em 0.1em var(--aColor);
+}
+.layoutConfigSide .colorCard .cardTop {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.3em;
+}
+.layoutConfigSide .colorCard .cardTop .colorKey {
+    font-size: 0.95em;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+}
+.layoutConfigSide .colorCard .cardTop .colorRole {
+    font-size: 0.72em;
+    color: var(--txLight);
+}
+.layoutConfigSide .colorCard .cardBottom {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+}
+.layoutConfigSide .colorCard .cardBottom .swatch {
+    width: 1.2em;
+    height: 1.2em;
+    border-radius: 50%;
+    border: 1px solid var(--aColor);
+    flex-shrink: 0;
+}
+.layoutConfigSide .colorCard .cardBottom .hexText {
+    font-size: 0.82em;
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--txSub);
+}
+
+.layoutConfigSide .pickerArea {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    flex-shrink: 0;
+    padding-top: 0.2em;
+}
+.layoutConfigSide .satValBox {
+    position: relative;
+    width: 100%;
+    height: 9em;
+    border-radius: var(--roundSm, 0.4em);
+    overflow: hidden;
+    cursor: crosshair;
+    background: linear-gradient(to bottom, transparent 0%, #000 100%),
+                linear-gradient(to right, #fff 0%, #ff0000 100%);
+    box-shadow: inset 0 0 0 1px var(--aColor);
+}
+.layoutConfigSide .satValCursor {
+    position: absolute;
+    width: 0.85em;
+    height: 0.85em;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,0.8);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+}
+.layoutConfigSide .hueRow {
+    width: 100%;
+}
+.layoutConfigSide .hueSlider {
+    position: relative;
+    width: 100%;
+    height: 0.75em;
+    border-radius: 0.4em;
+    cursor: pointer;
+    background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    box-shadow: inset 0 0 0 1px var(--aColor);
+}
+.layoutConfigSide .hueThumb {
+    position: absolute;
+    top: 50%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--aHigh);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    left: 0%;
+}
+.layoutConfigSide .inputRow {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+}
+.layoutConfigSide .curPreview {
+    width: 2.1em;
+    height: 2.1em;
+    border-radius: 50%;
+    border: 1px solid var(--aColor);
+    background-color: #0f172a;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px var(--aLow);
+}
+.layoutConfigSide .hexInputWrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: var(--bgSub);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBtn, 2em);
+    padding: 0 0.8em;
+    height: 2.1em;
+    gap: 0.2em;
+}
+.layoutConfigSide .hexInputWrap .prefix {
+    color: var(--txLight);
+    font-weight: 700;
+    font-family: monospace;
+}
+.layoutConfigSide .hexInputWrap .hexInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--txColor);
+    font-family: monospace;
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 0;
+    outline: none;
+    text-transform: lowercase;
+}
+.layoutConfigSide .btnEyedropper {
+    font-size: 1.2em;
+    color: var(--txLight);
+    cursor: pointer;
+    padding: 0.2em;
+    transition: color 0.15s, transform 0.15s;
+    flex-shrink: 0;
+}
+.layoutConfigSide .btnEyedropper:hover {
+    color: var(--main);
+    transform: scale(1.15);
+}
+.layoutConfigSide .presetRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+    margin-top: 0.2em;
+}
+.layoutConfigSide .presetLabel {
+    font-size: 0.72em;
+    color: var(--txLight);
+    font-weight: 500;
+}
+.layoutConfigSide .presetSwatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45em;
+}
+.layoutConfigSide .presetChip {
+    width: 1.25em;
+    height: 1.25em;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid var(--aColor);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.layoutConfigSide .presetChip:hover {
+    transform: scale(1.25);
+    box-shadow: 0 2px 6px var(--aDark);
+}
+
+.layoutConfigSide .greetingSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65em;
+    margin-top: 1em;
+    border-top: 1px solid var(--aLight);
+    padding: 1em 0;
+}
+.layoutConfigSide .greetingHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6em;
+}
+.layoutConfigSide .greetingHeader .sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    font-size: 0.88em;
+    font-weight: 600;
+    color: var(--txColor);
+    white-space: nowrap;
+}
+.layoutConfigSide .greetingHeader .sectionTitle i.fi {
+    font-size: 1.15em;
+    color: var(--main);
+}
+.layoutConfigSide .greetingLangDrop {
+    min-width: 11.5em;
+    position: relative;
+    flex-shrink: 0;
+}
+.layoutConfigSide .greetingLangDrop > header {
+    height: 2.2em;
+    padding: 0 0.85em;
+    border: 1px solid var(--aLight);
+    border-radius: var(--roundBtn, 2em);
+    background-color: var(--bgColor);
+    font-size: 0.82em;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.4em;
+    cursor: pointer;
+    color: var(--txColor);
+    white-space: nowrap;
+    word-break: keep-all;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+.layoutConfigSide .greetingLangDrop > header:hover {
+    border-color: var(--aColor);
+    background-color: var(--aLow);
+}
+.layoutConfigSide .greetingLangDrop > header i.fi {
+    color: var(--txLight);
+    font-size: 1.05em;
+    flex-shrink: 0;
+}
+.layoutConfigSide .greetingLangDrop > header .curLangName {
+    flex: 1;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+}
+.layoutConfigSide .greetingLangDrop > header .curLangName small {
+    white-space: nowrap;
+    font-size: 0.85em;
+    color: var(--txLight);
+}
+.layoutConfigSide .greetingLangDrop > ul.down {
+    min-width: 100%;
+    border: 1px solid var(--aLight);
+    border-radius: 0.6em;
+    background-color: var(--bgColor);
+    box-shadow: 0 4px 16px var(--aDark);
+    white-space: nowrap;
+}
+.layoutConfigSide .greetingLangDrop > ul.down > li {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+}
+.layoutConfigSide .greetingLangDrop > ul.down > li small {
+    color: var(--txLight);
+    font-size: 0.85em;
+}
+.layoutConfigSide .greetingPanels .greetingPanel {
+    display: none;
+}
+.layoutConfigSide .greetingPanels .greetingPanel.active {
+    display: block;
+}
+.layoutConfigSide .greetingPanels .greetingText {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--aLight);
+    border-radius: 0.7em;
+    background-color: var(--bgColor);
+    color: var(--txColor);
+    padding: 0.75em 0.9em;
+    font-size: 0.9em;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 10em;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.layoutConfigSide .greetingPanels .greetingText:focus {
+    border-color: var(--aDark);
+}
+.layoutConfigSide .greetingPanels .greetingText::placeholder {
+    color: var(--txLight);
+    opacity: 0.6;
+}
+.layoutConfigSide .greetingFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.4em;
+    padding: 0 0.25em;
+    font-size: 0.75em;
+    color: var(--txLight);
+}
+.layoutConfigSide .greetingFooter .charCount {
+    font-family: monospace;
+    font-size: 0.95em;
+}
+
+.layoutConfigSide footer.panelFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65em 1em;
+    background-color: var(--bgColor);
+    border-top: 1px solid var(--lineColor);
+    flex-shrink: 0;
+    gap: 0.6em;
+}
+.layoutConfigSide footer.panelFooter .btnReset {
+    color: var(--txLight);
+    cursor: pointer;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    transition: color 0.15s;
+}
+.layoutConfigSide footer.panelFooter .btnReset:hover {
+    color: var(--txColor);
+}
+.layoutConfigSide footer.panelFooter .rightBtns {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+.layoutConfigSide footer.panelFooter .actCancel {
+    color: var(--txSub);
+    padding: 0.4em 0.8em;
+    border-radius: var(--roundBtn, 2em);
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: color 0.15s, background-color 0.15s;
+}
+.layoutConfigSide footer.panelFooter .actCancel:hover {
+    color: var(--txColor);
+    background-color: var(--aLow);
+}
+.layoutConfigSide footer.panelFooter .actSave {
+    background-color: var(--main);
+    border: 1px solid var(--aColor);
+    color: #fff;
+    padding: 0.4em 1.1em;
+    border-radius: var(--roundBtn, 2em);
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    transition: filter 0.15s;
+}
+.layoutConfigSide footer.panelFooter .actSave:hover {
+    filter: brightness(1.1);
+}
+</style>
+
+<script>
+window.initLayoutConfig = function(container, category, layoutName) {
+    const root = container.querySelector('.layoutConfigSide');
+    if (!root) return;
+
+    // Modern 레이아웃 고유 기본 색상
+    const defaultColors = {
+        light: { main: '#182134', sub: '#707b90', point: '#538fa8', deco: '#184957' },
+        dark: { main: '#182134', sub: '#707b90', point: '#538fa8', deco: '#184957' }
+    };
+
+    // 상태 관리 객체
+    const state = {
+        category: category,
+        layoutName: layoutName,
+        hasSavedSetting: @(hasSavedSetting ? "true" : "false"),
+        initialBodyTheme: document.body.dataset.theme || (document.documentElement.dataset.theme || 'dark'),
+        isReset: false,
+        currentTab: 'light',
+        currentColorKey: 'main',
+        colors: {
+            light: {
+                main: '@(model.Main)'.toLowerCase() || '#182134',
+                sub: '@(model.Sub)'.toLowerCase() || '#707b90',
+                point: '@(model.Point)'.toLowerCase() || '#538fa8',
+                deco: '@(model.Deco)'.toLowerCase() || '#184957'
+            },
+            dark: {
+                main: '@(model.DarkMain)'.toLowerCase() || '#182134',
+                sub: '@(model.DarkSub)'.toLowerCase() || '#707b90',
+                point: '@(model.DarkPoint)'.toLowerCase() || '#538fa8',
+                deco: '@(model.DarkDeco)'.toLowerCase() || '#184957'
+            }
+        },
+        greetings: {
+            @foreach (var cult in cultures)
+            {
+                var textVal = model.Greetings?.GetValueOrDefault(cult) ?? "";
+                <text>'@cult': @this.Js(textVal ?? ""),</text>
+            }
+        },
+        initialGreetings: null,
+        initialColors: null,
+        h: 0, s: 1, v: 1
+    };
+    state.initialColors = JSON.parse(JSON.stringify(state.colors));
+    state.initialGreetings = JSON.parse(JSON.stringify(state.greetings));
+
+    // 좌측 패널 인사말 요소 및 실시간 미리보기용 컨텍스트
+    const brandGreetingEl = document.querySelector('.brandGreeting') || document.querySelector('.heroContent .brandGreeting');
+    const initialBrandGreetingHtml = brandGreetingEl ? brandGreetingEl.innerHTML : '';
+    const currentUiLang = '@currentCult'.toLowerCase();
+    const defaultGreetingFallback = @this.Js(T("WelcomeVisit", "방문해 주셔서 감사합니다.\r\n더 편리하고 안전한 서비스를 경험해 보세요."));
+
+    function formatGreetingHtml(text) {
+        if (!text) return '';
+        const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        return escaped.replace(/\r?\n/g, '<br />');
+    }
+
+    // 색상 유틸리티
+    function hexToRgb(hex) {
+        hex = hex.replace('#', '').trim();
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length !== 6) return { r: 0, g: 0, b: 0 };
+        return {
+            r: parseInt(hex.substring(0, 2), 16),
+            g: parseInt(hex.substring(2, 4), 16),
+            b: parseInt(hex.substring(4, 6), 16)
+        };
+    }
+    function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')).join('');
+    }
+    function rgbToHsv(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const d = max - min;
+        let h = 0;
+        const s = max === 0 ? 0 : d / max;
+        const v = max;
+        if (max !== min) {
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: h * 360, s, v };
+    }
+    function hsvToRgb(h, s, v) {
+        h = (h % 360 + 360) % 360;
+        const c = v * s;
+        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        const m = v - c;
+        let r = 0, g = 0, b = 0;
+        if (h < 60) { r = c; g = x; }
+        else if (h < 120) { r = x; g = c; }
+        else if (h < 180) { g = c; b = x; }
+        else if (h < 240) { g = x; b = c; }
+        else if (h < 300) { r = x; b = c; }
+        else { r = c; b = x; }
+        return {
+            r: Math.round((r + m) * 255),
+            g: Math.round((g + m) * 255),
+            b: Math.round((b + m) * 255)
+        };
+    }
+    function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+        if (max === min) { h = s = 0; }
+        else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: h * 360, s, l };
+    }
+    function hslToHex(h, s, l) {
+        h = (h % 360 + 360) % 360;
+        const c = (1 - Math.abs(2 * l - 1)) * s;
+        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        const m = l - c / 2;
+        let r = 0, g = 0, b = 0;
+        if (h < 60) { r = c; g = x; }
+        else if (h < 120) { r = x; g = c; }
+        else if (h < 180) { g = c; b = x; }
+        else if (h < 240) { g = x; b = c; }
+        else if (h < 300) { r = x; b = c; }
+        else { r = c; b = x; }
+        return rgbToHex(Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255));
+    }
+    function generateColorScale(hex) {
+        const rgb = hexToRgb(hex);
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        const light = hslToHex(hsl.h, hsl.s, Math.min(0.95, hsl.l + 0.15));
+        const dark = hslToHex(hsl.h, hsl.s, Math.max(0.05, hsl.l - 0.15));
+        const steps = [];
+        for (let i = 0; i < 10; i++) {
+            const stepL = 0.95 - (i * 0.09);
+            steps.push(hslToHex(hsl.h, hsl.s, Math.max(0.05, Math.min(0.95, stepL))));
+        }
+        return { base: hex, light, dark, steps };
+    }
+
+    // 라이브 CSS 주입
+    function applyLiveCss() {
+        let styleTag = document.getElementById('layoutThemeColors');
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'layoutThemeColors';
+            document.head.appendChild(styleTag);
+        }
+        if (state.isReset) {
+            styleTag.innerHTML = '';
+            return;
+        }
+
+        const buildScope = (colorMap) => {
+            const lines = [];
+            ['main', 'sub', 'point', 'deco'].forEach(name => {
+                const hex = colorMap[name];
+                if (!hex) return;
+                const scale = generateColorScale(hex);
+                lines.push(`    --${name}: ${scale.base};`);
+                lines.push(`    --${name}Light: ${scale.light};`);
+                lines.push(`    --${name}Dark: ${scale.dark};`);
+                scale.steps.forEach((sHex, i) => lines.push(`    --${name}${i}: ${sHex};`));
+            });
+            lines.push(`    --primary: var(--point);`);
+            lines.push(`    --primaryLight: var(--pointLight);`);
+            lines.push(`    --primaryDark: var(--pointDark);`);
+            return lines.join('\n');
+        };
+
+        const css = `:root {\n${buildScope(state.colors.light)}\n}\n[data-theme="dark"] {\n${buildScope(state.colors.dark)}\n}`;
+        styleTag.innerHTML = css;
+    }
+
+    // DOM 요소 캐싱
+    const themeTabs = root.querySelectorAll('.themeTabs .tabItem');
+    const colorCards = root.querySelectorAll('.colorCard');
+    const satValBox = root.querySelector('.satValBox');
+    const satValCursor = root.querySelector('.satValCursor');
+    const hueSlider = root.querySelector('.hueSlider');
+    const hueThumb = root.querySelector('.hueThumb');
+    const curPreview = root.querySelector('.curPreview');
+    const hexInput = root.querySelector('.hexInput');
+    const btnEyedropper = root.querySelector('.btnEyedropper');
+    const btnReset = root.querySelector('.btnReset');
+    const actSave = root.querySelector('.actSave');
+    const presetChips = root.querySelectorAll('.presetChip');
+
+    function updateCardsUI() {
+        const curTabColors = state.colors[state.currentTab];
+        colorCards.forEach(card => {
+            const key = card.dataset.color;
+            const hex = curTabColors[key] || '#000000';
+            const swatch = card.querySelector('.swatch');
+            const hexText = card.querySelector('.hexText');
+            if (swatch) swatch.style.backgroundColor = hex;
+            if (hexText) hexText.textContent = hex;
+            card.classList.toggle('active', key === state.currentColorKey);
+        });
+    }
+
+    function syncPickerFromCurrent() {
+        const hex = state.colors[state.currentTab][state.currentColorKey];
+        const rgb = hexToRgb(hex);
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        state.h = hsv.h;
+        state.s = hsv.s;
+        state.v = hsv.v;
+
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+
+        const pureHueRgb = hsvToRgb(state.h, 1, 1);
+        const pureHueHex = rgbToHex(pureHueRgb.r, pureHueRgb.g, pureHueRgb.b);
+        satValBox.style.background = `linear-gradient(to bottom, transparent 0%, #000 100%), linear-gradient(to right, #fff 0%, ${pureHueHex} 100%)`;
+
+        satValCursor.style.left = (state.s * 100) + '%';
+        satValCursor.style.top = ((1 - state.v) * 100) + '%';
+        hueThumb.style.left = ((state.h / 360) * 100) + '%';
+    }
+
+    function setCurrentHex(hex) {
+        if (!hex.startsWith('#')) hex = '#' + hex;
+        state.colors[state.currentTab][state.currentColorKey] = hex.toLowerCase();
+        state.isReset = false;
+        updateCardsUI();
+        syncPickerFromCurrent();
+        applyLiveCss();
+    }
+
+    function switchThemeTab(tab) {
+        state.currentTab = tab;
+        themeTabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.body.dataset.theme = tab;
+        document.documentElement.dataset.theme = tab;
+        updateCardsUI();
+        syncPickerFromCurrent();
+    }
+
+    // 탭 클릭
+    themeTabs.forEach(tab => {
+        tab.addEventListener('click', () => switchThemeTab(tab.dataset.tab));
+    });
+
+    // 색상 카드 클릭
+    colorCards.forEach(card => {
+        card.addEventListener('click', () => {
+            state.currentColorKey = card.dataset.color;
+            updateCardsUI();
+            syncPickerFromCurrent();
+        });
+    });
+
+    // Sat/Val 드래그
+    let isDraggingSatVal = false;
+    function handleSatValMove(e) {
+        const rect = satValBox.getBoundingClientRect();
+        let x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        let y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+        state.s = x / rect.width;
+        state.v = 1 - (y / rect.height);
+        satValCursor.style.left = (state.s * 100) + '%';
+        satValCursor.style.top = ((1 - state.v) * 100) + '%';
+
+        const rgb = hsvToRgb(state.h, state.s, state.v);
+        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        state.colors[state.currentTab][state.currentColorKey] = hex.toLowerCase();
+        state.isReset = false;
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+        updateCardsUI();
+        applyLiveCss();
+    }
+
+    satValBox.addEventListener('pointerdown', e => {
+        isDraggingSatVal = true;
+        satValBox.setPointerCapture(e.pointerId);
+        handleSatValMove(e);
+    });
+    satValBox.addEventListener('pointermove', e => {
+        if (isDraggingSatVal) handleSatValMove(e);
+    });
+    satValBox.addEventListener('pointerup', e => {
+        if (isDraggingSatVal) {
+            isDraggingSatVal = false;
+            try { satValBox.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+    });
+
+    // Hue 슬라이더
+    let isDraggingHue = false;
+    function handleHueMove(e) {
+        const rect = hueSlider.getBoundingClientRect();
+        let x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        state.h = (x / rect.width) * 360;
+        hueThumb.style.left = ((state.h / 360) * 100) + '%';
+
+        const pureHueRgb = hsvToRgb(state.h, 1, 1);
+        const pureHueHex = rgbToHex(pureHueRgb.r, pureHueRgb.g, pureHueRgb.b);
+        satValBox.style.background = `linear-gradient(to bottom, transparent 0%, #000 100%), linear-gradient(to right, #fff 0%, ${pureHueHex} 100%)`;
+
+        const rgb = hsvToRgb(state.h, state.s, state.v);
+        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        state.colors[state.currentTab][state.currentColorKey] = hex.toLowerCase();
+        state.isReset = false;
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+        updateCardsUI();
+        applyLiveCss();
+    }
+
+    hueSlider.addEventListener('pointerdown', e => {
+        isDraggingHue = true;
+        hueSlider.setPointerCapture(e.pointerId);
+        handleHueMove(e);
+    });
+    hueSlider.addEventListener('pointermove', e => {
+        if (isDraggingHue) handleHueMove(e);
+    });
+    hueSlider.addEventListener('pointerup', e => {
+        if (isDraggingHue) {
+            isDraggingHue = false;
+            try { hueSlider.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+    });
+
+    // HEX 입력
+    hexInput.addEventListener('input', () => {
+        let val = hexInput.value.replace(/[^0-9a-fA-F]/g, '');
+        if (val.length === 3 || val.length === 6) {
+            setCurrentHex('#' + val);
+        }
+    });
+    hexInput.addEventListener('change', () => {
+        let val = hexInput.value.replace(/[^0-9a-fA-F]/g, '');
+        if (val.length !== 3 && val.length !== 6) {
+            hexInput.value = state.colors[state.currentTab][state.currentColorKey].replace('#', '');
+        }
+    });
+
+    // 스포이트
+    if (window.EyeDropper) {
+        btnEyedropper.addEventListener('click', async () => {
+            try {
+                const eyeDropper = new EyeDropper();
+                const res = await eyeDropper.open();
+                if (res && res.sRGBHex) {
+                    setCurrentHex(res.sRGBHex);
+                }
+            } catch (err) {}
+        });
+    } else {
+        btnEyedropper.style.display = 'none';
+    }
+
+    // 프리셋 클릭
+    presetChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const hex = chip.dataset.hex;
+            if (hex) setCurrentHex(hex);
+        });
+    });
+
+    // 다국어 인사말 드롭다운 언어 전환
+    const greetingLangDrop = root.querySelector('#greetingLangDrop');
+    if (greetingLangDrop) {
+        greetingLangDrop.addEventListener('change', (e) => {
+            const lang = (e.detail?.value || greetingLangDrop.dataset.val || '').trim();
+            if (!lang) return;
+            const header = greetingLangDrop.querySelector('header');
+            const selectedLi = greetingLangDrop.querySelector(`li[data-val="${lang}"]`);
+            if (header && selectedLi) {
+                const inner = selectedLi.innerHTML;
+                header.innerHTML = `<i class="fi fiGlobe"></i><span class="curLangName">${inner}</span>`;
+            }
+            root.querySelectorAll('.greetingPanel').forEach(p => {
+                p.classList.toggle('active', p.dataset.lang.toLowerCase() === lang.toLowerCase());
+            });
+        });
+    }
+
+    // 다국어 인사말 실시간 입력 및 좌측 패널 미리보기
+    root.querySelectorAll('.greetingText').forEach(ta => {
+        const lang = ta.dataset.lang;
+        const panel = ta.closest('.greetingPanel');
+        const countEl = panel ? panel.querySelector('.charCount') : null;
+
+        ta.addEventListener('input', () => {
+            state.greetings[lang] = ta.value;
+            if (countEl) countEl.textContent = `${ta.value.length}/300`;
+
+            if (brandGreetingEl && lang.toLowerCase() === currentUiLang) {
+                const trimmed = ta.value.trim();
+                brandGreetingEl.innerHTML = trimmed ? formatGreetingHtml(ta.value) : formatGreetingHtml(defaultGreetingFallback);
+            }
+        });
+    });
+
+    // 기본값 복원
+    btnReset.addEventListener('click', () => {
+        state.isReset = true;
+        state.colors = JSON.parse(JSON.stringify(defaultColors));
+        applyLiveCss();
+        updateCardsUI();
+
+        const hex = state.colors[state.currentTab][state.currentColorKey];
+        const rgb = hexToRgb(hex);
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        state.h = hsv.h; state.s = hsv.s; state.v = hsv.v;
+        curPreview.style.backgroundColor = hex;
+        hexInput.value = hex.replace('#', '');
+        const pureHueRgb = hsvToRgb(state.h, 1, 1);
+        const pureHueHex = rgbToHex(pureHueRgb.r, pureHueRgb.g, pureHueRgb.b);
+        satValBox.style.background = `linear-gradient(to bottom, transparent 0%, #000 100%), linear-gradient(to right, #fff 0%, ${pureHueHex} 100%)`;
+        satValCursor.style.left = (state.s * 100) + '%';
+        satValCursor.style.top = ((1 - state.v) * 100) + '%';
+        hueThumb.style.left = ((state.h / 360) * 100) + '%';
+
+        Object.keys(state.greetings).forEach(k => state.greetings[k] = '');
+        root.querySelectorAll('.greetingText').forEach(ta => {
+            ta.value = '';
+            const panel = ta.closest('.greetingPanel');
+            const countEl = panel ? panel.querySelector('.charCount') : null;
+            if (countEl) countEl.textContent = '0/300';
+        });
+        if (brandGreetingEl) brandGreetingEl.innerHTML = formatGreetingHtml(defaultGreetingFallback);
+    });
+
+    // 저장
+    actSave.addEventListener('click', async () => {
+        try {
+            actSave.style.pointerEvents = 'none';
+            actSave.innerHTML = '<i class="fi fiSpinner"></i> <span>저장 중...</span>';
+
+            if (state.isReset) {
+                const res = await fetch(`/api/config/layout/${state.category}/${state.layoutName}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                const result = await res.json();
+                if (result && result.success) {
+                    state.hasSavedSetting = false;
+                    const styleTag = document.getElementById('layoutThemeColors');
+                    if (styleTag) styleTag.innerHTML = '';
+                    common.info('레이아웃 설정이 원본으로 초기화되었습니다.');
+                    closeLayoutConfig(false);
+                } else {
+                    common.alert(result.message || '초기화에 실패했습니다.', 'Error');
+                }
+            } else {
+                const payload = {
+                    Main: state.colors.light.main,
+                    Sub: state.colors.light.sub,
+                    Point: state.colors.light.point,
+                    Deco: state.colors.light.deco,
+                    DarkMain: state.colors.dark.main,
+                    DarkSub: state.colors.dark.sub,
+                    DarkPoint: state.colors.dark.point,
+                    DarkDeco: state.colors.dark.deco,
+                    Greetings: state.greetings
+                };
+                const res = await fetch(`/api/config/layout/${state.category}/${state.layoutName}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result && result.success) {
+                    state.hasSavedSetting = true;
+                    state.initialColors = JSON.parse(JSON.stringify(state.colors));
+                    state.initialGreetings = JSON.parse(JSON.stringify(state.greetings));
+                    common.info('레이아웃 설정이 저장되었습니다.');
+                    closeLayoutConfig(false);
+                } else {
+                    common.alert(result.message || '저장에 실패했습니다.', 'Error');
+                }
+            }
+        } catch (err) {
+            console.error('[Save LayoutConfig Error]', err);
+            common.alert('저장 중 네트워크 오류가 발생했습니다.', 'Error');
+        } finally {
+            actSave.style.pointerEvents = 'auto';
+            actSave.innerHTML = '<i class="fi fiCheckmark"></i> <span>' + @this.Js(this.CurrentUICulture.TwoLetterISOLanguageName == "ko" ? "저장" : "Save") + '</span>';
+        }
+    });
+
+    const initialTab = state.initialBodyTheme === 'dark' ? 'dark' : 'light';
+    switchThemeTab(initialTab);
+
+    container._revertColors = function() {
+        if (state.initialBodyTheme) {
+            document.body.dataset.theme = state.initialBodyTheme;
+            document.documentElement.dataset.theme = state.initialBodyTheme;
+        }
+        const styleTag = document.getElementById('layoutThemeColors');
+        if (!state.hasSavedSetting) {
+            if (styleTag) styleTag.innerHTML = '';
+        } else if (state.initialColors) {
+            state.colors = JSON.parse(JSON.stringify(state.initialColors));
+            state.isReset = false;
+            applyLiveCss();
+        }
+
+        if (brandGreetingEl && initialBrandGreetingHtml !== undefined) {
+            brandGreetingEl.innerHTML = initialBrandGreetingHtml;
+        }
+        if (state.initialGreetings) {
+            state.greetings = JSON.parse(JSON.stringify(state.initialGreetings));
+            root.querySelectorAll('.greetingText').forEach(ta => {
+                const val = state.greetings[ta.dataset.lang] || '';
+                ta.value = val;
+                const panel = ta.closest('.greetingPanel');
+                const countEl = panel ? panel.querySelector('.charCount') : null;
+                if (countEl) countEl.textContent = `${val.length}/300`;
+            });
+        }
+    };
+};
+</script>

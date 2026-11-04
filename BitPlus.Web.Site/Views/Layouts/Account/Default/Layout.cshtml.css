@@ -1,0 +1,706 @@
+@charset "UTF-8";
+div#app.accountLayout {
+  --main: #346472;
+  --sub: #31363b;
+  --point: var(--point, #2a8699);
+  --accountActionColor: var(--main);
+  --accountActionHover: var(--mainDark);
+  /* 화면 높이에 고정: 카드가 화면보다 크면 카드 안 main 영역이 세로 스크롤된다 */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3em 1.5em;
+  font-size: 1rem;
+  box-sizing: border-box;
+  /* sub 색상 기반 배경색 & 부드러운 radial gradient 앰비언트 조명 */
+  background-color: var(--sub);
+  background-image: radial-gradient(ellipse at 50% 35%, var(--subLight) 0%, var(--subDark) 100%), radial-gradient(circle at 1px 1px, var(--aLight) 1px, transparent 0);
+  background-size: 100% 100%, 24px 24px;
+  /* 배경과 뚜렷하게 분리되는 엽서 카드: 입체 그림자 및 클린 외곽선 */
+  /* 약관 팝업 다이얼로그 (HTML5 Native Modal) */
+  /* 모바일 반응형 대응 (세로 모드 시 상하로 화면을 가득 채우도록 구현) */
+}
+div#app.accountLayout > .postcard {
+  width: 100%;
+  max-width: 66em;
+  min-height: min(40em, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: row;
+  border-radius: 0.8em;
+  overflow: hidden;
+  background-color: #444444;
+  border: 1px solid var(--aColor);
+  box-shadow: 0.1em 0.1em 0.6em 0.2em var(--aColor);
+  /* 좌측 프레스티지 블루 브랜드 영역 (main 색상 바인딩) */
+  /* 우측 라이트 클린 스튜디오 폼 영역 */
+}
+div#app.accountLayout > .postcard > .brandSide {
+  flex: 0 0 42%;
+  background: linear-gradient(155deg, var(--main) 0%, var(--mainDark) 100%);
+  color: var(--mainText, #fff);
+  padding: 3.2em 3em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  /* 언어 선택 드롭다운 (공용 .dropDown, ul.up 으로 위로 펼침) — 어두운 패널용 색만 조정 */
+}
+div#app.accountLayout > .postcard > .brandSide::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(circle at 30% 25%, var(--decoLight) 0%, transparent 60%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+div#app.accountLayout > .postcard > .brandSide > header {
+  position: relative;
+  z-index: 1;
+}
+div#app.accountLayout > .postcard > .brandSide > header > .brandLogo {
+  font-size: 1.3em;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  color: var(--pointLight);
+  text-transform: uppercase;
+}
+div#app.accountLayout > .postcard > .brandSide > .brandContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  /* 방문 환영 문구 (옅은 색) */
+}
+div#app.accountLayout > .postcard > .brandSide > .brandContent > h1 {
+  font-family: "Playfair Display", Didot, "Cinzel", Georgia, serif;
+  font-size: 2.6em;
+  line-height: 1.15;
+  font-weight: 500;
+  margin: 0;
+  color: var(--mainText, #fff);
+  letter-spacing: -0.02em;
+}
+div#app.accountLayout > .postcard > .brandSide > .brandContent > h1::after {
+  content: "";
+  display: block;
+  width: 2em;
+  height: 3px;
+  background-color: var(--deco);
+  margin-top: 0.45em;
+  border-radius: 2px;
+}
+div#app.accountLayout > .postcard > .brandSide > .brandContent > p {
+  margin: 0;
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: var(--mainText, #fff);
+  opacity: 0.75;
+}
+div#app.accountLayout > .postcard > .brandSide > footer {
+  position: relative;
+  z-index: 1;
+}
+div#app.accountLayout > .postcard > .brandSide > footer > .dropDown {
+  font-size: 0.85em;
+}
+div#app.accountLayout > .postcard > .brandSide > footer > .dropDown > header {
+  background-color: transparent;
+  color: var(--mainText, #fff);
+  border-color: var(--aColor);
+  opacity: 0.85;
+}
+div#app.accountLayout > .postcard > .brandSide > footer > .dropDown > ul {
+  color: var(--txColor);
+  background-color: var(--bgColor);
+}
+div#app.accountLayout > .postcard > .formSide {
+  flex: 1 1 58%;
+  min-height: 0;
+  background-color: var(--bgColor);
+  color: var(--txColor);
+  padding: 3.2em 3.8em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+div#app.accountLayout > .postcard > .formSide > header > nav {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.8em;
+  font-size: 0.88em;
+}
+div#app.accountLayout > .postcard > .formSide > header > nav > a {
+  color: var(--txSub);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+div#app.accountLayout > .postcard > .formSide > header > nav > a:hover {
+  color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > header > nav > a.navBtn {
+  border: 1px solid var(--accountActionColor);
+  border-radius: var(--roundBtn, 2em);
+  padding: 0.4em 1em;
+  color: var(--accountActionColor);
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s, transform 0.15s;
+}
+div#app.accountLayout > .postcard > .formSide > header > nav > a.navBtn:hover {
+  background-color: var(--accountActionColor);
+  color: var(--mainText, #fff);
+}
+div#app.accountLayout > .postcard > .formSide > main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  padding: 1.5em 0;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep {
+  /* 모던 언더라인 입력 필드 그리드 */
+  /* 약관 동의 한 줄 문장(로그인) & 약관 동의 목록(회원가입) — 보기/팝업 링크 버튼 공용 */
+  /* 모던 제출 액션 버튼 (스타일 기반 화살표 가상 요소 포함) */
+  /* 아이디 찾기 / 비밀번호 재설정 요청 (.findAccount) */
+  /* 비밀번호 재설정 (.resetPassword) */
+  /* 메일 인증 안내 (.verifyMail) */
+  /* 외부 로그인 버튼 (nav.externalLogin) */
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep > h2, div#app.accountLayout > .postcard > .formSide > main ::deep h2 {
+  font-family: "Playfair Display", Didot, Georgia, serif;
+  font-size: 2.2em;
+  font-weight: 500;
+  color: var(--txColor);
+  margin: 0 0 1em;
+  letter-spacing: -0.01em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4em;
+  margin-bottom: 1.3em;
+  /* 입력 아래 보조 안내 (예: 비밀번호 규칙) — 그리드 전체 폭 */
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .inputGrid.single {
+  grid-template-columns: 1fr;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .inputGrid > small {
+  grid-column: 1/-1;
+  margin-top: -1.2em;
+  font-size: 0.75em;
+  color: var(--txLight);
+  line-height: 1.4;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .fieldCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .fieldCol > label {
+  font-size: 0.85em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--txSub);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .fieldCol > input {
+  border: none;
+  border-bottom: 1px solid var(--silver);
+  background: transparent;
+  height: 2.2em;
+  padding: 0.4em 0;
+  font-size: 0.95em;
+  color: var(--txColor);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: none;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .fieldCol > input:focus {
+  border-bottom-color: var(--accountActionColor);
+  box-shadow: 0 1px 0 var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .fieldCol > input::placeholder {
+  color: var(--txLight);
+  font-weight: 300;
+  font-size: 0.9em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsSentence {
+  font-size: 0.82em;
+  color: var(--txSub);
+  line-height: 1.5;
+  margin: 0.6em 0 1.2em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin: 0.6em 0 1.2em;
+  font-size: 0.85em;
+  color: var(--txSub);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree[hidden] {
+  display: none;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > label.agreeAll,
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > label {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--txColor);
+  padding-bottom: 0.5em;
+  border-bottom: 1px dashed var(--lineColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.2em 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > ul > li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > ul > li > label > span {
+  font-size: 0.9em;
+  color: var(--txColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsSentence > .termsBtn, div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > ul > li > .termsBtn {
+  background: none;
+  border: none;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  color: var(--accountActionColor);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  border-radius: 0;
+  box-shadow: none;
+  transition: color 0.2s;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .termsSentence > .termsBtn:hover, div#app.accountLayout > .postcard > .formSide > main ::deep .termsAgree > ul > li > .termsBtn:hover {
+  color: var(--accountActionHover);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitBtn,
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitArrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  height: auto;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--accountActionColor);
+  cursor: pointer;
+  padding: 0.4em 0.8em 0.4em 0;
+  margin-top: 0.5em;
+  overflow: visible;
+  transition: color 0.2s, transform 0.15s;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitBtn::after,
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitArrow::after {
+  content: "→";
+  display: inline-block;
+  font-size: 1.15em;
+  line-height: 1;
+  margin-left: 0.1em;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitBtn:hover,
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitArrow:hover {
+  color: var(--accountActionHover);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitBtn:hover::after,
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitArrow:hover::after {
+  transform: translateX(0.35em);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitBtn:active,
+div#app.accountLayout > .postcard > .formSide > main ::deep .submitArrow:active {
+  transform: scale(0.98);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  width: 100%;
+}
+@media (max-width: 780px) {
+  div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount {
+    max-width: 24em;
+  }
+  div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > nav > span {
+    flex: 1 1 0;
+    padding: 0.6em 0.4em;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > nav {
+  display: flex;
+  gap: 0.5em;
+  border-bottom: 1px solid var(--lineColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > nav > span {
+  padding: 0.6em 1.2em;
+  font-size: 0.95em;
+  font-weight: 500;
+  color: var(--txLight);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > nav > span:hover {
+  color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > nav > span[aria-selected=true] {
+  font-weight: 600;
+  color: var(--accountActionColor);
+  border-bottom-color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > nav > span[aria-selected=true]:hover {
+  color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) > p {
+  margin: 0 0 1.5em;
+  font-size: 0.88em;
+  line-height: 1.6;
+  color: var(--txLight);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) > div:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  padding: 2.2em 1.5em;
+  text-align: center;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundSize);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) > div:not([hidden]) > b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  font-size: 1.4em;
+  border-radius: 50%;
+  background-color: var(--success);
+  color: var(--bgColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) > div:not([hidden]) > p {
+  margin: 0;
+  font-size: 0.85em;
+  color: var(--txColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) > div:not([hidden]) > strong {
+  font-size: 0.9em;
+  color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .findAccount > article:not([hidden]) > div:not([hidden]) > nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.8em;
+  margin-top: 0.8em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .resetPassword {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  width: 100%;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .resetPassword > p {
+  margin: 0 0 1em;
+  font-size: 0.88em;
+  line-height: 1.6;
+  color: var(--txLight);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .resetPassword > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2em;
+  padding: 2.2em 1.5em;
+  text-align: center;
+  border: 1px solid var(--danger);
+  border-radius: var(--roundSize);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .resetPassword > div > p {
+  margin: 0;
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: var(--danger);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .resetPassword > div > nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.8em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85em;
+  width: 100%;
+  max-width: 30em;
+  margin: 0 auto;
+  text-align: center;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.8em;
+  height: 3.8em;
+  border-radius: 50%;
+  border: 2px solid var(--primary2);
+  background-color: var(--primary1);
+  color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > b > i.fi {
+  font-size: 1.9em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail.notSent > b {
+  border-color: var(--warning2);
+  background-color: var(--warning1);
+  color: var(--warning);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail.failed > b {
+  border-color: var(--danger2);
+  background-color: var(--danger1);
+  color: var(--danger);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > h2 {
+  margin: 0;
+  font-size: 1.45em;
+  font-weight: 700;
+  color: var(--txColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > p {
+  margin: 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: var(--txLight);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 1.2em;
+  font-size: 0.95em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBtn);
+  color: var(--txColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > strong > i.fi {
+  color: var(--accountActionColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > small {
+  font-size: 0.82em;
+  line-height: 1.5;
+  color: var(--txLight);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > form {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > form > button.btn {
+  width: 100%;
+  max-width: 22em;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > form + form > button, div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.4em 0.8em;
+  font-size: 0.85em;
+  border: none;
+  background: none;
+  color: var(--txLight);
+  text-decoration: none;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > form + form > button:hover, div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > a:hover {
+  color: var(--txColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > aside {
+  width: 100%;
+  margin-top: 0.8em;
+  padding: 0.9em 1.2em;
+  font-size: 0.8em;
+  text-align: left;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundSize);
+  color: var(--txLight);
+  box-sizing: border-box;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > aside > h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin: 0 0 0.4em;
+  font-size: 1em;
+  color: var(--txColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > aside > h4 > i.fi {
+  color: var(--info);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep .verifyMail > aside > ul {
+  margin: 0;
+  padding-left: 1.2em;
+  line-height: 1.4;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin-top: 1.6em;
+}
+@media (max-width: 780px) {
+  div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin {
+    width: 100%;
+    max-width: 24em;
+  }
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > span {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > span::before, div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > span::after {
+  content: "";
+  flex: 1 1 auto;
+  border-top: 1px solid var(--lineColor);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  height: 2.6em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBtn);
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--txColor);
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > a:hover {
+  border-color: var(--accountActionColor);
+  color: var(--accountActionColor);
+  background-color: var(--aLow);
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > a > img.brandIcon {
+  width: 1.25em;
+  height: 1.25em;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+div#app.accountLayout > .postcard > .formSide > main ::deep nav.externalLogin > a > i.fi {
+  font-size: 1.15em;
+}
+@media (max-width: 780px) {
+  div#app.accountLayout {
+    padding: 0;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  div#app.accountLayout > .postcard {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+  div#app.accountLayout > .postcard > .brandSide {
+    flex: 0 0 auto;
+    padding: 2.2em 1.8em 1.5em;
+    gap: 1.2em;
+  }
+  div#app.accountLayout > .postcard > .brandSide > .brandContent {
+    gap: 1em;
+  }
+  div#app.accountLayout > .postcard > .brandSide > .brandContent > h1 {
+    font-size: 1.8em;
+  }
+  div#app.accountLayout > .postcard > .formSide {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 1.8em 1.8em max(2em, env(safe-area-inset-bottom, 2em));
+    border-radius: 0;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+  }
+  div#app.accountLayout > .postcard > .formSide > main {
+    padding: 1em 0;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: visible;
+  }
+  div#app.accountLayout > .postcard > .formSide > main ::deep > form {
+    width: 100%;
+    max-width: 24em;
+  }
+  div#app.accountLayout > .postcard > .formSide > main ::deep > form input {
+    padding: 0.3em 0.5em !important;
+  }
+  div#app.accountLayout > .postcard > .formSide > main ::deep .inputGrid {
+    grid-template-columns: 1fr;
+    gap: 1.2em;
+    margin-bottom: 1.2em;
+  }
+}
+
+/* 다크 테마 오버라이드: 어두운 배경 위에서 화사하고 선명한 민트 포인트 색상 바인딩 */
+[data-theme=dark] div#app.accountLayout {
+  --accountActionColor: var(--point);
+  --accountActionHover: var(--pointLight);
+}
+[data-theme=dark] div#app.accountLayout > .postcard > .formSide > header > nav > a.navBtn:hover {
+  color: var(--pointText, #112019);
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Layouts/Account/Default/Layout.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;EACI;EACA;EACA;EACA;EACA;AACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;EACA;EACA;EACA;AACA;AA4pBA;AA+EA;;AA1uBA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AA+FA;;AA9FA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AA8DA;;AA5DA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;AAqBA;;AAnBA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;;AAEA;EACI;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGI;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAOpB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AASI;AA0DA;AAsEA;AAyCA;AAmGA;AAuCA;AAuIA;;AAlcA;EACI;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;AAKA;;AAHA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAKZ;EACI;EACA;EACA;;AAKJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAKZ;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;;AAGJ;AAAA;EACI;;AAEA;AAAA;EACI;;AAIR;AAAA;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAEA;EAPJ;IAQQ;;EAEA;IACI;IACA;IACA;IACA;;;AAIR;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EAPJ;IAQQ;IACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EAEI;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAS5B;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAIR;EACI;EACA;EACA;EACA;;AAKZ;EAjwBJ;IAkwBQ;IACA;IACA;IACA;IACA;IACA;;EAEA;IACI;IACA;IACA;IACA;IACA;IACA;IACA;IACA;IACA;;EAEA;IACI;IACA;IACA;;EAEA;IACI;;EAEA;IACI;;EAKZ;IACI;IACA;IACA;IACA;IACA;;EAEA;IACI;IACA;IACA;IACA;;EAGI;IACI;IACA;;EAEA;IACI;;EAIR;IACI;IACA;IACA;;;;AAS5B;AACA;EACI;EACA;;AAEA;EACI%22%7D */

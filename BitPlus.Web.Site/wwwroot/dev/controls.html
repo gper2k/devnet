@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>입력 컨트롤 — BitPlus DevKit</title>
+    <link rel="stylesheet" href="/lib/fluenticons/fluenticons.min.css" />
+    <link rel="stylesheet" href="/css/site.min.css" />
+    <link rel="stylesheet" href="/dev/devkit.css" />
+    <script defer src="/dev/devkit.js"></script>
+</head>
+<body>
+    <div class="devPage">
+        <!-- ═══ 태그 목록 (ul.tags) ═══ -->
+        <section class="devSection">
+            <h2>태그 목록</h2>
+
+            <!-- 1. 쓰기 모드 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>1. 쓰기 모드 <span class="tag css">ul.tags &gt; li &gt; input</span></h3>
+                    <p>자식 <code>li</code> 에 입력항을 두면 쓰기 모드로 동작합니다. 입력 후 <b>Enter</b>(또는 change) 시 입력항 <code>li</code> 앞에 태그가 추가되고 입력은 비워집니다. 빈 값과 중복(대소문자 무시)은 추가하지 않으며, 태그의 삭제 버튼으로 제거합니다. 이벤트는 <code>site.ts</code> body 위임으로 처리되어 별도 스크립트가 필요 없습니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <ul class="tags" id="tagWrite">
+                            <li><span>ASP.NET</span><button type="button"><i class="fi fiDismiss"></i></button></li>
+                            <li><span>TypeScript</span><button type="button"><i class="fi fiDismiss"></i></button></li>
+                            <li><input type="text" placeholder="태그 입력 후 Enter" /></li>
+                        </ul>
+                        <small id="tagLog">tag 이벤트: -</small>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>&lt;ul class="tags"&gt;
+    &lt;li&gt;&lt;span&gt;ASP.NET&lt;/span&gt;&lt;button type="button"&gt;&lt;i class="fi fiDismiss"&gt;&lt;/i&gt;&lt;/button&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;input type="text" placeholder="태그 입력 후 Enter" /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+// 추가/삭제 감지 (선택)
+list.addEventListener("tag", e =&gt; console.log(e.detail.text, e.detail.add));</code></pre>
+                </div>
+            </div>
+
+            <!-- 2. 읽기 전용 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>2. 읽기 전용 <span class="tag css">ul.tags</span></h3>
+                    <p>입력항이 있는 <code>li</code> 가 없으면 표시 전용 태그 목록입니다. 삭제 버튼 없이 텍스트만 둡니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <ul class="tags">
+                        <li>공지</li>
+                        <li>이벤트</li>
+                        <li>업데이트</li>
+                    </ul>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>&lt;ul class="tags"&gt;
+    &lt;li&gt;공지&lt;/li&gt;
+    &lt;li&gt;이벤트&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+                </div>
+            </div>
+
+            <!-- 3. 스크립트 바인딩 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>3. 값 바인딩 / 수집 <span class="tag js">JS</span></h3>
+                    <p><code>common.setTags(list, tags)</code> 로 태그를 채우고(쓰기 모드면 삭제 버튼 포함), <code>common.getTags(list)</code> 로 태그 텍스트 배열을 얻습니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <ul class="tags" id="tagBind">
+                            <li><input type="text" placeholder="태그 입력 후 Enter" /></li>
+                        </ul>
+                        <div class="demoRow">
+                            <button type="button" class="sm" id="btnSetTags">setTags</button>
+                            <button type="button" class="sm" id="btnGetTags">getTags</button>
+                            <small id="tagResult"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>common.setTags(list, ["C#", "Razor", "SCSS"]);
+const tags = common.getTags(list); // ["C#", "Razor", "SCSS"]</code></pre>
+                </div>
+            </div>
+
+            <div class="refTable">
+                <table>
+                    <thead><tr><th>옵션 (3번째 인자)</th><th>기본</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr><td>mode</td><td>"datetime"</td><td>입력 형식. <code>"datetime"</code>: 날짜+시간(ISO 8601 UTC 로 주고받음, 화면은 로컬 시간), <code>"date"</code>: 날짜만(<code>yyyy-MM-dd</code>), <code>"time"</code>: 시간만(<code>HH:mm</code>). date/time 은 시간대 변환 없이 그대로 주고받음</td></tr>
+                        <tr><td>title</td><td>"발행 기간"</td><td>제목 (문자열만 주면 제목으로 사용)</td></tr>
+                        <tr><td>icon</td><td>"fiCalClock"</td><td>제목 앞 아이콘 클래스 (fluenticons)</td></tr>
+                        <tr><td>startLabel / endLabel</td><td>"게시 시작일" / "게시 종료일"</td><td>시작·종료 입력칸 라벨</td></tr>
+                        <tr><td>info</td><td>"비워 두면 기간 제한 없이 게시됩니다."</td><td>하단 안내 문구, 빈 문자열(<code>""</code>)이면 안내 영역을 숨김</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- API 참조 -->
+            <div class="refTable">
+                <table>
+                    <thead><tr><th>이름</th><th>유형</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr><td>ul.tags</td><td>CSS</td><td>태그 목록 (li: 태그)</td></tr>
+                        <tr><td>li &gt; input</td><td>HTML</td><td>쓰기 모드 입력항. Enter/change 시 앞에 태그 추가 후 입력 비움</td></tr>
+                        <tr><td>li &gt; span + button</td><td>HTML</td><td>쓰기 모드 태그 (텍스트 + 삭제 버튼)</td></tr>
+                        <tr><td>tag (event)</td><td>CustomEvent</td><td>ul 에 발생, <code>detail = { text, add }</code> (add: 추가 true / 삭제 false)</td></tr>
+                        <tr><td>common.getTags(list)</td><td>method</td><td>태그 텍스트 배열 반환</td></tr>
+                        <tr><td>common.setTags(list, tags)</td><td>method</td><td>기존 태그를 지우고 바인딩</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══ 날짜·시간 입력 (.datePick / .timePick / .dateTimePick) ═══ -->
+        <section class="devSection">
+            <h2>날짜·시간 입력</h2>
+
+            <!-- 1. 날짜 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>1. 날짜 <span class="tag css">.datePick</span></h3>
+                    <p>태그만 선언하면 <code>site.ts</code> 가 초기화합니다(나중에 추가되는 모달 안의 태그도 자동). 누르면 달력 팝업이 열리고(위쪽 년도를 누르면 10년 단위 년도 선택, 월을 누르면 12개월 선택 화면 — 문화권과 상관없이 4자리 년도 - 2자리 월 숫자로 표시), 아래의 오늘·초기화 버튼을 지원합니다. 값은 <code>yyyy-MM-dd</code>, <code>data-min</code>/<code>data-max</code> 밖의 날짜는 선택할 수 없습니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="datePick" id="demoDate" data-name="day" data-value="2026-10-14" data-min="2026-10-01" data-max="2026-12-31" data-placeholder="날짜 선택"></div>
+                        <small id="dateLog">change 이벤트: -</small>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>&lt;div class="datePick" data-name="day" data-value="2026-10-14"
+     data-min="2026-10-01" data-max="2026-12-31" data-placeholder="날짜 선택"&gt;&lt;/div&gt;
+
+const el = document.querySelector(".datePick");
+el.value;                 // "2026-10-14" (비어 있으면 "")
+el.value = "2026-11-02";  // 쓰기 (이벤트 없음)
+el.addEventListener("change", () =&gt; console.log(el.value));</code></pre>
+                </div>
+            </div>
+
+            <!-- 2. 시간 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>2. 시간 <span class="tag css">.timePick</span></h3>
+                    <p>누르면 시·분 스피너 팝업이 열립니다. 위/아래 화살표(또는 키보드 ↑↓)로 올리고 내리면 팝업 안에서만 바뀌고, <b>적용</b> 버튼(또는 입력칸에서 Enter)을 눌러야 값이 정해집니다(적용하지 않고 닫으면 버려짐). 초기화 버튼은 값을 비웁니다. 숫자를 직접 입력할 수도 있습니다. <code>data-step</code> 으로 분 단위 간격(기본 1)을 정합니다. 값은 <code>HH:mm</code>.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="timePick" id="demoTime" data-name="time" data-value="15:03" data-step="5"></div>
+                        <small id="timeLog">change 이벤트: -</small>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>&lt;div class="timePick" data-name="time" data-value="15:03" data-step="5"&gt;&lt;/div&gt;</code></pre>
+                </div>
+            </div>
+
+            <!-- 3. 날짜 + 시간 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>3. 날짜 + 시간 <span class="tag css">.dateTimePick</span></h3>
+                    <p>날짜와 시간을 따로 입력받는 한 쌍입니다. 값은 <code>yyyy-MM-ddTHH:mm</code>(사용자의 로컬 시간)이고, 날짜만 고르면 시간은 현재 시(분 <code>00</code>), 날짜를 지우면 시간도 비워집니다. 시간 팝업도 값이 없으면 현재 시(분 00)에서 시작합니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="dateTimePick" id="demoDateTime" data-name="start" data-value="2026-10-14T09:30" data-step="10"></div>
+                        <div class="demoRow">
+                            <button type="button" class="sm" id="btnDtSet">값 설정</button>
+                            <button type="button" class="sm" id="btnDtClear">비우기</button>
+                            <small id="dtLog">value: -</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>&lt;div class="dateTimePick" data-name="start" data-value="2026-10-14T09:30"&gt;&lt;/div&gt;
+
+const el = document.querySelector(".dateTimePick");
+el.value = "2026-12-24T18:00";
+const utc = el.value ? new Date(el.value).toISOString() : null; // 서버로 보낼 때 UTC 로</code></pre>
+                </div>
+            </div>
+
+            <!-- 4. 기간 설정 모달 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>4. 기간 설정 모달 <span class="tag js">common.periodEdit</span></h3>
+                    <p>시작~종료 값을 정하는 공용 모달입니다(위 날짜·시간 컨트롤 사용). 발행 기간뿐 아니라 어떤 기간·범위 입력에도 쓸 수 있도록 제목·아이콘·라벨·안내 문구와 입력 형식(날짜+시간 / 날짜만 / 시간만)을 호출할 때 바꿀 수 있습니다.</p>
+                    <ol>
+                        <li><code>await common.periodEdit(시작, 끝, 옵션)</code> 으로 엽니다. 시작·끝은 비워 두면(<code>null</code>) 그쪽은 제한 없음입니다.</li>
+                        <li>3번째 인자는 제목 문자열 또는 옵션 객체이며 모두 생략할 수 있습니다(생략하면 "발행 기간" 문구).</li>
+                        <li>사용자가 <b>적용</b>을 누르면 <code>{ start, end }</code>, <b>취소</b>(Esc 포함)면 <code>null</code> 을 돌려줍니다. 초기화는 두 값을 모두 비웁니다.</li>
+                        <li>끝이 시작보다 앞서면 적용되지 않고 알림이 나옵니다. 모달 너비는 입력 형식에 맞게 자동 조정됩니다.</li>
+                    </ol>
+                </div>
+                <div class="blockDemo">
+                    <div class="demoCol">
+                        <div class="demoRow">
+                            <button type="button" class="sm" id="btnPeriod">기간 설정 열기</button>
+                            <button type="button" class="sm" id="btnPeriod2">문구 바꿔 열기</button>
+                            <button type="button" class="sm" id="btnPeriodDate">날짜만</button>
+                            <button type="button" class="sm" id="btnPeriodTime">시간만</button>
+                            <small id="periodLog">결과: -</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>const result = await common.periodEdit(start, end); // start/end: ISO 8601 UTC 또는 null
+if (result) { /* { start, end } */ }              // 취소하면 null
+
+// 발행 기간이 아닌 용도: 3번째 인자에 제목 문자열 또는 문구 옵션 (모두 생략 가능, info: "" 이면 하단 안내 숨김)
+await common.periodEdit(start, end, { title: "예약 기간", icon: "fiCal", startLabel: "시작", endLabel: "종료", info: "" });
+
+// 입력 형식: 날짜+시간(기본) / 날짜만 / 시간만
+await common.periodEdit(start, end, { mode: "datetime" });
+
+// 날짜만 / 시간만 받기 (date: "yyyy-MM-dd", time: "HH:mm" 그대로 주고받음, 모달 너비도 자동 조정)
+await common.periodEdit("2026-10-14", null, { mode: "date", title: "휴가 기간" });
+await common.periodEdit("09:00", "18:00", { mode: "time", title: "근무 시간" });</code></pre>
+                </div>
+            </div>
+
+            <!-- API 참조 -->
+            <div class="refTable">
+                <table>
+                    <thead><tr><th>이름</th><th>유형</th><th>설명</th></tr></thead>
+                    <tbody>
+                        <tr><td>.datePick / .timePick / .dateTimePick</td><td>CSS</td><td>태그 선언만으로 쓰는 날짜 / 시간 / 날짜+시간 컨트롤</td></tr>
+                        <tr><td>data-value</td><td>HTML</td><td>초기값 (날짜 yyyy-MM-dd, 시간 HH:mm, 날짜시간 yyyy-MM-ddTHH:mm)</td></tr>
+                        <tr><td>data-name</td><td>HTML</td><td>있으면 같은 이름의 hidden input 이 값을 따라가 폼 전송에 쓸 수 있음</td></tr>
+                        <tr><td>data-min / data-max</td><td>HTML</td><td>선택 가능한 날짜 범위 (날짜, dateTimePick 은 날짜 부분)</td></tr>
+                        <tr><td>data-step</td><td>HTML</td><td>시간의 분 단위 간격 (1~30, 기본 1)</td></tr>
+                        <tr><td>data-placeholder</td><td>HTML</td><td>값이 없을 때 표시할 글자</td></tr>
+                        <tr><td>el.value</td><td>property</td><td>값 읽기/쓰기 (로컬 시간, 비면 빈 문자열)</td></tr>
+                        <tr><td>change (event)</td><td>Event</td><td>사용자가 값을 바꾸면 요소에서 발생 (bubbles, 쓰기로 바꾼 값은 발생하지 않음)</td></tr>
+                        <tr><td>common.periodEdit(start, end, title?)</td><td>method</td><td>기간 설정 모달 열기(title: 제목 문자열 또는 { title, icon, startLabel, endLabel, info } 로 문구 교체), 확인 시 { start, end } (UTC ISO 또는 null), 취소 시 null</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script type="module">
+        import { Site } from "/js/site.js";
+        const common = new Site();
+
+        const write = document.getElementById("tagWrite");
+        write.addEventListener("tag", e => {
+            document.getElementById("tagLog").textContent = `tag 이벤트: ${e.detail.add ? "추가" : "삭제"} "${e.detail.text}" → [${common.getTags(write).join(", ")}]`;
+        });
+
+        const bind = document.getElementById("tagBind");
+        document.getElementById("btnSetTags").addEventListener("click", () => common.setTags(bind, ["C#", "Razor", "SCSS"]));
+        document.getElementById("btnGetTags").addEventListener("click", () => {
+            document.getElementById("tagResult").textContent = JSON.stringify(common.getTags(bind));
+        });
+
+        // 날짜·시간 컨트롤 샘플
+        const dateEl = document.getElementById("demoDate");
+        dateEl.addEventListener("change", () => document.getElementById("dateLog").textContent = `change 이벤트: value = "${dateEl.value}"`);
+        const timeEl = document.getElementById("demoTime");
+        timeEl.addEventListener("change", () => document.getElementById("timeLog").textContent = `change 이벤트: value = "${timeEl.value}"`);
+        const dtEl = document.getElementById("demoDateTime");
+        const dtShow = () => document.getElementById("dtLog").textContent = `value: "${dtEl.value}"`;
+        dtEl.addEventListener("change", dtShow);
+        document.getElementById("btnDtSet").addEventListener("click", () => { dtEl.value = "2026-12-24T18:00"; dtShow(); });
+        document.getElementById("btnDtClear").addEventListener("click", () => { dtEl.value = ""; dtShow(); });
+        document.getElementById("btnPeriod2").addEventListener("click", async () => {
+            const result = await common.periodEdit(null, null, { title: "예약 기간", icon: "fiCal", startLabel: "시작", endLabel: "종료", info: "" });
+            document.getElementById("periodLog").textContent = `결과: ${JSON.stringify(result)}`;
+        });
+        document.getElementById("btnPeriodDate").addEventListener("click", async () => {
+            const result = await common.periodEdit("2026-10-14", null, { mode: "date", title: "휴가 기간" });
+            document.getElementById("periodLog").textContent = `결과: ${JSON.stringify(result)}`;
+        });
+        document.getElementById("btnPeriodTime").addEventListener("click", async () => {
+            const result = await common.periodEdit("09:00", "18:00", { mode: "time", title: "근무 시간", icon: "fiClock" });
+            document.getElementById("periodLog").textContent = `결과: ${JSON.stringify(result)}`;
+        });
+        document.getElementById("btnPeriod").addEventListener("click", async () => {
+            const result = await common.periodEdit("2026-10-14T00:00:00Z", null);
+            document.getElementById("periodLog").textContent = `결과: ${JSON.stringify(result)}`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Site.Widgets
+@{
+    var items = Model.Lines("items");
+}
+@* 강점 카드 위젯 — 가운데 제목·설명, 아래에 카드(아이콘·제목·설명)를 열 수만큼 나란히 (780 미만 2열, 520 미만 1열) *@
+<div class="widgetCards" style="--cols: @Model.Int("columns", 4)">
+    @if (Model.Text("label").Length > 0)
+    {
+        <em>@Model.Text("label")</em>
+    }
+    @if (Model.Text("title").Length > 0)
+    {
+        <h2>@Model.Text("title")</h2>
+    }
+    @if (Model.Text("text").Length > 0)
+    {
+        <p>@Model.Text("text")</p>
+    }
+    <ul>
+        @foreach (var item in items)
+        {
+            <li>
+                <span><i class="fi @SlotView.IconOf(item[0])"></i></span>
+                <strong>@(item.Length > 1 ? item[1] : "")</strong>
+                <p>@(item.Length > 2 ? item[2] : "")</p>
+            </li>
+        }
+    </ul>
+</div>

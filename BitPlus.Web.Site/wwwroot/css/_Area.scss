@@ -1,0 +1,854 @@
+@use "Document" as *;
+/* ==========================================================================
+   Area: 구조적 레이아웃 영역 및 컨테이너
+   - flexRow, flexCol 영역 분할 체계
+   - 정렬, 간격(gap), 자식 크기 분배
+   - 기본 구조 영역 컨테이너 (.card, .container)
+   ========================================================================== */
+
+/* Flex 컨테이너 베이스 */
+.flexRow,
+.flexCol {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5em; /* 기본 공통 간격 */
+    /* 주축/교차축 정렬 모디파이어 */
+    &.center {
+        justify-content: center;
+        align-items: center;
+    }
+
+    &.between {
+        justify-content: space-between;
+    }
+
+    &.around {
+        justify-content: space-around;
+    }
+
+    &.start {
+        justify-content: flex-start;
+    }
+
+    &.end {
+        justify-content: flex-end;
+    }
+
+    &.alignStart {
+        align-items: flex-start;
+    }
+
+    &.alignCenter {
+        align-items: center;
+    }
+
+    &.alignEnd {
+        align-items: flex-end;
+    }
+
+    &.alignStretch {
+        align-items: stretch;
+    }
+
+    &.wrap {
+        flex-wrap: wrap;
+    }
+    /* 간격(Gap) 모디파이어 */
+    &.noGap {
+        gap: 0;
+    }
+
+    &.gapXs {
+        gap: 0.25em;
+    }
+
+    &.gapSm {
+        gap: 0.5em;
+    }
+
+    &.gapMd {
+        gap: 1em;
+    }
+
+    &.gapLg {
+        gap: 1.5em;
+    }
+
+    &.gapXl {
+        gap: 2em;
+    }
+    /* 자식 요소 크기 분배 헬퍼 */
+    & > .auto {
+        flex: 1 1 auto !important;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    & > .fix {
+        flex: 0 0 auto !important;
+    }
+
+    & > .grow {
+        flex-grow: 1;
+    }
+}
+
+/* 가로 방향 영역 (.flexRow) */
+.flexRow {
+    flex-direction: row !important;
+    align-items: center; /* 가로 배치 시 기본 수직 중앙 정렬 */
+
+    /* 컨트롤(버튼·입력·선택)은 공통 높이(2.6em)를 유지: 100% 가 되면 부모 높이가 자동일 때 내용 높이로 줄어 나란한 입력 그룹과 높이가 어긋남 
+    & > :where(:not(button, .btn, input, select)) {
+        height: 100%;
+    }*/
+}
+
+/* 세로 방향 영역 (.flexCol) */
+.flexCol {
+    flex-direction: column !important;
+
+    & > * {
+        width: 100%;
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 80em;
+    margin: 0 auto;
+    padding: 0 1em;
+}
+
+/* 반응형 카드 그리드 (.cardGrid) - 설정/정책 카드 등 N개 카드 균등 배치 */
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+    gap: 1em;
+
+    &.auto {
+        overflow: auto;
+        padding: 0.2em;
+    }
+}
+
+/* 전체 높이 컨테이너 (.pageBox)
+   - Layout 없이(_Layout 단독) 렌더링되는 iframe 임베드 페이지의 루트 컨테이너.
+   - body(100vh)를 그대로 상속해 뷰포트(또는 iframe) 높이에 정확히 맞추고,
+     내부 플렉스 자식(.flexRow.auto 등)이 남는 높이를 그대로 채우도록 한다.
+   - 패딩 없음(edge-to-edge) — 바깥 iframe 래퍼가 이미 탭 박스와의 간격을
+     margin 으로 처리하므로, 안쪽에서 또 여백을 주면 박스 안에 박스처럼 겹친다. */
+.pageBox {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    overflow: hidden;
+
+    /* .flexRow/.flexCol 의 자식 크기 분배 헬퍼(.auto/.fix/.grow)를 pageBox 의
+       직계 자식에도 그대로 적용 — pageBox 자체가 flex 컨테이너이므로 동일하게 동작해야 한다. */
+    & > .auto {
+        flex: 1 1 auto;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    & > .fix {
+        flex: 0 0 auto;
+    }
+
+    & > .grow {
+        flex-grow: 1;
+    }
+}
+
+/* 좌측 선택 목록 패널 (.asideList)
+   - .selectList 등을 담는 좌측 고정폭 패널. border-right 가 우측 콘텐츠와의
+     구분선 역할을 하며, 부모가 .flexRow.alignStretch 일 때 전체 높이로 이어진다. */
+aside.asideList {
+    flex: 0 0 auto;
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBox);
+    padding: 0.5em;
+    overflow-y: auto;
+
+    & > ul.selectList {
+        & > li {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    & > ul.pager {
+        border-top: 1px solid var(--aLight);
+        padding-top: 1em;
+        justify-content: center;
+    }
+}
+
+footer.pageFooter {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 0.5em;
+    border: 1px solid var(--aLight);
+    border-radius: var(--roundBox);
+    background-color: var(--aLow);
+
+    & button {
+        font-size: 0.85em;
+    }
+}
+
+/* ==========================================================================
+   빈데이터 처리
+   ========================================================================== */
+tr.empty > td,
+li.empty {
+    width: 100%;
+    height: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: transparent !important;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: var(--aColor);
+    text-transform: uppercase;
+    line-height: 1.4em;
+    cursor: default !important;
+    border: none !important;
+
+    & > i.fi {
+        font-size: 3.2em;
+    }
+}
+tr.empty > td {
+    display: table-cell !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.overZoom {
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: scale(1.02);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+.overShadow {
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        border-color: var(--aDark);
+        box-shadow: 0.1em 0.1em 0.8em 0.2em var(--aColor);
+    }
+
+    &:active {
+        border-color: var(--aColor);
+        box-shadow: none;
+    }
+}
+
+.overBoth {
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: scale(1.02);
+        border-color: var(--aDark);
+        box-shadow: 0.1em 0.1em 0.8em 0.2em var(--aColor);
+    }
+
+    &:active {
+        transform: scale(0.98);
+        border-color: var(--aColor);
+        box-shadow: none;
+    }
+}
+
+
+ul.bannerScarf {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 1em;
+    margin: 0;
+    padding: 1em 2em;
+    list-style: none;
+    background-color: var(--aLow);
+    border: 1px solid var(--lineColor);
+    border-radius: var(--roundBox, 0.8em);
+    overflow: hidden;
+
+    & > li {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0.6em;
+        padding: 1em;
+
+        & > i {
+            font-size: 3em;
+            color: var(--main);
+        }
+
+        & > span {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--txColor);
+
+            & > small {
+                display: block;
+                font-size: 0.4em;
+                color: var(--txLight);
+            }
+        }
+
+        &.divider {
+            padding-left: 0;
+            padding-right: 0;
+
+            &:after {
+                content: "";
+                display: block;
+                height: 100%;
+                width: 0.1em;
+                margin: 0;
+                border-radius: 0.1em;
+                background-color: var(--lineColor);
+            }
+        }
+    }
+
+    @each $color in $colors {
+        &.#{$color} {
+            background-color: var(--#{$color}0, var(--aLow));
+
+            & > li > i {
+                color: var(--#{$color});
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   다이얼로그 공용 폼 레이아웃 (ul.form)
+   ========================================================================== */
+ul.form {
+    margin: 0;
+    padding: 0.5em;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: 100%;
+
+    & > li {
+        &,
+        &.col2 > div,
+        &.col3 > div,
+        &.col4 > div {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.5em;
+
+            & > header {
+                display: block;
+                padding: 0.3em;
+                margin: 0 0 -0.3em 0;
+                line-height: 1em;
+                font-size: 0.9em;
+                font-weight: 700;
+                color: var(--txLight);
+
+                & > small {
+                    font-size: 0.85em;
+                    color: var(--txLight);
+                }
+
+                & > i.fi {
+                    font-size: 1.2em;
+                }
+            }
+
+            &.left,
+            &.center,
+            &.right {
+                display: flex;
+            }
+
+            &.left {
+                justify-content: flex-start;
+            }
+
+            &.center {
+                justify-content: center;
+            }
+
+            &.right {
+                justify-content: flex-end;
+            }
+
+            & > * {
+                width: 100%;
+            }
+        }
+
+        &.left,
+        &.center,
+        &.right {
+            display: flex;
+            flex-direction: row;
+
+            & > * {
+                flex: 0 0 auto;
+                width: auto;
+            }
+        }
+
+        &.left {
+            justify-content: flex-start;
+        }
+
+        &.center {
+            justify-content: center;
+        }
+
+        &.right {
+            justify-content: flex-end;
+        }
+
+        &.col2,
+        &.col3,
+        &.col4 {
+            display: grid;
+        }
+
+        &.col2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        &.col3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        &.col4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        &.auto {
+            flex: 1 1 auto;
+            min-height: 0;
+
+            & > * {
+                flex: 1 1 auto;
+                min-height: 0;
+            }
+        }
+
+        &.subTitle {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 1.5em 0 0.5em 0;
+            border-bottom: 1px solid var(--aColor);
+        }
+
+        &.row,
+        &.col2.row > div,
+        &.col3.row > div,
+        &.col4.row > div {
+            flex-direction: row;
+
+            & > header {
+                flex: 0 0 auto;
+                width: auto;
+                display: flex;
+                align-items: center;
+
+                &.fix {
+                    min-width: 8em;
+                }
+            }
+        }
+
+        &.tx {
+            gap: 0.4em;
+
+            & > div {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5em;
+            }
+        }
+    }
+}
+
+/* 기본 구조 영역 컨테이너 (.card, .container) */
+.card {
+    font-size: 1rem;
+    background-color: var(--bgColor);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 0.8em;
+    gap: 0.4em;
+
+    & > header {
+        flex: 0 0 auto;
+        font-size: 1.05em;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--txColor);
+
+        & > small {
+            display: block;
+            font-weight: normal;
+            font-size: 0.8em;
+            color: var(--txLight);
+        }
+    }
+
+    & > span {
+        flex: 1 1 auto;
+        font-size: 0.85em;
+        color: var(--txColor);
+        line-height: 1.4;
+    }
+
+    &.line {
+        border: 1px solid var(--aColor);
+        border-radius: var(--roundBox);
+    }
+
+    &.widget {
+        border: none;
+        padding: 0;
+        margin: 0;
+
+        & > header {
+            flex: 0 0 auto;
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 0.5em 0.2em;
+            color: var(--txColor);
+        }
+    }
+
+    &.headline {
+        flex-direction: row;
+        padding: 0;
+
+        &.line {
+            padding: 0.8em;
+        }
+
+        & > * {
+            flex: 1 1 50%;
+            overflow:hidden;
+
+            & > img {
+                width: 100%;
+                height: 100%;
+                border-radius: var(--roundBox);
+                object-fit: cover;
+            }
+        }
+    }
+
+    &.news {
+        overflow: hidden;
+
+        & > span {
+            max-height: 5.6em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            word-break: break-all;
+
+            & > img {
+                float: left;
+                width: 6em;
+                height: 4em;
+                margin-right: 0.5em;
+                border-radius: var(--roundBox);
+                object-fit: cover;
+            }
+        }
+
+        &.sm {
+            padding: 0.4em 0;
+            gap: 0.4em;
+
+            &:has(img) {
+                position: relative;
+                padding-left: 2.8em;
+
+                & > img {
+                    position: absolute;
+                    left: 0;
+                    top: 0.4em;
+                    width: 2.5em;
+                    height: 2.2em;
+                    object-fit: cover;
+                    border-radius: var(--roundBox);
+                }
+            }
+
+            & > header {
+                font-size: 0.9em;
+                line-height: 1em;
+            }
+
+            & > span {
+                display: block;
+                font-size: 0.8em;
+                line-height: 1em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        & > footer {
+            font-size: 0.9em;
+            font-weight: bold;
+
+            & > small {
+                font-weight: normal;
+            }
+        }
+    }
+
+    &.photo {
+        overflow: hidden;
+        padding: 0;
+
+        & > * {
+            padding: 0 0.5em;
+        }
+
+        & > img {
+            width: 100%;
+            height: 6em;
+            object-fit: cover;
+            padding: 0;
+        }
+
+        & > header {
+            font-size: 1em;
+
+            & > small {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+
+        & > footer {
+            padding: 0.5em;
+            font-size: 0.85em;
+            color: var(--txLight);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
+    &.comment {
+        & > footer {
+            padding: 0.5em 0 0.2em;
+            font-size: 0.9em;
+        }
+    }
+}
+
+ul.cardList {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1em;
+    list-style: none;
+
+    &.vertical {
+        flex-direction: column;
+    }
+
+    &.cut {
+        overflow: hidden;
+    }
+
+    & > li {
+        flex: 1 1 auto;
+        overflow: hidden;
+
+        &.blockTitle {
+            flex: 0 0 18%;
+            padding: 0.5em;
+            font-weight: bold;
+            border: none;
+
+            & > small {
+                font-weight: normal;
+
+                &:before {
+                    content: "";
+                    display: block;
+                }
+            }
+        }
+    }
+
+    &.content {
+        gap: 0.2em;
+        flex-direction: column;
+        font-size: 0.9em;
+        font-weight:bold;
+        
+        &.sm {
+            font-size: 0.8em;
+        }
+
+        & > li {
+            white-space: nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+    }
+
+    &.dotLine {
+        gap: 0;
+
+        & > li {
+            border-top: 1px dashed var(--aColor);
+
+            &:first-child {
+                border-top: none;
+            }
+        }
+    }
+
+    &.solid {
+        border: 1px solid var(--aColor);
+        border-radius: var(--roundBox);
+        padding: 0.4em 0.8em;
+    }
+}
+
+footer {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.3em;
+
+    &.left {
+        justify-content: flex-start;
+    }
+
+    &.center {
+        justify-content: center;
+    }
+
+    &.right {
+        justify-content: flex-end;
+    }
+}
+
+header > div.tools,
+footer.tools {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBox);
+    overflow: hidden;
+    padding: 0.3em;
+    align-items: center;
+    gap: 0.3em;
+
+    & > * {
+        flex: 0 0 auto;
+
+        &.space {
+            flex: 1 1 auto;
+        }
+
+        &:not(.space):not(label) {
+            padding: 0.2em 0.4em;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0.2em;
+            color: var(--main);
+            background-color: var(--aLow);
+            border: 1px solid var(--aLow);
+            border-radius: var(--roundBox);
+            transition: all .2s;
+            cursor: pointer;
+
+            & > i.fi {
+                font-size: 1.2em;
+            }
+
+            & > small {
+                padding: 0.2em 0 0 0;
+                font-size: 0.8em;
+            }
+
+            &:hover {
+                background-color: var(--main);
+                color: white;
+
+                & > small {
+                    color: silver;
+                }
+            }
+
+            &:active {
+                background-color: var(--main2);
+                color: var(--main);
+
+                & > small {
+                    color: var(--main);
+                }
+            }
+        }
+    }
+
+    & > label {
+        padding: 0.2em 0.4em;
+        font-size: 0.9em;
+        font-weight: bold;
+        color: var(--main);
+
+        & > i.fi {
+            font-size: 1.2em;
+            margin: 0.1em 0 -0.1em 0;
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "key": "Full",
+  "version": 1,
+  "order": 1,
+  "name": { "ko": "전체 폭", "en": "Full width" },
+  "description": { "ko": "화면 폭 전체를 쓰는 칸 하나. 배너·갤러리처럼 넓은 위젯에 맞습니다.", "en": "One slot across the full width, for wide widgets such as banners and galleries." },
+  "slots": ["a"],
+  "layouts": {
+    "1024": ["a"],
+    "1023": ["a"],
+    "779": ["a"],
+    "519": ["a"]
+  }
+}

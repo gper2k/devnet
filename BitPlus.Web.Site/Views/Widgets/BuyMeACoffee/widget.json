@@ -1,0 +1,26 @@
+{
+  "key": "BuyMeACoffee",
+  "version": 1,
+  "name": {
+    "ko": "커피 후원 (Buy Me a Coffee)",
+    "en": "Buy Me a Coffee"
+  },
+  "description": {
+    "ko": "사이드 패널에 개발자 커피 후원(buymeacoffee.com) 배너를 표시하고 후원 페이지로 연결합니다.",
+    "en": "Displays a Buy Me a Coffee donation banner in the side panel linking to your support page."
+  },
+  "categories": [
+    "side",
+    "general"
+  ],
+  "size": {
+    "min": [1, 1],
+    "max": [4, 4]
+  },
+  "frame": false,
+  "settings": [
+    { "key": "url", "type": "text", "default": "https://buymeacoffee.com" },
+    { "key": "image", "type": "text", "default": "/img/banners/side_coffee.svg" },
+    { "key": "target", "type": "bool", "default": true }
+  ]
+}

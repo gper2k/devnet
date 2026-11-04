@@ -1,0 +1,1 @@
+.contentFaqWrite{display:flex;flex-direction:column;gap:1em;width:100%;max-width:56em;margin-inline:auto}.contentFaqWrite>header>span>small{margin-inline-start:.5em;color:var(--txLight)}.contentFaqWrite textarea{width:100%;resize:vertical;line-height:1.6}.contentFaqWrite>footer{display:flex;justify-content:center;gap:.6em}

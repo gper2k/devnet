@@ -1,0 +1,164 @@
+/* 갤러리형 목록(Index/List) 전용 스타일: 카드 격자 */
+.contentGallery {
+    overflow: visible;
+
+    & > div {
+        overflow: visible;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 0.8em;
+        /* 도구줄: 쓰기·미승인 버튼 / 검색 */
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0;
+            gap: 0.6em;
+
+            & ::deep > form {
+                display: flex;
+                align-items: center;
+                gap: 0.4em;
+
+                & > .dropDown > header {
+                    height: 2.6em;
+                    min-height: 2.6em;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    font-size: 0.9rem;
+                }
+            }
+
+            & > div {
+                display: flex;
+                flex-direction: row;
+                padding: 0;
+                gap: 0.5em;
+
+                & > button {
+                    font-size: 0.9rem;
+                    padding: 0.65em 0.8em;
+                    height: auto;
+                }
+            }
+        }
+        /* 카드 격자 */
+        & > ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(13em, 1fr));
+            gap: 1em;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            & ::deep > li {
+                min-width: 0;
+
+                &.empty {
+                    grid-column: 1 / -1;
+                    text-align: center;
+                    padding: 3em 0;
+                    color: var(--txLight);
+                }
+
+                & > a {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.4em;
+                    height: 100%;
+                    padding: 0.5em;
+                    color: var(--txColor);
+                    text-decoration: none;
+                    border: 1px solid var(--lineColor);
+                    border-radius: var(--roundBox);
+                    background-color: var(--bgColor);
+                    transition: box-shadow .2s, border-color .2s;
+
+                    &:not([href]) {
+                        color: var(--txLight);
+                        cursor: default;
+                    }
+
+                    &[href]:hover {
+                        border-color: var(--aColor);
+                        box-shadow: 0.1em 0.1em 0.6em 0.1em var(--aLight);
+                    }
+                    /* 대표 이미지 (4:3, 가운데 채움) */
+                    & > figure {
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0;
+                        aspect-ratio: 4 / 3;
+                        overflow: hidden;
+                        border-radius: var(--roundBox);
+                        background-color: var(--aLow);
+                        color: var(--txLight);
+
+                        & > i {
+                            font-size: 3.2em;
+                            opacity: 0.55;
+                        }
+
+                        & > img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                        /* 공지·임시저장·미승인 배지 */
+                        & > span {
+                            position: absolute;
+                            top: 0.4em;
+                            left: 0.4em;
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 0.25em;
+                            font-size: 0.8em;
+                        }
+                    }
+
+                    & > b {
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                    }
+
+                    & > small {
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 0.2em 0.6em;
+                        font-size: 0.8em;
+                        color: var(--txLight);
+
+                        & > i.fi {
+                            margin-right: -0.4em;
+                        }
+
+                        & > time {
+                            margin-left: auto;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /* 하단: 목록 크기, 페이저 */
+    & > footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.6em;
+    }
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+    .contentGallery > div > ul {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6em;
+    }
+}

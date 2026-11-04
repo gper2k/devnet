@@ -1,0 +1,4 @@
+@model ContentPageModel
+
+@* FAQ형 설정(/content/manage/{규칙}, 신규는 /content/manage?type=FAQ) — 일반 형식 설정 화면을 쓰되 FAQ 면 승인자·파일 탭과 FAQ 에 필요 없는 권한·옵션을 숨긴다(서버가 정함: FaqContentHandler). *@
+<partial name="~/Views/Content/Default/Manage.cshtml" model="Model" />

@@ -1,0 +1,4 @@
+@model ContentPageModel
+
+@* 메뉴얼형 첫 화면(/content/{규칙}) — 글이 있으면 컨트롤러가 첫 글 보기로 보내므로 여기는 글이 하나도 없을 때만 열린다. 목차와 빈 안내를 보여 주는 Manual/View 를 그대로 쓴다. *@
+<partial name="~/Views/Content/Manual/View.cshtml" model="Model" />

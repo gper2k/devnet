@@ -1,0 +1,59 @@
+@charset "UTF-8";
+/* 계정 관리 > 권한 정책 전용 스타일. 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.policyBox > article > section.card {
+  padding: 0;
+  overflow: hidden;
+}
+div.policyBox > article > section.card > div.dataList ::deep {
+  padding: 0.5em;
+  overflow-y: auto;
+}
+div.policyBox > article > section.card > div.dataList ::deep > header > .colName, div.policyBox > article > section.card > div.dataList ::deep > ul > li > .colName {
+  flex: 0 0 14em;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+div.policyBox > article > section.card > div.dataList ::deep > header > .colSource, div.policyBox > article > section.card > div.dataList ::deep > ul > li > .colSource {
+  flex: 0 0 9em;
+  justify-content: center;
+  gap: 0.3em;
+  white-space: nowrap;
+}
+div.policyBox > article > section.card > div.dataList ::deep > header > .colTarget, div.policyBox > article > section.card > div.dataList ::deep > ul > li > .colTarget {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+div.policyBox > article > section.card > div.dataList ::deep > header > .colPeriod, div.policyBox > article > section.card > div.dataList ::deep > ul > li > .colPeriod {
+  flex: 0 0 18em;
+  justify-content: center;
+  white-space: nowrap;
+}
+div.policyBox > article > section.card > div.dataList ::deep > header > .colFlag, div.policyBox > article > section.card > div.dataList ::deep > ul > li > .colFlag {
+  flex: 0 0 6em;
+  justify-content: center;
+}
+div.policyBox > article > section.card > div.dataList ::deep > ul > li {
+  cursor: pointer;
+}
+
+dialog#policyModal {
+  width: 40em;
+}
+dialog#policyModal > header {
+  color: var(--main);
+}
+dialog#policyModal li[hidden] {
+  display: none;
+}
+dialog#policyModal li[data-config] p {
+  white-space: pre-line;
+}
+dialog#policyModal > footer > label.check {
+  width: auto;
+  margin-right: auto;
+}

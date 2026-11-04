@@ -1,0 +1,19 @@
+﻿@charset "UTF-8";
+/* 페이지 뷰(/view/{번호}) 사이드 패널 배치: 사이드 구성이 보일 때만 div.pageWrap 으로 감싼다 (감춤이면 본문만) */
+div.pageWrap {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  gap: 1em;
+  overflow: visible;
+  font-size: 1rem;
+  /* 사이드 위치 = 우측: 사이드 패널을 본문 오른쪽에 */
+  /* 본문(_Body 파샬뷰, 다른 뷰라 ::deep): 남는 너비를 채움 */
+}
+div.pageWrap.sideRight {
+  flex-direction: row-reverse;
+}
+div.pageWrap ::deep > article {
+  flex: 1 1 auto;
+  min-width: 0;
+}

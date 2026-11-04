@@ -1,0 +1,159 @@
+/* 사용자 및 조직 관리 (iframe 임베드) 페이지 전용 스코프 스타일.
+   좌측(조직 트리)/우측(목록) 모두 독립된 .card 라운드 박스이며,
+   flex-grow 비율만 다르게 준 flex 사이즈라 컨테이너 폭에 따라 유동적으로 늘고 줄고,
+   내용이 넘치면 각 박스 내부에서만 스크롤된다(overflow-y: auto). */
+// 목록 컬럼 트랙: NAME | VISIBLE | ENABLER | CREATE | 액션
+// 런타임에 바뀔 일 없는 레이아웃 상수라 CSS 커스텀 프로퍼티(:root) 대신
+// SCSS 변수로 컴파일 타임에 바로 박아 넣는다(두 규칙에서만 쓰는 값).
+$colGrid: minmax(16em, 1fr) 6em 6em 8em 3em;
+
+div.pageBox > div.flexRow {
+    gap: 1em;
+
+    & > aside.orgBox {
+        flex: 0 0 18em;
+        overflow: hidden;
+        padding: 0.5em;
+        gap: 0.5em;
+
+        & > div.treeBox {
+            overflow-y: auto;
+        }
+    }
+
+    & > section {
+        flex: 1 1 auto;
+        padding: 0;
+        overflow: hidden;
+        gap: 0;
+
+        & > header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1em;
+            padding: 0.5em;
+
+            & > strong {
+                display: flex;
+                align-items: center;
+                padding: 0 0.5em;
+                gap: 0.4em;
+                font-size: 1.02em;
+                color: var(--txColor);
+
+                & > i.fi {
+                    font-size: 1.4em;
+                }
+            }
+            /* 검색창 폭만 지정 — 나머지는 공용 .inputGroup 그대로 사용 */
+            & > div.inputGroup {
+                width: 16em;
+
+                & > input {
+                    font-size: 0.9em;
+                }
+            }
+        }
+
+        & > div ::deep {
+            overflow-y: auto;
+
+            & > * {
+                & .colName {
+                    flex: 1 1 auto;
+                    cursor: pointer;
+                }
+
+                & .colFlag {
+                    flex: 0 0 5em;
+                }
+
+                & .colDate {
+                    flex: 0 0 8em;
+                    font-size: 0.85em;
+                    justify-content: center;
+                }
+
+                & .colAction {
+                    flex: 0 0 2em;
+                }
+            }
+
+            & > ul > li {
+                padding: 0.2em 0.5em;
+                & > .colName {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    gap: 0.5em;
+
+                    & > i.fi {
+                        font-size: 1.4em;
+                        color: var(--main);
+                    }
+                }
+
+                & > button {
+                    height: auto;
+                    width: auto;
+                    padding: 0.3em;
+                }
+            }
+        }
+
+        & > footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1em;
+            padding: 0.5em 1em;
+            border-top: 1px solid var(--lineColor);
+        }
+    }
+}
+
+dialog#userModal,
+dialog#groupModal {
+    & > header {
+        color: var(--main);
+        & > span.badge {
+            background-color: var(--danger);
+            color: white;
+        }
+    }
+
+    & > section {
+        & > section,
+        & > section > div, 
+        & > section > div > div {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+/* 그룹/사용자 모달 — 탭마다 콘텐츠 양(기본정보 폼 vs 속성/그룹/역할 목록)이 달라
+   dialog 기본값(내용에 맞춰 자동 가로/세로 크기 조정)이 탭 전환마다 흔들린다.
+   dialog 자체 너비를 고정하고, 탭 패널 공통 컨테이너 높이를 기본정보 탭 기준으로 고정한다. */
+dialog#userModal,
+dialog#groupModal {
+    width: 34em;
+
+    & .tabBox > section {
+        /* min-height 는 바닥값일 뿐이라 기본정보 탭 실제 높이가 추정치보다 크면 그만큼 또 흔들린다.
+           고정 height + 내부 스크롤로 탭이 바뀌어도 콘텐츠 양과 무관하게 항상 동일 높이를 유지한다. */
+        height: 27em;
+        overflow-y: auto;
+    }
+
+    & .tabBox ul.form {
+        padding: 0;
+    }
+
+    /* 삭제 버튼은 저장/취소와 떨어진 왼쪽에 둔다 (그룹/사용자 모달 공통) */
+    & > footer > button.danger {
+        margin-right: auto;
+    }
+}

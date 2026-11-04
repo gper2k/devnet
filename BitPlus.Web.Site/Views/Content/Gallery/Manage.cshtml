@@ -1,0 +1,5 @@
+@model ContentPageModel
+
+@* 갤러리형 게시판 설정(/content/manage/{규칙}, 신규는 /content/manage?type=Gallery) — 일반 형식 설정 화면을 쓰되 그 화면이 갤러리 형식이면 첨부 사용·허용 확장자·업로드/다운로드 권한 입력과
+   답변 권한·답글 허용·글 변경 기록·비공개·익명 옵션을 숨긴다(서버가 저장할 때 자동으로 정함: GalleryContentHandler). *@
+<partial name="~/Views/Content/Default/Manage.cshtml" model="Model" />

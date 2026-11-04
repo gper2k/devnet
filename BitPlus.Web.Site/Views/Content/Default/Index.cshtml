@@ -1,0 +1,202 @@
+@model ContentPageModel
+@{
+    var isForum = Model.Type == BitPlus.Data.Content.ContentTypes.Forum; // 포럼: 번호 열 없이 토픽·댓글 수·활동 시각(UDate)을 보이고(마지막 댓글 열 없음), 글쓰기 버튼은 "New Topic"
+}
+
+@* 일반 형식 목록(/content/{규칙}, /content/{규칙}/list): 읽기 권한과 상관없이 누구에게나 보인다. 글 목록은 페이지가 아니라 API(api/content/list)로 불러와 .dataList 의 ul 에 채운다.
+   검색은 제목·내용·글쓴이·태그에서 동시에, 카테고리가 있는 게시판은 검색창 앞의 선택 상자(맨 위 "전체")로 한 카테고리만 볼 수 있다. 목록 크기는 바꾸면 세션 스토리지(공용 listPageSize)에 보관되어 다음에 열 때 기본이 된다. *@
+<article class="contentDefault">
+    <header>
+        <span>
+            @Model.Title
+            <i class="badge point" id="contentCount">All Items. <b id="contentTotal">0</b></i>
+            <small></small>
+        </span>
+    </header>
+    <div>
+        <header>
+            <div>
+                @if (Model.Permission.CanWrite)
+                {
+                    <button type="button" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiEdit"></i> @this.Lang(isForum ? "NewTopic" : "ContentWrite")</button>
+                }
+                @* 미승인/일반 보기 전환: 관리자·승인자에게 미승인 글이 있으면 "미승인 N건"(누르면 승인 목록 모드), 승인 목록 모드에서는 "일반 보기"(누르면 원래 목록) *@
+                <button type="button" id="contentPendingView" hidden><i class="fi fiShieldTask"></i><span></span></button>
+            </div>
+            <form id="contentSearch">
+                @if (Model.Categories.Count > 0)
+                {
+                    @* 카테고리: 공용 드롭박스(.dropDown) — 맨 위 "전체"(값 *)가 기본, 고르면 그 카테고리 글만 *@
+                    <div class="dropDown" id="contentCategory" data-val="*">
+                        <header>@this.Lang("All")</header>
+                        <ul class="dropBox">
+                            <li data-val="*" class="active">CATEGORY</li>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <li data-val="@category.Key">@category.Value</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="inputGroup inline sm">
+                    <input type="search" name="q" maxlength="100" autocomplete="off" placeholder="@this.Lang("Search")" />
+                    <button type="submit" class="deco"><i class="fi fiSearch"></i></button>
+                </div>
+            </form>
+        </header>
+        <div class="dataList">
+            <header>
+                @if (!isForum)
+                {
+                    <span class="contentNo">No</span>
+                }
+                <span class="title">@this.Lang("ContentTitle")</span>
+                @if (Model.Categories.Count > 0)
+                {
+                    <span class="cate">@this.Lang("ContentCategory")</span>
+                }
+                <span class="writer">@this.Lang("ContentWriter")</span>
+                @if (isForum)
+                {
+                    <span class="read">@this.Lang("ContentViews")</span>
+                    <span class="create">@this.Lang("ContentLastActivity")</span>
+                }
+                else
+                {
+                    <span class="read">@this.Lang("ContentViews")</span>
+                    <span class="create">@this.Lang("ContentDate")</span>
+                }
+            </header>
+            <ul></ul>
+        </div>
+    </div>
+    <footer>
+        <div>
+            <div class="pageSize">
+                <label>LIST SIZE</label>
+                <select name="pageSize">
+                    @foreach (var size in ContentPageModel.PageSizes)
+                    {
+                        <option value="@size">@size</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div>
+            <ul class="pager" id="contentPager"></ul>
+        </div>
+    </footer>
+</article>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('article.contentDefault');
+        const ruleNo = @Model.RuleNo;
+        const list = root.querySelector('.dataList > ul'); // 목록이 채워질 ul (한 줄의 모양은 아래 rowOf 템플릿)
+        const form = root.querySelector('#contentSearch');
+        const categoryBox = root.querySelector('#contentCategory'); // 카테고리 드롭박스 (없으면 null)
+        const sizeSelect = root.querySelector('select[name="pageSize"]');
+        const noticeText = @this.Js(this.Lang("Notice"));
+        const unapprovedText = @this.Js(this.Lang("ContentUnapprovedCount")); // {0} 은 미승인 건수
+        const isForum = @(isForum ? "true" : "false");
+        const hasCategory = @(Model.Categories.Count > 0 ? "true" : "false"); // 카테고리가 없는 게시판은 카테고리 열을 그리지 않음
+        const normalViewText = @this.Js(this.Lang("ContentNormalView"));
+        const draftText = @this.Js(this.Lang("SaveDraft")); // 임시 저장 글(본인 글만 목록에 나옴)은 제목 앞에 임시저장 뱃지
+        const rejectedText = @this.Js(this.Lang("ContentRejected"));
+        const pendingText = @this.Js(this.Lang("ContentPendingApproval"));
+        const movedText = @this.Js(this.Lang("ContentMoved")); // 다른 게시판으로 옮긴 글의 자리 글(답글 트리 유지용): 이동됨 뱃지, 링크는 옮긴 글
+        const emptyText = @this.Js(this.Lang("DataEmpty"));
+        const noReadText = @this.Js(this.Lang("ContentNoReadPermission"));
+        let pageSize = common.applyPageSize(sizeSelect); // 이전에 고른 크기(세션 스토리지)를 기본으로 (변경 저장은 공용 처리가 함)
+        const pendingMode = new URLSearchParams(location.search).get('pending') === '1'; // ?pending=1 : 승인 목록 모드 (관리자·승인자일 때만 서버가 적용)
+        // 목록 상태는 주소줄 쿼리로 다룬다: 기본값이 아닌 옵션(page, size, q, category, pending)만 쿼리에 담아 주소에 반영하고, 글 보기로 갈 때도 그대로 붙여 보내
+        // 보기 화면의 목록 버튼이 같은 쿼리로 이전 목록(같은 페이지·검색·카테고리)으로 돌아오게 한다. 주소를 열면 이 쿼리로 같은 상태를 바로 불러온다.
+        const params = new URLSearchParams(location.search);
+        const defaultSize = @ContentPageModel.PageSizes[0];
+        let listQuery = ''; // 지금 목록 상태의 쿼리 문자열 ("?page=2&q=…" 또는 빈 문자열)
+        const queryOf = (page, size, q, category) => {
+            const p = new URLSearchParams();
+            if (page > 1) p.set('page', page);
+            if (size !== defaultSize) p.set('size', size);
+            if (q) p.set('q', q);
+            if (category && category !== '*') p.set('category', category);
+            if (pendingMode) p.set('pending', '1');
+            return p.size ? `?${p}` : '';
+        };
+
+        // 목록 한 줄의 모양 (common.html: ${값} 은 자동 이스케이프, 안에 다른 common.html 을 넣을 수 있음). 열을 바꾸려면 이 템플릿과 .dataList > header 를 같이 고친다.
+        const badge = (cls, text) => common.html`<i class="badge sm ${cls}">${text}</i> `;
+        const rowOf = i => common.html`
+            <li class="${i.isNotice ? 'notice' : ''}">
+                ${isForum ? '' : common.html`<span class="contentNo">${i.isNotice ? badge('main notice', noticeText) : i.contentNo}</span>`}
+                <span class="title ${isForum ? 'topic': ''}" style="padding-inline-start: ${i.level * 1.2}em">
+                    ${i.summary && i.bodyImage ? common.html`<img src="${i.bodyImage}" alt="" loading="lazy" />` : ''}
+                    <span>
+                        ${i.level > 0 ? common.html`<i class="fi fiArrReply"></i> ` : ''}
+                        ${isForum && i.isNotice ? badge('main notice', noticeText) : ''}
+                        ${i.published === false ? badge('danger', draftText) : ''}
+                        ${i.approved ? '' : badge(i.state === 'rejected' ? 'danger' : 'warning', i.state === 'rejected' ? rejectedText : pendingText)}
+                        ${i.gate ? common.html`<i class="fi fiLock"></i> ` : ''}
+                        ${i.movedTo ? badge('silver', movedText) : ''}
+                        ${i.locked ? common.html`<a href="#" data-locked="true">${i.title}</a>` : common.html`<a href="${i.movedTo ? `/content/view/${i.movedTo}` : `/content/${ruleNo}/view/${i.contentNo}${listQuery}`}">${i.title}</a>`}
+                        ${i.fileCount > 0 ? common.html`<em><i class="fi fiAttach"></i>${i.fileCount}</em>` : ''}
+                        ${i.commentCount > 0 ? common.html`<em><i class="fi fiComment"></i>${i.commentCount}</em>` : ''}
+                    </span>
+                    ${i.summary ? common.html`<small>${i.summary}</small>` : ''}
+                </span><span class="space"></span>
+                ${hasCategory ? common.html`<span class="cate">${i.category ?? ''}</span>` : ''}
+                <span class="writer">${i.writer}</span>
+                ${isForum ? common.html`
+                    <span class="read">${i.readCount}</span>
+                    <span class="create"><span title="${common.localTime(i.uDate, true)}">${common.ago(i.uDate)}</span></span>` : common.html`
+                    <span class="read">${i.readCount}</span>
+                    <span class="create"><span title="${common.localTime(i.cDate, true)}">${common.ago(i.cDate, 3)}</span></span>`}
+            </li>`;
+        const emptyRow = common.html`<li class="empty"><i class="fi fiAnimalDog"></i><br />${emptyText}</li>`;
+
+        /** 글 목록을 API 로 불러와 목록(ul)과 페이저를 다시 그린다 (page: 1부터) */
+        const load = async (page = 1) => {
+            const query = new URLSearchParams({ ruleNo, page, size: pageSize, q: form.q.value.trim(), pending: pendingMode, category: categoryBox && categoryBox.dataset.val !== '*' ? categoryBox.dataset.val : '' });
+            const res = await common.getSend(`/api/content/list?${query}`, { useLoading: false });
+            if (!res || !res.success) return;
+            const data = res.data;
+            listQuery = queryOf(data.page, data.pageSize, form.q.value.trim(), categoryBox?.dataset.val); // 서버가 맞춘 실제 페이지로 쿼리를 만들고 주소에 반영
+            history.replaceState(null, '', location.pathname + listQuery);
+            root.querySelector('#contentTotal').textContent = data.total;
+            root.querySelector('#contentCount').classList.toggle('warning', data.pending); // 승인 목록 모드면 건수 뱃지를 포인트 색에서 경고 색으로
+            root.querySelector('#contentCount').classList.toggle('point', !data.pending);
+            const toggle = root.querySelector('#contentPendingView'); // 승인 목록 모드면 "일반 보기", 아니면 미승인 글이 있을 때만 "미승인 N건"
+            toggle.hidden = !data.pending && !data.pendingCount;
+            toggle.querySelector('span').textContent = data.pending ? normalViewText : unapprovedText.replace('{0}', data.pendingCount);
+            common.bindList(list, data.items, rowOf, emptyRow); // 목록 바인딩
+            // 페이지 수는 서버가 센 pageCount 를 따른다 (첫 페이지는 공지가 차지한 만큼 줄어 있어서 total / 페이지 크기 로 계산하면 페이지가 모자람)
+            root.querySelector('#contentPager').replaceWith(common.makePager(data.page - 1, data.pageSize, data.pageCount * data.pageSize).then(p => load(p + 1)));
+            root.querySelector('ul.pager').id = 'contentPager';
+        };
+
+        root.querySelector('#contentPendingView').onclick = () => location.assign(pendingMode ? `/content/${ruleNo}` : `/content/${ruleNo}?pending=1`); // 승인 목록 모드 ↔ 일반 목록 전환
+        form.onsubmit = e => { e.preventDefault(); load(1); }; // 검색: 제목·내용·글쓴이·태그 동시에
+        list.addEventListener('click', e => {
+            const a = e.target.closest('a[data-locked]');
+            if (a) {
+                e.preventDefault();
+                common.alert(noReadText);
+            }
+        });
+        categoryBox?.addEventListener('change', () => { // 카테고리 선택: 선택 항목 표시를 옮기고 그 카테고리 글만 불러옴
+            categoryBox.querySelectorAll('li').forEach(li => li.classList.toggle('active', li.dataset.val === categoryBox.dataset.val));
+            load(1);
+        });
+        sizeSelect.addEventListener('change', () => { pageSize = Number(sizeSelect.value); load(1); }); // 크기 변경: 처음 페이지부터 다시 불러옴 (저장은 공용 처리)
+        // 주소의 쿼리로 목록 상태 복원: 검색어·카테고리 선택·목록 크기를 되돌린 뒤 쿼리의 페이지를 연다
+        form.q.value = params.get('q') ?? '';
+        const category = categoryBox && [...categoryBox.querySelectorAll('li')].find(li => li.dataset.val === params.get('category'));
+        if (category) {
+            categoryBox.dataset.val = category.dataset.val;
+            categoryBox.querySelector('header').textContent = category.textContent;
+            categoryBox.querySelectorAll('li').forEach(li => li.classList.toggle('active', li === category));
+        }
+        const size = Number(params.get('size'));
+        if (size >= 1 && size <= 100) { pageSize = size; if ([...sizeSelect.options].some(o => Number(o.value) === size)) sizeSelect.value = size; }
+        load(Number(params.get('page')) || 1);
+    });
+</script>

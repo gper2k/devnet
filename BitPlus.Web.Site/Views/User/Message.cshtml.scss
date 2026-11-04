@@ -1,0 +1,335 @@
+﻿/* 동그란 이미지(없으면 사람 아이콘): 사람 표시와 말풍선 옆 보낸 사람 공용 */
+%pic {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 50%;
+    overflow: hidden;
+    color: var(--deco);
+    background: var(--bgColor);
+    border: 0.12em solid var(--main2);
+
+    & > i.fi {
+        font-size: 1.4em;
+    }
+
+    & > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+/* 사람 표시(목록·대화 머리 공용): 이미지 / 이름 · 기본 그룹·역할 */
+%person {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    min-width: 0;
+
+    & > span {
+        @extend %pic;
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+
+        & > strong,
+        & > small {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        & > small {
+            font-size: 0.8em;
+            font-weight: normal;
+            color: var(--txLight);
+        }
+    }
+}
+/* 내 메시지: 왼쪽 상대 목록 / 오른쪽 대화(메신저형).
+   레이아웃이 창 높이에 맞춤(#app.fit — main 이 남은 높이를 채우는 flex 열)이라 높이를 위에서 받고, 창이 줄면 대화 ul 이 먼저 줄어듦. 메시지 목록은 최소 20em — 그보다 작아지면 본문 영역이 스크롤(모바일에서 푸터에 가려지지 않게) */
+.userMessage {
+    flex: 1 1 0;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    & > div {
+        flex: 1 1 0;
+        display: flex;
+        align-items: stretch;
+        gap: 1em;
+        padding: 0;
+        /* 상대 목록: 이름·메시지 수·안 읽은 수 (목록은 스크롤, 아래 페이지 이동 ul.pager 는 공용 스타일) */
+        & > aside {
+            flex: 0 0 16em;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 페이지 이동은 가운데, 목록은 꽉 차게 */
+            gap: 0.5em;
+            min-height: 0;
+            padding-bottom: 0.5em;
+            border: 1px solid var(--lineColor);
+            border-radius: var(--roundBox);
+
+            & > ul {
+                align-self: stretch;
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-y: auto;
+                margin: 0;
+                padding: 0.4em;
+                list-style: none;
+
+                & > li {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5em;
+                    padding: 0.7em 0.8em;
+                    border: 1px solid transparent;
+                    border-radius: var(--roundBtn);
+                    cursor: pointer;
+
+                    & > div {
+                        @extend %person;
+                    }
+
+                    & > small {
+                        background-color: var(--main);
+                        color: white;
+                        padding: 0.3em 0.5em;
+                        border-radius: 1em;
+                        line-height: 1em;
+                    }
+
+                    & > b {
+                        font-size: 0.75em;
+                        padding: 0.1em 0.5em;
+                        border-radius: var(--roundBtn);
+                        color: var(--bgColor);
+                        background: var(--danger);
+                    }
+
+                    &:hover {
+                        background: var(--main1);
+                    }
+
+                    &.active {
+                        background: var(--main1);
+                        border-color: var(--aLight);
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+        /* 대화: 상대 이름 / 메시지(내 것은 오른쪽) / 입력창 */
+        & > article {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            border: 1px solid var(--lineColor);
+            border-radius: var(--roundBox);
+
+            &[hidden] {
+                display: none;
+            }
+
+            & > header {
+                flex: 0 0 auto;
+                padding: 0.8em 1em;
+                background-color: var(--main1);
+                color: var(--main);
+                border-top-left-radius: var(--roundBox);
+                border-top-right-radius: var(--roundBox);
+
+                & > div {
+                    @extend %person;
+                }
+
+                border-bottom: 1px solid var(--lineColor);
+            }
+
+            & > ul {
+                flex: 1 1 0;
+                min-height: 20em; /* 메시지를 볼 수 있는 최소 높이 — 대화 영역은 머리·입력창 + 이 높이 */
+                display: flex;
+                flex-direction: column;
+                gap: 0.8em;
+                margin: 0;
+                padding: 1em;
+                list-style: none;
+                overflow-y: auto;
+
+                /* 메시지: 보낸 사람 이미지 / 말풍선·시각 (내 것은 좌우 반전) */
+                & > li {
+                    align-self: flex-start;
+                    max-width: 75%;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.5em;
+
+                    & > span {
+                        @extend %pic;
+                        width: 2em;
+                        height: 2em;
+                    }
+
+                    /* 이름 / 말풍선 / 시각: 말풍선은 늘려서 시각 줄(좌우 여백 포함)보다 항상 조금 넓게, 시각 줄보다 좁아지지 않게(min-width 기본값 = 내용 최소 너비) */
+                    & > div {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.2em;
+
+                        & > small {
+                            padding: 0 0.6em;
+                            font-size: 0.75em;
+                            font-weight: bold;
+                            color: var(--txLight);
+                        }
+
+                        & > p {
+                            margin: 0;
+                            padding: 0.6em 0.9em;
+                            border-radius: 0.2em 1em 1em 1em;
+                            background: var(--main1);
+                            white-space: pre-wrap;
+                            word-break: break-word;
+                        }
+
+                        /* 아이콘 + 시각: 작성 시각, (내 메시지) 읽은 시각 — 줄바꿈 없이, 말풍선이 이 줄보다 좁아지지 않음 */
+                        & > footer {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.8em;
+                            padding: 0 0.8em;
+                            font-size: 0.75em;
+                            white-space: nowrap;
+                            color: var(--txLight);
+
+                            & > span {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 0.2em;
+                            }
+                            /* 읽음은 메인색 */
+                            & > span > i.fiEye {
+                                color: var(--main);
+                            }
+                        }
+                    }
+                    /* 삭제: 마우스를 올렸을 때만 말풍선 앞쪽(상대 메시지는 오른쪽, 내 메시지는 왼쪽)에 */
+                    & > button {
+                        align-self: center;
+                        flex: 0 0 auto;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 1.6em;
+                        height: 1.6em;
+                        padding: 0;
+                        border: none;
+                        margin-left: -0.2em; /* 말풍선 쪽으로 조금 당김 (내 메시지는 아래에서 반대쪽) */
+                        border-radius: 50%;
+                        background: none;
+                        color: var(--txLight);
+                        cursor: pointer;
+                        visibility: hidden;
+                        /* 버튼 위: 메인색 원 + 흰 아이콘 */
+                        &:hover {
+                            background: var(--main);
+                            color: white;
+                        }
+                    }
+
+                    &:hover > button {
+                        visibility: visible;
+                    }
+
+                    &.mine {
+                        align-self: flex-end;
+                        flex-direction: row-reverse;
+
+                        & > button {
+                            margin-left: 0;
+                            margin-right: -0.2em;
+                        }
+
+                        & > div {
+                            & > small {
+                                text-align: right;
+                            }
+
+                            & > p {
+                                border-radius: 1em 0.2em 1em 1em;
+                                color: var(--bgColor);
+                                background: var(--main);
+                            }
+
+                            & > footer {
+                                justify-content: flex-end;
+                            }
+                        }
+                    }
+                }
+            }
+
+            & > footer {
+                flex: 0 0 auto;
+                display: flex;
+                align-items: flex-end;
+                gap: 0.5em;
+                padding: 0.6em;
+                border-top: 1px solid var(--lineColor);
+                background-color: var(--aLow);
+                border-bottom-left-radius: var(--roundBox);
+                border-bottom-right-radius: var(--roundBox);
+
+                & > textarea {
+                    flex: 1 1 auto;
+                    resize: none;
+                    border: 1px solid var(--aColor);
+                    //background-color: var(--aLow);
+                }
+            }
+        }
+
+        & > p {
+            flex: 1 1 auto;
+            margin: 0;
+            padding: 2em;
+            text-align: center;
+            color: var(--txLight);
+
+            &[hidden] {
+                display: none;
+            }
+        }
+    }
+}
+
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+    .userMessage {
+        & > div {
+            flex-direction: column;
+
+            & > aside {
+                flex: 0 0 auto;
+                max-height: 12em;
+            }
+
+            & > article {
+                flex: 1 1 0;
+            }
+        }
+    }
+}

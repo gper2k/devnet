@@ -1,0 +1,5525 @@
+﻿@charset "UTF-8";
+/* ==========================================================================
+   BitPlus 메인 통합 스타일시트 (Site.scss)
+   Document, Controls, Area, Complex, Util 모듈을 단일 스타일시트로 병합
+   ========================================================================== */
+/* ==========================================================================
+  Document: HTML 기본 태그들의 스타일 정의와 각종 CSS 변수
+  - BaseUI 표준 html, body, #app 스타일 및 a 태그 일반 글자색 매핑
+  - 9대 테마색 (main, sub, point, deco, primary, info, success, warning, danger)
+  - 각 색상별 Base, Dark, Light 및 0~9 밝기 단계 지원
+  - 다크/라이트 테마 오버라이드 및 레이아웃별 오버라이드 지원
+  - 이미지 무드 기반 버튼, 폼 입력필드, textarea, h1~h6 기본 스타일 완비
+  - em 단위 기반 버튼과 입력항의 동일 높이(2.6em) 보장 및 비례 스케일링
+  ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap");
+:root {
+  /* ----------------------------------------------------------------------
+     1. main (Forest Green - 주 색상 / Primary Brand Color)
+     ---------------------------------------------------------------------- */
+  --main: #1f382c;
+  --mainLight: #335947;
+  --mainDark: #14241d;
+  --main1: #eaf1ed;
+  --main2: #d4e3db;
+  --main3: #b0ccbd;
+  --main4: #85af9a;
+  --main5: #5c9177;
+  --main6: #3d735a;
+  --main7: #2d5542;
+  --main8: #1f382c;
+  --main9: #112019;
+  /* ----------------------------------------------------------------------
+     2. sub (Slate Sage)
+     ---------------------------------------------------------------------- */
+  --sub: #5288b7;
+  --subLight: #7da6c9;
+  --subDark: #3c6990;
+  --sub1: #f1f5f9;
+  --sub2: #cbdbe9;
+  --sub3: #a5c1da;
+  --sub4: #7fa7ca;
+  --sub5: #598dba;
+  --sub6: #41729d;
+  --sub7: #315777;
+  --sub8: #223b51;
+  --sub9: #121f2b;
+  /* ----------------------------------------------------------------------
+     3. point (Fresh Lime)
+     ---------------------------------------------------------------------- */
+  --point: #9be82e;
+  --pointLight: #b2f051;
+  --pointDark: #7ec71c;
+  --point1: #f3fde2;
+  --point2: #e3fac0;
+  --point3: #d1f79c;
+  --point4: #bdf274;
+  --point5: #9be82e;
+  --point6: #7ec71c;
+  --point7: #619e12;
+  --point8: #437009;
+  --point9: #254203;
+  /* ----------------------------------------------------------------------
+     4. deco (Muted Teal Slate)
+     ---------------------------------------------------------------------- */
+  --deco: #638791;
+  --decoLight: #85a4ac;
+  --decoDark: #4a656d;
+  --deco1: #f3f6f7;
+  --deco2: #d3dee1;
+  --deco3: #b3c6cb;
+  --deco4: #93aeb6;
+  --deco5: #7496a0;
+  --deco6: #5a7b84;
+  --deco7: #445d64;
+  --deco8: #2f3f44;
+  --deco9: #192224;
+  /* ----------------------------------------------------------------------
+     5. primary (Royal Blue)
+     ---------------------------------------------------------------------- */
+  --primary: #3175da;
+  --primaryLight: #6598e3;
+  --primaryDark: #1f59ae;
+  --primary1: #eef3fc;
+  --primary2: #c0d5f4;
+  --primary3: #93b7ec;
+  --primary4: #6698e3;
+  --primary5: #387adb;
+  --primary6: #2260bc;
+  --primary7: #1a498f;
+  --primary8: #113261;
+  --primary9: #091a34;
+  /* ----------------------------------------------------------------------
+     6. info (Sky Blue)
+     ---------------------------------------------------------------------- */
+  --info: #3a9acc;
+  --infoLight: #6bb3d9;
+  --infoDark: #2977a0;
+  --info1: #eff7fb;
+  --info2: #c4e1f0;
+  --info3: #9acbe5;
+  --info4: #6fb5da;
+  --info5: #459fcf;
+  --info6: #2e83b0;
+  --info7: #236486;
+  --info8: #18445b;
+  --info9: #0d2431;
+  /* ----------------------------------------------------------------------
+     7. success (Emerald Green)
+     ---------------------------------------------------------------------- */
+  --success: #1fa280;
+  --successLight: #29d5a9;
+  --successDark: #156f57;
+  --success1: #eefcf8;
+  --success2: #c1f3e6;
+  --success3: #94ebd4;
+  --success4: #67e2c2;
+  --success5: #3ad9b0;
+  --success6: #24ba93;
+  --success7: #1b8d70;
+  --success8: #12604c;
+  --success9: #0a3329;
+  /* ----------------------------------------------------------------------
+     8. warning (Amber Orange)
+     ---------------------------------------------------------------------- */
+  --warning: #e0b718;
+  --warningLight: #ecca4a;
+  --warningDark: #a98a12;
+  --warning1: #fdfaed;
+  --warning2: #f8ecbc;
+  --warning3: #f3de8c;
+  --warning4: #edd05b;
+  --warning5: #e8c22b;
+  --warning6: #c8a415;
+  --warning7: #987c10;
+  --warning8: #68550b;
+  --warning9: #372d06;
+  /* ----------------------------------------------------------------------
+     9. danger (Coral Red)
+     ---------------------------------------------------------------------- */
+  --danger: #e1553c;
+  --dangerLight: #e98371;
+  --dangerDark: #c2371e;
+  --danger1: #fcf0ed;
+  --danger2: #f5c7bf;
+  --danger3: #ee9f91;
+  --danger4: #e77662;
+  --danger5: #e04e34;
+  --danger6: #c0361e;
+  --danger7: #922916;
+  --danger8: #631c0f;
+  --danger9: #350f08;
+  /* ----------------------------------------------------------------------
+     표면 및 텍스트/경계선 색상 (대시보드 이미지 톤앤매너)
+     ---------------------------------------------------------------------- */
+  --bgColor: white;
+  --bgSub: #eaf1ed;
+  --txColor: #14241d;
+  --txSub: #586e63;
+  --txLight: #8fa59b;
+  --lineColor: #dbe6df;
+  --lineFocusColor: rgba(0, 0, 0, 0.15);
+  --modalBg: rgba(20, 36, 29, 0.5);
+  --silver: #cbd5e1;
+  --shwColor: rgba(20, 36, 29, 0.06);
+  /* Alpha Layers (검은색 반투명 계층 - 그림자 및 음영 효과 전용) */
+  --aLow: rgba(0, 0, 0, 0.04);
+  --aLight: rgba(0, 0, 0, 0.08);
+  --aColor: rgba(0, 0, 0, 0.12);
+  --aDark: rgba(0, 0, 0, 0.2);
+  --aHigh: rgba(0, 0, 0, 0.35);
+  --aDeep: rgba(0, 0, 0, 0.55);
+  /* 크기 및 라운딩 규격 */
+  --fontSize: 16px;
+  --roundSize: 0.6em;
+  --roundBtn: 0.5em;
+  --roundBox: 0.5em;
+  --xxs: 0.7rem;
+  --xs: 0.8rem;
+  --sm: 0.9rem;
+  --md: 1rem;
+  --lg: 1.2rem;
+  --xl: 1.6rem;
+  --xxl: 2.2rem;
+}
+
+/* ==========================================================================
+   다크 테마 오버라이드
+   ========================================================================== */
+[data-theme=dark] {
+  /* ----------------------------------------------------------------------
+     다크 테마: 라이트 색상값을 기준으로 밝기(L)만 조정 — 색조·채도는 그대로 (같은 색으로 보임)
+     어두운 색은 조금 밝게, 밝은 색은 어둡게 모아 어두운 바탕에서 고르게 보이게 한다.
+     - 아주 어두운 값(L < 0.25, 예: main 기본): L' = 0.16 + L × 0.36 (살짝 올림)
+     - 중간 톤(L 0.25 ~ 0.6, 예: 하단 영역 deco7): L' = 0.25 + (L − 0.25) × 0.55 (낮춤)
+     - 바탕 틴트로 쓰는 아주 밝은 값(L > 0.6): L' = 0.4425 − (L − 0.6) × 0.75 (어두운 틴트로)
+     - 1~9 단계는 다크에서 어두운 톤 → 밝은 톤 (그 색의 기본색 색조, 밝기 15·20·26·33·40·48·56·65·75%) — 1 = 어두운 바탕 틴트, 9 = 밝은 글자용
+     ---------------------------------------------------------------------- */
+  --main: #3e7157;
+  --mainLight: #477b64;
+  --mainDark: #3a6955;
+  --main1: #1e2e26;
+  --main2: #293d33;
+  --main3: #2f5642;
+  --main4: #3c6d54;
+  --main5: #488465;
+  --main6: #579e7a;
+  --main7: #6eaf8e;
+  --main8: #8cc0a5;
+  --main9: #add2bf;
+  --sub: #3c688f;
+  --subLight: #3e6d95;
+  --subDark: #325778;
+  --sub1: #1b2731;
+  --sub2: #243442;
+  --sub3: #27445d;
+  --sub4: #325677;
+  --sub5: #3c6990;
+  --sub6: #487dac;
+  --sub7: #6192bd;
+  --sub8: #81a8ca;
+  --sub9: #a5c1d9;
+  --point: #78bd15;
+  --pointLight: #7fc511;
+  --pointDark: #65a016;
+  --point1: #2a3c11;
+  --point2: #385016;
+  --point3: #4c770d;
+  --point4: #609711;
+  --point5: #75b814;
+  --point6: #8cdc18;
+  --point7: #9fe935;
+  --point8: #b3ed5e;
+  --point9: #c8f28c;
+  --deco: #4f6b73;
+  --decoLight: #678e98;
+  --decoDark: #36494f;
+  --deco1: #161b1d;
+  --deco2: #21292c;
+  --deco3: #2c3b40;
+  --deco4: #3b4e55;
+  --deco5: #49626a;
+  --deco6: #5a7882;
+  --deco7: #6b8f9a;
+  --deco8: #86a4ac;
+  --deco9: #a4bbc1;
+  --primary: #1f58ad;
+  --primaryLight: #205bb1;
+  --primaryDark: #1a4a90;
+  --primary1: #142339;
+  --primary2: #1a2e4c;
+  --primary3: #143970;
+  --primary4: #1a498f;
+  --primary5: #1f58ad;
+  --primary6: #256ad0;
+  --primary7: #417fdd;
+  --primary8: #689ae4;
+  --primary9: #93b6ec;
+  --info: #2977a0;
+  --infoLight: #2b7da9;
+  --infoDark: #226386;
+  --info1: #162b36;
+  --info2: #1e3a48;
+  --info3: #1b4f6a;
+  --info4: #226486;
+  --info5: #2a79a2;
+  --info6: #3291c3;
+  --info7: #4ca3d1;
+  --info8: #71b6db;
+  --info9: #9acbe5;
+  --success: #1a896c;
+  --successLight: #20a583;
+  --successDark: #156d56;
+  --success1: #14382f;
+  --success2: #1b4b3f;
+  --success3: #156f58;
+  --success4: #1b8d70;
+  --success5: #21ab87;
+  --success6: #27cea2;
+  --success7: #42dbb3;
+  --success8: #69e3c3;
+  --success9: #94ebd4;
+  --warning: #af8f13;
+  --warningLight: #caa415;
+  --warningDark: #91760f;
+  --warning1: #3c3311;
+  --warning2: #504416;
+  --warning3: #78620d;
+  --warning4: #987c10;
+  --warning5: #b89614;
+  --warning6: #ddb418;
+  --warning7: #e9c435;
+  --warning8: #eed05e;
+  --warning9: #f3dd8c;
+  --danger: #ba341d;
+  --dangerLight: #a9301a;
+  --dangerDark: #9c2c18;
+  --danger1: #3a1813;
+  --danger2: #4d2119;
+  --danger3: #732012;
+  --danger4: #922917;
+  --danger5: #b0311c;
+  --danger6: #d43b21;
+  --danger7: #e1553d;
+  --danger8: #e77865;
+  --danger9: #ee9e91;
+  /* 표면 및 텍스트/경계선 (무채색 회색 톤, 바탕 #222) */
+  --bgColor: #222222;
+  --bgSub: #2a2a2a;
+  --txColor: #e4e4e4;
+  --txSub: #b0b0b0;
+  --txLight: #828282;
+  --lineColor: #3a3a3a;
+  --lineFocusColor: rgba(255, 255, 255, 0.18);
+  --modalBg: rgba(0, 0, 0, 0.6);
+  --shwColor: rgba(0, 0, 0, 0.5);
+  --silver: #4c4c4c;
+  /* Alpha Layers: 겹침·경계선용(aLow~aColor)은 흰색 반투명, 그림자용(aDark·aHigh)은 검은색, 글자용(aDeep)은 흰색 */
+  --aLow: rgba(255, 255, 255, 0.03);
+  --aLight: rgba(255, 255, 255, 0.06);
+  --aColor: rgba(255, 255, 255, 0.11);
+  --aDark: rgba(0, 0, 0, 0.45);
+  --aHigh: rgba(0, 0, 0, 0.6);
+  --aDeep: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================================================
+   레이아웃별 색상 오버라이드 훅
+   ========================================================================== */
+.pageLayout, [data-layout=page] {
+  /* 일반 사용자 페이지 전용 테마 변수 오버라이드 가능 */
+}
+
+.adminLayout, [data-layout=admin] {
+  /* 관리자 페이지 전용 테마 변수 오버라이드 가능 */
+}
+
+.accountLayout, [data-layout=account] {
+  /* 회원 및 인증 페이지 전용 테마 변수 오버라이드 가능 */
+}
+
+/* ==========================================================================
+   HTML 문서 및 문서 기본 컨트롤 SCSS (BaseUI 표준 연동)
+   ========================================================================== */
+html {
+  font-size: var(--fontSize);
+  /* a 태그는 일반 텍스트와 동일한 글자색을 가지며 밑줄 제거 */
+}
+html, html * {
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  resize: none;
+  /* 범용 얇고 투명한 스크롤바 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--lineColor) transparent;
+}
+html, html:before, html:after, html *, html *:before, html *:after {
+  box-sizing: border-box;
+  user-select: none;
+}
+html:focus, html *:focus {
+  outline: none;
+}
+html::-webkit-scrollbar, html *::-webkit-scrollbar {
+  width: 0.28em;
+  height: 0.28em;
+  background-color: transparent;
+}
+html::-webkit-scrollbar-track, html *::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+html::-webkit-scrollbar-thumb, html *::-webkit-scrollbar-thumb {
+  background-color: var(--lineColor);
+  border-radius: 1em;
+  transition: background-color 0.2s ease;
+}
+html::-webkit-scrollbar-thumb:hover, html *::-webkit-scrollbar-thumb:hover {
+  background-color: var(--lineFocusColor);
+}
+html::-webkit-scrollbar-corner, html *::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+html, html > body {
+  color: var(--txColor);
+  background-color: var(--bgColor);
+}
+html, html > body, html > body > div#app,
+html #app {
+  display: block;
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 100vw;
+  height: 100vh;
+}
+html a {
+  color: var(--txColor);
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   제목 및 본문 타이포그래피 (h1 ~ h6, p)
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 0.4em 0;
+  color: var(--txColor);
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--xxl);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: var(--xl);
+  line-height: 1.25;
+}
+
+h3 {
+  font-size: var(--lg);
+  line-height: 1.3;
+}
+
+h4 {
+  font-size: var(--md);
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: var(--sm);
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: var(--xs);
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--txSub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+p {
+  margin: 0 0 0.8em 0;
+  line-height: 1.6;
+  color: var(--txColor);
+}
+
+b, strong {
+  font-weight: 700;
+}
+
+small {
+  font-weight: normal;
+  font-size: var(--xs);
+  color: var(--txSub);
+}
+
+hr {
+  margin: 1.5em 0;
+  border: 0;
+  border-top: 1px solid var(--lineColor);
+}
+
+/* 외부 위젯(에디터 .sun-editor/.jodit-container 와 Jodit 팝업·대화상자 안쪽)에는 아래 태그 기본 스타일을 적용하지 않음 — :where() 라 선택자 우선순위는 그대로 */
+/* ==========================================================================
+   인터랙션 컨트롤 공통 기본 스타일 (button, .btn, input, select)
+   - 버튼과 폼 입력항이 나란히 배치될 때 100% 동일한 높이(2.6em), 라운딩, 패딩, 폰트사이즈 일치 보장
+   - 공통 disabled 상태 및 em 기반 사이즈 스케일링 일원화 (DRY 원칙)
+   ========================================================================== */
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+.btn,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) {
+  box-sizing: border-box;
+  vertical-align: middle;
+  height: 2.6em;
+  padding: 0.5em 0.8em;
+  font-size: 1em;
+  border-radius: var(--roundBtn);
+  border: 1px solid var(--lineColor);
+  background-color: var(--bgColor);
+  color: var(--txColor);
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  /* 비활성화 공통 상태 (disabled) */
+  /* 공통 사이즈 스케일링 (em 기반 비례 변동) */
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled, button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).disabled,
+.btn:disabled,
+.btn.disabled,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).disabled,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: var(--bgSub);
+  border-color: var(--lineColor);
+  color: var(--txLight);
+  box-shadow: none;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxs,
+.btn.xxs,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxs,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxs {
+  font-size: var(--xxs);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xs,
+.btn.xs,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xs,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xs {
+  font-size: var(--xs);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sm,
+.btn.sm,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sm,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sm {
+  font-size: var(--sm);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).md,
+.btn.md,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).md,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).md {
+  font-size: var(--md);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).lg,
+.btn.lg,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).lg,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).lg {
+  font-size: var(--lg);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xl,
+.btn.xl,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xl,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xl {
+  font-size: var(--xl);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxl,
+.btn.xxl,
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxl,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxl {
+  font-size: var(--xxl);
+}
+
+/* ==========================================================================
+   버튼 컴포넌트 고유 스타일 (button, .btn)
+   - 클래스 없이 기본 태그만으로도 완성도 높은 디자인 적용
+   - 외곽선: aColor(블랙 반투명)로 기본 경계 구분 및 테마색 주입 시 자동 짙은 음영 테두리 형성
+   - 이동(translate) 없이 스케일(0.98)과 안쪽 그림자(inset)로 단정한 클릭 피드백
+   - 9대 테마 색상키 지원
+   ========================================================================== */
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  border-color: var(--aLight);
+  box-shadow: none;
+  transition: all 0.2s;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+  /* 평시 호버 효과 - 이동(translate) 없이 aColor 경계선 강화 및 반투명 그림자 */
+  /* 액티브(눌림) 효과 - 이동(translate) 없이 스케일 및 안쪽 그림자로 눌림 피드백 */
+  /* 비활성화 버튼 고유 보정 */
+  /* 파일 업로드 버튼: 투명화된 input[type="file"]을 버튼 전체에 오버레이 */
+  /* 9대 테마 색상키 지원 */
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) > svg, button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) > i,
+.btn > svg,
+.btn > i {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  font-size: 1.15em;
+  flex-shrink: 0;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+.btn:hover {
+  box-shadow: 0.1em 0.1em 0.5em 0.1em var(--aDark);
+  transform: scale(1.01);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):active,
+.btn:active {
+  border-color: var(--aColor);
+  box-shadow: inset 0.1em 0.1em 0.5em 0.1em var(--aDark);
+  transform: scale(0.98);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled, button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).disabled,
+.btn:disabled,
+.btn.disabled {
+  border-color: var(--aLight);
+  transform: none;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) > input[type=file],
+.btn > input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0 !important;
+  cursor: pointer;
+  z-index: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) > input[type=file]:disabled,
+.btn > input[type=file]:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):has(> input[type=file]:disabled),
+.btn:has(> input[type=file]:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: var(--bgSub);
+  border-color: var(--aLight);
+  color: var(--txLight);
+  box-shadow: none;
+  transform: none;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).main,
+.btn.main {
+  background-color: var(--main);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).main:hover,
+.btn.main:hover {
+  background-color: var(--mainLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).main:active,
+.btn.main:active {
+  background-color: var(--mainDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sub,
+.btn.sub {
+  background-color: var(--sub);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sub:hover,
+.btn.sub:hover {
+  background-color: var(--subLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sub:active,
+.btn.sub:active {
+  background-color: var(--subDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).point,
+.btn.point {
+  background-color: var(--point);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).point:hover,
+.btn.point:hover {
+  background-color: var(--pointLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).point:active,
+.btn.point:active {
+  background-color: var(--pointDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).deco,
+.btn.deco {
+  background-color: var(--deco);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).deco:hover,
+.btn.deco:hover {
+  background-color: var(--decoLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).deco:active,
+.btn.deco:active {
+  background-color: var(--decoDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).primary,
+.btn.primary {
+  background-color: var(--primary);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).primary:hover,
+.btn.primary:hover {
+  background-color: var(--primaryLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).primary:active,
+.btn.primary:active {
+  background-color: var(--primaryDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).info,
+.btn.info {
+  background-color: var(--info);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).info:hover,
+.btn.info:hover {
+  background-color: var(--infoLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).info:active,
+.btn.info:active {
+  background-color: var(--infoDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).success,
+.btn.success {
+  background-color: var(--success);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).success:hover,
+.btn.success:hover {
+  background-color: var(--successLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).success:active,
+.btn.success:active {
+  background-color: var(--successDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).warning,
+.btn.warning {
+  background-color: var(--warning);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).warning:hover,
+.btn.warning:hover {
+  background-color: var(--warningLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).warning:active,
+.btn.warning:active {
+  background-color: var(--warningDark);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).danger,
+.btn.danger {
+  background-color: var(--danger);
+  color: white;
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).danger:hover,
+.btn.danger:hover {
+  background-color: var(--dangerLight);
+}
+button:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).danger:active,
+.btn.danger:active {
+  background-color: var(--dangerDark);
+}
+
+/* ==========================================================================
+   파일 업로드 전용 래퍼 (.fileBtn)
+   - 일반 버튼을 감싸거나 단독 버튼 형태로 투명 input[type="file"] 오버레이 지원
+   ========================================================================== */
+.fileBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  overflow: hidden;
+  border-radius: var(--roundBtn);
+}
+.fileBtn > input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.fileBtn > input[type=file]:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.fileBtn:hover > button, .fileBtn:hover > .btn {
+  background-color: var(--bgSub);
+  box-shadow: 0.1em 0.1em 0.5em 0.1em var(--aDark);
+  transform: scale(1.01);
+}
+.fileBtn:active > button, .fileBtn:active > .btn {
+  border-color: var(--aColor);
+  background-color: var(--lineColor);
+  box-shadow: inset 0.1em 0.1em 0.5em 0.1em var(--aDark);
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   폼 입력 필드 공통 (input, select, textarea)
+   - 텍스트 입력 계열 공통 안쪽 음영, 플레이스홀더, 포커스 및 readonly 상태
+   ========================================================================== */
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) {
+  box-shadow: inset 0 1px 2px var(--aLow);
+  /* 호버 상태 */
+  /* 포커스 상태 */
+  /* 유효성 오류 상태 (ValidResult.markErrors 가 부여, 다시 입력하면 해제) */
+  /* 읽기 전용 상태 (readonly) */
+}
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *))::placeholder,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *))::placeholder,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *))::placeholder {
+  color: var(--txLight);
+  font-weight: 400;
+}
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover {
+  border-color: var(--lineFocusColor);
+}
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus {
+  outline: none;
+  border-color: var(--lineFocusColor);
+  box-shadow: inset 0 0 0.3em 0.1em var(--aColor);
+  background-color: var(--bgColor);
+}
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error, input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error:hover, input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error:focus,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error:hover,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error:focus,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error:hover,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).error:focus {
+  border-color: var(--danger);
+  background-color: var(--danger1);
+}
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):read-only,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):read-only,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):read-only {
+  background-color: var(--bgSub);
+  border-color: var(--lineColor);
+  color: var(--txSub);
+  cursor: default;
+  box-shadow: none;
+  user-select: text;
+}
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):read-only:focus,
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):read-only:focus,
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):read-only:focus {
+  border-color: var(--lineColor);
+  box-shadow: none;
+}
+
+/* 한 줄 텍스트 입력항 (input, select) */
+input:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) {
+  display: inline-block;
+  width: 100%;
+  line-height: normal;
+}
+
+select:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23586e63' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.1em center;
+  background-size: 0.85em;
+}
+
+/* 체크박스, 라디오, 레인지, 파일 등 비텍스트 입력항 스타일 무력화(리셋) */
+input[type=checkbox]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+input[type=radio]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+input[type=range]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+input[type=file]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)),
+input[type=color]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  padding: initial;
+  background-color: transparent;
+  border: initial;
+  border-radius: initial;
+  box-shadow: none;
+  line-height: initial;
+  vertical-align: middle;
+  cursor: pointer;
+}
+input[type=checkbox]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover, input[type=checkbox]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus,
+input[type=radio]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+input[type=radio]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus,
+input[type=range]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+input[type=range]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus,
+input[type=file]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+input[type=file]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus,
+input[type=color]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):hover,
+input[type=color]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):focus {
+  border-color: initial;
+  box-shadow: none;
+  background-color: transparent;
+  outline: revert;
+}
+input[type=checkbox]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled,
+input[type=radio]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled,
+input[type=range]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled,
+input[type=file]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled,
+input[type=color]:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   여러 줄 텍스트 영역 (textarea)
+   ========================================================================== */
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 5.5em;
+  padding: 0.8em 1.1em;
+  font-size: 1em;
+  line-height: 1.5;
+  color: var(--txColor);
+  background-color: var(--bgColor);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)):disabled, textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: var(--bgSub);
+  border-color: var(--lineColor);
+  color: var(--txLight);
+  box-shadow: none;
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxs {
+  font-size: var(--xxs);
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xs {
+  font-size: var(--xs);
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).sm {
+  font-size: var(--sm);
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).md {
+  font-size: var(--md);
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).lg {
+  font-size: var(--lg);
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xl {
+  font-size: var(--xl);
+}
+textarea:where(:not(.sun-editor *, .jodit-container *, .jodit-popup *, .jodit-dialog *)).xxl {
+  font-size: var(--xxl);
+}
+
+/* ==========================================================================
+   전역 사이즈 유틸리티 (단독 클래스로도 적용 가능)
+   ========================================================================== */
+.xxs {
+  font-size: var(--xxs);
+}
+
+.xs {
+  font-size: var(--xs);
+}
+
+.sm {
+  font-size: var(--sm);
+}
+
+.md {
+  font-size: var(--md);
+}
+
+.lg {
+  font-size: var(--lg);
+}
+
+.xl {
+  font-size: var(--xl);
+}
+
+.xxl {
+  font-size: var(--xxl);
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+  html {
+    font-size: 14px;
+  }
+  html ul.form li.col2, html ul.form li.col3, html ul.form li.col4 {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1em;
+  }
+}
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+  html {
+    font-size: 13px;
+  }
+}
+/* ==========================================================================
+   BitPlus 메인 통합 스타일시트 (Site.scss)
+   Document, Controls, Area, Complex, Util 모듈을 단일 스타일시트로 병합
+   ========================================================================== */
+/* ==========================================================================
+   Controls: 개별 인터랙션 및 입력 컨트롤
+   - 드롭다운 트리거 컨트롤 (.dropDown)
+   - 플로팅 드롭박스 레이어 (.dropBox)
+   - 체크박스 (label.check, .check)
+   - 라디오 (label.radio, .radio)
+   - 토글 / 스위치 (label.toggle, label.switch)
+   - 테이블 체커 (.checker)
+   - 범용 툴바 및 액션바 (.toolBar, .toolbar) -> _ToolBar.scss
+   - 윈도우 탐색기 폴더 트리 (.treeView, .treeBox) -> _Tree.scss
+   - 페이지 이동 (ul.pager)
+   - 태그 목록 (ul.tags)
+   ========================================================================== */
+/* ==========================================================================
+   범용 툴바 컴포넌트 (_ToolBar.scss)
+   - 모던 플로팅 툴바 (.toolBar, .toolbar)
+   - 수평/수직 정렬, 세그먼트 일체형, 스택형 아이템, 액션 버튼, 디바이더
+   - 드롭다운/셀렉트 박스 결합 (.dropDown, .dropBox)
+   - 툴바 연계 컬러 팔레트 팝오버 (.toolPalette)
+   - 9대 테마 색상 및 비례 크기 스케일링 (.sm, 기본, .lg)
+   ========================================================================== */
+.toolBar,
+.toolbar {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.35em 0.5em;
+  margin: 0;
+  list-style: none;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: var(--bgColor);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox, 0.8em);
+  box-shadow: 0 4px 16px var(--aLight), 0 1px 3px var(--aLow);
+  color: var(--txColor);
+  user-select: none;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  /* 1. 플로팅 필(Pill) 스타일 (.floating, .pill) */
+  /* 2. 플랫 스타일 (.flat - 그림자 없이 테두리/배경만 깔끔하게) */
+  /* 3. 수직 툴바 (.vertical) */
+  /* 4. 세그먼트 / 일체형 툴바 (.segmented, .joined) */
+  /* 5. 툴바 내부 기본 아이템 (button, a, .item, li) */
+  /* 6. 디바이더 구분선 (.divider, li.divider) */
+  /* 7. 여백 채움 (.space, li.space) */
+  /* 8. 상태 뱃지 및 라벨 (.label, .status, .badge) */
+  /* 9. 액션 전용 버튼 (.actionBtn, button.main, button.point) */
+  /* 10. 숫자 스텝퍼 / 입력 필드 (.stepper) */
+  /* 11. 툴바 내 드롭다운 및 셀렉트 (.dropDown) */
+  /* 플로팅 / 필 툴바 내 드롭다운 */
+  /* 세그먼트 / 일체형 툴바 내 드롭다운 */
+  /* 12. 크기 변형 (.sm, .lg) */
+  /* 13. 9대 테마 색상 지원 */
+}
+.toolBar.floating, .toolBar.pill,
+.toolbar.floating,
+.toolbar.pill {
+  border-radius: var(--roundBtn, 2em);
+  box-shadow: 0 8px 24px var(--aDark), 0 2px 6px var(--aLow);
+}
+.toolBar.flat,
+.toolbar.flat {
+  box-shadow: none;
+  background-color: var(--bgSub);
+}
+.toolBar.vertical,
+.toolbar.vertical {
+  flex-direction: column;
+  padding: 0.5em 0.35em;
+  width: max-content;
+}
+.toolBar.vertical > .divider, .toolBar.vertical > li.divider,
+.toolbar.vertical > .divider,
+.toolbar.vertical > li.divider {
+  min-width: 0;
+  min-height: 0;
+  width: 1.4em;
+  height: 1px;
+  margin: 0.35em auto;
+}
+.toolBar.vertical > .space, .toolBar.vertical > li.space,
+.toolbar.vertical > .space,
+.toolbar.vertical > li.space {
+  width: 100%;
+  height: auto;
+}
+.toolBar.segmented, .toolBar.joined,
+.toolbar.segmented,
+.toolbar.joined {
+  gap: 0;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0.4em;
+}
+.toolBar.segmented > :first-child, .toolBar.joined > :first-child,
+.toolbar.segmented > :first-child,
+.toolbar.joined > :first-child {
+  border-top-left-radius: inherit;
+  border-bottom-left-radius: inherit;
+}
+.toolBar.segmented > :last-child, .toolBar.joined > :last-child,
+.toolbar.segmented > :last-child,
+.toolbar.joined > :last-child {
+  border-top-right-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+.toolBar.segmented > * + *, .toolBar.joined > * + *,
+.toolbar.segmented > * + *,
+.toolbar.joined > * + * {
+  border-left: 1px solid var(--lineColor);
+}
+.toolBar.segmented > button, .toolBar.segmented > .item, .toolBar.segmented > li, .toolBar.joined > button, .toolBar.joined > .item, .toolBar.joined > li,
+.toolbar.segmented > button,
+.toolbar.segmented > .item,
+.toolbar.segmented > li,
+.toolbar.joined > button,
+.toolbar.joined > .item,
+.toolbar.joined > li {
+  border-radius: 0;
+  border: none;
+}
+.toolBar > button, .toolBar > a, .toolBar > .item, .toolBar > li,
+.toolbar > button,
+.toolbar > a,
+.toolbar > .item,
+.toolbar > li {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  min-width: 2.2em;
+  height: 2.2em;
+  padding: 0.35em 0.55em;
+  font-size: 0.95em;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--txSub);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--roundBtn, 0.4em);
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  /* 활성화 / 선택 상태 (.active) */
+  /* 비활성 상태 */
+  /* 아이콘 전용 원형/정사각형 버튼 */
+  /* 상하 스택형 아이템 (.stacked) - 아이콘 위, 텍스트 아래 */
+}
+.toolBar > button > i.fi, .toolBar > a > i.fi, .toolBar > .item > i.fi, .toolBar > li > i.fi,
+.toolbar > button > i.fi,
+.toolbar > a > i.fi,
+.toolbar > .item > i.fi,
+.toolbar > li > i.fi {
+  font-size: 1.25em;
+  flex-shrink: 0;
+}
+.toolBar > button > span, .toolBar > a > span, .toolBar > .item > span, .toolBar > li > span,
+.toolbar > button > span,
+.toolbar > a > span,
+.toolbar > .item > span,
+.toolbar > li > span {
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.toolBar > button:hover, .toolBar > a:hover, .toolBar > .item:hover, .toolBar > li:hover,
+.toolbar > button:hover,
+.toolbar > a:hover,
+.toolbar > .item:hover,
+.toolbar > li:hover {
+  color: var(--txColor);
+  background-color: var(--aLow);
+  border-color: var(--aColor);
+}
+.toolBar > button:active, .toolBar > a:active, .toolBar > .item:active, .toolBar > li:active,
+.toolbar > button:active,
+.toolbar > a:active,
+.toolbar > .item:active,
+.toolbar > li:active {
+  transform: scale(0.96);
+  background-color: var(--aColor);
+}
+.toolBar > button.active, .toolBar > a.active, .toolBar > .item.active, .toolBar > li.active,
+.toolbar > button.active,
+.toolbar > a.active,
+.toolbar > .item.active,
+.toolbar > li.active {
+  color: white;
+  background-color: var(--main);
+  border-color: var(--aColor);
+  font-weight: 600;
+}
+.toolBar > button.active > i.fi, .toolBar > a.active > i.fi, .toolBar > .item.active > i.fi, .toolBar > li.active > i.fi,
+.toolbar > button.active > i.fi,
+.toolbar > a.active > i.fi,
+.toolbar > .item.active > i.fi,
+.toolbar > li.active > i.fi {
+  color: currentColor;
+}
+.toolBar > button:disabled, .toolBar > button.disabled, .toolBar > a:disabled, .toolBar > a.disabled, .toolBar > .item:disabled, .toolBar > .item.disabled, .toolBar > li:disabled, .toolBar > li.disabled,
+.toolbar > button:disabled,
+.toolbar > button.disabled,
+.toolbar > a:disabled,
+.toolbar > a.disabled,
+.toolbar > .item:disabled,
+.toolbar > .item.disabled,
+.toolbar > li:disabled,
+.toolbar > li.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.toolBar > button.iconOnly, .toolBar > a.iconOnly, .toolBar > .item.iconOnly, .toolBar > li.iconOnly,
+.toolbar > button.iconOnly,
+.toolbar > a.iconOnly,
+.toolbar > .item.iconOnly,
+.toolbar > li.iconOnly {
+  width: 2.2em;
+  padding: 0;
+}
+.toolBar > button.circle, .toolBar > a.circle, .toolBar > .item.circle, .toolBar > li.circle,
+.toolbar > button.circle,
+.toolbar > a.circle,
+.toolbar > .item.circle,
+.toolbar > li.circle {
+  border-radius: 50%;
+}
+.toolBar > button.stacked, .toolBar > a.stacked, .toolBar > .item.stacked, .toolBar > li.stacked,
+.toolbar > button.stacked,
+.toolbar > a.stacked,
+.toolbar > .item.stacked,
+.toolbar > li.stacked {
+  flex-direction: column;
+  height: auto;
+  min-height: 3.2em;
+  padding: 0.4em 0.6em;
+  gap: 0.25em;
+}
+.toolBar > button.stacked > i.fi, .toolBar > a.stacked > i.fi, .toolBar > .item.stacked > i.fi, .toolBar > li.stacked > i.fi,
+.toolbar > button.stacked > i.fi,
+.toolbar > a.stacked > i.fi,
+.toolbar > .item.stacked > i.fi,
+.toolbar > li.stacked > i.fi {
+  font-size: 1.35em;
+}
+.toolBar > button.stacked > span, .toolBar > a.stacked > span, .toolBar > .item.stacked > span, .toolBar > li.stacked > span,
+.toolbar > button.stacked > span,
+.toolbar > a.stacked > span,
+.toolbar > .item.stacked > span,
+.toolbar > li.stacked > span {
+  font-size: 0.72em;
+  font-weight: 500;
+}
+.toolBar > .divider, .toolBar > li.divider,
+.toolbar > .divider,
+.toolbar > li.divider {
+  display: inline-block;
+  flex: 0 0 auto;
+  min-width: 0;
+  width: 1px;
+  height: 1.4em;
+  background-color: var(--lineColor);
+  margin: 0 0.35em;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  pointer-events: none;
+}
+.toolBar > .space, .toolBar > li.space,
+.toolbar > .space,
+.toolbar > li.space {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  pointer-events: none;
+}
+.toolBar > .label, .toolBar > .status, .toolBar > li.label, .toolBar > li.status,
+.toolbar > .label,
+.toolbar > .status,
+.toolbar > li.label,
+.toolbar > li.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.3em 0.75em;
+  font-size: 0.82em;
+  font-weight: 600;
+  color: var(--txSub);
+  background-color: var(--bgSub);
+  border: 1px solid var(--aLow);
+  border-radius: var(--roundBtn, 1.2em);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.toolBar > button.actionBtn, .toolBar > .actionBtn,
+.toolbar > button.actionBtn,
+.toolbar > .actionBtn {
+  height: 2.2em;
+  padding: 0.35em 0.9em;
+  border-radius: var(--roundBtn, 2em);
+  color: #ffffff;
+  background-color: #1e2229;
+  border: 1px solid var(--aColor);
+  font-weight: 600;
+}
+.toolBar > button.actionBtn:hover, .toolBar > .actionBtn:hover,
+.toolbar > button.actionBtn:hover,
+.toolbar > .actionBtn:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+.toolBar > button.actionBtn.point, .toolBar > .actionBtn.point,
+.toolbar > button.actionBtn.point,
+.toolbar > .actionBtn.point {
+  background-color: var(--point);
+  color: var(--pointText);
+}
+.toolBar > button.actionBtn.point:hover, .toolBar > .actionBtn.point:hover,
+.toolbar > button.actionBtn.point:hover,
+.toolbar > .actionBtn.point:hover {
+  background-color: var(--pointDark);
+}
+.toolBar > button.actionBtn.main, .toolBar > .actionBtn.main,
+.toolbar > button.actionBtn.main,
+.toolbar > .actionBtn.main {
+  background-color: var(--main);
+  color: white;
+}
+.toolBar > button.actionBtn.main:hover, .toolBar > .actionBtn.main:hover,
+.toolbar > button.actionBtn.main:hover,
+.toolbar > .actionBtn.main:hover {
+  background-color: var(--mainDark);
+}
+.toolBar > .stepper,
+.toolbar > .stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--txColor);
+}
+.toolBar > .stepper > span,
+.toolbar > .stepper > span {
+  min-width: 1.6em;
+  text-align: center;
+}
+.toolBar > .stepper > .spinBtns,
+.toolbar > .stepper > .spinBtns {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1em;
+  cursor: pointer;
+  font-size: 0.6em;
+  color: var(--txLight);
+}
+.toolBar > .dropDown,
+.toolbar > .dropDown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* 기본 헤더 (셀렉트 트리거) */
+  /* 아이콘/버튼 트리거로 열리는 경우 */
+  /* 열린 상태 (.open) */
+  /* 드롭박스 팝업 (.dropBox, ul, section) */
+  /* 부모 .dropDown 에 .up 또는 .right 가 지정된 경우도 포괄 지원 */
+}
+.toolBar > .dropDown > header,
+.toolbar > .dropDown > header {
+  min-height: 2.2em;
+  height: 2.2em;
+  padding: 0.25em 0.65em;
+  font-size: 0.9em;
+  font-weight: 500;
+  gap: 0.4em;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--roundBtn, 0.4em);
+  color: var(--txSub);
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.toolBar > .dropDown > header > span,
+.toolbar > .dropDown > header > span {
+  white-space: nowrap;
+}
+.toolBar > .dropDown > header > i.fi,
+.toolbar > .dropDown > header > i.fi {
+  font-size: 1.15em;
+}
+.toolBar > .dropDown > header:after,
+.toolbar > .dropDown > header:after {
+  content: "";
+  display: inline-block;
+  width: 0.35em;
+  height: 0.35em;
+  border-right: 0.12em solid currentColor;
+  border-bottom: 0.12em solid currentColor;
+  transform: rotate(45deg);
+  margin-left: 0.4em;
+  margin-bottom: 0.12em;
+  transition: transform 0.15s;
+}
+.toolBar > .dropDown > header:hover,
+.toolbar > .dropDown > header:hover {
+  color: var(--txColor);
+  background-color: var(--aLight);
+  border-color: var(--aColor);
+  box-shadow: none;
+}
+.toolBar > .dropDown > button.item:after,
+.toolbar > .dropDown > button.item:after {
+  display: none;
+}
+.toolBar > .dropDown.open > header,
+.toolbar > .dropDown.open > header {
+  color: var(--txColor);
+  background-color: var(--aLight);
+  border-color: var(--aColor);
+}
+.toolBar > .dropDown.open > header:after,
+.toolbar > .dropDown.open > header:after {
+  transform: rotate(225deg);
+  margin-bottom: -0.1em;
+}
+.toolBar > .dropDown.open > button.item,
+.toolbar > .dropDown.open > button.item {
+  background-color: var(--aLight);
+  border-color: var(--aColor);
+  color: var(--txColor);
+}
+.toolBar > .dropDown > .dropBox, .toolBar > .dropDown > ul,
+.toolbar > .dropDown > .dropBox,
+.toolbar > .dropDown > ul {
+  top: calc(100% + 0.35em);
+  bottom: auto;
+  left: 0;
+  right: auto;
+  min-width: 10em;
+  background-color: var(--bgColor);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox, 0.8em);
+  box-shadow: 0 8px 24px var(--aDark), 0 2px 6px var(--aLow);
+  z-index: 100;
+}
+.toolBar > .dropDown > .dropBox.up, .toolBar > .dropDown > ul.up,
+.toolbar > .dropDown > .dropBox.up,
+.toolbar > .dropDown > ul.up {
+  top: auto;
+  bottom: calc(100% + 0.35em);
+}
+.toolBar > .dropDown > .dropBox.right, .toolBar > .dropDown > ul.right,
+.toolbar > .dropDown > .dropBox.right,
+.toolbar > .dropDown > ul.right {
+  left: auto;
+  right: 0;
+}
+.toolBar > .dropDown > .dropBox > li, .toolBar > .dropDown > ul > li,
+.toolbar > .dropDown > .dropBox > li,
+.toolbar > .dropDown > ul > li {
+  padding: 0.4em 0.7em;
+  font-size: 0.9em;
+}
+.toolBar > .dropDown > .dropBox > li.divider, .toolBar > .dropDown > ul > li.divider,
+.toolbar > .dropDown > .dropBox > li.divider,
+.toolbar > .dropDown > ul > li.divider {
+  height: 1px;
+  background-color: var(--lineColor);
+  margin: 0.3em 0;
+  padding: 0;
+}
+.toolBar > .dropDown.up > .dropBox, .toolBar > .dropDown.up > ul,
+.toolbar > .dropDown.up > .dropBox,
+.toolbar > .dropDown.up > ul {
+  top: auto;
+  bottom: calc(100% + 0.35em);
+}
+.toolBar > .dropDown.right > .dropBox, .toolBar > .dropDown.right > ul,
+.toolbar > .dropDown.right > .dropBox,
+.toolbar > .dropDown.right > ul {
+  left: auto;
+  right: 0;
+}
+.toolBar.floating > .dropDown > header, .toolBar.pill > .dropDown > header,
+.toolbar.floating > .dropDown > header,
+.toolbar.pill > .dropDown > header {
+  border-radius: var(--roundBtn, 2em);
+  background-color: var(--bgSub);
+  border-color: var(--aLow);
+}
+.toolBar.floating > .dropDown > header:hover, .toolBar.pill > .dropDown > header:hover,
+.toolbar.floating > .dropDown > header:hover,
+.toolbar.pill > .dropDown > header:hover {
+  background-color: var(--aLight);
+  border-color: var(--aColor);
+}
+.toolBar.segmented > .dropDown > header, .toolBar.joined > .dropDown > header,
+.toolbar.segmented > .dropDown > header,
+.toolbar.joined > .dropDown > header {
+  border-radius: 0;
+  border: none;
+  border-right: 1px solid var(--lineColor);
+}
+.toolBar.sm,
+.toolbar.sm {
+  font-size: var(--sm);
+  padding: 0.25em 0.4em;
+  gap: 0.2em;
+}
+.toolBar.sm > button, .toolBar.sm > .item, .toolBar.sm > a,
+.toolbar.sm > button,
+.toolbar.sm > .item,
+.toolbar.sm > a {
+  min-width: 1.9em;
+  height: 1.9em;
+}
+.toolBar.sm > .dropDown > header,
+.toolbar.sm > .dropDown > header {
+  min-height: 1.9em;
+  height: 1.9em;
+  padding: 0.2em 0.5em;
+  font-size: 0.82em;
+}
+.toolBar.lg,
+.toolbar.lg {
+  font-size: var(--lg);
+  padding: 0.45em 0.7em;
+  gap: 0.35em;
+}
+.toolBar.lg > button, .toolBar.lg > .item, .toolBar.lg > a,
+.toolbar.lg > button,
+.toolbar.lg > .item,
+.toolbar.lg > a {
+  min-width: 2.6em;
+  height: 2.6em;
+}
+.toolBar.lg > .dropDown > header,
+.toolbar.lg > .dropDown > header {
+  min-height: 2.6em;
+  height: 2.6em;
+  padding: 0.35em 0.8em;
+  font-size: 1em;
+}
+.toolBar.main,
+.toolbar.main {
+  border-color: var(--mainLight, var(--aColor));
+}
+.toolBar.main > button.active, .toolBar.main > .item.active, .toolBar.main > li.active,
+.toolbar.main > button.active,
+.toolbar.main > .item.active,
+.toolbar.main > li.active {
+  background-color: var(--main);
+  color: var(--mainText);
+  border-color: var(--aColor);
+}
+.toolBar.sub,
+.toolbar.sub {
+  border-color: var(--subLight, var(--aColor));
+}
+.toolBar.sub > button.active, .toolBar.sub > .item.active, .toolBar.sub > li.active,
+.toolbar.sub > button.active,
+.toolbar.sub > .item.active,
+.toolbar.sub > li.active {
+  background-color: var(--sub);
+  color: var(--subText);
+  border-color: var(--aColor);
+}
+.toolBar.point,
+.toolbar.point {
+  border-color: var(--pointLight, var(--aColor));
+}
+.toolBar.point > button.active, .toolBar.point > .item.active, .toolBar.point > li.active,
+.toolbar.point > button.active,
+.toolbar.point > .item.active,
+.toolbar.point > li.active {
+  background-color: var(--point);
+  color: var(--pointText);
+  border-color: var(--aColor);
+}
+.toolBar.deco,
+.toolbar.deco {
+  border-color: var(--decoLight, var(--aColor));
+}
+.toolBar.deco > button.active, .toolBar.deco > .item.active, .toolBar.deco > li.active,
+.toolbar.deco > button.active,
+.toolbar.deco > .item.active,
+.toolbar.deco > li.active {
+  background-color: var(--deco);
+  color: var(--decoText);
+  border-color: var(--aColor);
+}
+.toolBar.primary,
+.toolbar.primary {
+  border-color: var(--primaryLight, var(--aColor));
+}
+.toolBar.primary > button.active, .toolBar.primary > .item.active, .toolBar.primary > li.active,
+.toolbar.primary > button.active,
+.toolbar.primary > .item.active,
+.toolbar.primary > li.active {
+  background-color: var(--primary);
+  color: var(--primaryText);
+  border-color: var(--aColor);
+}
+.toolBar.success,
+.toolbar.success {
+  border-color: var(--successLight, var(--aColor));
+}
+.toolBar.success > button.active, .toolBar.success > .item.active, .toolBar.success > li.active,
+.toolbar.success > button.active,
+.toolbar.success > .item.active,
+.toolbar.success > li.active {
+  background-color: var(--success);
+  color: var(--successText);
+  border-color: var(--aColor);
+}
+.toolBar.info,
+.toolbar.info {
+  border-color: var(--infoLight, var(--aColor));
+}
+.toolBar.info > button.active, .toolBar.info > .item.active, .toolBar.info > li.active,
+.toolbar.info > button.active,
+.toolbar.info > .item.active,
+.toolbar.info > li.active {
+  background-color: var(--info);
+  color: var(--infoText);
+  border-color: var(--aColor);
+}
+.toolBar.warning,
+.toolbar.warning {
+  border-color: var(--warningLight, var(--aColor));
+}
+.toolBar.warning > button.active, .toolBar.warning > .item.active, .toolBar.warning > li.active,
+.toolbar.warning > button.active,
+.toolbar.warning > .item.active,
+.toolbar.warning > li.active {
+  background-color: var(--warning);
+  color: var(--warningText);
+  border-color: var(--aColor);
+}
+.toolBar.danger,
+.toolbar.danger {
+  border-color: var(--dangerLight, var(--aColor));
+}
+.toolBar.danger > button.active, .toolBar.danger > .item.active, .toolBar.danger > li.active,
+.toolbar.danger > button.active,
+.toolbar.danger > .item.active,
+.toolbar.danger > li.active {
+  background-color: var(--danger);
+  color: var(--dangerText);
+  border-color: var(--aColor);
+}
+
+/* 툴바 연계 컬러 팔레트 팝오버 (.toolPalette) */
+.toolPalette {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.35em 0.65em;
+  background-color: var(--bgColor);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBtn, 2em);
+  box-shadow: 0 8px 24px var(--aDark), 0 2px 6px var(--aLow);
+  user-select: none;
+}
+.toolPalette > .swatch {
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.toolPalette > .swatch:hover {
+  transform: scale(1.18);
+}
+.toolPalette > .swatch.active {
+  border-color: var(--txColor);
+  box-shadow: 0 0 0 2px var(--bgColor);
+}
+
+/* ==========================================================================
+   Tree: 윈도우 탐색기 스타일 폴더 트리 컨트롤 (.treeBox)
+   - 폴더 아이콘: 자식 있음 = fi-folder(닫힘) / fi-folder-open(열림), 자식 없음 = fi-folder(라인형)
+   - 폴더 아이콘 색상: var(--main) 기본
+   - 선택: main 배경 full-width 바 + 코너 라운딩 (토글 방식, 재클릭 시 해제)
+   - 들여쓰기는 header padding-left 로 처리 (모든 행이 동일한 전체 너비)
+   ========================================================================== */
+.treeBox {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-size: 1rem;
+  user-select: none;
+  color: var(--txColor);
+  /* 트리 리스트 — 들여쓰기는 header padding으로 처리 */
+  /* 자식 리스트: 기본 닫힘 */
+  /* 열림 상태 */
+  /* 노드 아이템 */
+  /* ── 노드 헤더 행 ── */
+  /* ── 선택 상태 ── */
+  /* 포커스 링 */
+  /* 비활성화 노드 */
+  /* 체크박스 모드 */
+}
+.treeBox ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.treeBox li > ul {
+  display: none;
+}
+.treeBox li.opened > ul {
+  display: flex;
+}
+.treeBox li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.treeBox li > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  height: 2em;
+  min-height: 2em;
+  padding-right: 0.5em;
+  margin-block: 1px;
+  border-radius: var(--roundSm, 0.35em);
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  /* 호버 */
+  /* 폴더 아이콘 — main 색상 기본 */
+  /* 텍스트 영역 */
+  /* 확장 메뉴 아이콘 (...) — span 사용 */
+  /* 행 호버 시 ... 표시 */
+}
+.treeBox li > div:hover {
+  background-color: var(--aLight);
+}
+.treeBox li > div > i.fi {
+  flex-shrink: 0;
+  font-size: 1.15em;
+  color: var(--main);
+  transition: transform 0.1s ease;
+  /* 이벤트 비활성 아이콘 */
+}
+.treeBox li > div > i.fi:active {
+  transform: scale(0.92);
+}
+.treeBox li > div > i.fi.nonEvent {
+  pointer-events: none;
+}
+.treeBox li > div > div {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9em;
+  line-height: 1;
+}
+.treeBox li > div > div > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* 노드 끝 개수 뱃지 */
+}
+.treeBox li > div > div > span > .badge {
+  margin-left: 0.5em;
+  font-size: 0.75em;
+}
+.treeBox li > div > span.moreBtn {
+  opacity: 0;
+  pointer-events: none;
+  flex-shrink: 0;
+  width: 1.6em;
+  height: 1.6em;
+  min-height: 1.6em;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--txSub);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.1s ease, background-color 0.1s ease;
+}
+.treeBox li > div > span.moreBtn > i.fi {
+  font-size: 1em;
+  color: inherit;
+}
+.treeBox li > div > span.moreBtn:hover {
+  background-color: var(--aColor);
+  color: var(--txColor);
+}
+.treeBox li > div:hover > span.moreBtn {
+  opacity: 1;
+  pointer-events: auto;
+}
+.treeBox li.selected > div {
+  background-color: var(--main);
+  /* 선택 행에서 ... 항시 표시 */
+}
+.treeBox li.selected > div > i.fi {
+  color: rgba(255, 255, 255, 0.9);
+}
+.treeBox li.selected > div > div {
+  color: white;
+  font-weight: 600;
+}
+.treeBox li.selected > div > span.moreBtn {
+  opacity: 1;
+  pointer-events: auto;
+  color: rgba(255, 255, 255, 0.8);
+}
+.treeBox li.selected > div > span.moreBtn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.treeBox li > div:focus-visible {
+  outline: 2px solid var(--lineFocusColor);
+  outline-offset: -2px;
+}
+.treeBox li.disabled > div {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.treeBox li > div label.check {
+  margin: 0;
+  gap: 0.3em;
+}
+
+/* 확장 메뉴 오버레이 (.treeMenu) */
+.treeMenu {
+  position: absolute !important;
+  display: none;
+  min-width: 10.5em;
+  padding: 0.35em;
+  margin: 0;
+  list-style: none;
+  background-color: var(--bgColor);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox, 0.6em);
+  box-shadow: 0 8px 24px var(--aDark);
+  z-index: 2000;
+}
+.treeMenu.open {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+.treeMenu > li {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.45em 0.8em;
+  font-size: 0.88em;
+  border-radius: var(--roundSm, 0.4em);
+  cursor: pointer;
+  color: var(--txColor);
+  user-select: none;
+  transition: background-color 0.1s ease, color 0.1s ease;
+  /* 이미 처리된 항목 (승인 기록 등): 옅게 */
+}
+.treeMenu > li > i.fi {
+  font-size: 1.15em;
+  color: var(--txSub);
+}
+.treeMenu > li:hover {
+  background-color: var(--aLight);
+}
+.treeMenu > li:hover > i.fi {
+  color: var(--txColor);
+}
+.treeMenu > li:active {
+  transform: scale(0.98);
+}
+.treeMenu > li.danger {
+  color: var(--danger);
+}
+.treeMenu > li.danger > i.fi {
+  color: var(--danger);
+}
+.treeMenu > li.danger:hover {
+  background-color: var(--danger0, var(--aLight));
+}
+.treeMenu > li.muted {
+  opacity: 0.55;
+}
+.treeMenu > li.divider {
+  height: 1px;
+  margin: 0.3em 0;
+  padding: 0;
+  background-color: var(--lineColor);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* 1. 드롭다운 트리거 래퍼 (.dropDown) */
+.dropDown {
+  position: relative;
+  display: inline-block;
+  font-size: 1rem;
+}
+.dropDown > header {
+  cursor: pointer;
+  width: 100%;
+  min-height: 2.6em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  padding: 0.5em 0.8em;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBtn);
+  background-color: var(--bgColor);
+  color: var(--txColor);
+  user-select: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.dropDown > header:after {
+  content: "";
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  border-right: 0.12em solid currentColor;
+  border-bottom: 0.12em solid currentColor;
+  transform: rotate(45deg);
+  margin-left: 0.3em;
+  margin-bottom: 0.15em;
+  transition: transform 0.15s;
+}
+.dropDown > header:hover {
+  border-color: var(--aDark);
+  box-shadow: 0 4px 12px var(--aDark);
+}
+.dropDown.open > header:after {
+  transform: rotate(225deg);
+  margin-bottom: -0.1em;
+}
+
+/* 2. 플로팅 드롭박스 팝업 (.dropBox 및 .dropDown 하위 ul / section) */
+.dropBox,
+.dropDown > ul,
+.dropDown > section,
+.dropDown > .dropBox {
+  font-size: 1rem;
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.1em);
+  bottom: auto;
+  left: 0;
+  right: auto;
+  min-width: 100%;
+  width: max-content;
+  background-color: var(--bgColor);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  box-shadow: 0 0.5em 1.5em var(--aDark);
+  padding: 0.4em;
+  margin: 0;
+  z-index: 100;
+  overflow-y: auto;
+  /* 위치 방향 변형 */
+  /* 활성화 상태 (자체 .opened 또는 부모 .open) */
+}
+.dropBox.up,
+.dropDown > ul.up,
+.dropDown > section.up,
+.dropDown > .dropBox.up {
+  top: auto;
+  bottom: calc(100% + 0.3em);
+}
+.dropBox.right,
+.dropDown > ul.right,
+.dropDown > section.right,
+.dropDown > .dropBox.right {
+  left: auto;
+  right: 0;
+}
+.dropBox.opened,
+.dropDown > ul.opened,
+.dropDown > section.opened,
+.dropDown > .dropBox.opened {
+  display: block;
+  animation: dropBoxFly 0.15s ease-out forwards;
+}
+
+/* 부모 컨테이너 (.open)와 연동 */
+.open,
+.dropDown.open {
+  position: relative;
+}
+.open > .dropBox, .open > ul, .open > section,
+.dropDown.open > .dropBox,
+.dropDown.open > ul,
+.dropDown.open > section {
+  display: block;
+  animation: dropBoxFly 0.15s ease-out forwards;
+}
+
+/* 3. 메뉴 목록형 (ul.dropBox 및 .dropBox 내부 ul, .dropDown 내부 ul) */
+ul.dropBox,
+.dropBox > ul,
+.dropDown > ul {
+  list-style: none;
+  max-height: 20em;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.3em;
+}
+ul.dropBox > li,
+.dropBox > ul > li,
+.dropDown > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  width: 100%;
+  padding: 0.5em 0.8em;
+  border-radius: var(--roundBtn);
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--txColor);
+  font-size: 0.95em;
+  user-select: none;
+  transition: background-color 0.12s, color 0.12s;
+  margin-top: 0.2em;
+}
+ul.dropBox > li:first-child,
+.dropBox > ul > li:first-child,
+.dropDown > ul > li:first-child {
+  margin: 0;
+}
+ul.dropBox > li:hover,
+.dropBox > ul > li:hover,
+.dropDown > ul > li:hover {
+  background-color: var(--aLight);
+}
+ul.dropBox > li.active,
+.dropBox > ul > li.active,
+.dropDown > ul > li.active {
+  background-color: var(--main);
+  color: white;
+  font-weight: 600;
+}
+ul.dropBox > li.disabled,
+.dropBox > ul > li.disabled,
+.dropDown > ul > li.disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+ul.dropBox > li.divider,
+.dropBox > ul > li.divider,
+.dropDown > ul > li.divider {
+  display: block;
+  height: 1px;
+  padding: 0;
+  margin: 0.3em 0;
+  background-color: var(--aLight);
+  pointer-events: none;
+}
+
+@keyframes dropBoxFly {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ==========================================================================
+   4. 체크 상자 (label.check, .check) 및 라디오 상자 (label.radio, .radio)
+   - BaseUI 호환: input 은 숨김 처리 후 span:before 또는 i.fi 마스크 아이콘으로 커스텀 렌더링
+   - 9대 테마 색상 및 크기 비례 스케일링 지원
+   ========================================================================== */
+label.check,
+label.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  cursor: pointer;
+  user-select: none;
+  font-size: 1rem;
+  line-height: 1.4;
+  width: auto !important;
+  /* 크기 스케일링 */
+}
+label.check.sm,
+label.radio.sm {
+  font-size: var(--sm);
+}
+label.check.lg,
+label.radio.lg {
+  font-size: var(--lg);
+}
+label.check > input,
+label.radio > input {
+  display: none;
+  /* 기본 마스크 아이콘 (span:before) */
+  /* i.fi 명시 시 i.fi 에 스타일 적용 및 span:before 중복 억제 */
+}
+label.check > input ~ span:before,
+label.radio > input ~ span:before {
+  content: "";
+  font-size: 1.25em;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background-color: currentColor;
+  -webkit-mask: var(--i) no-repeat 50% 50%/100% 100%;
+  mask: var(--i) no-repeat 50% 50%/100% 100%;
+  flex-shrink: 0;
+  margin-right: 0.25em;
+  transition: color 0.15s;
+}
+label.check > input ~ i.fi,
+label.radio > input ~ i.fi {
+  font-size: 1.25em;
+  margin-right: 0.25em;
+  transition: color 0.15s;
+}
+label.check > input ~ i.fi ~ span:before,
+label.radio > input ~ i.fi ~ span:before {
+  content: none;
+  display: none;
+}
+label.check > span,
+label.radio > span {
+  font-size: 0.95em;
+  color: var(--txColor);
+}
+label.check[readonly], label.check:has(> input[readonly]),
+label.radio[readonly],
+label.radio:has(> input[readonly]) {
+  pointer-events: none;
+}
+label.check[disabled], label.check:has(> input:disabled),
+label.radio[disabled],
+label.radio:has(> input:disabled) {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* 체크박스 아이콘 상태 매핑 */
+label.check > input ~ span:before, label.check > input ~ i.fi {
+  --i: url(/lib/fluenticons/i/633.svg);
+  color: var(--txLight);
+}
+label.check > input:checked ~ span:before, label.check > input:checked ~ i.fi {
+  --i: url(/lib/fluenticons/i/628.svg);
+  color: var(--main);
+}
+label.check > input:indeterminate ~ span:before, label.check > input:indeterminate ~ i.fi {
+  --i: url(/lib/fluenticons/i/630.svg);
+  color: var(--main);
+}
+
+/* 라디오 아이콘 상태 매핑 */
+label.radio > input ~ span:before, label.radio > input ~ i.fi {
+  --i: url(/lib/fluenticons/i/659.svg);
+  color: var(--txLight);
+}
+label.radio > input:checked ~ span:before, label.radio > input:checked ~ i.fi {
+  --i: url(/lib/fluenticons/i/640.svg);
+  color: var(--main);
+}
+
+/* 체크박스 & 라디오 9대 테마 색상 지원 */
+label.check.main > input:checked ~ span:before,
+label.check.main > input:checked ~ i.fi,
+label.radio.main > input:checked ~ span:before,
+label.radio.main > input:checked ~ i.fi {
+  color: var(--main);
+}
+
+label.check.sub > input:checked ~ span:before,
+label.check.sub > input:checked ~ i.fi,
+label.radio.sub > input:checked ~ span:before,
+label.radio.sub > input:checked ~ i.fi {
+  color: var(--sub);
+}
+
+label.check.point > input:checked ~ span:before,
+label.check.point > input:checked ~ i.fi,
+label.radio.point > input:checked ~ span:before,
+label.radio.point > input:checked ~ i.fi {
+  color: var(--point);
+}
+
+label.check.deco > input:checked ~ span:before,
+label.check.deco > input:checked ~ i.fi,
+label.radio.deco > input:checked ~ span:before,
+label.radio.deco > input:checked ~ i.fi {
+  color: var(--deco);
+}
+
+label.check.primary > input:checked ~ span:before,
+label.check.primary > input:checked ~ i.fi,
+label.radio.primary > input:checked ~ span:before,
+label.radio.primary > input:checked ~ i.fi {
+  color: var(--primary);
+}
+
+label.check.info > input:checked ~ span:before,
+label.check.info > input:checked ~ i.fi,
+label.radio.info > input:checked ~ span:before,
+label.radio.info > input:checked ~ i.fi {
+  color: var(--info);
+}
+
+label.check.success > input:checked ~ span:before,
+label.check.success > input:checked ~ i.fi,
+label.radio.success > input:checked ~ span:before,
+label.radio.success > input:checked ~ i.fi {
+  color: var(--success);
+}
+
+label.check.warning > input:checked ~ span:before,
+label.check.warning > input:checked ~ i.fi,
+label.radio.warning > input:checked ~ span:before,
+label.radio.warning > input:checked ~ i.fi {
+  color: var(--warning);
+}
+
+label.check.danger > input:checked ~ span:before,
+label.check.danger > input:checked ~ i.fi,
+label.radio.danger > input:checked ~ span:before,
+label.radio.danger > input:checked ~ i.fi {
+  color: var(--danger);
+}
+
+/* ==========================================================================
+   5. 토글 / 스위치 컨트롤 (label.toggle)
+   - Pill 배경과 원형 노브(i) 슬라이딩 인터랙션
+   - 9대 테마 색상 및 크기 스케일링 (.sm, .lg)
+   ========================================================================== */
+label.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+  user-select: none;
+  font-size: 1rem;
+  /* 슬라이더 트랙 */
+  /* 라벨 텍스트 */
+  /* 토글 / 스위치 9대 테마 색상 지원 */
+}
+label.toggle > input {
+  display: none;
+}
+label.toggle > input:checked ~ span:first-of-type {
+  background-color: var(--main);
+}
+label.toggle > input:checked ~ span:first-of-type > i {
+  margin-left: 1.2em;
+}
+label.toggle > span:first-of-type {
+  display: inline-block;
+  width: 2.8em;
+  height: 1.55em;
+  padding: 0.15em;
+  background-color: var(--aLow);
+  border: 1px solid var(--aLight);
+  border-radius: 1em;
+  transition: background-color 0.15s, border-color 0.15s;
+  cursor: pointer;
+  flex-shrink: 0;
+  /* 원형 노브 */
+}
+label.toggle > span:first-of-type > i {
+  display: block;
+  width: 1.15em;
+  height: 1.15em;
+  background-color: var(--bgColor);
+  border: 1px solid var(--aColor);
+  border-radius: 1em;
+  box-shadow: 0 1px 3px var(--aDark);
+  transition: margin-left 0.15s;
+}
+label.toggle > span:last-of-type:not(:first-of-type) {
+  font-size: 0.95em;
+  color: var(--txColor);
+}
+label.toggle[readonly], label.toggle:has(> input[readonly]) {
+  pointer-events: none;
+}
+label.toggle[disabled], label.toggle:has(> input:disabled) {
+  opacity: 0.45;
+  pointer-events: none;
+}
+label.toggle.xxs {
+  font-size: calc(var(--xxs) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.xs {
+  font-size: calc(var(--xs) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.sm {
+  font-size: calc(var(--sm) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.md {
+  font-size: calc(var(--md) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.lg {
+  font-size: calc(var(--lg) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.xl {
+  font-size: calc(var(--xl) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.xxl {
+  font-size: calc(var(--xxl) * 0.8); /* 토글은 같은 크기 등급의 다른 컨트롤보다 20% 작게 */
+}
+label.toggle.main > input:checked ~ span:first-of-type {
+  background-color: var(--main);
+}
+label.toggle.sub > input:checked ~ span:first-of-type {
+  background-color: var(--sub);
+}
+label.toggle.point > input:checked ~ span:first-of-type {
+  background-color: var(--point);
+}
+label.toggle.deco > input:checked ~ span:first-of-type {
+  background-color: var(--deco);
+}
+label.toggle.primary > input:checked ~ span:first-of-type {
+  background-color: var(--primary);
+}
+label.toggle.info > input:checked ~ span:first-of-type {
+  background-color: var(--info);
+}
+label.toggle.success > input:checked ~ span:first-of-type {
+  background-color: var(--success);
+}
+label.toggle.warning > input:checked ~ span:first-of-type {
+  background-color: var(--warning);
+}
+label.toggle.danger > input:checked ~ span:first-of-type {
+  background-color: var(--danger);
+}
+
+/* ==========================================================================
+   6. 테이블 / 목록용 단독 체커 (.checker)
+   ========================================================================== */
+.checker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  opacity: 1;
+}
+.checker > i.fi {
+  font-size: 1.15rem;
+  cursor: pointer;
+  --i: url(/lib/fluenticons/i/633.svg);
+}
+.checker > i.fi.checked {
+  --i: url(/lib/fluenticons/i/628.svg);
+  color: var(--main);
+}
+
+/* 페이지 이동 (ul.pager): li[data-page] 클릭 시 ul 에 "page" 이벤트(detail: 페이지 번호) 발생 — common.makePager 로 생성 */
+ul.pager {
+  display: flex;
+  gap: 0.3em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* hidden 속성으로 감출 수 있게 (display: flex 가 기본 숨김을 덮음) */
+}
+ul.pager[hidden] {
+  display: none;
+}
+ul.pager > li {
+  min-width: 2em;
+  height: 2em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundSize);
+  font-size: 0.85em;
+  cursor: pointer;
+}
+ul.pager > li.disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+ul.pager > li.active {
+  background-color: var(--main);
+  border-color: var(--main);
+  color: white;
+  font-weight: 700;
+}
+
+/* 태그 목록 (ul.tags): li 태그 목록, 자식 li 에 입력항을 두면 쓰기 모드(테두리 상자 + 태그 삭제 버튼)
+   - 입력 후 엔터/change 시 입력항 li 앞에 태그 추가 후 입력 비움 (site.ts body 위임), ul 에 "tag" 이벤트(detail: { text, add }) 발생 */
+ul.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.tags > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  height: 1.9em;
+  line-height: 1em;
+  padding: 0.2em 0.5em;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBtn);
+  background-color: var(--main0);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+ul.tags > li > button {
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: -0.4em;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--txSub);
+}
+ul.tags > li > button:hover {
+  color: var(--danger);
+}
+ul.tags > li:has(> input) {
+  flex: 1 1 6em;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+ul.tags > li:has(> input) > input {
+  height: 100%;
+  padding: 0 0.3em;
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+}
+ul.tags:has(> li > input) {
+  box-sizing: border-box;
+  min-height: 2.6em;
+  padding: 0.3em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBtn);
+  background-color: var(--bgColor);
+  box-shadow: inset 0 1px 2px var(--aLow);
+  cursor: text;
+}
+ul.tags:has(> li > input):focus-within {
+  border-color: var(--lineFocusColor);
+  box-shadow: inset 0 0 0.3em 0.1em var(--aColor);
+}
+
+/* ==========================================================================
+   에디터 높이 채우기 (common.makeEditor height "100%")
+   - 기본 높이. 세로 flex 부모 안에서 남는 높이를 차지하고(최소 200px), 에디터 편집 영역이 그 높이를 채운다 (내용이 넘치면 편집 영역 안에서 스크롤)
+   ========================================================================== */
+.editorFill {
+  flex: 1 1 auto;
+  min-height: 200px; /* 요청 사양: 에디터 최소 높이 200px */
+  display: flex;
+  flex-direction: column;
+}
+.editorFill > .sun-editor {
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+}
+.editorFill > .sun-editor > .se-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.editorFill > .sun-editor > .se-container > .se-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   날짜·시간 입력 컨트롤 (.datePick, .timePick, .dateTimePick — 태그 선언만으로 사용, DateTimePick.ts)
+   - 트리거: 아이콘 + 선택한 값(없으면 안내 글자) + 화살표, 클릭하면 팝업(.pickPopup: 달력 / 시·분 스피너)
+   - dateTimePick 은 날짜와 시간을 나란히 둔 한 쌍
+   ========================================================================== */
+.datePick,
+.timePick {
+  position: relative;
+  display: inline-block;
+  font-size: 1rem;
+  min-width: 0;
+}
+.datePick > .pickTrigger,
+.timePick > .pickTrigger {
+  width: 100%;
+  justify-content: flex-start;
+  font-weight: normal;
+  color: var(--txColor);
+  background-color: var(--bgColor);
+  border-color: var(--lineColor);
+  box-shadow: none;
+  transform: none;
+}
+.datePick > .pickTrigger > .pickText,
+.timePick > .pickTrigger > .pickText {
+  flex: 1 1 auto;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.datePick > .pickTrigger > .pickText.placeholder,
+.timePick > .pickTrigger > .pickText.placeholder {
+  color: var(--txLight);
+}
+.datePick > .pickTrigger > .pickArrow,
+.timePick > .pickTrigger > .pickArrow {
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+.datePick > .pickTrigger > i.fi:first-child,
+.timePick > .pickTrigger > i.fi:first-child {
+  color: var(--txLight);
+}
+
+.dateTimePick {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5em;
+  width: 100%;
+}
+.dateTimePick > .datePick {
+  flex: 1 1 auto;
+  min-width: 11em; /* 날짜 글자가 잘리지 않도록 */
+}
+.dateTimePick > .timePick {
+  flex: 0 0 auto;
+}
+
+/* 팝업: 최상위 레이어(popover)로 떠서 모달 안에서도 가려지지 않는다 */
+.pickPopup {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  z-index: 3000;
+  font-size: 0.9rem;
+  color: var(--txColor);
+  background-color: var(--bgColor);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  box-shadow: 0 0.4em 1.2em var(--aDark);
+  padding: 0.8em;
+}
+.pickPopup button {
+  height: auto;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  box-shadow: none;
+  transform: none;
+  font-weight: normal;
+}
+.pickPopup footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.3em;
+  margin-top: 0.4em;
+}
+.pickPopup footer > button {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  color: var(--txLight);
+}
+.pickPopup footer > button:hover {
+  background-color: var(--aLow);
+  color: var(--txColor);
+}
+.pickPopup footer > button[data-apply] {
+  color: var(--main);
+}
+
+/* 달력 */
+.pickCalendar {
+  display: flex;
+  flex-direction: column;
+  /* 년도(10년 단위)·월 선택 화면: 12칸 */
+}
+.pickCalendar > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0.4em 0;
+  /* 년도·월(4자리 년 - 2자리 월)은 눌러서 년도/월 선택 화면으로 간다 */
+}
+.pickCalendar > header > strong {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  font-weight: 600;
+}
+.pickCalendar > header > strong > button {
+  padding: 0.2em 0.45em;
+  border-radius: 0.5em;
+  font-weight: inherit;
+}
+.pickCalendar > header > strong > button:hover {
+  background-color: var(--aLow);
+}
+.pickCalendar > header > button {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+}
+.pickCalendar > header > button:hover {
+  background-color: var(--aLow);
+}
+.pickCalendar > .pickGrid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 0.4em;
+  padding: 0.4em 0;
+}
+.pickCalendar > .pickGrid > button {
+  border-radius: 0.7em;
+}
+.pickCalendar > .pickGrid > button:hover:not(:disabled):not(.selected) {
+  background-color: var(--aLow);
+}
+.pickCalendar > .pickGrid > button.other {
+  color: var(--txLight);
+  opacity: 0.6;
+}
+.pickCalendar > .pickGrid > button.today {
+  background-color: color-mix(in srgb, var(--main) 14%, transparent);
+  color: var(--main);
+  font-weight: 600;
+}
+.pickCalendar > .pickGrid > button.selected {
+  background-color: var(--main);
+  color: white;
+  opacity: 1;
+}
+.pickCalendar > .pickGrid > button:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+.pickCalendar > .pickDays {
+  display: grid;
+  grid-template-columns: repeat(7, 2.4em);
+  gap: 0.1em;
+  justify-items: center;
+}
+.pickCalendar > .pickDays > span {
+  padding: 0.4em 0;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+.pickCalendar > .pickDays > button {
+  width: 2.4em;
+  height: 2.4em;
+  border-radius: 0.7em;
+  /* 선택된 날짜는 마우스를 올려도 색이 바뀌지 않는다 */
+  /* 오늘: 선택 색보다 옅은 배경 */
+}
+.pickCalendar > .pickDays > button:hover:not(:disabled):not(.selected) {
+  background-color: var(--aLow);
+}
+.pickCalendar > .pickDays > button.other {
+  color: var(--txLight);
+  opacity: 0.6;
+}
+.pickCalendar > .pickDays > button.today {
+  background-color: color-mix(in srgb, var(--main) 14%, transparent);
+  color: var(--main);
+  font-weight: 600;
+  /* 오늘에 마우스를 올리면 배경이 더 옅어지지 않고 한 단계 진해진다 */
+}
+.pickCalendar > .pickDays > button.today:hover:not(:disabled):not(.selected) {
+  background-color: color-mix(in srgb, var(--main) 26%, transparent);
+}
+.pickCalendar > .pickDays > button.selected {
+  background-color: var(--main);
+  color: white;
+  opacity: 1;
+}
+.pickCalendar > .pickDays > button:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* 시간 스피너: 시 · 분 */
+.pickTime {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  column-gap: 1em;
+  padding: 0.6em 1.2em 0.4em;
+}
+.pickTime > b {
+  font-size: 1.6em;
+  padding-top: 1.4em;
+}
+.pickTime > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+}
+.pickTime > div > small {
+  color: var(--txLight);
+}
+.pickTime > div > button {
+  width: 2.4em;
+  height: 1.8em;
+  border-radius: 0.5em;
+  color: var(--txLight);
+}
+.pickTime > div > button:hover {
+  background-color: var(--aLow);
+  color: var(--txColor);
+}
+.pickTime > div > input {
+  width: 2.6em;
+  height: 2.2em;
+  padding: 0;
+  text-align: center;
+  font-size: 1.5em;
+}
+.pickTime > footer {
+  grid-column: 1/-1;
+}
+
+/* 회사 로고 아이콘 (공유 메뉴 등): 글꼴 아이콘이 없는 X(트위터)·페이스북 로고를 다른 .fi 아이콘처럼 마스크로 그림 (색은 글자색, 필요하면 iconColor 로) */
+.fi.fiBrandX {
+  --f: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z'/%3E%3C/svg%3E");
+}
+
+.fi.fiBrandFacebook {
+  --f: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   BitPlus 메인 통합 스타일시트 (Site.scss)
+   Document, Controls, Area, Complex, Util 모듈을 단일 스타일시트로 병합
+   ========================================================================== */
+/* ==========================================================================
+   Area: 구조적 레이아웃 영역 및 컨테이너
+   - flexRow, flexCol 영역 분할 체계
+   - 정렬, 간격(gap), 자식 크기 분배
+   - 기본 구조 영역 컨테이너 (.card, .container)
+   ========================================================================== */
+/* Flex 컨테이너 베이스 */
+.flexRow,
+.flexCol {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5em; /* 기본 공통 간격 */
+  /* 주축/교차축 정렬 모디파이어 */
+  /* 간격(Gap) 모디파이어 */
+  /* 자식 요소 크기 분배 헬퍼 */
+}
+.flexRow.center,
+.flexCol.center {
+  justify-content: center;
+  align-items: center;
+}
+.flexRow.between,
+.flexCol.between {
+  justify-content: space-between;
+}
+.flexRow.around,
+.flexCol.around {
+  justify-content: space-around;
+}
+.flexRow.start,
+.flexCol.start {
+  justify-content: flex-start;
+}
+.flexRow.end,
+.flexCol.end {
+  justify-content: flex-end;
+}
+.flexRow.alignStart,
+.flexCol.alignStart {
+  align-items: flex-start;
+}
+.flexRow.alignCenter,
+.flexCol.alignCenter {
+  align-items: center;
+}
+.flexRow.alignEnd,
+.flexCol.alignEnd {
+  align-items: flex-end;
+}
+.flexRow.alignStretch,
+.flexCol.alignStretch {
+  align-items: stretch;
+}
+.flexRow.wrap,
+.flexCol.wrap {
+  flex-wrap: wrap;
+}
+.flexRow.noGap,
+.flexCol.noGap {
+  gap: 0;
+}
+.flexRow.gapXs,
+.flexCol.gapXs {
+  gap: 0.25em;
+}
+.flexRow.gapSm,
+.flexCol.gapSm {
+  gap: 0.5em;
+}
+.flexRow.gapMd,
+.flexCol.gapMd {
+  gap: 1em;
+}
+.flexRow.gapLg,
+.flexCol.gapLg {
+  gap: 1.5em;
+}
+.flexRow.gapXl,
+.flexCol.gapXl {
+  gap: 2em;
+}
+.flexRow > .auto,
+.flexCol > .auto {
+  flex: 1 1 auto !important;
+  min-width: 0;
+  min-height: 0;
+}
+.flexRow > .fix,
+.flexCol > .fix {
+  flex: 0 0 auto !important;
+}
+.flexRow > .grow,
+.flexCol > .grow {
+  flex-grow: 1;
+}
+
+/* 가로 방향 영역 (.flexRow) */
+.flexRow {
+  flex-direction: row !important;
+  align-items: center; /* 가로 배치 시 기본 수직 중앙 정렬 */
+  /* 컨트롤(버튼·입력·선택)은 공통 높이(2.6em)를 유지: 100% 가 되면 부모 높이가 자동일 때 내용 높이로 줄어 나란한 입력 그룹과 높이가 어긋남 
+  & > :where(:not(button, .btn, input, select)) {
+      height: 100%;
+  }*/
+}
+
+/* 세로 방향 영역 (.flexCol) */
+.flexCol {
+  flex-direction: column !important;
+}
+.flexCol > * {
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+  max-width: 80em;
+  margin: 0 auto;
+  padding: 0 1em;
+}
+
+/* 반응형 카드 그리드 (.cardGrid) - 설정/정책 카드 등 N개 카드 균등 배치 */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+  gap: 1em;
+}
+.cardGrid.auto {
+  overflow: auto;
+  padding: 0.2em;
+}
+
+/* 전체 높이 컨테이너 (.pageBox)
+   - Layout 없이(_Layout 단독) 렌더링되는 iframe 임베드 페이지의 루트 컨테이너.
+   - body(100vh)를 그대로 상속해 뷰포트(또는 iframe) 높이에 정확히 맞추고,
+     내부 플렉스 자식(.flexRow.auto 등)이 남는 높이를 그대로 채우도록 한다.
+   - 패딩 없음(edge-to-edge) — 바깥 iframe 래퍼가 이미 탭 박스와의 간격을
+     margin 으로 처리하므로, 안쪽에서 또 여백을 주면 박스 안에 박스처럼 겹친다. */
+.pageBox {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  overflow: hidden;
+  /* .flexRow/.flexCol 의 자식 크기 분배 헬퍼(.auto/.fix/.grow)를 pageBox 의
+     직계 자식에도 그대로 적용 — pageBox 자체가 flex 컨테이너이므로 동일하게 동작해야 한다. */
+}
+.pageBox > .auto {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+.pageBox > .fix {
+  flex: 0 0 auto;
+}
+.pageBox > .grow {
+  flex-grow: 1;
+}
+
+/* 좌측 선택 목록 패널 (.asideList)
+   - .selectList 등을 담는 좌측 고정폭 패널. border-right 가 우측 콘텐츠와의
+     구분선 역할을 하며, 부모가 .flexRow.alignStretch 일 때 전체 높이로 이어진다. */
+aside.asideList {
+  flex: 0 0 auto;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  padding: 0.5em;
+  overflow-y: auto;
+}
+aside.asideList > ul.selectList > li {
+  flex-direction: column;
+  align-items: flex-start;
+}
+aside.asideList > ul.pager {
+  border-top: 1px solid var(--aLight);
+  padding-top: 1em;
+  justify-content: center;
+}
+
+footer.pageFooter {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 0.5em;
+  border: 1px solid var(--aLight);
+  border-radius: var(--roundBox);
+  background-color: var(--aLow);
+}
+footer.pageFooter button {
+  font-size: 0.85em;
+}
+
+/* ==========================================================================
+   빈데이터 처리
+   ========================================================================== */
+tr.empty > td,
+li.empty {
+  width: 100%;
+  height: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: transparent !important;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: var(--aColor);
+  text-transform: uppercase;
+  line-height: 1.4em;
+  cursor: default !important;
+  border: none !important;
+}
+tr.empty > td > i.fi,
+li.empty > i.fi {
+  font-size: 3.2em;
+}
+
+tr.empty > td {
+  display: table-cell !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.overZoom {
+  transition: transform 0.2s;
+}
+.overZoom:hover {
+  transform: scale(1.02);
+}
+.overZoom:active {
+  transform: scale(0.98);
+}
+
+.overShadow {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.overShadow:hover {
+  border-color: var(--aDark);
+  box-shadow: 0.1em 0.1em 0.8em 0.2em var(--aColor);
+}
+.overShadow:active {
+  border-color: var(--aColor);
+  box-shadow: none;
+}
+
+.overBoth {
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.overBoth:hover {
+  transform: scale(1.02);
+  border-color: var(--aDark);
+  box-shadow: 0.1em 0.1em 0.8em 0.2em var(--aColor);
+}
+.overBoth:active {
+  transform: scale(0.98);
+  border-color: var(--aColor);
+  box-shadow: none;
+}
+
+ul.bannerScarf {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 1em;
+  margin: 0;
+  padding: 1em 2em;
+  list-style: none;
+  background-color: var(--aLow);
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox, 0.8em);
+  overflow: hidden;
+}
+ul.bannerScarf > li {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6em;
+  padding: 1em;
+}
+ul.bannerScarf > li > i {
+  font-size: 3em;
+  color: var(--main);
+}
+ul.bannerScarf > li > span {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: var(--txColor);
+}
+ul.bannerScarf > li > span > small {
+  display: block;
+  font-size: 0.4em;
+  color: var(--txLight);
+}
+ul.bannerScarf > li.divider {
+  padding-left: 0;
+  padding-right: 0;
+}
+ul.bannerScarf > li.divider:after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 0.1em;
+  margin: 0;
+  border-radius: 0.1em;
+  background-color: var(--lineColor);
+}
+ul.bannerScarf.main {
+  background-color: var(--main0, var(--aLow));
+}
+ul.bannerScarf.main > li > i {
+  color: var(--main);
+}
+ul.bannerScarf.sub {
+  background-color: var(--sub0, var(--aLow));
+}
+ul.bannerScarf.sub > li > i {
+  color: var(--sub);
+}
+ul.bannerScarf.point {
+  background-color: var(--point0, var(--aLow));
+}
+ul.bannerScarf.point > li > i {
+  color: var(--point);
+}
+ul.bannerScarf.deco {
+  background-color: var(--deco0, var(--aLow));
+}
+ul.bannerScarf.deco > li > i {
+  color: var(--deco);
+}
+ul.bannerScarf.primary {
+  background-color: var(--primary0, var(--aLow));
+}
+ul.bannerScarf.primary > li > i {
+  color: var(--primary);
+}
+ul.bannerScarf.info {
+  background-color: var(--info0, var(--aLow));
+}
+ul.bannerScarf.info > li > i {
+  color: var(--info);
+}
+ul.bannerScarf.success {
+  background-color: var(--success0, var(--aLow));
+}
+ul.bannerScarf.success > li > i {
+  color: var(--success);
+}
+ul.bannerScarf.warning {
+  background-color: var(--warning0, var(--aLow));
+}
+ul.bannerScarf.warning > li > i {
+  color: var(--warning);
+}
+ul.bannerScarf.danger {
+  background-color: var(--danger0, var(--aLow));
+}
+ul.bannerScarf.danger > li > i {
+  color: var(--danger);
+}
+
+/* ==========================================================================
+   다이얼로그 공용 폼 레이아웃 (ul.form)
+   ========================================================================== */
+ul.form {
+  margin: 0;
+  padding: 0.5em;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+ul.form > li, ul.form > li.col2 > div, ul.form > li.col3 > div, ul.form > li.col4 > div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+ul.form > li > header, ul.form > li.col2 > div > header, ul.form > li.col3 > div > header, ul.form > li.col4 > div > header {
+  display: block;
+  padding: 0.3em;
+  margin: 0 0 -0.3em 0;
+  line-height: 1em;
+  font-size: 0.9em;
+  font-weight: 700;
+  color: var(--txLight);
+}
+ul.form > li > header > small, ul.form > li.col2 > div > header > small, ul.form > li.col3 > div > header > small, ul.form > li.col4 > div > header > small {
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+ul.form > li > header > i.fi, ul.form > li.col2 > div > header > i.fi, ul.form > li.col3 > div > header > i.fi, ul.form > li.col4 > div > header > i.fi {
+  font-size: 1.2em;
+}
+ul.form > li.left, ul.form > li.center, ul.form > li.right, ul.form > li.col2 > div.left, ul.form > li.col2 > div.center, ul.form > li.col2 > div.right, ul.form > li.col3 > div.left, ul.form > li.col3 > div.center, ul.form > li.col3 > div.right, ul.form > li.col4 > div.left, ul.form > li.col4 > div.center, ul.form > li.col4 > div.right {
+  display: flex;
+}
+ul.form > li.left, ul.form > li.col2 > div.left, ul.form > li.col3 > div.left, ul.form > li.col4 > div.left {
+  justify-content: flex-start;
+}
+ul.form > li.center, ul.form > li.col2 > div.center, ul.form > li.col3 > div.center, ul.form > li.col4 > div.center {
+  justify-content: center;
+}
+ul.form > li.right, ul.form > li.col2 > div.right, ul.form > li.col3 > div.right, ul.form > li.col4 > div.right {
+  justify-content: flex-end;
+}
+ul.form > li > *, ul.form > li.col2 > div > *, ul.form > li.col3 > div > *, ul.form > li.col4 > div > * {
+  width: 100%;
+}
+ul.form > li.left, ul.form > li.center, ul.form > li.right {
+  display: flex;
+  flex-direction: row;
+}
+ul.form > li.left > *, ul.form > li.center > *, ul.form > li.right > * {
+  flex: 0 0 auto;
+  width: auto;
+}
+ul.form > li.left {
+  justify-content: flex-start;
+}
+ul.form > li.center {
+  justify-content: center;
+}
+ul.form > li.right {
+  justify-content: flex-end;
+}
+ul.form > li.col2, ul.form > li.col3, ul.form > li.col4 {
+  display: grid;
+}
+ul.form > li.col2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+ul.form > li.col3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+ul.form > li.col4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+ul.form > li.auto {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+ul.form > li.auto > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+ul.form > li.subTitle {
+  font-size: 1.1em;
+  font-weight: bold;
+  padding: 1.5em 0 0.5em 0;
+  border-bottom: 1px solid var(--aColor);
+}
+ul.form > li.row, ul.form > li.col2.row > div, ul.form > li.col3.row > div, ul.form > li.col4.row > div {
+  flex-direction: row;
+}
+ul.form > li.row > header, ul.form > li.col2.row > div > header, ul.form > li.col3.row > div > header, ul.form > li.col4.row > div > header {
+  flex: 0 0 auto;
+  width: auto;
+  display: flex;
+  align-items: center;
+}
+ul.form > li.row > header.fix, ul.form > li.col2.row > div > header.fix, ul.form > li.col3.row > div > header.fix, ul.form > li.col4.row > div > header.fix {
+  min-width: 8em;
+}
+ul.form > li.tx {
+  gap: 0.4em;
+}
+ul.form > li.tx > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* 기본 구조 영역 컨테이너 (.card, .container) */
+.card {
+  font-size: 1rem;
+  background-color: var(--bgColor);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 0.8em;
+  gap: 0.4em;
+}
+.card > header {
+  flex: 0 0 auto;
+  font-size: 1.05em;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--txColor);
+}
+.card > header > small {
+  display: block;
+  font-weight: normal;
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+.card > span {
+  flex: 1 1 auto;
+  font-size: 0.85em;
+  color: var(--txColor);
+  line-height: 1.4;
+}
+.card.line {
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+}
+.card.widget {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.card.widget > header {
+  flex: 0 0 auto;
+  font-size: 1.1em;
+  font-weight: bold;
+  padding: 0.5em 0.2em;
+  color: var(--txColor);
+}
+.card.headline {
+  flex-direction: row;
+  padding: 0;
+}
+.card.headline.line {
+  padding: 0.8em;
+}
+.card.headline > * {
+  flex: 1 1 50%;
+  overflow: hidden;
+}
+.card.headline > * > img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--roundBox);
+  object-fit: cover;
+}
+.card.news {
+  overflow: hidden;
+}
+.card.news > span {
+  max-height: 5.6em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  word-break: break-all;
+}
+.card.news > span > img {
+  float: left;
+  width: 6em;
+  height: 4em;
+  margin-right: 0.5em;
+  border-radius: var(--roundBox);
+  object-fit: cover;
+}
+.card.news.sm {
+  padding: 0.4em 0;
+  gap: 0.4em;
+}
+.card.news.sm:has(img) {
+  position: relative;
+  padding-left: 2.8em;
+}
+.card.news.sm:has(img) > img {
+  position: absolute;
+  left: 0;
+  top: 0.4em;
+  width: 2.5em;
+  height: 2.2em;
+  object-fit: cover;
+  border-radius: var(--roundBox);
+}
+.card.news.sm > header {
+  font-size: 0.9em;
+  line-height: 1em;
+}
+.card.news.sm > span {
+  display: block;
+  font-size: 0.8em;
+  line-height: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card.news > footer {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+.card.news > footer > small {
+  font-weight: normal;
+}
+.card.photo {
+  overflow: hidden;
+  padding: 0;
+}
+.card.photo > * {
+  padding: 0 0.5em;
+}
+.card.photo > img {
+  width: 100%;
+  height: 6em;
+  object-fit: cover;
+  padding: 0;
+}
+.card.photo > header {
+  font-size: 1em;
+}
+.card.photo > header > small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.card.photo > footer {
+  padding: 0.5em;
+  font-size: 0.85em;
+  color: var(--txLight);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.card.comment > footer {
+  padding: 0.5em 0 0.2em;
+  font-size: 0.9em;
+}
+
+ul.cardList {
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1em;
+  list-style: none;
+}
+ul.cardList.vertical {
+  flex-direction: column;
+}
+ul.cardList.cut {
+  overflow: hidden;
+}
+ul.cardList > li {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+ul.cardList > li.blockTitle {
+  flex: 0 0 18%;
+  padding: 0.5em;
+  font-weight: bold;
+  border: none;
+}
+ul.cardList > li.blockTitle > small {
+  font-weight: normal;
+}
+ul.cardList > li.blockTitle > small:before {
+  content: "";
+  display: block;
+}
+ul.cardList.content {
+  gap: 0.2em;
+  flex-direction: column;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+ul.cardList.content.sm {
+  font-size: 0.8em;
+}
+ul.cardList.content > li {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+ul.cardList.dotLine {
+  gap: 0;
+}
+ul.cardList.dotLine > li {
+  border-top: 1px dashed var(--aColor);
+}
+ul.cardList.dotLine > li:first-child {
+  border-top: none;
+}
+ul.cardList.solid {
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  padding: 0.4em 0.8em;
+}
+
+footer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.3em;
+}
+footer.left {
+  justify-content: flex-start;
+}
+footer.center {
+  justify-content: center;
+}
+footer.right {
+  justify-content: flex-end;
+}
+
+header > div.tools,
+footer.tools {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  overflow: hidden;
+  padding: 0.3em;
+  align-items: center;
+  gap: 0.3em;
+}
+header > div.tools > *,
+footer.tools > * {
+  flex: 0 0 auto;
+}
+header > div.tools > *.space,
+footer.tools > *.space {
+  flex: 1 1 auto;
+}
+header > div.tools > *:not(.space):not(label),
+footer.tools > *:not(.space):not(label) {
+  padding: 0.2em 0.4em;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.2em;
+  color: var(--main);
+  background-color: var(--aLow);
+  border: 1px solid var(--aLow);
+  border-radius: var(--roundBox);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+header > div.tools > *:not(.space):not(label) > i.fi,
+footer.tools > *:not(.space):not(label) > i.fi {
+  font-size: 1.2em;
+}
+header > div.tools > *:not(.space):not(label) > small,
+footer.tools > *:not(.space):not(label) > small {
+  padding: 0.2em 0 0 0;
+  font-size: 0.8em;
+}
+header > div.tools > *:not(.space):not(label):hover,
+footer.tools > *:not(.space):not(label):hover {
+  background-color: var(--main);
+  color: white;
+}
+header > div.tools > *:not(.space):not(label):hover > small,
+footer.tools > *:not(.space):not(label):hover > small {
+  color: silver;
+}
+header > div.tools > *:not(.space):not(label):active,
+footer.tools > *:not(.space):not(label):active {
+  background-color: var(--main2);
+  color: var(--main);
+}
+header > div.tools > *:not(.space):not(label):active > small,
+footer.tools > *:not(.space):not(label):active > small {
+  color: var(--main);
+}
+header > div.tools > label,
+footer.tools > label {
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: var(--main);
+}
+header > div.tools > label > i.fi,
+footer.tools > label > i.fi {
+  font-size: 1.2em;
+  margin: 0.1em 0 -0.1em 0;
+}
+
+/* ==========================================================================
+   BitPlus 메인 통합 스타일시트 (Site.scss)
+   Document, Controls, Area, Complex, Util 모듈을 단일 스타일시트로 병합
+   ========================================================================== */
+/* ==========================================================================
+   Complex: 영역과 컨트롤의 중간의 복합적인 스타일 용도
+   - 키-값 속성 상자 (.keyValueBox)
+   - 칩 목록 상자 (.chipBox)
+   ========================================================================== */
+/* ==========================================================================
+   탭박스 컴포넌트 (.tabBox)
+   - 상단 Pill 탭 헤더 및 본문 섹션 전환 패널
+   ========================================================================== */
+.tabBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  width: 100%;
+}
+.tabBox > header {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  border-bottom: 1px solid var(--aLight);
+  padding-bottom: 0.4em;
+}
+.tabBox > header > * {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.4em 0.9em;
+  font-size: 0.95em;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--roundBtn, 2em);
+  color: var(--txSub);
+  background-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+.tabBox > header > *:hover {
+  color: var(--txColor);
+  background-color: var(--aLight);
+}
+.tabBox > header > *.active {
+  color: white;
+  background-color: var(--main);
+  font-weight: 600;
+}
+.tabBox > section {
+  flex: 1 1 auto;
+}
+.tabBox > section > * {
+  display: none;
+}
+.tabBox > section > *.active {
+  display: block;
+}
+
+/* ==========================================================================
+   입력 그룹 컴포넌트 (.inputGroup)
+   - 부트스트랩 input-group과 유사하게 접두사/접미사(span), 인풋, 버튼, 드롭다운 결합
+   - 포커스링(box-shadow / outline) 없이 깔끔한 단일 테두리 유지
+   ========================================================================== */
+.inputGroup {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  width: 100%;
+  font-size: 1rem;
+  /* 인라인 형태 변형 */
+  /* 유효성 오류 상태: 그룹 안 입력항에 오류가 있으면 그룹 전체 테두리를 오류 색으로 표시 */
+  /* 1. 자식 요소 공통 (경계선 중복 방지 및 포커스링 제거) */
+  /* 2. 첫 번째 / 마지막 자식 요소만 라운딩 적용 */
+  /* 3. 인접 형제 요소 경계선 겹침 (-1px 오프셋) */
+  /* 4. 텍스트 / 아이콘 애드온 (span, label) */
+  /* 5. 입력 필드 (input, select) - 포커스링 및 그림자 완전 제거 */
+  /* 6. 액션 버튼 (button, .btn)
+     공통 규칙(button{height:2.6em})이 input 과 강제로 똑같이 맞추려 하면서
+     오히려 테두리/라운딩 결합부에서 높이가 어긋나 보이는 원인이 됐다.
+     높이는 초기값(auto)으로 되돌리고 padding/line-height 로 자연스럽게
+     input 과 같은 라인에 맞춰지도록 한다. */
+  /* 7. 드롭다운 결합 (.dropDown) — 그룹 크기(사이즈 클래스)를 따르도록 1rem 대신 1em */
+  /* 8. 사이즈 스케일링 (.inputGroup.xs 등) — 자식(입력/버튼/애드온)은 em 기준이라 그룹 글자 크기에 비례 */
+}
+.inputGroup.inline {
+  display: inline-flex;
+  width: auto;
+}
+.inputGroup.error > * {
+  border-color: var(--danger);
+}
+.inputGroup > * {
+  position: relative;
+  border-radius: 0;
+}
+.inputGroup > *:focus, .inputGroup > *:focus-within, .inputGroup > *.open {
+  z-index: 2;
+  outline: none;
+  box-shadow: none;
+}
+.inputGroup > :first-child {
+  border-top-left-radius: var(--roundBtn);
+  border-bottom-left-radius: var(--roundBtn);
+}
+.inputGroup > :last-child {
+  border-top-right-radius: var(--roundBtn);
+  border-bottom-right-radius: var(--roundBtn);
+}
+.inputGroup > * + * {
+  margin-left: -1px;
+}
+.inputGroup > span, .inputGroup > label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.6em;
+  padding: 0.5em 0.8em;
+  font-size: 1em;
+  font-weight: 500;
+  white-space: nowrap;
+  background-color: var(--bgSub);
+  color: var(--txSub);
+  border: 1px solid var(--lineColor);
+  user-select: none;
+  flex: 0 0 auto;
+}
+.inputGroup > span > i.fi, .inputGroup > label > i.fi {
+  font-size: 1.1em;
+}
+.inputGroup > span > input[type=checkbox], .inputGroup > span > input[type=radio], .inputGroup > label > input[type=checkbox], .inputGroup > label > input[type=radio] {
+  margin: 0;
+  cursor: pointer;
+}
+.inputGroup > input, .inputGroup > select {
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+  height: 2.6em;
+}
+.inputGroup > input:focus, .inputGroup > select:focus {
+  outline: none;
+  box-shadow: inset 0 0 0.3em 0.1em var(--aColor);
+}
+.inputGroup > button, .inputGroup > .btn {
+  flex: 0 0 auto;
+  height: initial;
+  box-shadow: none;
+  transform: scale(1);
+}
+.inputGroup > .dropDown {
+  flex: 0 0 auto;
+  font-size: 1em;
+}
+.inputGroup > .dropDown > header {
+  border-radius: inherit;
+  border: 1px solid var(--lineColor);
+}
+.inputGroup > .dropDown > ul, .inputGroup > .dropDown > section, .inputGroup > .dropDown > .dropBox {
+  border-radius: var(--roundBox, 0.8em);
+  z-index: 100;
+}
+.inputGroup.xxs {
+  font-size: var(--xxs);
+}
+.inputGroup.xs {
+  font-size: var(--xs);
+}
+.inputGroup.sm {
+  font-size: var(--sm);
+}
+.inputGroup.md {
+  font-size: var(--md);
+}
+.inputGroup.lg {
+  font-size: var(--lg);
+}
+.inputGroup.xl {
+  font-size: var(--xl);
+}
+.inputGroup.xxl {
+  font-size: var(--xxl);
+}
+
+/* ==========================================================================
+   선택형 목록 컴포넌트 (.selectList)
+   - 좌측 패널에서 하나를 선택해 우측 상세 폼과 연동하는 목록 (역할/약관/템플릿 등)
+   ========================================================================== */
+.selectList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.2em;
+}
+.selectList > li {
+  padding: 0.3em 0.5em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--roundBox);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.selectList > li > header {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-weight: 600;
+  color: var(--txColor);
+  gap: 0.5em;
+}
+.selectList > li > header > span > small {
+  font-size: 0.75em;
+  font-weight: normal;
+  margin-left: 0.5em;
+}
+.selectList > li > p {
+  display: block;
+  margin: 0;
+  margin-top: 0.15em;
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+.selectList > li:hover {
+  background-color: var(--aLow);
+  border-color: var(--aLow);
+}
+.selectList > li.active {
+  background-color: var(--aDeep);
+}
+.selectList > li.active > header {
+  color: white;
+}
+.selectList > li.active > p {
+  color: silver;
+}
+.selectList.main > li > header {
+  color: var(--mainDark);
+}
+.selectList.main > li > p {
+  color: var(--mainLight);
+}
+.selectList.main > li.active {
+  background-color: var(--main);
+}
+.selectList.main > li.active > header {
+  color: white;
+}
+.selectList.main > li.active > p {
+  color: var(--main2);
+}
+.selectList.sub > li > header {
+  color: var(--subDark);
+}
+.selectList.sub > li > p {
+  color: var(--subLight);
+}
+.selectList.sub > li.active {
+  background-color: var(--sub);
+}
+.selectList.sub > li.active > header {
+  color: white;
+}
+.selectList.sub > li.active > p {
+  color: var(--sub2);
+}
+.selectList.point > li > header {
+  color: var(--pointDark);
+}
+.selectList.point > li > p {
+  color: var(--pointLight);
+}
+.selectList.point > li.active {
+  background-color: var(--point);
+}
+.selectList.point > li.active > header {
+  color: white;
+}
+.selectList.point > li.active > p {
+  color: var(--point2);
+}
+.selectList.deco > li > header {
+  color: var(--decoDark);
+}
+.selectList.deco > li > p {
+  color: var(--decoLight);
+}
+.selectList.deco > li.active {
+  background-color: var(--deco);
+}
+.selectList.deco > li.active > header {
+  color: white;
+}
+.selectList.deco > li.active > p {
+  color: var(--deco2);
+}
+.selectList.primary > li > header {
+  color: var(--primaryDark);
+}
+.selectList.primary > li > p {
+  color: var(--primaryLight);
+}
+.selectList.primary > li.active {
+  background-color: var(--primary);
+}
+.selectList.primary > li.active > header {
+  color: white;
+}
+.selectList.primary > li.active > p {
+  color: var(--primary2);
+}
+.selectList.info > li > header {
+  color: var(--infoDark);
+}
+.selectList.info > li > p {
+  color: var(--infoLight);
+}
+.selectList.info > li.active {
+  background-color: var(--info);
+}
+.selectList.info > li.active > header {
+  color: white;
+}
+.selectList.info > li.active > p {
+  color: var(--info2);
+}
+.selectList.success > li > header {
+  color: var(--successDark);
+}
+.selectList.success > li > p {
+  color: var(--successLight);
+}
+.selectList.success > li.active {
+  background-color: var(--success);
+}
+.selectList.success > li.active > header {
+  color: white;
+}
+.selectList.success > li.active > p {
+  color: var(--success2);
+}
+.selectList.warning > li > header {
+  color: var(--warningDark);
+}
+.selectList.warning > li > p {
+  color: var(--warningLight);
+}
+.selectList.warning > li.active {
+  background-color: var(--warning);
+}
+.selectList.warning > li.active > header {
+  color: white;
+}
+.selectList.warning > li.active > p {
+  color: var(--warning2);
+}
+.selectList.danger > li > header {
+  color: var(--dangerDark);
+}
+.selectList.danger > li > p {
+  color: var(--dangerLight);
+}
+.selectList.danger > li.active {
+  background-color: var(--danger);
+}
+.selectList.danger > li.active > header {
+  color: white;
+}
+.selectList.danger > li.active > p {
+  color: var(--danger2);
+}
+
+/* ==========================================================================
+   데이터 리스트 - UL을 이용한 리스트 출력
+   ========================================================================== */
+.dataList {
+  padding: 0 0.5em;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.5em;
+}
+.dataList > * {
+  width: 100%;
+}
+.dataList > header {
+  flex: 0 0 auto;
+  background-color: var(--main);
+  color: white;
+}
+.dataList > header > span {
+  line-height: 1em;
+}
+.dataList > header > span > span {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+.dataList > ul {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.2em;
+  overflow: auto;
+}
+.dataList > header, .dataList > ul > li {
+  border-radius: var(--roundBox);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  align-items: center;
+  padding: 0.5em;
+  gap: 0.5em;
+  justify-content: space-between;
+}
+.dataList > header > *, .dataList > ul > li > * {
+  padding: 0.2em 0.5em;
+  line-height: 1.4em;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.dataList > header > *.auto, .dataList > ul > li > *.auto {
+  flex: 1 1 auto;
+}
+.dataList > ul > li {
+  border: 1px solid transparent;
+}
+.dataList > ul > li:hover {
+  background-color: var(--aLow);
+  border-color: var(--aLow);
+}
+
+/* 키-값 속성 상자 (.keyValueBox)
+   - ul > li: 키(header) + 값(input 또는 시스템 속성 span) + 삭제 버튼
+   - footer: 새 키 입력 + 값 입력 + 추가 버튼 */
+.keyValueBox {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  border: 1px solid var(--aLight);
+  border-radius: var(--roundBox);
+  padding: 0.5em;
+  gap: 0.5em;
+}
+.keyValueBox > ul {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  overflow: auto;
+}
+.keyValueBox > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.2em 0;
+  border-bottom: 1px dashed var(--lineColor);
+}
+.keyValueBox > ul > li > header {
+  flex: 0 0 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 0.85em;
+}
+.keyValueBox > ul > li > input, .keyValueBox > ul > li > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.3em 0.5em;
+  line-height: 1em;
+  height: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.keyValueBox > ul > li > span {
+  padding: 0.5em;
+  color: var(--txLight);
+  font-size: 0.85em;
+}
+.keyValueBox > ul > li > button {
+  flex: 0 0 auto;
+  height: 100%;
+}
+.keyValueBox > footer {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+.keyValueBox > footer > input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.keyValueBox > footer > input:first-child {
+  flex: 0 0 8em;
+}
+.keyValueBox > footer > button {
+  flex: 0 0 auto;
+  height: 100%;
+}
+
+/* 칩 목록 상자 (.chipBox)
+   - ul > li: 기본 지정 라디오(label.radio) + 삭제 버튼, footer: 추가 버튼(오른쪽 정렬) */
+.chipBox {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  border: 1px solid var(--aLight);
+  border-radius: var(--roundBox);
+  padding: 0.5em;
+  gap: 0.5em;
+  /* 잠금(inert, 예: 시스템 항목): 추가/삭제 버튼 숨김 */
+}
+.chipBox.auto {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.chipBox > ul {
+  flex: 1 1 auto;
+  margin: 0px;
+  padding: 0.5em;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+.chipBox > ul > li:not(.empty) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.3em;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBtn);
+  background-color: var(--bgColor);
+}
+.chipBox > ul > li:not(.empty) > button {
+  width: 1.6em;
+  height: 1.6em;
+}
+.chipBox > footer {
+  display: flex;
+  justify-content: flex-end;
+}
+.chipBox[inert] > footer, .chipBox[inert] > ul > li > button {
+  display: none;
+}
+
+/*
+    관리형 목록
+*/
+ul.managedList {
+  font-size: 1rem;
+  padding: 0.5em;
+  margin: 0;
+  list-style: none;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  min-height: 10em;
+  display: flex;
+  gap: 0.5em;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+ul.managedList > li {
+  padding: 0.2em 0.5em;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  border-bottom: 1px dashed var(--aColor);
+  gap: 0.5em;
+}
+ul.managedList > li > * {
+  flex: 0 0 auto;
+  padding: 0 0.5em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+ul.managedList > li > *.auto {
+  flex: 1 1 auto;
+}
+ul.managedList > li > button {
+  font-size: 0.8em;
+  padding: 0.2em;
+  height: auto;
+  width: auto;
+}
+
+/* ==========================================================================
+   BitPlus 메인 통합 스타일시트 (Site.scss)
+   Document, Controls, Area, Complex, Util 모듈을 단일 스타일시트로 병합
+   ========================================================================== */
+/* ==========================================================================
+   Util: 기타 유틸리티 및 로딩 마스크 레이어
+   ========================================================================== */
+/* 전체 화면 로딩 마스크 레이어 */
+div.loading[popover] {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background-color: var(--modalBg, rgba(0, 0, 0, 0.4));
+  backdrop-filter: blur(0.2em);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+div.loading[popover]:popover-open {
+  display: flex;
+}
+div.loading[popover] > .loadingWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8em;
+  color: var(--txColor);
+}
+div.loading[popover] > .loadingWrap > .loadingSvg {
+  width: 3.5em;
+  height: 3.5em;
+  animation: spin 1.4s linear infinite;
+}
+div.loading[popover] > .loadingWrap > .loadingSvg > circle {
+  fill: none;
+  stroke: var(--main);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+div.loading[popover] > .loadingWrap > .loadingSvg > circle:first-child {
+  stroke: var(--aLight);
+}
+div.loading[popover] > .loadingWrap > .loadingSvg > circle:last-child {
+  stroke-dasharray: 120, 200;
+  stroke-dashoffset: 0;
+}
+div.loading[popover] > .loadingWrap > div {
+  font-size: 0.9em;
+  color: var(--txSub);
+  font-weight: 500;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* ==========================================================================
+   유효성 검사 토스트 (ValidResult.popover) - 우하단 표시 후 자동 제거
+   ========================================================================== */
+div.validMsg[popover] {
+  color: var(--txColor);
+  background-color: var(--bgColor);
+  font-size: 1rem;
+  position: fixed;
+  inset: auto 1em 1em auto;
+  margin: 0;
+  padding: 1em;
+  max-width: min(24em, 100vw - 2em);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundSize);
+  box-shadow: 0.1em 0.1em 0.6em 0.3em var(--aColor);
+  transition: opacity 0.3s ease, transform 0.3s ease, overlay 0.3s allow-discrete;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5em;
+  /* 등장: 아래에서 올라옴 */
+  /* 퇴장(hidePopover): 위로 올라가며 사라짐 */
+}
+@starting-style {
+  div.validMsg[popover]:popover-open {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+}
+div.validMsg[popover]:not(:popover-open) {
+  opacity: 0;
+  transform: translateY(-1.2em);
+}
+div.validMsg[popover] > i.fi {
+  font-size: 2.4em;
+}
+div.validMsg[popover] > div {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.5em;
+}
+div.validMsg[popover] > div > header {
+  font-size: 1.05em;
+  font-weight: bold;
+  line-height: 1em;
+}
+div.validMsg[popover] > div > ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  font-size: 0.85em;
+  color: var(--txSub);
+  align-items: flex-start;
+  gap: 0.5em;
+}
+div.validMsg[popover] > div > ul > li {
+  width: 100%;
+  line-height: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+div.validMsg[popover].main > div > header {
+  color: var(--mainDark);
+}
+div.validMsg[popover].main > i.fi {
+  color: var(--main);
+}
+div.validMsg[popover].sub > div > header {
+  color: var(--subDark);
+}
+div.validMsg[popover].sub > i.fi {
+  color: var(--sub);
+}
+div.validMsg[popover].point > div > header {
+  color: var(--pointDark);
+}
+div.validMsg[popover].point > i.fi {
+  color: var(--point);
+}
+div.validMsg[popover].deco > div > header {
+  color: var(--decoDark);
+}
+div.validMsg[popover].deco > i.fi {
+  color: var(--deco);
+}
+div.validMsg[popover].primary > div > header {
+  color: var(--primaryDark);
+}
+div.validMsg[popover].primary > i.fi {
+  color: var(--primary);
+}
+div.validMsg[popover].info > div > header {
+  color: var(--infoDark);
+}
+div.validMsg[popover].info > i.fi {
+  color: var(--info);
+}
+div.validMsg[popover].success > div > header {
+  color: var(--successDark);
+}
+div.validMsg[popover].success > i.fi {
+  color: var(--success);
+}
+div.validMsg[popover].warning > div > header {
+  color: var(--warningDark);
+}
+div.validMsg[popover].warning > i.fi {
+  color: var(--warning);
+}
+div.validMsg[popover].danger > div > header {
+  color: var(--dangerDark);
+}
+div.validMsg[popover].danger > i.fi {
+  color: var(--danger);
+}
+
+/* ==========================================================================
+   안내 박스 (.information) - 좌측 강조선 + 아이콘 헤더 + 본문 설명
+   ========================================================================== */
+.inform {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  padding: 0.8em 1em;
+  background-color: var(--aLow);
+  border: 1px solid var(--aLow);
+  border-left: 5px solid var(--aDark);
+  border-radius: var(--roundSize);
+  font-size: 0.88em;
+}
+.inform > header {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-weight: 700;
+  color: var(--aDeep);
+}
+.inform > p, .inform > div {
+  margin: 0;
+  color: var(--txSub);
+}
+.inform.main {
+  border-color: var(--main2);
+  border-left-color: var(--main);
+  background-color: var(--main1);
+}
+.inform.main > header {
+  color: var(--mainDark);
+}
+.inform.sub {
+  border-color: var(--sub2);
+  border-left-color: var(--sub);
+  background-color: var(--sub1);
+}
+.inform.sub > header {
+  color: var(--subDark);
+}
+.inform.point {
+  border-color: var(--point2);
+  border-left-color: var(--point);
+  background-color: var(--point1);
+}
+.inform.point > header {
+  color: var(--pointDark);
+}
+.inform.deco {
+  border-color: var(--deco2);
+  border-left-color: var(--deco);
+  background-color: var(--deco1);
+}
+.inform.deco > header {
+  color: var(--decoDark);
+}
+.inform.primary {
+  border-color: var(--primary2);
+  border-left-color: var(--primary);
+  background-color: var(--primary1);
+}
+.inform.primary > header {
+  color: var(--primaryDark);
+}
+.inform.info {
+  border-color: var(--info2);
+  border-left-color: var(--info);
+  background-color: var(--info1);
+}
+.inform.info > header {
+  color: var(--infoDark);
+}
+.inform.success {
+  border-color: var(--success2);
+  border-left-color: var(--success);
+  background-color: var(--success1);
+}
+.inform.success > header {
+  color: var(--successDark);
+}
+.inform.warning {
+  border-color: var(--warning2);
+  border-left-color: var(--warning);
+  background-color: var(--warning1);
+}
+.inform.warning > header {
+  color: var(--warningDark);
+}
+.inform.danger {
+  border-color: var(--danger2);
+  border-left-color: var(--danger);
+  background-color: var(--danger1);
+}
+.inform.danger > header {
+  color: var(--dangerDark);
+}
+
+/* ==========================================================================
+   메일 인증 안내 줄 (.mailNotice) - 최상위 레이아웃 맨 위에 모든 페이지 공통으로 표시
+   ========================================================================== */
+.mailNotice {
+  font-size: 0.9em;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  padding: 0.5em;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  background-color: var(--danger1);
+  border-bottom: 1px solid var(--danger2);
+  color: var(--dangerDark);
+}
+.mailNotice > i.fi {
+  color: var(--danger);
+}
+.mailNotice > a {
+  font-weight: 700;
+  text-decoration: underline;
+  color: inherit;
+}
+
+body:has(.mailNotice) {
+  padding-top: 2.3em;
+}
+
+/* ==========================================================================
+   인라인 배지 (.badge) - 치환 태그, 상태값 등 짧은 라벨 표시
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.3em 0.6em;
+  font-size: 0.75rem;
+  font-weight: normal;
+  line-height: 1em;
+  background-color: var(--aColor);
+  border-radius: 1em;
+  color: var(--txColor);
+  /* display 지정이 hidden 속성(브라우저 기본 display:none)을 덮지 않도록 숨김 상태를 명시 */
+}
+.badge > code {
+  font-size: 0.95em;
+}
+.badge[hidden] {
+  display: none;
+}
+.badge.main {
+  background-color: var(--main);
+  color: white;
+}
+.badge.sub {
+  background-color: var(--sub);
+  color: white;
+}
+.badge.point {
+  background-color: var(--point);
+  color: white;
+}
+.badge.deco {
+  background-color: var(--deco);
+  color: white;
+}
+.badge.primary {
+  background-color: var(--primary);
+  color: white;
+}
+.badge.info {
+  background-color: var(--info);
+  color: white;
+}
+.badge.success {
+  background-color: var(--success);
+  color: white;
+}
+.badge.warning {
+  background-color: var(--warning);
+  color: white;
+}
+.badge.danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+/* ==========================================================================
+   표시 개수(List Size)
+   ========================================================================== */
+div.pageSize {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.85em;
+  color: var(--txSub);
+}
+div.pageSize > label {
+  font-size: 0.8em;
+  line-height: 1.2em;
+  text-transform: uppercase;
+  color: var(--txSub);
+}
+div.pageSize > select {
+  font-size: 0.9em;
+}
+
+/* ==========================================================================
+   hidden 속성 숨김 보장
+   - 브라우저 기본 [hidden]{display:none} 은 작성자 스타일(button, .badge 등의 display)에 항상 밀리므로
+     파일 마지막에 같은 규칙을 두어 hidden 이 붙은 요소는 어떤 컴포넌트든 숨겨지도록 한다.
+   ========================================================================== */
+[hidden] {
+  display: none;
+}
+
+.nameLine {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: var(--txColor);
+  font-weight: bold;
+  gap: 0.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nameLine > img {
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--lineColor);
+}
+.nameLine > small {
+  font-size: 0.9em;
+  font-weight: normal;
+  color: var(--txLight);
+}
+
+/* ==========================================================================
+   BitPlus 모달 스타일시트 (Site.scss)
+   기본 모달 및 개별 모달 구성
+   ========================================================================== */
+dialog {
+  font-size: 1rem;
+  background-color: var(--bgColor);
+  color: var(--txColor);
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox, 1em);
+  padding: 0;
+  margin: auto;
+  display: none;
+  flex-direction: column;
+  min-width: 18em;
+  max-width: 92vw;
+  max-height: 90vh;
+  box-shadow: 0 0.5em 2em var(--aDark);
+  overflow: hidden;
+  transition: filter 0.15s;
+  /* 회원 약관 전용 모달 (termsDialog) */
+  /* 글 입력 모달 (textInput): 안내 문구 + 여러 줄 입력, danger 는 반려 같은 경고 입력 */
+}
+dialog::backdrop {
+  background-color: transparent;
+}
+dialog[open] {
+  display: flex;
+  animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+dialog[open][data-first]::backdrop {
+  background-color: var(--modalBg);
+  backdrop-filter: blur(0.25em);
+}
+dialog[open][data-under] {
+  filter: blur(0.1em);
+}
+dialog[open].closing {
+  pointer-events: none;
+  animation: modalSlideDown 0.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+dialog[open].closing::backdrop {
+  animation: modalFadeOut 0.2s ease-out forwards;
+}
+dialog > header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 1em 1em 0.5em 1em;
+  font-size: 1.15em;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: var(--primary);
+}
+dialog > header > i.fi {
+  font-size: 1.2em;
+}
+dialog > div, dialog > section {
+  flex: 1 1 auto;
+  padding: 0.5em 1em;
+  font-size: 0.95em;
+  line-height: 1.5;
+  color: var(--txSub);
+  overflow-y: auto;
+  word-break: break-word;
+  min-width: 10em;
+  min-height: 5em;
+}
+dialog > footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6em;
+  padding: 0.5em 1em 1em 1em;
+}
+dialog > footer > button {
+  height: auto;
+  padding: 0.45em 0.8em 0.45em 0.6em;
+  font-size: 0.9em;
+}
+dialog.checkConfirm > div > p {
+  margin: 0 0 0.8em 0;
+}
+dialog.checkConfirm > div > ul {
+  margin: 0;
+  padding: 0.5em 1em;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+dialog#reportUserModal > header, dialog#reportModal > header, dialog.groupDialog > header, dialog.messageDialog > header, dialog.qrDialog > header, dialog.forumComment > header, dialog.manualOrder > header {
+  color: var(--main);
+}
+dialog#reportUserModal > footer > button.primary, dialog#reportModal > footer > button.primary, dialog.groupDialog > footer > button.primary, dialog.messageDialog > footer > button.primary, dialog.qrDialog > footer > button.primary, dialog.forumComment > footer > button.primary, dialog.manualOrder > footer > button.primary {
+  background-color: var(--main);
+}
+dialog.groupDialog {
+  width: 28em;
+}
+dialog.groupDialog > section > section.tabBox > section > div > div.chipBox {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid var(--aColor);
+  border-radius: 0;
+}
+dialog.groupDialog > section > section.tabBox > section > div > div.chipBox > ul {
+  height: 12em;
+  overflow-y: auto;
+  padding: 0.2em;
+}
+dialog.checkConfirm, dialog.alertWin {
+  max-width: 28em;
+}
+dialog.checkConfirm > header, dialog.alertWin > header {
+  color: var(--danger);
+}
+dialog.checkConfirm > footer > button.primary, dialog.alertWin > footer > button.primary {
+  background-color: var(--danger);
+}
+dialog.termsDialog {
+  width: 38em;
+  max-width: 92vw;
+  height: fit-content;
+  max-height: 85vh;
+  border: none;
+  border-radius: 0.8em;
+  padding: 1.3em 1.5em 1.2em;
+  background-color: var(--bgColor);
+  color: var(--txColor);
+  box-shadow: 0 0.8em 3em var(--aDark);
+  box-sizing: border-box;
+  gap: 0.8em;
+}
+dialog.termsDialog::backdrop {
+  background-color: var(--modalBg, rgba(0, 0, 0, 0.55));
+  backdrop-filter: blur(4px);
+}
+dialog.termsDialog > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  color: var(--txColor);
+  flex-shrink: 0;
+}
+dialog.termsDialog > header > .termsTitle {
+  font-size: 1.25em;
+  font-weight: 700;
+  color: var(--txColor);
+  margin: 0;
+  line-height: 1;
+}
+dialog.termsDialog > header > .closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.3em;
+  cursor: pointer;
+  line-height: 1;
+  color: var(--txSub);
+  border-radius: var(--roundBtn, 2em);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  height: auto;
+  transition: color 0.15s, background-color 0.15s;
+}
+dialog.termsDialog > header > .closeBtn:hover {
+  color: var(--txColor);
+  background-color: var(--aLow);
+}
+dialog.termsDialog > .termsContent {
+  flex: 0 1 auto;
+  height: 28em;
+  max-height: 55vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 2px dashed var(--lineColor, #cfd6dc);
+  border-radius: 0.6em;
+  padding: 1em 1.1em;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  font-size: 0.86em;
+  color: var(--txSub);
+  line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  margin: 0;
+}
+dialog.termsDialog > .termsContent > h1, dialog.termsDialog > .termsContent > h2, dialog.termsDialog > .termsContent > h3, dialog.termsDialog > .termsContent > h4, dialog.termsDialog > .termsContent > h5 {
+  margin: 1.1em 0 0.35em;
+  font-size: 1.05em;
+  font-weight: 700;
+  color: var(--txColor);
+}
+dialog.termsDialog > .termsContent > h1:first-child, dialog.termsDialog > .termsContent > h2:first-child, dialog.termsDialog > .termsContent > h3:first-child, dialog.termsDialog > .termsContent > h4:first-child, dialog.termsDialog > .termsContent > h5:first-child {
+  margin-top: 0;
+}
+dialog.termsDialog > .termsContent > p {
+  margin: 0 0 0.75em;
+}
+dialog.termsDialog > .termsContent > p:first-child {
+  margin-top: 0;
+}
+dialog.termsDialog > .termsContent > p:last-child {
+  margin-bottom: 0;
+}
+dialog.termsDialog > .termsContent ol, dialog.termsDialog > .termsContent ul {
+  padding-left: 1.4em;
+  margin: 0 0 0.75em;
+}
+dialog.termsDialog > footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+dialog.termsDialog > footer > button.confirmBtn {
+  height: 2.4em;
+  padding: 0 1.3em;
+  font-size: 0.9em;
+  font-weight: 600;
+  border-radius: 0.45em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background-color: #475569;
+  color: #ffffff;
+  border: none;
+  transition: background-color 0.15s;
+  margin: 0;
+}
+dialog.termsDialog > footer > button.confirmBtn:hover {
+  background-color: #334155;
+}
+dialog.inputWin {
+  max-width: 28em;
+}
+dialog.inputWin.wide {
+  width: 40em;
+  max-width: 95vw;
+}
+dialog.inputWin > header {
+  color: var(--info);
+}
+dialog.inputWin > div > p {
+  margin: 0 0 0.6em 0;
+}
+dialog.inputWin > div > textarea {
+  width: 100%;
+  min-height: 6em;
+  resize: vertical;
+}
+dialog.inputWin > footer > button.primary {
+  background-color: var(--info);
+}
+dialog.inputWin.danger > header {
+  color: var(--danger);
+}
+dialog.inputWin.danger > footer > button.primary {
+  background-color: var(--danger);
+}
+dialog.infoWin {
+  max-width: 52em;
+}
+dialog.infoWin > header {
+  color: var(--info);
+}
+dialog.infoWin > footer > button.primary {
+  background-color: var(--info);
+}
+dialog.confirmWin {
+  max-width: 28em;
+}
+dialog.confirmWin > header {
+  color: var(--warning);
+}
+dialog.confirmWin > footer > button.primary {
+  background-color: var(--warning);
+}
+dialog.qrDialog > section > div.inputGroup > button {
+  color: var(--deco);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(2em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes modalSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(2em);
+  }
+}
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+dialog.userSelect > header, dialog.roleSelect > header, dialog.groupSelect > header, dialog.langInput > header {
+  color: var(--main);
+}
+dialog.userSelect > footer, dialog.roleSelect > footer, dialog.groupSelect > footer, dialog.langInput > footer {
+  padding: 0.6em 1em;
+  border-top: 1px dashed var(--aColor);
+  justify-content: center;
+}
+dialog.userSelect > div, dialog.roleSelect > div {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.5em;
+  height: 26em;
+}
+dialog.userSelect > div > div, dialog.roleSelect > div > div {
+  flex: 0 0 auto;
+}
+dialog.userSelect > div > ul.selectList, dialog.roleSelect > div > ul.selectList {
+  flex: 1 1 auto;
+}
+dialog.userSelect > div > ul.pager, dialog.roleSelect > div > ul.pager {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+dialog.groupSelect > div {
+  width: 20em;
+  height: 26em;
+}
+
+/* 메뉴 편집 모달 (modals/menuEdit.ts) — 탭 전환 시 크기가 흔들리지 않게 너비/탭 높이 고정 */
+dialog.menuEdit {
+  width: 34em;
+}
+dialog.menuEdit > header {
+  color: var(--main);
+}
+dialog.menuEdit > header > span.badge {
+  background-color: var(--danger);
+  color: white;
+}
+dialog.menuEdit .tabBox > section {
+  height: 24em;
+  overflow-y: auto;
+}
+dialog.menuEdit .tabBox > section:has(> .tabAccess.active[inert]) {
+  cursor: not-allowed;
+}
+dialog.menuEdit .tabBox ul.form {
+  padding: 0;
+}
+dialog.menuEdit .tabAccess.active {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0.5em;
+}
+dialog.menuEdit .tabAccess.active[inert] {
+  opacity: 0.45;
+}
+dialog.menuEdit .tabAccess.active[inert] > ul {
+  background-color: var(--bgSub);
+  border-color: var(--lineColor);
+}
+dialog.menuEdit .tabAccess.active[inert] > ul > li > button {
+  background-color: var(--bgSub);
+  border-color: var(--lineColor);
+  color: var(--txLight);
+}
+dialog.menuEdit .tabAccess.active > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  /* 추가 버튼 줄(.tools): 오른쪽 정렬, 모양은 공용 .tools 스타일(바깥 테두리와 안쪽 여백은 이 모달에서 쓰지 않음) */
+}
+dialog.menuEdit .tabAccess.active > header > small {
+  color: var(--txLight);
+}
+dialog.menuEdit .tabAccess.active > header > div.tools {
+  margin-left: auto;
+  border: none;
+  padding: 0;
+}
+dialog.menuEdit .tabAccess.active > ul {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.5em;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  overflow-y: auto;
+}
+dialog.menuEdit .tabAccess.active > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.4em;
+  border-bottom: 1px dashed var(--aColor);
+}
+dialog.menuEdit .tabAccess.active > ul > li:last-child {
+  border-bottom: none;
+}
+dialog.menuEdit .tabAccess.active > ul > li > span {
+  flex: 1 1 auto;
+}
+dialog.menuEdit .tabAccess.active > ul > li > button {
+  width: 1.8em;
+  height: 1.8em;
+  padding: 0;
+}
+dialog.menuEdit > footer > button.danger {
+  margin-right: auto;
+}
+
+/* 기간 설정 모달 (modals/periodEdit.ts) */
+dialog.periodEdit {
+  width: 24em; /* 날짜·시간 컨트롤(날짜 글자가 잘리지 않을 너비) */
+}
+dialog.periodEdit[data-mode=date] {
+  width: 19em;
+}
+dialog.periodEdit[data-mode=time] {
+  width: 17em;
+}
+dialog.periodEdit > header {
+  color: var(--main);
+}
+dialog.periodEdit > section {
+  padding: 0.5em 1em;
+}
+dialog.periodEdit > section ul.form {
+  padding: 0;
+}
+dialog.periodEdit > section > small {
+  color: var(--txLight);
+}
+
+/* 사이드 구성 모달 (modals/sideEdit.ts) */
+dialog.sideEdit {
+  width: 26em;
+}
+dialog.sideEdit > header {
+  color: var(--main);
+}
+dialog.sideEdit > section {
+  padding: 0.5em 1em;
+}
+dialog.sideEdit > section ul.form {
+  padding: 0;
+}
+
+/* 대상 편집 모달 (modals/targetEdit.ts) */
+dialog.targetEdit {
+  width: 30em;
+}
+dialog.targetEdit > header {
+  color: var(--main);
+}
+dialog.targetEdit > section {
+  display: flex;
+  flex-direction: column;
+  height: 20em;
+  gap: 0.5em;
+  padding: 0.5em 1em;
+  /* 대상 종류 추가 버튼(.tools): 오른쪽 정렬, 모양은 공용 .tools 스타일 */
+}
+dialog.targetEdit > section > header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  /* 추가 버튼 줄: 공용 .tools 의 바깥 테두리와 안쪽 여백은 이 모달에서 쓰지 않는다 */
+}
+dialog.targetEdit > section > header > div.tools {
+  border: none;
+  padding: 0;
+}
+dialog.targetEdit > section > ul {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.5em;
+  border: 1px solid var(--aColor);
+  border-radius: var(--roundBox);
+  overflow-y: auto;
+}
+dialog.targetEdit > section > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.4em;
+  border-bottom: 1px dashed var(--aColor);
+}
+dialog.targetEdit > section > ul > li:last-child {
+  border-bottom: none;
+}
+dialog.targetEdit > section > ul > li > span {
+  flex: 1 1 auto;
+}
+dialog.targetEdit > section > ul > li > button {
+  font-size: 0.7em; /* 삭제 버튼은 이전 크기의 70% (크기와 아이콘 모두 em 기준) */
+  width: 1.8em;
+  height: 1.8em;
+  padding: 0;
+}
+
+dialog {
+  /* 포럼 댓글 입력 모달 (forumComment): 에디터 + 첨부 파일 목록 */
+  /* 설문 항목 입력 모달 (surveyItem): 질문 + 선택 방식 + 옵션 목록 */
+  /* 메뉴얼 페이지 순서 변경 모달 (manualOrder): 끌어서 정렬하는 페이지 목록 */
+}
+dialog.surveyItem {
+  width: 32em;
+  max-height: 92dvh;
+}
+dialog.surveyItem > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+}
+dialog.surveyItem > div > label:not(.check) {
+  font-size: 0.9em;
+  font-weight: 700;
+}
+dialog.surveyItem > div > textarea {
+  width: 100%;
+  resize: vertical;
+}
+dialog.surveyItem > div > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+dialog.surveyItem > div > ul > li {
+  display: flex;
+  gap: 0.4em;
+}
+dialog.surveyItem > div > ul > li > input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+dialog.surveyItem > div > ul > li > button {
+  flex: 0 0 auto;
+  width: 2.2em;
+  padding: 0;
+}
+dialog.surveyItem > div > button {
+  align-self: flex-start;
+}
+dialog.manualOrder {
+  width: 26em;
+  max-height: 90dvh;
+}
+dialog.manualOrder > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+}
+dialog.manualOrder > div > p {
+  margin: 0;
+  color: var(--txLight);
+  font-size: 0.9em;
+}
+dialog.manualOrder > div > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+dialog.manualOrder > div > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.5em 0.7em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  background-color: var(--bgColor);
+  cursor: grab;
+  user-select: none;
+}
+dialog.manualOrder > div > ul > li > i.fi {
+  color: var(--txLight);
+}
+dialog.manualOrder > div > ul > li.empty {
+  justify-content: center;
+  color: var(--txLight);
+  cursor: default;
+}
+dialog.forumComment {
+  width: 46em;
+  max-height: 95dvh;
+  /* 작은 화면(720px 이하): 너비·높이 모두 화면의 99%, 에디터가 남는 높이를 채움 */
+  /* 에디터 엔진의 속성 창(이미지 등)은 이 대화상자 안에 position: fixed 로 붙는데, 열림 애니메이션이 끝난 뒤에도 transform 이 남으면
+     대화상자가 기준이 되어 속성 창이 대화상자 크기로 잘린다. 애니메이션이 끝나면 transform 을 없애 화면 전체를 기준으로 보이게 한다. */
+  /* 에디터 엔진이 대화상자 안에 붙이는 툴팁·팝업 상자: 자리를 차지하면 아래에 빈 여백이 생기므로 높이 0 으로 */
+}
+@media (width <= 720px) {
+  dialog.forumComment {
+    width: 99vw;
+    max-width: 99vw;
+    height: 99dvh;
+    max-height: 99dvh;
+  }
+}
+dialog.forumComment[open]:not(.closing) {
+  animation-fill-mode: backwards;
+}
+dialog.forumComment > .jodit-box {
+  flex: 0 0 0;
+  height: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+}
+dialog.forumComment > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  color: var(--txColor);
+  /* 첨부 파일: 일반 게시판 글쓰기의 첨부와 같은 모양 — 선택 버튼 + 제한 안내, 아래 목록은 한 줄에 파일명 / 전송 상태(진행률) / 용량 / 삭제, 4개 높이까지 보이고 넘으면 스크롤 */
+}
+dialog.forumComment > div > section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  padding: 0;
+  min-height: 0;
+  overflow: visible;
+}
+dialog.forumComment > div > section[hidden] {
+  display: none;
+}
+dialog.forumComment > div > section > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0;
+  min-height: 0;
+  overflow: visible;
+  /* 보이는 버튼 위에 투명한 파일 입력을 겹쳐 클릭이 곧바로 파일 선택창을 연다 */
+}
+dialog.forumComment > div > section > div > small {
+  color: var(--txLight);
+}
+dialog.forumComment > div > section > div > span {
+  position: relative;
+  display: inline-flex;
+}
+dialog.forumComment > div > section > div > span > button {
+  width: auto;
+  height: auto;
+  padding: 0.45em 0.8em 0.45em 0.6em;
+  font-size: 0.9em;
+  pointer-events: none;
+}
+dialog.forumComment > div > section > div > span > input[type=file] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+dialog.forumComment > div > section > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin: 0;
+  padding: 0.3em;
+  list-style: none;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  max-height: 8.7em; /* 4개 높이, 넘으면 스크롤 */
+  overflow-y: auto;
+}
+dialog.forumComment > div > section > ul:empty {
+  display: none;
+}
+dialog.forumComment > div > section > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2em;
+  border-top: 1px dashed var(--aColor);
+}
+dialog.forumComment > div > section > ul > li:first-child {
+  border-top: none;
+}
+dialog.forumComment > div > section > ul > li > span {
+  flex: 0 1 12em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9em;
+  padding-left: 0.4em;
+}
+dialog.forumComment > div > section > ul > li > div {
+  flex: 1 1 0;
+  min-width: 4em;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0;
+  min-height: 0;
+  overflow: visible;
+}
+dialog.forumComment > div > section > ul > li > div > progress {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 0.8em;
+  accent-color: var(--deco);
+}
+dialog.forumComment > div > section > ul > li > div > em {
+  flex: 0 0 auto;
+  min-width: 3em;
+  text-align: right;
+  font-style: normal;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+dialog.forumComment > div > section > ul > li > small {
+  flex: 0 0 5em;
+  text-align: right;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+dialog.forumComment > div > section > ul > li > button {
+  flex: 0 0 auto;
+  width: 1.35em;
+  height: 1.35em;
+  padding: 0;
+}
+dialog.forumComment > div > section > ul > li[data-state=error] > div > progress {
+  display: none;
+}
+dialog.forumComment > div > section > ul > li[data-state=error] > div > em {
+  flex: 1 1 auto;
+  text-align: left;
+  color: var(--danger5);
+}
+
+/* 컨텐츠 본문 공통 규칙 — 보기 화면(.editorContentPage > section)과 에디터 편집 영역에 같이 쓴다 */
+/* 글 보기의 본문 상자 (common.renderContent): 본문을 사이트 문서에 직접 출력하므로 contain 으로 상자 밖(화면 고정 레이어 등)에 그리지 못하게 막는다 */
+.contentBody {
+  contain: content;
+  overflow-wrap: anywhere;
+}
+.contentBody figure {
+  margin: 0;
+}
+.contentBody img {
+  max-width: 100% !important;
+  max-height: min(80vh, 48em); /* 너무 긴 이미지는 화면 높이를 넘지 않게 (비율은 유지) */
+  object-fit: contain;
+  border-radius: var(--roundBox);
+}
+
+.editorContentPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 1em 0 0 0;
+}
+.editorContentPage > section {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 0.5em;
+}
+.editorContentPage > section figure {
+  margin: 0;
+}
+.editorContentPage > section img {
+  max-width: 100% !important;
+  max-height: min(80vh, 48em); /* 너무 긴 이미지는 화면 높이를 넘지 않게 (비율은 유지) */
+  object-fit: contain;
+  border-radius: var(--roundBox);
+}
+.editorContentPage > footer {
+  flex: 0 0 auto;
+  padding: 0.5em 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+/* 에디터 편집 영역 (common.makeEditor 의 siteCss: SunEditor iframe 에 사이트 CSS 를 연결한 body).
+   사이트 CSS 의 문서 전체용 body 규칙(float·100vw/100vh)과 글자 선택 금지를 되돌려, 편집할 때도 보기 화면과 같은 스타일로 보이게 한다. */
+html:has(> body:is(.sun-editor-editable, .jodit-wysiwyg)) {
+  float: none;
+  width: auto;
+  height: auto;
+}
+
+html > body:is(.sun-editor-editable, .jodit-wysiwyg) {
+  float: none;
+  width: auto;
+  height: auto;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  /* 편집 중인 본문(contenteditable)만 가장자리에서 0.5em 띄운다 (SunEditor, Jodit 공통) */
+}
+html > body:is(.sun-editor-editable, .jodit-wysiwyg), html > body:is(.sun-editor-editable, .jodit-wysiwyg) * {
+  user-select: text;
+}
+html > body:is(.sun-editor-editable, .jodit-wysiwyg)[contenteditable] {
+  padding: 0.5em;
+}
+html > body:is(.sun-editor-editable, .jodit-wysiwyg) figure {
+  margin: 0;
+}
+html > body:is(.sun-editor-editable, .jodit-wysiwyg) img {
+  max-width: 100% !important;
+  max-height: min(80vh, 48em); /* 너무 긴 이미지는 화면 높이를 넘지 않게 (비율은 유지) */
+  object-fit: contain;
+  border-radius: var(--roundBox);
+}
+
+/* 모달(dialog) 안의 Jodit: Jodit 가 툴팁 상자(.jodit-ui-tooltip-container)를 dialog 의 직계 자식으로 붙이는데, 모달의 flex 흐름에 들어가 footer 아래에 빈 공간이 생기므로 흐름에서 뺀다 */
+dialog > .jodit-ui-tooltip-container {
+  position: absolute;
+}
+
+/* 좁은 화면(태블릿 이하, 사이트 두 번째 중단점 780px)에서는 덜 쓰는 도구 버튼을 숨겨 도구줄이 3단까지 늘어나지 않게 한다: 글머리 기호·번호 목록, 가로줄, 표
+   (Jodit: 버튼 이름 클래스 — Jodit 자체 CSS 가 나중에 로드되므로 .jodit-container 로 우선순위를 높임, SunEditor: data-command) */
+@media (width <= 780px) {
+  .jodit-container .jodit-toolbar-button_ul,
+  .jodit-container .jodit-toolbar-button_ol,
+  .jodit-container .jodit-toolbar-button_hr,
+  .jodit-container .jodit-toolbar-button_table,
+  .sun-editor .se-toolbar button[data-command=list],
+  .sun-editor .se-toolbar button[data-command=hr],
+  .sun-editor .se-toolbar button[data-command=table] {
+    display: none;
+  }
+}
+/* 400px 미만(아주 좁은 화면)에서는 스타일 지우기 버튼도 숨겨 도구줄을 2단으로 맞춘다 (400px 이상에서는 보임) */
+@media (width < 400px) {
+  .jodit-container .jodit-toolbar-button_eraser,
+  .sun-editor .se-toolbar button[data-command=removeFormat] {
+    display: none;
+  }
+}
+/* Jodit 다크 테마(사이트 다크 테마일 때 JoditProvider 가 theme: "dark" 로 만듦)의 색을 사이트 다크 팔레트로 맞춤 (Jodit 기본 다크는 회색 톤) */
+[data-theme=dark] {
+  --jd-dark-background-color: var(--bgSub);
+  --jd-dark-background-darknes: var(--bgColor);
+  --jd-dark-background-ligher: var(--silver);
+  --jd-dark-border-color: var(--lineColor);
+  --jd-dark-text-color: var(--txColor);
+  --jd-dark-icon-color: var(--txSub);
+  --jd-dark-toolbar-color: var(--bgSub);
+  --jd-dark-toolbar-seperator-color1: var(--lineColor);
+  --jd-dark-toolbar-seperator-color2: var(--lineColor);
+  --jd-dark-toolbar-seperator-color3: var(--lineColor);
+  --jd-dark-toolbar-seperator-color-opacity80: var(--lineColor);
+}
+[data-theme=dark] .jodit_theme_dark {
+  --jd-color-border: var(--lineColor);
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/Site.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Document.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Controls.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_ToolBar.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Tree.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Area.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Complex.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Util.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Modals.scss%22,%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/wwwroot/css/_Editor.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AAAA;AAAA;AAAA;ACAC;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAUO;AASR;AACI;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;AAAA;AAAA;EAGA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAGJ;AAAA;AAAA;AAGA;AACI;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;EAQA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAGJ;AAAA;AAAA;AAGA;AACI;;;AAGJ;AACI;;;AAGJ;AACI;;;AAGJ;AAAA;AAAA;AAGA;EACI;AAmEA;;AAjEA;EAEI;EACA;EACA;EACA;AAaA;EACA;EACA;;AAbA;EAGI;EACA;;AAGJ;EACI;;AAOJ;EACI;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;;AAIR;EACI;;AAIR;EAEI;EACA;;AAGJ;AAAA;EAII;EACA;EACA;EACA;EACA;EACA;;AAIJ;EACI;EACA;;;AAIR;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;;;AAGJ;EAAK;EAAuB;;;AAC5B;EAAK;EAAuB;;;AAC5B;EAAK;EAAuB;;;AAC5B;EAAK;EAAuB;EAAmB;;;AAC/C;EAAK;EAAuB;EAAmB;;;AAC/C;EAAK;EAAuB;EAAmB;EAAkB;EAAqB;EAA2B;;;AAEjH;EACI;EACA;EACA;;;AAGJ;EACI;;;AAGJ;EACI;EACA;EACA;;;AAGJ;EACI;EACA;EACA;;;AAGJ;AAGA;AAAA;AAAA;AAAA;AAAA;AAKA;AAAA;AAAA;AAAA;EAII;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAYA;;AAXA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;;AAKA;AAAA;AAAA;AAAA;EAAa;;AAAb;AAAA;AAAA;AAAA;EAAa;;AAAb;AAAA;AAAA;AAAA;EAAa;;AAAb;AAAA;AAAA;AAAA;EAAa;;AAAb;AAAA;AAAA;AAAA;EAAa;;AAAb;AAAA;AAAA;AAAA;EAAa;;AAAb;AAAA;AAAA;AAAA;EAAa;;;AAIrB;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAOA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAUA;AAKA;AAMA;AAMA;AAiCA;;AA1DA;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;;AAGJ;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;EACA;EACA;;AAGJ;AAAA;AAAA;EAEI;EACA;;AAGJ;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;EACA;;AAIR;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIA;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AATR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;;AAMhB;AAAA;AAAA;AAAA;AAIA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EAEI;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;;;AAIR;AAAA;AAAA;AAAA;AAIA;AAAA;AAAA;EAGI;AAMA;AAIA;AAOA;AAOA;;AAtBA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EACI;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;EACA;;AAGJ;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;EAGI;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;;;AAKZ;AACA;AAAA;EAEI;EACA;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;;AAGJ;AACA;AAAA;AAAA;AAAA;AAAA;EAKI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;EAEI;EACA;EACA;EACA;;AAGJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;EACA;;;AAIR;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;;AAIA;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;;AAGrB;AAAA;AAAA;AAII;EAAY;;;AAAZ;EAAY;;;AAAZ;EAAY;;;AAAZ;EAAY;;;AAAZ;EAAY;;;AAAZ;EAAY;;;AAAZ;EAAY;;;AAKhB;AACA;EACI;IACI;;;AAIR;AACA;EACI;IACI;;EAIQ;IAGI;IACA;IACA;;;AAOpB;AACA;EACI;IACI;;;ADrzBR;AAAA;AAAA;AAAA;AEAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;ACAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AASA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAOA;AAMA;AAsBA;AA8BA;AA6FA;AAgBA;AAaA;AAmBA;AA6BA;AAyBA;AAsIA;AAeA;AAYA;AAqCA;;AAzcA;AAAA;AAAA;EAEI;EACA;;AAIJ;AAAA;EACI;EACA;;AAIJ;AAAA;EACI;EACA;EACA;;AAEA;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;;AAGJ;AAAA;AAAA;EAEI;EACA;;AAKR;AAAA;AAAA;EAEI;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EACI;;AAGJ;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;EAGI;EACA;;AAKR;AAAA;AAAA;AAAA;AAAA;EAII;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAuBA;AAYA;AAOA;AAUA;;AAlDA;AAAA;AAAA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;EACA;;AAGJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;;AAIJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;EACA;EACA;;AAEA;AAAA;AAAA;AAAA;AAAA;EACI;;AAKR;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;EAEI;EACA;;AAIJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;AAAA;AAAA;EACI;;AAIJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;AAAA;AAAA;EACI;;AAGJ;AAAA;AAAA;AAAA;AAAA;EACI;EACA;;AAMZ;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIJ;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIJ;AAAA;AAAA;AAAA;AAAA;EAII;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIJ;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;;AACA;AAAA;AAAA;EAAU;;AAGd;AAAA;AAAA;EACI;EACA;;AACA;AAAA;AAAA;EAAU;;AAKlB;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;;AAKR;AAAA;EACI;EACA;EACA;AAEA;AA8CA;AAOA;AAoBA;AAqCA;;AA7GA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;AAAA;EACI;EACA;EACA;EACA;;AAMJ;AAAA;EACI;;AAMJ;AAAA;EACI;EACA;EACA;;AAEA;AAAA;EACI;EACA;;AAIR;AAAA;EACI;EACA;EACA;;AAKR;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;;AAEA;AAAA;AAAA;EACI;EACA;EACA;EACA;;AAOR;AAAA;AAAA;EAEI;EACA;;AAKJ;AAAA;AAAA;EAEI;EACA;;AAQR;AAAA;AAAA;EACI;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;;AASJ;AAAA;AAAA;EACI;EACA;EACA;;AAMZ;AAAA;EACI;EACA;EACA;;AAEA;AAAA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;EACA;EACA;EACA;;AAIR;AAAA;EACI;EACA;EACA;;AAEA;AAAA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;EACA;EACA;EACA;;AAMJ;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;AARR;AAAA;EACI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;EACA;;;AAMhB;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;;;ACnhBZ;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAQA;EACI;EACA;EACA;EACA;EACA;EACA;AAEA;AASA;AAGA;AAGA;AAOA;AA2FA;AAwBA;AAMA;AAOA;;AArJA;EACI;EACA;EACA;EACA;EACA;;AAIJ;EAAY;;AAGZ;EAAmB;;AAGnB;EACI;EACA;EACA;;AAIJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAGA;AAaA;AAwBA;AA8BA;;AArEA;EAAU;;AAGV;EACI;EACA;EACA;EACA;AAIA;;AAFA;EAAW;;AAGX;EAAa;;AAIjB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;AAEA;;AACA;EACI;EACA;;AAMZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;;AAKR;EACI;EACA;;AAKR;EACI;AASA;;AAPA;EAAW;;AAEX;EACI;EACA;;AAIJ;EACI;EACA;EACA;;AAEA;EACI;EACA;;AAMZ;EACI;EACA;;AAIJ;EACI;EACA;EACA;;AAIJ;EACI;EACA;;;AAIR;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAuBA;;AArBA;EACI;EACA;;AAGJ;EACI;;AAEA;EAAW;;AAGf;EAAW;;AAEX;EACI;;AAEA;EAAW;;AAEX;EAAU;;AAId;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;;AF5NZ;AACA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;;;AAIR;AACA;AAAA;AAAA;AAAA;EAII;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAWA;;AAVA;AAAA;AAAA;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;AAAA;EACI;EACA;;AAIJ;AAAA;AAAA;AAAA;EACI;EACA;;;AAIR;AACA;AAAA;EAEI;;AAEA;AAAA;AAAA;AAAA;EAGI;EACA;;;AAIR;AACA;AAAA;AAAA;EAGI;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;;AAGJ;AAAA;AAAA;EACI;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;;;AAKZ;EACI;IACI;IACA;;EAEJ;IACI;IACA;;;AAIR;AAAA;AAAA;AAAA;AAAA;AAMA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;;AACA;AAAA;EAAO;;AACP;AAAA;EAAO;;AAEP;AAAA;EACI;AAEA;AAgBA;;AAfA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIJ;AAAA;EACI;EACA;EACA;;AAEA;AAAA;EACI;EACA;;AAKZ;AAAA;EACI;EACA;;AAGJ;AAAA;AAAA;EAEI;;AAGJ;AAAA;AAAA;EAEI;EACA;;;AAIR;AAEI;EAEI;EACA;;AAGJ;EAEI;EACA;;AAGJ;EAEI;EACA;;;AAIR;AAEI;EAEI;EACA;;AAGJ;EAEI;EACA;;;AAIR;AAEI;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAJJ;AAAA;AAAA;AAAA;EAII;;;AAIR;AAAA;AAAA;AAAA;AAAA;AAMA;EACI;EACA;EACA;EACA;EACA;EACA;AAaA;AAwBA;AAsBA;;AAzDA;EACI;;AAEA;EACI;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;;AAGJ;EAEI;;AAGJ;EAEI;EACA;;AAIA;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AAKJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;AADJ;EACI;;;AAMZ;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;;;AAKZ;AACA;EACI;EACA;EACA;EACA;EACA;AACA;;AACA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;;AAKZ;AAAA;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAKR;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAMZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;;AAKZ;AAAA;AAAA;AAAA;AAIA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;;AAOhB;AAAA;AAAA;AAAA;AAAA;AAKA;AAAA;EAEI;EACA;EACA;EACA;;AAEA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;EACA;EACA;EACA;;AAEA;AAAA;EACI;;AAIR;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;;;AAKZ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;;AAIR;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;;AAMhB;AACA;EACI;EACA;AAqCA;;AAnCA;EACI;EACA;EACA;EACA;AAEA;;AACA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;;AAEA;EACI;;AAMZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAEA;EACI;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;AAEA;AAUA;;AATA;EACI;;AAGJ;EACI;EACA;;AAIJ;EACI;EACA;EACA;AAEA;;AACA;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;EACA;;;AAMhB;AACA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;;;AAIR;AACA;EACI;;;AAGJ;EACI;;;AFz0BJ;AAAA;AAAA;AAAA;AKCA;AAAA;AAAA;AAAA;AAAA;AAAA;AAOA;AACA;AAAA;EAEI;EACA;EACA;AACA;AAyCA;AAwBA;;AAhEA;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;EACA;EACA;;AAGJ;AAAA;EACI;;AAGJ;AAAA;EACI;;;AAIR;AACA;EACI;EACA;AAEA;AAAA;AAAA;AAAA;;;AAMJ;AACA;EACI;;AAEA;EACI;;;AAIR;EACI;EACA;EACA;EACA;;;AAGJ;AACA;EACI;EACA;EACA;;AAEA;EACI;EACA;;;AAIR;AAAA;AAAA;AAAA;AAAA;AAAA;AAMA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAAA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;;AAIR;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;;AAGI;EACI;EACA;;AAIR;EACI;EACA;EACA;;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;;AAIR;AAAA;AAAA;AAGA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;;;AAGR;EACI;EACA;EACA;;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;;;AAIR;EACI;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;;;AAIR;EACI;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;;;AAKR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAIR;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAMR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;AAJR;EACI;;AAEA;EACI;;;AAMhB;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAGI;EAII;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAIR;EAGI;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAIR;EAGI;EACA;;AAEA;EACI;EACA;;AAIR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EAGI;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAGJ;EAII;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAKZ;EACI;;AAEA;EACI;EACA;EACA;EACA;;;AAMhB;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAKZ;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;;AAEA;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAEA;EACI;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAKJ;EACI;EACA;;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAEA;EACI;EACA;;AAMhB;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAIR;EACI;;AAEA;EACI;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;;;AAIR;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;EACA;;AAGJ;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAIR;AAAA;EACI;EACA;;AAEA;AAAA;EACI;;AAMhB;AAAA;EACI;EACA;EACA;EACA;;AAEA;AAAA;EACI;EACA;;;ALl1BZ;AAAA;AAAA;AAAA;AMCA;AAAA;AAAA;AAAA;AAAA;AAQA;AAAA;AAAA;AAAA;AAIA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;;AAEA;EACI;;AAEA;EACI;;;AAMhB;AAAA;AAAA;AAAA;AAAA;AAKA;EACI;EACA;EACA;EACA;EACA;EACA;AACA;AAKA;AAIA;AAaA;AAUA;AAIA;AA2BA;AAaA;AAAA;AAAA;AAAA;AAAA;AAYA;AAiBA;;AAxGA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EAGI;EACA;EACA;;AAIR;EACI;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;;AAGJ;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EAEI;EACA;;AAIR;EAEI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAQR;EAEI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;;AAGJ;EAGI;EACA;;AAKJ;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;AAAb;EAAa;;;AAIrB;AAAA;AAAA;AAAA;AAIA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;;AASA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;AAfR;EACI;;AAGJ;EACI;;AAGJ;EACI;;AACA;EACI;;AAGJ;EACI;;;AAQxB;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;;AAEA;EACI;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAKZ;EACI;;AAEA;EACI;EACA;;;AAKZ;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;EACA;EACA;;AAEA;EACI;EACA;;AAEA;EACI;;AAIR;EACI;EACA;;;AAKZ;AAAA;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAyCA;;AAvCA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAKZ;EACI;EACA;;AAKA;EAEI;;;AAMZ;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;EACA;;;ANhiBZ;AAAA;AAAA;AAAA;AOEA;AAAA;AAAA;AAIA;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;;AAKZ;EACI;EACA;EACA;;;AAKZ;EACI;IACI;;;AAIR;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAQA;;AAPA;EACI;IACI;IACA;;;AAKR;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAOJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;AALJ;EACI;;AAGJ;EACI;;;AAMhB;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAGJ;EAEI;EACA;;AAIA;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;AANR;EACI;EACA;EACA;;AAEA;EACI;;;AAMhB;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;;AAIR;EACI;;;AAGJ;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAKA;;AAHA;EACI;;AAGJ;EACI;;AAIA;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;AAFJ;EACI;EACA;;;AAKZ;AAAA;AAAA;AAGA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;;;AAIR;AAAA;AAAA;AAAA;AAAA;AAKA;EACI;;;AAIJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;;;AC7TR;AAAA;AAAA;AAAA;AAKA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AAuIA;AA8IA;;AAlRA;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EAEI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAMA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAYR;EACI;;AAGJ;EACI;;AAIR;EACI;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAKZ;EAEI;;AAEA;EACI;;AAGJ;EACI;;AAKR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAIR;EACI;;AAEA;EACI;;AAGJ;EACI;;AAIR;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAMhB;EACI;;AAEA;EACI;EACA;;AAGJ;EACI;;AAIA;EACI;;AAGJ;EACI;EACA;EACA;;AAIR;EACI;;AAIA;EACI;;AAGJ;EACI;;AAKZ;EACI;;AAEA;EACI;;AAGJ;EACI;;AAIR;EACI;;AAEA;EACI;;AAGJ;EACI;;AAIR;EACI;;;AAIR;EACI;IACI;IACA;;EAGJ;IACI;IACA;;;AAIR;EACI;IACI;IACA;;EAGJ;IACI;IACA;;;AAIR;EACI;IACI;;EAGJ;IACI;;;AASA;EACI;;AAGJ;EACI;EACA;EACA;;AAIR;EAEI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;;;AAIR;AACA;EACI;;AAEA;EACI;;AAEA;EACI;EACA;;AAIR;EACI;EACA;;AAEA;EACI;;AAIR;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAEA;EACI;EACA;;AAEA;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;AAMA;;AAJA;EACI;;AAIJ;EACI;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAMhB;EACI;;;AAIR;AACA;EACI;;AACA;EAAsB;;AACtB;EAAsB;;AAEtB;EACI;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;;;AAKZ;AACA;EACI;;AAEA;EACI;;AAGJ;EACI;;AAEA;EACI;;;AAKZ;AACA;EACI;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;AAEA;;AACA;EACI;EACA;EACA;EACA;EACA;AAEA;;AACA;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;;AAOpB;AACI;AACA;AAmDA;;AAlDA;EACI;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;;AAMZ;EACI;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAOpB;EACI;EACA;AAEA;AAQA;AAAA;AAMA;;AAbA;EALJ;IAMQ;IACA;IACA;IACA;;;AAKJ;EACI;;AAIJ;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;AAEA;;AACA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAMA;;AAJA;EACI;;AAIJ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAIA;EACI;;AAGJ;EACI;EACA;EACA;;;AC35B/B;AAcD;AACA;EACI;EACA;;AAfA;EACI;;AAGJ;EACI;EACA;EACA;EACA;;;AAWR;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AA7BJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAyBJ;EACI;EACA;EACA;EACA;EACA;EACA;;;AAIR;AAAA;AAEA;EACI;EACA;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;AAOA;;AALA;EAEI;;AAIJ;EACI;;AAlEJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;;AAgER;AACA;EACI;;;AAGJ;AAAA;AAEA;EACI;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;IAOI;;;AAIR;AACA;EACI;AAAA;IAEI;;;AAIR;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI%22%7D */

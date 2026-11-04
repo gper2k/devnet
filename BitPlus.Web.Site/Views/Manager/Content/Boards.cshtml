@@ -1,0 +1,53 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("ContentBoards"));
+}
+
+<div class="pageBox contentList">
+    <section class="card line flexCol auto">
+        <header class="fix">
+            <strong>
+                <i class="fi fiDocOnePage"></i>
+                @this.Lang("ContentBoards")
+                <i class="badge deco">0</i>
+            </strong>
+            <div class="flexRow gapSm alignCenter">
+                <div class="inputGroup inline sm">
+                    <input type="text" name="search" placeholder="@this.Lang("Search")" autocomplete="off" />
+                    <button type="button" class="sub"><i class="fi fiSearch"></i></button>
+                </div>
+                <button type="button" class="sub sm" id="addBoardBtn"><i class="fi fiAdd"></i> @this.Lang("Add")</button>
+            </div>
+        </header>
+
+        <div class="dataList auto">
+            <header>
+                <span class="colNo"><span>NO</span></span>
+                <span class="colName"><span>TITLE</span></span>
+                <span class="colType"><span>TYPE</span></span>
+                <span class="colCount"><span>POSTS</span></span>
+                <span class="colFlag"><span>ENABLER</span></span>
+                <span class="colDate"><span>CREATE</span></span>
+                <span class="colMore"></span>
+            </header>
+            <ul></ul>
+        </div>
+
+        <footer class="fix">
+            <div class="pageSize">
+                <label>List Size</label>
+                <select name="pageSize">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <ul class="pager"></ul>
+        </footer>
+    </section>
+</div>
+
+<!--
+    주의: 이 뷰는 Content.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 Content.cshtml 의 wireBoardsPage() 가 담당한다.
+-->

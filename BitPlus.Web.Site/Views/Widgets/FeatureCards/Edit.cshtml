@@ -1,0 +1,16 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 강점 카드 위젯 설정 — title, text, items(한 줄에 아이콘 | 제목 | 설명), columns(열 수) *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_DesignFields.cshtml" model='new[] { "heading" }' />
+    <li>
+        <header>@this.Lang("WidgetCardItems")</header>
+        <textarea name="items" rows="6" spellcheck="false" placeholder="@this.Lang("WidgetFeatureCardsSample")"></textarea>
+    </li>
+    <li>
+        <header>@this.Lang("WidgetColumns")</header>
+        <input type="number" name="columns" min="1" max="6" />
+    </li>
+</ul>

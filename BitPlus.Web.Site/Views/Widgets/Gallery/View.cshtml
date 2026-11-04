@@ -1,0 +1,27 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@{
+    var posts = Model.Data as List<BitPlus.Web.Site.Widgets.WidgetPost> ?? [];
+}
+@* 갤러리 위젯 — 대표 이미지 격자(열 수 설정), 이미지 없는 글은 아이콘과 제목 *@
+<ul class="widgetGallery" style="--cols: @Model.Int("columns", 4)">
+    @foreach (var post in posts)
+    {
+        <li>
+            <a href="@post.Url">
+                @if (post.Image is not null)
+                {
+                    <img src="@post.Image" alt="" loading="lazy" />
+                }
+                else
+                {
+                    <span><i class="fi fiImage"></i></span>
+                }
+                <b>@post.Title</b>
+            </a>
+        </li>
+    }
+    @if (posts.Count == 0)
+    {
+        <li class="empty">@this.Lang("DataEmpty")</li>
+    }
+</ul>

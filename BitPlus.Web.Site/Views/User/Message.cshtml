@@ -1,0 +1,149 @@
+﻿@model UserPageModel
+@{
+    this.AppClass = "fit"; // 레이아웃을 창 높이에 맞춤 — 창이 줄면 대화 목록(ul)이 먼저 줄고 스크롤됨
+}
+
+@* 내 메시지(/user/message): 왼쪽은 주고받은 상대별 목록(이미지·이름·기본 그룹/역할·메시지 수·안 읽은 수, 마지막 메시지 최근순, 10명씩 페이지), 오른쪽은 고른 상대와의 대화(메신저처럼 내 메시지는 오른쪽).
+   대화는 처음에 최근 30개, 맨 위로 올리면 이전 30개씩 더. 말풍선 옆에 보낸 사람 이미지(상대 왼쪽, 나 오른쪽). 대화를 열면 받은 메시지는 읽음 처리. 메시지마다 작은 삭제 버튼(내 쪽에서만 지움, 양쪽 모두 지우면 완전히 삭제). 아래 입력창으로 그 상대에게 보냄. 데이터는 api/user/message/... *@
+<div class="userMessage">
+    <partial name="_UserHead" model="Model" />
+    <div>
+        <aside>
+            <ul></ul>
+            <ul hidden></ul>
+        </aside>
+        <article hidden>
+            <header></header>
+            <ul></ul>
+            <footer>
+                <textarea name="message" rows="2" maxlength="1000" placeholder="@this.Lang("ContentBody")"></textarea>
+                <button type="button" class="main"><i class="fi fiSend"></i> @this.Lang("Send")</button>
+            </footer>
+        </article>
+        <p>@this.Lang("MessageEmpty")</p>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.querySelector('div.userMessage > div');
+        const threads = root.querySelector('aside > ul'), chat = root.querySelector('article'), lines = chat.querySelector(':scope > ul'), input = chat.querySelector('textarea');
+        const empty = root.querySelector(':scope > p');
+        const scope = [...root.attributes].find(p => p.name.startsWith('b-'))?.name; // 격리 스타일 속성을 스크립트로 만든 요소에도 붙임
+        const mk = (tag, text) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (scope) el.setAttribute(scope, ''); return el; };
+        const deleteText = @this.Js(this.Lang("Delete")), deleteMsg = @this.Js(this.Lang("DeleteMessageMsg") + " " + this.Lang("DelWarning")), seenText = @this.Js(this.Lang("Seen")), unseenText = @this.Js(this.Lang("Unseen")), sentText = @this.Js(this.Lang("Sent"));
+        const myPhoto = @this.Js(Model.Photo ?? string.Empty), myName = @this.Js(Model.Name);
+        const state = { userId: null, person: null, page: 0, more: false, loading: false };
+        let pager = root.querySelector('aside > ul + ul'); // 상대 목록 페이지 이동 (loadThreads 가 common.makePager 로 바꿔 끼움)
+
+        // 동그란 이미지(없으면 사람 아이콘) — 사람 표시와 대화 말풍선 옆 보낸 사람 표시가 같이 씀
+        const picOf = photo => {
+            const pic = mk('span');
+            if (photo) { const img = mk('img'); img.src = photo; img.alt = ''; pic.append(img); }
+            else pic.append((i => { i.className = 'fi fiPerson fiFill'; return i; })(mk('i')));
+            return pic;
+        };
+
+        const iconOf = name => { const i = mk('i'); i.className = `fi ${name}`; return i; };
+        // 아이콘 + 시각(없으면 아이콘만), title 로 의미 표시 — 말풍선 아래 작성 시각·읽은 시각
+        const timeOf = (icon, utc, title) => {
+            const el = mk('span');
+            el.title = title;
+            el.append(iconOf(icon));
+            if (utc) el.append(mk('time', common.localTime(utc, true)));
+            return el;
+        };
+
+        // 사람 표시: 이미지 / 이름 · 기본 그룹·역할 — 왼쪽 목록과 대화 머리가 같이 씀
+        const personOf = t => {
+            const wrap = mk('div'), text = mk('div');
+            text.append(mk('strong', t.name), mk('small', [t.group, t.role].filter(Boolean).join(' · ')));
+            wrap.append(picOf(t.photo), text);
+            return wrap;
+        };
+
+        // 왼쪽 상대 목록: 마지막 메시지가 최근인 순서로 한 페이지(10명)씩, 아래 페이지 이동 (고른 상대는 active)
+        const loadThreads = async (page = state.page) => {
+            const res = await common.getSend(`/api/user/message/threads?page=${page}`, { useLoading: false });
+            if (!res || !res.success) return [];
+            const { items, total, pageSize } = res.data;
+            if (!items.length && page > 0) return loadThreads(page - 1); // 마지막 페이지가 비면(지운 대화) 앞 페이지로
+            state.page = page;
+            threads.replaceChildren(...items.map(t => {
+                const li = mk('li'), count = mk('small', t.count);
+                li.dataset.user = t.userId;
+                li.classList.toggle('active', t.userId === state.userId);
+                li.append(personOf(t), count);
+                if (t.unread > 0) li.append(mk('b', t.unread));
+                li.onclick = () => open(t);
+                return li;
+            }));
+            const next = common.makePager(page, pageSize, total).then(p => loadThreads(p));
+            if (total <= pageSize) next.style.display = 'none'; // 한 페이지면 숨김 (ul.pager 의 display 가 [hidden] 보다 우선이라 직접)
+            pager.replaceWith(next);
+            pager = next;
+            empty.hidden = total > 0;
+            if (!total) chat.hidden = true; // 남은 대화가 없으면 대화창도 닫음
+            return items;
+        };
+
+        // 메시지 한 줄: 보낸 사람 이미지(상대는 왼쪽·나는 오른쪽), 말풍선 위 이름, 아래 시각(·읽음), 마우스를 올리면 삭제 버튼
+        const lineOf = (m, person) => {
+            const li = mk('li'), body = mk('div'), text = mk('p', m.message), foot = mk('footer'), del = mk('button');
+            const pic = picOf(m.mine ? myPhoto : person.photo), name = m.mine ? myName : person.name;
+            pic.title = name;
+            if (m.mine) li.classList.add('mine');
+            del.type = 'button';
+            del.title = deleteText;
+            del.append(iconOf('fiDelete'));
+            del.onclick = async () => {
+                if (!await common.confirm(deleteMsg)) return; // 메시지를 삭제합니다. 삭제된 정보는 복구할 수 없습니다.
+                const r = await common.delSend(`/api/user/message/${m.id}`);
+                if (r && r.success) { await open(person); loadThreads(); }
+            };
+            foot.append(timeOf('fiClock', m.cDate, sentText));
+            if (m.mine) foot.append(m.rDate ? timeOf('fiEye', m.rDate, seenText) : timeOf('fiEyeSlash', null, unseenText)); // 상대가 읽었는지와 읽은 시각
+            body.append(mk('small', name), text, foot);
+            li.append(pic, body, del);
+            li.dataset.id = m.id;
+            return li;
+        };
+
+        // 오른쪽 대화: 처음엔 최근 30개(오래된 순)를 그리고 맨 아래로 스크롤
+        const open = async person => {
+            const userId = person.userId;
+            Object.assign(state, { userId, person, more: false });
+            threads.querySelectorAll('li').forEach(li => li.classList.toggle('active', li.dataset.user === userId));
+            const res = await common.getSend(`/api/user/message/${userId}`, { useLoading: false });
+            if (!res || !res.success) return;
+            chat.hidden = false;
+            chat.querySelector(':scope > header').replaceChildren(personOf(person));
+            lines.replaceChildren(...res.data.items.map(m => lineOf(m, person)));
+            state.more = res.data.more;
+            requestAnimationFrame(() => lines.scrollTop = lines.scrollHeight); // 그려진 뒤 맨 아래로
+            loadThreads(); // 읽음 처리된 수 반영
+        };
+
+        // 대화를 맨 위까지 올리면 그 이전 메시지 30개를 위에 붙임 (보던 위치 유지)
+        lines.addEventListener('scroll', async () => {
+            if (lines.scrollTop > 0 || !state.more || state.loading) return;
+            const { userId, person } = state, first = lines.firstElementChild?.dataset.id;
+            state.loading = true;
+            const res = await common.getSend(`/api/user/message/${userId}?before=${first}`, { useLoading: false });
+            state.loading = false;
+            if (!res || !res.success || userId !== state.userId) return;
+            const height = lines.scrollHeight;
+            lines.prepend(...res.data.items.map(m => lineOf(m, person)));
+            state.more = res.data.more;
+            lines.scrollTop = lines.scrollHeight - height;
+        });
+
+        chat.querySelector('footer > button').onclick = async () => {
+            if (!input.value.trim() || !state.userId) return input.focus();
+            const res = await common.postSend(`/api/user/${state.userId}/message`, common.makeFormData({ message: input.value }), { useInfo: false }); // 보낸 메시지가 대화에 바로 보이므로 완료 알림 없음
+            if (res && res.success) { input.value = ''; open(state.person); }
+        };
+
+        loadThreads().then(list => { if (list.length) open(list[0]); });
+    });
+</script>

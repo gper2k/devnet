@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>기본 스타일 — BitPlus DevKit</title>
+  <link rel="stylesheet" href="/lib/fluenticons/fluenticons.min.css" />
+  <link rel="stylesheet" href="/css/site.min.css" />
+  <link rel="stylesheet" href="/dev/devkit.css" />
+  <script defer src="/dev/devkit.js"></script>
+</head>
+<body>
+<div class="devPage">
+  <!-- Section: 컨트롤 규격 검증 -->
+  <section class="devSection">
+    <h2>컨트롤 규격 검증</h2>
+
+    <!-- Block 1: 버튼 & 입력항 높이 일치 -->
+    <div class="devBlock">
+      <div class="blockHead">
+        <h3>버튼 &amp; 입력항 높이 일치 (2.6em) <span class="tag css">button</span> <span class="tag css">input</span> <span class="tag css">select</span></h3>
+        <p>버튼과 입력항은 동일한 <code>2.6em</code> 높이와 pill 라운딩. 나란히 배치 시 정렬 보장.</p>
+      </div>
+      <div class="blockDemo">
+        <div class="demoRow">
+          <input type="text" placeholder="검색어 입력..." />
+          <button class="btn">검색</button>
+          <button class="btn point">예약 신청</button>
+          <button type="button" class="btn">
+            <i class="fi fiUpload"></i><span>파일 첨부</span>
+            <input type="file" style="position:absolute;opacity:0;inset:0;cursor:pointer;width:100%;" />
+          </button>
+          <select><option>주간</option><option>월간</option></select>
+        </div>
+      </div>
+      <div class="blockCode">
+        <button class="copyBtn" onclick="copyCode(this)">복사</button>
+        <pre><code>&lt;div style="display:flex;gap:0.6em;align-items:center;flex-wrap:wrap;"&gt;
+  &lt;input type="text" placeholder="검색어 입력..." /&gt;
+  &lt;button class="btn"&gt;검색&lt;/button&gt;
+  &lt;button class="btn point"&gt;예약 신청&lt;/button&gt;
+  &lt;button type="button" class="btn"&gt;
+    &lt;i class="fi fiUpload"&gt;&lt;/i&gt;&lt;span&gt;파일 첨부&lt;/span&gt;
+    &lt;input type="file" /&gt;
+  &lt;/button&gt;
+  &lt;select&gt;&lt;option&gt;주간&lt;/option&gt;&lt;option&gt;월간&lt;/option&gt;&lt;/select&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- Block 2: 9대 테마 색상 버튼 -->
+    <div class="devBlock">
+      <div class="blockHead">
+        <h3>9대 테마 색상 버튼 <span class="tag css">.main</span> <span class="tag css">.point</span> <span class="tag css">.primary</span></h3>
+        <p>9개 색상 테마 클래스. 클릭 시 <code>translateY</code> 없이 <code>scale(0.98)</code> + 인셋 그림자 피드백.</p>
+      </div>
+      <div class="blockDemo">
+        <div class="demoRow">
+          <button class="btn">기본</button>
+          <button class="btn point">Point</button>
+          <button class="btn main">Main</button>
+          <button class="btn sub">Sub</button>
+          <button class="btn primary">Primary</button>
+          <button class="btn success">Success</button>
+          <button class="btn danger">Danger</button>
+          <button class="btn warning">Warning</button>
+          <button class="btn info">Info</button>
+          <button class="btn deco">Deco</button>
+        </div>
+      </div>
+      <div class="blockCode">
+        <button class="copyBtn" onclick="copyCode(this)">복사</button>
+        <pre><code>&lt;button class="btn"&gt;기본&lt;/button&gt;
+&lt;button class="btn point"&gt;Point&lt;/button&gt;
+&lt;button class="btn main"&gt;Main&lt;/button&gt;
+&lt;button class="btn sub"&gt;Sub&lt;/button&gt;
+&lt;button class="btn primary"&gt;Primary&lt;/button&gt;
+&lt;button class="btn success"&gt;Success&lt;/button&gt;
+&lt;button class="btn danger"&gt;Danger&lt;/button&gt;
+&lt;button class="btn warning"&gt;Warning&lt;/button&gt;
+&lt;button class="btn info"&gt;Info&lt;/button&gt;
+&lt;button class="btn deco"&gt;Deco&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- Block 3: 버튼 크기 단계 -->
+    <div class="devBlock">
+      <div class="blockHead">
+        <h3>버튼 크기 단계 (em 비례 스케일) <span class="tag css">.xxs</span> <span class="tag css">.xs</span> <span class="tag css">.sm</span> <span class="tag css">.lg</span> <span class="tag css">.xl</span> <span class="tag css">.xxl</span></h3>
+        <p><code>font-size</code> 기반 em 비례 크기 스케일. 버튼과 입력항 모두 동일 클래스로 확장.</p>
+      </div>
+      <div class="blockDemo">
+        <div class="demoRow" style="align-items:center;">
+          <button class="btn point xxs">XXS</button>
+          <button class="btn point xs">XS</button>
+          <button class="btn point sm">SM</button>
+          <button class="btn point">MD (기본)</button>
+          <button class="btn point lg">LG</button>
+          <button class="btn point xl">XL</button>
+          <button class="btn point xxl">XXL</button>
+        </div>
+      </div>
+      <div class="blockCode">
+        <button class="copyBtn" onclick="copyCode(this)">복사</button>
+        <pre><code>&lt;button class="btn point xxs"&gt;XXS&lt;/button&gt;
+&lt;button class="btn point xs"&gt;XS&lt;/button&gt;
+&lt;button class="btn point sm"&gt;SM&lt;/button&gt;
+&lt;button class="btn point"&gt;MD (기본)&lt;/button&gt;
+&lt;button class="btn point lg"&gt;LG&lt;/button&gt;
+&lt;button class="btn point xl"&gt;XL&lt;/button&gt;
+&lt;button class="btn point xxl"&gt;XXL&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- Block 4: 입력항 상태 -->
+    <div class="devBlock">
+      <div class="blockHead">
+        <h3>입력항 상태 <span class="tag css">input</span> <span class="tag css">textarea</span></h3>
+        <p>포커스 시 <code>--lineFocusColor</code> 글로우, readonly/disabled 자동 스타일 처리.</p>
+      </div>
+      <div class="blockDemo">
+        <div class="demoCol" style="max-width:400px;">
+          <input type="text" placeholder="일반 입력항" />
+          <input type="text" readonly value="읽기 전용 (readonly)" />
+          <input type="text" disabled value="비활성 (disabled)" />
+          <textarea placeholder="여러 줄 텍스트..." style="min-height:80px;"></textarea>
+        </div>
+      </div>
+      <div class="blockCode">
+        <button class="copyBtn" onclick="copyCode(this)">복사</button>
+        <pre><code>&lt;input type="text" placeholder="일반 입력항" /&gt;
+&lt;input type="text" readonly value="읽기 전용 (readonly)" /&gt;
+&lt;input type="text" disabled value="비활성 (disabled)" /&gt;
+&lt;textarea placeholder="여러 줄 텍스트..."&gt;&lt;/textarea&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- Block 5: 커스텀 컨트롤 -->
+    <div class="devBlock">
+      <div class="blockHead">
+        <h3>커스텀 컨트롤 (체크박스, 라디오, 토글) <span class="tag css">label.check</span> <span class="tag css">label.radio</span> <span class="tag css">label.toggle</span></h3>
+        <p><code>label.check</code> / <code>label.radio</code> / <code>label.toggle</code> — 9대 테마색 + 크기 클래스 지원.</p>
+      </div>
+      <div class="blockDemo">
+        <div class="demoCol" style="gap:1em;">
+          <!-- 체크박스 -->
+          <div class="demoRow">
+            <label class="check"><input type="checkbox" checked /><span>기본</span></label>
+            <label class="check point"><input type="checkbox" checked /><span>Point</span></label>
+            <label class="check main"><input type="checkbox" checked /><span>Main</span></label>
+            <label class="check success"><input type="checkbox" checked /><span>Success</span></label>
+            <label class="check" style="opacity:0.5;pointer-events:none;"><input type="checkbox" disabled /><span>Disabled</span></label>
+          </div>
+          <!-- 라디오 -->
+          <div class="demoRow">
+            <label class="radio"><input type="radio" name="r1" checked /><span>옵션 A</span></label>
+            <label class="radio point"><input type="radio" name="r1" /><span>옵션 B</span></label>
+            <label class="radio main"><input type="radio" name="r1" /><span>옵션 C</span></label>
+            <label class="radio" style="opacity:0.5;pointer-events:none;"><input type="radio" name="r1" disabled /><span>Disabled</span></label>
+          </div>
+          <!-- 토글 -->
+          <div class="demoRow">
+            <label class="toggle"><input type="checkbox" checked /><span><i></i></span><span>ON</span></label>
+            <label class="toggle point"><input type="checkbox" /><span><i></i></span><span>Point</span></label>
+            <label class="toggle main"><input type="checkbox" checked /><span><i></i></span><span>Main</span></label>
+            <label class="toggle" style="opacity:0.5;pointer-events:none;"><input type="checkbox" disabled /><span><i></i></span><span>Disabled</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="blockCode">
+        <button class="copyBtn" onclick="copyCode(this)">복사</button>
+        <pre><code>&lt;!-- 체크박스 --&gt;
+&lt;label class="check"&gt;&lt;input type="checkbox" checked /&gt;&lt;span&gt;기본&lt;/span&gt;&lt;/label&gt;
+&lt;label class="check point"&gt;&lt;input type="checkbox" checked /&gt;&lt;span&gt;Point&lt;/span&gt;&lt;/label&gt;
+&lt;label class="check" disabled&gt;&lt;input type="checkbox" disabled /&gt;&lt;span&gt;Disabled&lt;/span&gt;&lt;/label&gt;
+
+&lt;!-- 라디오 --&gt;
+&lt;label class="radio"&gt;&lt;input type="radio" name="r" checked /&gt;&lt;span&gt;옵션 A&lt;/span&gt;&lt;/label&gt;
+&lt;label class="radio point"&gt;&lt;input type="radio" name="r" /&gt;&lt;span&gt;옵션 B&lt;/span&gt;&lt;/label&gt;
+
+&lt;!-- 토글 --&gt;
+&lt;label class="toggle"&gt;&lt;input type="checkbox" checked /&gt;&lt;span&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;span&gt;ON&lt;/span&gt;&lt;/label&gt;
+&lt;label class="toggle point"&gt;&lt;input type="checkbox" /&gt;&lt;span&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;span&gt;Point&lt;/span&gt;&lt;/label&gt;
+&lt;label class="toggle" disabled&gt;&lt;input type="checkbox" disabled /&gt;&lt;span&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;span&gt;Disabled&lt;/span&gt;&lt;/label&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- Block 6: inputGroup -->
+    <div class="devBlock">
+      <div class="blockHead">
+        <h3>입력 그룹 <span class="tag css">.inputGroup</span></h3>
+        <p>접두사/접미사 텍스트 애드온, 버튼 결합, 드롭다운 결합. 포커스 시 그룹 전체에 단일 포커스링.</p>
+      </div>
+      <div class="blockDemo">
+        <div class="demoCol" style="max-width:480px;gap:0.7em;">
+          <!-- 접두사 + 입력 -->
+          <div class="inputGroup">
+            <span>@</span>
+            <input type="text" placeholder="아이디" />
+          </div>
+          <!-- 입력 + 검색 버튼 -->
+          <div class="inputGroup">
+            <input type="text" placeholder="검색어 입력..." />
+            <button type="button" class="btn primary"><i class="fi fiSearch"></i><span>검색</span></button>
+          </div>
+          <!-- 드롭다운 + 입력 + 버튼 -->
+          <div class="inputGroup">
+            <div class="dropDown">
+              <header>전체</header>
+              <ul class="dropBox">
+                <li class="active"><span>전체 검색</span></li>
+                <li><span>이름</span></li>
+                <li><span>부서</span></li>
+              </ul>
+            </div>
+            <input type="text" placeholder="검색어" />
+            <button type="button" class="btn point"><i class="fi fiSearch"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="blockCode">
+        <button class="copyBtn" onclick="copyCode(this)">복사</button>
+        <pre><code>&lt;!-- 접두사 + 입력 --&gt;
+&lt;div class="inputGroup"&gt;
+  &lt;span&gt;@&lt;/span&gt;
+  &lt;input type="text" placeholder="아이디" /&gt;
+&lt;/div&gt;
+
+&lt;!-- 입력 + 검색 버튼 --&gt;
+&lt;div class="inputGroup"&gt;
+  &lt;input type="text" placeholder="검색어 입력..." /&gt;
+  &lt;button type="button" class="btn primary"&gt;&lt;i class="fi fiSearch"&gt;&lt;/i&gt;&lt;span&gt;검색&lt;/span&gt;&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- 드롭다운 + 입력 + 버튼 --&gt;
+&lt;div class="inputGroup"&gt;
+  &lt;div class="dropDown"&gt;
+    &lt;header&gt;전체&lt;/header&gt;
+    &lt;ul&gt;&lt;li&gt;전체 검색&lt;/li&gt;&lt;li&gt;이름&lt;/li&gt;&lt;li&gt;부서&lt;/li&gt;&lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;input type="text" placeholder="검색어" /&gt;
+  &lt;button type="button" class="btn point"&gt;&lt;i class="fi fiSearch"&gt;&lt;/i&gt;&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- Reference Table: Controls -->
+    <div class="refTable">
+      <table>
+        <thead>
+          <tr>
+            <th>클래스/속성</th>
+            <th>타입</th>
+            <th>설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>button.btn</td><td>CSS</td><td>기본 버튼 (2.6em 높이)</td></tr>
+          <tr><td>button.btn.{color}</td><td>CSS</td><td>9대 테마색 버튼</td></tr>
+          <tr><td>button.btn.{size}</td><td>CSS</td><td>크기 변형: <code>xxs</code>/<code>xs</code>/<code>sm</code>/<code>lg</code>/<code>xl</code>/<code>xxl</code></td></tr>
+          <tr><td>type="button" class="btn" + input[type=file]</td><td>HTML</td><td>파일 업로드 버튼 오버레이</td></tr>
+          <tr><td>label.check</td><td>CSS</td><td>체크박스 커스텀 래퍼</td></tr>
+          <tr><td>label.radio</td><td>CSS</td><td>라디오 커스텀 래퍼</td></tr>
+          <tr><td>label.toggle</td><td>CSS</td><td>토글/스위치 커스텀 래퍼</td></tr>
+          <tr><td>label.{control}.{color}</td><td>CSS</td><td>테마 색상 적용</td></tr>
+          <tr><td>label.{control}[disabled]</td><td>HTML</td><td>비활성화</td></tr>
+          <tr><td>.inputGroup</td><td>CSS</td><td>입력 그룹 래퍼</td></tr>
+          <tr><td>.inputGroup > span</td><td>CSS</td><td>텍스트/아이콘 애드온</td></tr>
+          <tr><td>.inputGroup > button</td><td>CSS</td><td>인라인 버튼</td></tr>
+          <tr><td>.inputGroup > .dropDown</td><td>CSS</td><td>인라인 드롭다운</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  function copyCode(btn) {
+    const code = btn.closest('.blockCode').querySelector('code');
+    navigator.clipboard.writeText(code.innerText).then(() => {
+      btn.textContent = '✓ 완료';
+      setTimeout(() => btn.textContent = '복사', 1500);
+    });
+  }
+
+  // dropDown open/close
+  document.addEventListener('click', e => {
+    const dd = e.target.closest('.dropDown');
+    if (!dd) {
+      document.querySelectorAll('.dropDown.open').forEach(el => el.classList.remove('open'));
+      return;
+    }
+    const isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.dropDown.open').forEach(el => el !== dd && el.classList.remove('open'));
+    dd.classList.toggle('open', !isOpen);
+  });
+
+  // selectBox: update header text on item click
+  document.addEventListener('click', e => {
+    const li = e.target.closest('.selectBox .dropBox li');
+    if (!li || li.classList.contains('divider')) return;
+    const dd = li.closest('.dropDown');
+    const header = dd.querySelector('header');
+    const span = header.querySelector('span');
+    if (span) span.textContent = li.querySelector('span')?.textContent ?? li.textContent;
+    dd.querySelectorAll('.dropBox li').forEach(el => el.classList.remove('active'));
+    li.classList.add('active');
+    dd.classList.remove('open');
+  });
+</script>
+</body>
+</html>

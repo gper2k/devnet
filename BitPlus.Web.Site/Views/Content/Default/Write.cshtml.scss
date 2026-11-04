@@ -1,0 +1,321 @@
+/* 일반 형식 글쓰기(Write) 전용 스타일 */
+.contentWrite {
+    /* 다국어: 원문 + 번역 언어 탭 (공용 .tabBox 머리 모양) */
+    & > nav {
+        flex: 0 0 auto;
+
+        & > header {
+            flex-wrap: wrap;
+        }
+    }
+
+    & > ul.form {
+        flex: 1 1 auto;
+        /* 번역 탭: 제목·본문 줄만 (원문에만 있는 항목, 공지·비공개 선택, 더보기 메뉴 숨김) */
+        &[data-translation] > li:not(.body):not(:first-child),
+        &[data-translation] > li:first-child .checkGroup,
+        &[data-translation] #contentMoreBtn {
+            display: none;
+        }
+
+        & > li {
+            flex: 0 0 auto;
+
+            &.body {
+                flex: 1 1 auto;
+                min-height: 20em;
+            }
+
+            &[hidden] {
+                display: none;
+            }
+
+            &[data-section="password"] > div > input {
+                width: 16em;
+                max-width: 100%;
+            }
+            /* 첨부 파일: 선택 버튼 + 제한 안내, 아래 목록은 한 줄에 파일명(말줄임) / 전송 상태(가장 넓게, 진행률) / 용량 / 삭제 */
+            &[data-section="files"] > div {
+                display: flex;
+                flex-direction: column;
+                gap: 0.6em;
+
+                & > div {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 0.8em;
+
+                    & > button {
+                        flex: 0 0 auto;
+                        width: auto;
+                        height: auto;
+                        padding: 0.45em 0.8em 0.45em 0.6em; /* 모달의 취소/저장 버튼과 같은 크기 */
+                        font-size: 0.9em;
+                    }
+
+                    & > small {
+                        color: var(--txLight);
+                    }
+
+                    & > input[type="file"] {
+                        display: none;
+                    }
+                }
+
+                & > ul {
+                    display: flex;
+                    flex-direction: column;
+                    border: 1px solid var(--lineColor);
+                    border-radius: var(--roundBox);
+                    gap: 0.2em;
+                    margin: 0;
+                    padding: 0.3em;
+                    list-style: none;
+
+                    &:empty {
+                        display: none;
+                    }
+
+                    max-height: 8.4em; /* 4개 높이, 넘으면 스크롤 */
+                    overflow-y: auto;
+
+                    & ::deep > li {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5em;
+                        padding: 0.2em;
+                        border-radius: var(--roundBox);
+                        border-top: 1px dashed var(--aColor);
+
+                        &:first-child {
+                            border-top: none;
+                        }
+
+                        & > span {
+                            flex: 0 1 20em;
+                            min-width: 0;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            font-size: 0.9em;
+                            padding-left: 0.4em;
+                        }
+
+                        & > div {
+                            flex: 1 1 0;
+                            min-width: 6em;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.6em;
+
+                            & > progress {
+                                flex: 1 1 auto;
+                                min-width: 0;
+                                height: 0.8em;
+                                accent-color: var(--deco);
+                            }
+
+                            & > em {
+                                flex: 0 0 auto;
+                                min-width: 3em;
+                                text-align: right;
+                                font-style: normal;
+                                font-size: 0.85em;
+                                color: var(--txLight);
+                            }
+                        }
+
+                        & > small {
+                            flex: 0 0 5.5em;
+                            text-align: right;
+                            color: var(--txLight);
+                        }
+
+                        & > button {
+                            flex: 0 0 auto;
+                            width: 1.35em;
+                            height: 1.35em;
+                            padding: 0;
+                        }
+
+                        &[data-state="error"] > div {
+                            & > progress {
+                                display: none;
+                            }
+
+                            & > em {
+                                flex: 1 1 auto;
+                                text-align: left;
+                                color: var(--danger5);
+                            }
+                        }
+                    }
+                }
+            }
+
+            &[data-section="links"] > ul.links {
+                display: flex;
+                flex-direction: column;
+                gap: 0.4em;
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+
+            & > header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.6em;
+
+                & > div {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6em;
+                }
+            }
+
+            & > div {
+                &.title {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    gap: 1em;
+
+                    & > div.inputGroup {
+                        flex: 1 1 auto;
+                    }
+
+                    & > div.checkGroup {
+                        flex: 0 0 auto;
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: nowrap;
+                        gap: 1em;
+
+                        & > label.check {
+                            flex: 0 0 auto;
+                        }
+                    }
+                }
+            }
+
+            & div.category {
+                justify-content: right;
+
+                & > select {
+                    width: auto;
+                    padding-right: 2.5em;
+                }
+            }
+        }
+    }
+
+    & > ul.form[hidden],
+    & > footer > button[hidden] {
+        display: none;
+    }
+    /* 수정할 비회원 글의 본인 확인(비밀번호 입력) */
+    & > section.gate {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8em;
+        padding: 2em 0;
+
+        &[hidden] {
+            display: none;
+        }
+
+        & > p {
+            margin: 0;
+            color: var(--txLight);
+        }
+
+        & > div {
+            display: flex;
+            gap: 0.6em;
+        }
+    }
+
+    & > footer {
+        border-top: 1px dashed var(--aColor);
+        padding-top: 1em;
+        display: flex;
+        justify-content: center;
+        gap: 0.6em;
+    }
+}
+
+/* 타블렛 W 이하 (~ 1024px) */
+@media (width <= 1024px) {
+    .contentWrite {
+    }
+}
+
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+    .contentWrite {
+        & > ul.form {
+            & > li {
+                flex-direction: column;
+
+                & > div.title {
+                    flex-direction: column;
+                    align-items: initial;
+
+                    & > div.checkGroup {
+                        justify-content: flex-end;
+                        margin-bottom: -0.5em;
+                    }
+                }
+
+                &.col2 {
+                    display: flex;
+
+                    & > div {
+                        flex-direction: column;
+
+                        & > *, 
+                        & > div > select {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* 모바일 (~ 520px) */
+@media (width <= 520px) {
+    .contentWrite {
+        /* 첨부 파일 한 줄: 파일명 + 용량 + 삭제 위, 전송 상태는 아래 줄 전체 */
+        & > ul.form > li[data-section="files"] > div > ul {
+            max-height: 14em; /* 모바일은 한 항목이 두 줄이라 더 높음 */
+        }
+
+        & > ul.form > li[data-section="files"] > div > ul ::deep > li {
+            flex-wrap: wrap;
+
+            & > span {
+                flex: 1 1 0;
+            }
+
+            & > small {
+                order: 2;
+            }
+
+            & > button {
+                order: 3;
+            }
+
+            & > div {
+                order: 4;
+                flex: 1 1 100%;
+            }
+        }
+    }
+}

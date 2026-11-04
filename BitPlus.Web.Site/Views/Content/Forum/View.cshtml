@@ -1,0 +1,4 @@
+@model ContentPageModel
+
+@* 포럼형 토픽 보기 — 일반 형식 글 보기 화면을 쓰되 포럼 토픽이면 댓글 영역을 Forum/Replies.cshtml 로, 이전/다음 글은 없이, 활동 시각(UDate)을 보인다. *@
+<partial name="~/Views/Content/Default/View.cshtml" model="Model" />

@@ -1,0 +1,19 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@using BitPlus.Web.Site.Services
+@{
+    Layout = null;
+    var smtpReady = !string.IsNullOrWhiteSpace(this.Config?.AccountSmtp.Host);
+}
+
+@* 오류 알림 서비스 설정 양식 (서비스 설정 모달 본문에 붙는 조각) — 같은 오류(형식 + 경로) 알림 간격(분, 비우면 기본, 0 이면 매번).
+   받는 사람은 최종 관리자 역할 사용자, 메일은 외부 서비스 > SMTP 구성으로 보낸다. 입력 이름은 ErrorAlertService 의 설정 키와 같아야 한다. *@
+<ul class="form">
+    <li>
+        <header>@this.Lang("ErrorAlertInterval") <small>@this.Lang("ErrorAlertIntervalInfo")</small></header>
+        <input type="number" name="@ErrorAlertService.IntervalKey" min="0" max="1440" placeholder="@ErrorAlertService.DefaultInterval" />
+    </li>
+    @if (!smtpReady)
+    {
+        <li><p class="txDanger">@this.Lang("ErrorAlertNoSmtp")</p></li>
+    }
+</ul>

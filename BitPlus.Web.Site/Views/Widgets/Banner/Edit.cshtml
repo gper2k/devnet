@@ -1,0 +1,21 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 배너·슬라이드 위젯 설정 — items(한 줄에 "이미지 주소 | 링크 | 문구"), interval(넘김 간격 초, 0 = 멈춤), height(높이 px, 0 = 2:1 비율) *@
+<ul class="form">
+    <li>
+        <header>@this.Lang("WidgetBannerItems")</header>
+        <textarea name="items" rows="6" spellcheck="false" placeholder="/img/banners/img1.jpg | /content | Contents&#10;/img/banners/side_coffee.svg | 7 | Buy Me a Coffee&#10;/img/banners/side_coffee.svg | @@gper | Buy Me a Coffee"></textarea>
+    </li>
+    <li class="col2">
+        <div>
+            <header>@this.Lang("WidgetInterval")</header>
+            <input type="number" name="interval" min="0" max="60" />
+        </div>
+        <div>
+            <header>@this.Lang("PopupHeight")</header>
+            <input type="number" name="height" min="0" max="1200" placeholder="0 = 2:1" />
+        </div>
+    </li>
+</ul>

@@ -1,0 +1,241 @@
+/* ==========================================================================
+   Tree: 윈도우 탐색기 스타일 폴더 트리 컨트롤 (.treeBox)
+   - 폴더 아이콘: 자식 있음 = fi-folder(닫힘) / fi-folder-open(열림), 자식 없음 = fi-folder(라인형)
+   - 폴더 아이콘 색상: var(--main) 기본
+   - 선택: main 배경 full-width 바 + 코너 라운딩 (토글 방식, 재클릭 시 해제)
+   - 들여쓰기는 header padding-left 로 처리 (모든 행이 동일한 전체 너비)
+   ========================================================================== */
+
+.treeBox {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 1rem;
+    user-select: none;
+    color: var(--txColor);
+
+    /* 트리 리스트 — 들여쓰기는 header padding으로 처리 */
+    & ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 자식 리스트: 기본 닫힘 */
+    & li > ul { display: none; }
+
+    /* 열림 상태 */
+    & li.opened > ul { display: flex; }
+
+    /* 노드 아이템 */
+    & li {
+        position: relative;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ── 노드 헤더 행 ── */
+    & li > div {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.45em;
+        height: 2em;
+        min-height: 2em;
+        padding-right: 0.5em;
+        margin-block: 1px;
+        border-radius: var(--roundSm, 0.35em);
+        cursor: pointer;
+        transition: background-color 0.1s ease;
+
+        /* 호버 */
+        &:hover { background-color: var(--aLight); }
+
+        /* 폴더 아이콘 — main 색상 기본 */
+        & > i.fi {
+            flex-shrink: 0;
+            font-size: 1.15em;
+            color: var(--main);
+            transition: transform 0.1s ease;
+
+            &:active { transform: scale(0.92); }
+
+            /* 이벤트 비활성 아이콘 */
+            &.nonEvent { pointer-events: none; }
+        }
+
+        /* 텍스트 영역 */
+        & > div {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.35em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9em;
+            line-height: 1;
+
+            & > span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                /* 노드 끝 개수 뱃지 */
+                & > .badge { 
+                    margin-left: 0.5em; 
+                    font-size: 0.75em;
+                }
+            }
+        }
+
+        /* 확장 메뉴 아이콘 (...) — span 사용 */
+        & > span.moreBtn {
+            opacity: 0;
+            pointer-events: none;
+            flex-shrink: 0;
+            width: 1.6em;
+            height: 1.6em;
+            min-height: 1.6em;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background-color: transparent;
+            color: var(--txSub);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.1s ease, background-color 0.1s ease;
+
+            & > i.fi {
+                font-size: 1em;
+                color: inherit;
+            }
+
+            &:hover {
+                background-color: var(--aColor);
+                color: var(--txColor);
+            }
+        }
+
+        /* 행 호버 시 ... 표시 */
+        &:hover > span.moreBtn {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+
+    /* ── 선택 상태 ── */
+    & li.selected > div {
+        background-color: var(--main);
+
+        & > i.fi { color: rgba(255, 255, 255, 0.9); }
+
+        & > div {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* 선택 행에서 ... 항시 표시 */
+        & > span.moreBtn {
+            opacity: 1;
+            pointer-events: auto;
+            color: rgba(255, 255, 255, 0.8);
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: #fff;
+            }
+        }
+    }
+
+    /* 포커스 링 */
+    & li > div:focus-visible {
+        outline: 2px solid var(--lineFocusColor);
+        outline-offset: -2px;
+    }
+
+    /* 비활성화 노드 */
+    & li.disabled > div {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    /* 체크박스 모드 */
+    & li > div label.check {
+        margin: 0;
+        gap: 0.3em;
+    }
+}
+
+/* 확장 메뉴 오버레이 (.treeMenu) */
+.treeMenu {
+    position: absolute !important;
+    display: none;
+    min-width: 10.5em;
+    padding: 0.35em;
+    margin: 0;
+    list-style: none;
+    background-color: var(--bgColor);
+    border: 1px solid var(--aColor);
+    border-radius: var(--roundBox, 0.6em);
+    box-shadow: 0 8px 24px var(--aDark);
+    z-index: 2000;
+
+    &.open {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15em;
+    }
+
+    & > li {
+        display: flex;
+        align-items: center;
+        gap: 0.55em;
+        padding: 0.45em 0.8em;
+        font-size: 0.88em;
+        border-radius: var(--roundSm, 0.4em);
+        cursor: pointer;
+        color: var(--txColor);
+        user-select: none;
+        transition: background-color 0.1s ease, color 0.1s ease;
+
+        & > i.fi {
+            font-size: 1.15em;
+            color: var(--txSub);
+        }
+
+        &:hover {
+            background-color: var(--aLight);
+
+            & > i.fi { color: var(--txColor); }
+        }
+
+        &:active { transform: scale(0.98); }
+
+        &.danger {
+            color: var(--danger);
+
+            & > i.fi { color: var(--danger); }
+
+            &:hover { background-color: var(--danger0, var(--aLight)); }
+        }
+
+        /* 이미 처리된 항목 (승인 기록 등): 옅게 */
+        &.muted {
+            opacity: 0.55;
+        }
+
+        &.divider {
+            height: 1px;
+            margin: 0.3em 0;
+            padding: 0;
+            background-color: var(--lineColor);
+            cursor: default;
+            pointer-events: none;
+        }
+    }
+}

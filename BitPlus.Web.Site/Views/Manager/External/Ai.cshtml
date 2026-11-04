@@ -1,0 +1,121 @@
+﻿@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("AiApi"));
+}
+
+@* AI API 접속 정보 (설정 "AiConnections") — 목록(행 클릭 = 편집), 하단 추가 버튼 = 등록 모달. 모달은 탭(접속 정보·옵션), 저장·삭제는 접속 하나씩(api/config/ai) *@
+<div class="pageBox aiBox">
+    <div class="inform">
+        <header><i class="fi fiSparkle"></i> @this.Lang("AiApi")</header>
+        <p>@this.Lang("AiApiInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <section class="card line flexCol auto">
+            <div class="dataList auto">
+                <header>
+                    <span class="colName"><span>NAME</span></span>
+                    <span class="colFormat"><span>FORMAT</span></span>
+                    <span class="colModel"><span>MODEL</span></span>
+                    <span class="colFlag"><span>ENABLER</span></span>
+                    <span class="colFlag"><span>DEFAULT</span></span>
+                </header>
+                <ul></ul>
+            </div>
+        </section>
+
+        <footer class="pageFooter">
+            <span></span>
+            <button type="button" class="main" data-mode="add"><i class="fi fiPlus"></i> @this.LangOf("AddOf", "AiConnection")</button>
+        </footer>
+    </article>
+</div>
+
+<!-- AI 접속 등록/수정 모달: 탭 접속 정보(이름·형식·주소·키·모델) / 옵션(온도·Top P·Top K·최대 출력 토큰·추론 강도), 하단 사용·기본 체크와 삭제(편집일 때만)·연결 테스트(저장 전 값)·취소·저장 -->
+<dialog id="aiModal">
+    <header><i class="fi fiSparkle fiFill"></i> <span></span></header>
+    <section class="tabBox">
+        <header>
+            <span data-for="#aiTabConnect" class="active">@this.Lang("AiConnectInfo")</span>
+            <span data-for="#aiTabOptions">@this.Lang("AiOptions")</span>
+        </header>
+        <section>
+            <div id="aiTabConnect" class="active">
+                <ul class="form">
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("Name") <small class="txDanger">*</small></header>
+                            <input type="text" name="name" maxlength="64" autocomplete="off" />
+                        </div>
+                        <div>
+                            <header>@this.Lang("AiFormat")</header>
+                            <select name="format">
+                                <option value="OpenAI">@this.Lang("AiFormatOpenAI")</option>
+                                <option value="Claude">Claude</option>
+                                <option value="Gemini">Gemini</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li>
+                        <header>@this.Lang("ApiEndpoint") <small class="txDanger">*</small></header>
+                        <input type="url" name="endpoint" maxlength="512" autocomplete="off" />
+                    </li>
+                    <li>
+                        <header>@this.Lang("ApiKey")</header>
+                        <input type="password" name="apiKey" maxlength="512" autocomplete="new-password" />
+                    </li>
+                    <li>
+                        <header>@this.Lang("AiModel") <small class="txDanger">*</small></header>
+                        <input type="text" name="model" maxlength="128" autocomplete="off" />
+                    </li>
+                </ul>
+            </div>
+            <div id="aiTabOptions">
+                <ul class="form">
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("Temperature") <small>0 ~ 2</small></header>
+                            <input type="number" name="temperature" min="0" max="2" step="0.1" placeholder="@this.Lang("ServerDefaultIfEmpty")" />
+                        </div>
+                        <div>
+                            <header>Top P <small>0 ~ 1</small></header>
+                            <input type="number" name="topP" min="0" max="1" step="0.05" placeholder="@this.Lang("ServerDefaultIfEmpty")" />
+                        </div>
+                    </li>
+                    <li class="col2">
+                        <div>
+                            <header>Top K</header>
+                            <input type="number" name="topK" min="1" max="1000" placeholder="@this.Lang("ServerDefaultIfEmpty")" />
+                        </div>
+                        <div>
+                            <header>@this.Lang("MaxTokens")</header>
+                            <input type="number" name="maxTokens" min="1" max="1000000" placeholder="@this.Lang("ServerDefaultIfEmpty")" />
+                        </div>
+                    </li>
+                    <li>
+                        <header>@this.Lang("ReasoningEffort")</header>
+                        <select name="reasoningEffort">
+                            <option value="">@this.Lang("NotUsed")</option>
+                            <option value="low">@this.Lang("Low")</option>
+                            <option value="medium">@this.Lang("Medium")</option>
+                            <option value="high">@this.Lang("High")</option>
+                        </select>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <label class="check main"><input type="checkbox" name="enabler" /><span>@this.Lang("Enabler")</span></label>
+        <label class="check main"><input type="checkbox" name="active" /><span>@this.Lang("DefaultMark")</span></label>
+        <button type="button" class="danger" data-mode="delete" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" data-mode="test"><i class="fi fiFlashCheck"></i> @this.Lang("SetupTest")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 External.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 External.cshtml 의 wireAiPage() 가 담당한다.
+-->

@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" class="bannerCoffee">
+  <!-- 사이드 패널 배너: Buy Me a Coffee 개발자 후원 (노란색 브랜드 테마, 3:2) -->
+  <style>
+    .bannerCoffee {
+      --coffeeBg1: #FFE033;
+      --coffeeBg2: #FFDD00;
+      --coffeeBg3: #F5C518;
+      --coffeeInk: #111111;
+      --coffeeSub: #222222;
+      --coffeeBtn: #111111;
+      --coffeeBtnText: #FFDD00;
+    }
+    [data-theme="dark"] .bannerCoffee {
+      --coffeeBg1: #F5C518;
+      --coffeeBg2: #E5B50A;
+      --coffeeBg3: #CC9E00;
+      --coffeeInk: #000000;
+      --coffeeSub: #1a1a1a;
+      --coffeeBtn: #000000;
+      --coffeeBtnText: #FFDD00;
+    }
+  </style>
+  <defs>
+    <linearGradient id="coffeeBgGrad" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" style="stop-color: var(--coffeeBg1)"/>
+      <stop offset="0.6" style="stop-color: var(--coffeeBg2)"/>
+      <stop offset="1" style="stop-color: var(--coffeeBg3)"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="url(#coffeeBgGrad)"/>
+  
+  <!-- Subtle decorative shapes -->
+  <circle cx="530" cy="70" r="140" fill="#ffffff" opacity="0.16"/>
+  <circle cx="430" cy="380" r="160" fill="#ffffff" opacity="0.12"/>
+  <circle cx="30" cy="380" r="120" fill="var(--coffeeBg3)" opacity="0.3"/>
+  <circle cx="280" cy="20" r="60" fill="#ffffff" opacity="0.1"/>
+
+  <!-- Left: Content text & CTA -->
+  <g font-family="'Noto Sans KR','Malgun Gothic',sans-serif">
+    <!-- Brand Badge -->
+    <rect x="40" y="32" width="200" height="34" rx="17" fill="var(--coffeeInk)" opacity="0.12"/>
+    <text x="140" y="55" font-size="17" font-weight="900" fill="var(--coffeeInk)" text-anchor="middle" letter-spacing="1.5">BUY ME A COFFEE</text>
+    
+    <!-- Headings -->
+    <text x="40" y="118" font-size="38" font-weight="900" fill="var(--coffeeInk)">개발자에게</text>
+    <text x="40" y="164" font-size="38" font-weight="900" fill="var(--coffeeInk)">커피 한 잔을</text>
+    
+    <!-- Subtitle (영문 글씨 크기 및 가독성 대폭 향상) -->
+    <text x="40" y="210" font-size="22" font-weight="700" fill="var(--coffeeSub)">Deliver a cup of coffee</text>
+    <text x="40" y="238" font-size="22" font-weight="700" fill="var(--coffeeSub)">to the developer.</text>
+
+    <!-- CTA Button -->
+    <g>
+      <rect x="40" y="276" width="220" height="54" rx="27" fill="var(--coffeeBtn)"/>
+      <text x="150" y="310" font-size="19" font-weight="800" fill="var(--coffeeBtnText)" text-anchor="middle">커피 후원하기 →</text>
+    </g>
+  </g>
+  
+  <!-- Right: Coffee Cup Illustration (깔끔한 플랫 벡터) -->
+  <g transform="translate(440 215)">
+    <!-- Floating steam paths -->
+    <path d="M-22 -85 C-30 -110 -15 -125 -22 -150" stroke="#8B5A2B" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M0 -80 C-8 -105 8 -120 0 -145" stroke="#8B5A2B" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.8"/>
+    <path d="M22 -85 C14 -110 29 -125 22 -150" stroke="#8B5A2B" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    
+    <!-- Saucer Shadow -->
+    <ellipse cx="0" cy="74" rx="60" ry="7" fill="var(--coffeeBg3)" opacity="0.5"/>
+
+    <!-- Cup Body -->
+    <path d="M-55 -60 L55 -60 L44 38 C42 52 30 62 15 62 L-15 62 C-30 62 -42 52 -44 38 Z" fill="#ffffff"/>
+    <!-- Coffee Surface -->
+    <ellipse cx="0" cy="-60" rx="55" ry="12" fill="#5A3A22"/>
+    <ellipse cx="0" cy="-60" rx="47" ry="9" fill="#7C4E2D"/>
+    <ellipse cx="0" cy="-60" rx="38" ry="6" fill="#8E5B35" opacity="0.7"/>
+    <!-- Cup Handle -->
+    <path d="M48 -40 C68 -40 76 -22 76 0 C76 22 65 30 40 30" stroke="#ffffff" stroke-width="11" stroke-linecap="round" fill="none"/>
+    <!-- Heart on Cup (Iconic amber heart) -->
+    <path d="M0 6 C-11 -7 -22 3 -11 15 L0 24 L11 15 C22 3 11 -7 0 6 Z" fill="#FF8A00"/>
+    <!-- Saucer -->
+    <ellipse cx="0" cy="68" rx="72" ry="9" fill="#ffffff" opacity="0.95"/>
+    <ellipse cx="0" cy="71" rx="56" ry="5" fill="#f0f0f0" opacity="0.6"/>
+  </g>
+</svg>

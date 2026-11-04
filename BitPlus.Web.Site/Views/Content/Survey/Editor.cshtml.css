@@ -1,0 +1,100 @@
+﻿@charset "UTF-8";
+/* 설문 편집기(Survey/Editor) 전용 스타일: 소개문 입력 + 설문 항목 카드 목록 (JS 로 그린 요소라 ::deep) */
+.surveyEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  width: 100%;
+}
+.surveyEditor ::deep section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  /* 설문 항목 카드 (보기 전용) */
+}
+.surveyEditor ::deep section > label {
+  font-size: 0.9em;
+  font-weight: 700;
+}
+.surveyEditor ::deep section > textarea {
+  width: 100%;
+  resize: vertical;
+  line-height: 1.6;
+}
+.surveyEditor ::deep section > header {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0;
+}
+.surveyEditor ::deep section > header > small {
+  color: var(--txLight);
+}
+.surveyEditor ::deep section > header > button {
+  margin-inline-start: auto;
+}
+.surveyEditor ::deep section > .note {
+  margin: 0;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+.surveyEditor ::deep section > ol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.surveyEditor ::deep section > ol > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  padding: 0.8em 1em;
+  border: 1px solid var(--lineColor);
+  border-radius: var(--roundBox);
+  /* 편집·삭제: 평소에는 글자 */
+}
+.surveyEditor ::deep section > ol > li > .head > .q.empty {
+  color: var(--txLight);
+}
+.surveyEditor ::deep section > ol > li > .head > em {
+  padding: 0 0 0 0.5em;
+  font-style: normal;
+  font-size: 0.8em;
+  color: var(--txLight);
+}
+.surveyEditor ::deep section > ol > li > ol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin: 0;
+  padding: 0 0 0 1.4em;
+  list-style: lower-alpha;
+  color: var(--txLight);
+}
+.surveyEditor ::deep section > ol > li > .tools {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.3em;
+  font-size: 0.85em;
+}
+.surveyEditor ::deep section > ol > li > .tools > span {
+  padding: 0.2em 0.8em;
+  border-radius: 2em;
+  color: var(--txLight);
+  cursor: pointer;
+  user-select: none;
+}
+.surveyEditor ::deep section > ol > li > .tools > span:hover {
+  background-color: var(--aColor);
+  color: var(--txColor);
+}
+.surveyEditor ::deep section > ol > li > .tools > span.danger:hover {
+  color: var(--danger1);
+}
+.surveyEditor ::deep section > ol > li > .tools > i.fi {
+  color: var(--txLight);
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Survey/Editor.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;AAiCA;;AA/BA;EACI;EACA;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AAyBA;;AArBI;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAIR;EACI%22%7D */

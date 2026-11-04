@@ -1,0 +1,384 @@
+﻿@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = "_AdminLayout";
+    this.SetTitle(this.Lang("Services"));
+    this.SetPageKey("Service");
+    this.SetDescription(this.Lang("ServicesInfo"));
+}
+
+@* 서비스 관리 — 탭: 사이트 메뉴(Service/Menu.cshtml, api/sitemap), 팝업(Service/Popup.cshtml, api/popup), 이벤트 서비스(Service/List.cshtml, api/service — 이벤트 구독 서비스 목록·상태·활성·설정 모달).
+   탭 추가: ① 아래 header 에 a[data-tab] ② srcMap 에 조각 경로 ③ (필요 시) initTab 초기화 함수 ④ ManagerController 에 조각 뷰 액션 *@
+<div class="tabView">
+    <header class="frameTabs">
+        <a data-tab="menu" href="#menu"><i class="fi fiLink"></i> @this.Lang("SiteMenu")</a>
+        <a data-tab="popup" href="#popup"><i class="fi fiWindow"></i> @this.Lang("Popup")</a>
+        <a data-tab="service" href="#service"><i class="fi fiFlashOn"></i> @this.Lang("EventServices")</a>
+    </header>
+    <div class="frameBody">
+        <div id="serviceContent"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const srcMap = {
+                menu: '/Manager/Service/Menu',
+                popup: '/Manager/Service/Popup',
+                service: '/Manager/Service/List'
+            };
+
+            // 서비스 — 목록(상태 5초마다 새로 고침), 행 끝 활성 토글, 행 클릭 = 서비스별 설정 양식 조각을 붙인 설정 모달
+            function wireServicePage() {
+                const root = document.getElementById('serviceContent');
+                const list = root.querySelector('div.serviceBox .dataList > ul');
+                const modal = root.querySelector('#serviceModal');
+                const formBox = modal.querySelector(':scope > section > div');
+                const enabler = modal.querySelector(':scope > footer [name="enabler"]');
+                const text = {
+                    Waiting: @this.Js(this.Lang("ServiceWaiting")),
+                    Running: @this.Js(this.Lang("ServiceRunning")),
+                    Disabled: @this.Js(this.Lang("ServiceDisabled")),
+                    noForm: @this.Js(this.Lang("ServiceNoForm")),
+                    formError: @this.Js(BitPlus.Web.WebCodes.Get(500) ?? string.Empty)
+                };
+                const colors = { Waiting: 'point', Running: 'main', Disabled: 'silver' };
+                const fields = () => [...formBox.querySelectorAll('[name]')];
+                let current = null;
+
+                // 목록 (행은 상태만 바뀌어도 다시 그림 — 서비스 수가 적음)
+                const load = async () => {
+                    const res = await common.getSend('/api/service', { useLoading: false });
+                    if (!res || !res.success) return;
+                    list.replaceChildren(...res.data.map(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="colName"><b></b><small></small></span>
+                            <span class="colEvents"></span>
+                            <span class="colState"><i></i></span>
+                            <span class="colCount"></span>
+                            <span class="colCount"></span>
+                            <span class="colDate"></span>
+                            <span class="colFlag"><label class="toggle point"><input type="checkbox" /><span><i></i></span></label></span>`;
+                        const cols = li.children;
+                        cols[0].firstElementChild.textContent = item.title;
+                        cols[0].lastElementChild.textContent = item.description;
+                        cols[1].textContent = cols[1].title = item.events.join(', ');
+                        cols[2].firstElementChild.className = `badge sm ${colors[item.state]}`;
+                        cols[2].firstElementChild.textContent = text[item.state];
+                        cols[3].textContent = item.queued;
+                        cols[4].textContent = item.processed;
+                        cols[5].textContent = item.lastRun ? common.localTime(item.lastRun, true) : '';
+                        if (item.lastError) {
+                            li.dataset.error = '';
+                            cols[5].title = `${common.localTime(item.lastErrorAt, true)} ${item.lastError}`;
+                        }
+                        const toggle = cols[6].querySelector('input');
+                        toggle.checked = item.state !== 'Disabled';
+                        cols[6].onclick = e => e.stopPropagation();
+                        toggle.onchange = async () => {
+                            const result = await common.putSend(`/api/service/${encodeURIComponent(item.name)}/enabler`, common.makeFormData({ enabler: toggle.checked }));
+                            if (!result || !result.success) toggle.checked = !toggle.checked;
+                            load();
+                        };
+                        li.onclick = () => openModal(item);
+                        return li;
+                    }));
+                };
+
+                // 설정 모달: 양식 조각을 붙이고 저장 값 채우기 (체크박스는 'true', 같은 이름 여럿은 쉼표로 묶인 값)
+                const openModal = async item => {
+                    const name = encodeURIComponent(item.name);
+                    const [html, res] = await Promise.all([
+                        fetch(`/Manager/Service/Form/${name}`, { cache: 'no-cache' }).then(r => r.ok ? r.text() : null),
+                        common.getSend(`/api/service/${name}`, { useLoading: false })
+                    ]);
+                    if (!res || !res.success) return;
+                    if (html === null) { common.alert(text.formError); return; } // 양식 조각을 못 그리면 "설정 없음"으로 보이지 않게 오류로 알림
+                    current = item;
+                    modal.querySelector(':scope > header > span').textContent = item.title;
+                    modal.querySelector(':scope > section > p').textContent = item.description;
+                    formBox.innerHTML = html.trim() || `<p>${text.noForm}</p>`;
+                    enabler.checked = res.data.enabler;
+                    fields().forEach(el => {
+                        const value = res.data.values[el.name];
+                        if (value == null) return;
+                        if (el.type === 'checkbox') el.checked = value === 'true';
+                        else if (el.type === 'radio') el.checked = el.value === value;
+                        else el.value = value;
+                    });
+                    modal.showModal();
+                };
+
+                modal.querySelector('[data-mode="save"]').onclick = async () => {
+                    const body = { enabler: enabler.checked };
+                    fields().filter(el => el.type !== 'radio' || el.checked).forEach(el => body[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim());
+                    const res = await common.putSend(`/api/service/${encodeURIComponent(current.name)}`, common.makeFormData(body));
+                    if (!res || !res.success) return;
+                    modal.close();
+                    load();
+                };
+
+                load();
+                const timer = setInterval(() => { // 5초마다 상태 새로 고침, 다른 탭으로 가면 멈춤
+                    if (!document.contains(list)) clearInterval(timer);
+                    else if (!document.hidden && !modal.open) load();
+                }, 5000);
+            }
+
+            // 사이트 메뉴 — 왼쪽 메뉴 트리(확장 메뉴), 오른쪽 선택 메뉴의 하위 목록(드래그로 순서 변경, 사용 토글), 등록/수정/삭제는 공용 메뉴 편집 모달(menuEdit)
+            function wireMenuPage() {
+                const root = document.getElementById('serviceContent');
+                const list = root.querySelector('#menuList');
+                // 선택 메뉴(null = 최상위)
+                const state = { parentKey: null };
+                const typeText = {
+                    @foreach (var type in Enum.GetNames<BitPlus.Data.SiteMap.LinkType>())
+                    {
+                        @:@(type): @this.Js(this.Lang("LinkType" + type)),
+                    }
+                };
+                const topText = @this.Js(this.Lang("TopLevel"));
+
+                const tree = common.makeTree({
+                    openSaveKey: 'menuTreeOpen',
+                    menus: [
+                        { text: @this.Js(this.LangOf("AddOf", "SubMenus")), icon: 'fi fiAdd', action: node => openModal(null, node.key) },
+                        { text: @this.Js(this.Lang("Edit")), icon: 'fi fiEdit', action: node => openModal(node.key) },
+                        { text: @this.Js(this.Lang("SideConfig")), icon: 'fi fiPanelLeft', action: node => editSide(node.key) },
+                        { divider: true },
+                        { text: @this.Js(this.Lang("Delete")), icon: 'fi fiDelete', danger: true, hidden: node => node.system, action: node => deleteMenu(node.key) }
+                    ],
+                    // 메뉴 선택 → 하위 목록, 선택 해제 → 최상위 목록
+                    onSelect: (mode, key) => {
+                        state.parentKey = mode === 'select' ? key : null;
+                        loadList();
+                    }
+                });
+
+                /** 메뉴 트리를 다시 받는다 (열림/선택 상태는 TreeBox 가 유지). 선택 메뉴가 사라졌으면 최상위로 되돌린다. */
+                async function loadTree() {
+                    const res = await common.getSend('/api/sitemap/menu/tree', { useLoading: false });
+                    tree.render('#menuTree', (res && res.data) || []);
+                    if (state.parentKey && !tree.getSelect()) state.parentKey = null;
+                }
+
+                /** 선택 메뉴의 하위 목록을 그린다. 행은 드래그 손잡이 + 아이콘 + 표시명/키, 형식, 경로, 사용 토글. */
+                async function loadList() {
+                    const query = state.parentKey ? `?parentKey=${encodeURIComponent(state.parentKey)}` : '';
+                    const res = await common.getSend(`/api/sitemap/menu/list${query}`, { useLoading: false });
+                    const items = (res && res.data) || [];
+                    list.innerHTML = '';
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.dataset.key = item.key;
+                        li.draggable = true;
+                        li.innerHTML = `
+                            <span class="colName"><i class="fi fiReOrderDotsVert"></i><span></span><small></small></span>
+                            <span class="colType"><span class="badge sm sub"></span></span>
+                            <span class="colAction"></span>
+                            <span class="colFlag"><label class="toggle xs point"><input type="checkbox" name="enabler"${item.enabler ? ' checked' : ''}${item.isSystem ? ' disabled' : ''} /><span><i></i></span></label></span>
+                            <span class="colDate">${common.localTime(item.cDate)}</span>`;
+                        li.querySelector('.colName > span').textContent = item.text;
+                        li.querySelector('.colName > small').textContent = (item.childCount ? `${item.key} (${item.childCount})` : item.key) + (item.isSystem ? ' · SYS' : '');
+                        // 형식이 "없음"(메뉴 그룹)이면 배지 없이 빈칸으로 둔다
+                        if (item.type === 'None') li.querySelector('.colType > .badge').remove();
+                        else li.querySelector('.colType > .badge').textContent = typeText[item.type] ?? item.type;
+                        li.querySelector('.colAction').textContent = item.action ?? '';
+                        list.appendChild(li);
+                    });
+                    common.syncEmpty(list);
+                    root.querySelector('#menuCounter').textContent = items.length;
+                    root.querySelector('#menuListTitle').textContent = state.parentKey ? tree.getSelectNode()?.text ?? state.parentKey : topText;
+                }
+
+                /**
+                 * 공용 메뉴 편집 모달을 열고, 저장/삭제되면 트리와 목록을 다시 그린다.
+                 * @@param {string|null} editKey 수정할 메뉴 키 (없으면 신규)
+                 * @@param {string|null} parentKey 신규 메뉴의 상위 메뉴 키
+                 */
+                async function openModal(editKey, parentKey = state.parentKey) {
+                    const result = await common.modal.append('menuEdit', { editKey, parentKey });
+                    if (!result) return;
+                    await loadTree();
+                    loadList();
+                }
+
+                /**
+                 * 사이드 구성 일괄 적용: 메뉴와 하위 메뉴의 경로가 가리키는 게시판(/content/{번호})·페이지 뷰(/view/{번호})를 세고,
+                 * 사이드 구성 모달(페이지 뷰 편집과 같은 sideEdit)에서 고른 값을 바로 한 번에 저장한다(완료 안내는 공용 응답 메시지). 대상이 없으면 안내만.
+                 * @@param {string} key 기준 메뉴 키
+                 */
+                async function editSide(key) {
+                    const url = `/api/sitemap/menu/side/${encodeURIComponent(key)}`;
+                    const info = await common.getSend(url);
+                    if (!info || !info.success) return;
+                    const { boards, pages, sideMenus } = info.data;
+                    if (boards + pages === 0) return common.info(@this.Js(this.Lang("SideApplyEmpty")));
+                    const result = await common.modal.append('sideEdit', { hidden: false, position: 'Left', menuKey: '', menus: sideMenus });
+                    if (!result) return;
+                    await common.putSend(url, common.makeFormData({ sideHidden: result.hidden, sidePosition: result.position, sideMenuKey: result.menuKey }));
+                }
+
+                /** 메뉴를 하위 메뉴까지 삭제하고 트리/목록을 다시 그린다. */
+                async function deleteMenu(key) {
+                    if (!await common.confirm(@this.Js(this.LangOf("DelMsg", "Menu") + " " + this.Lang("DelWithChildMenu") + " " + this.Lang("DelWarning")))) return false;
+                    const res = await common.delSend(`/api/sitemap/menu/item/${encodeURIComponent(key)}`);
+                    if (!res || !res.success) return false;
+                    await loadTree();
+                    loadList();
+                    return true;
+                }
+
+                root.querySelector('#addMenuBtn').onclick = () => openModal(null);
+
+                // 하위 목록: 행 클릭 → 편집, 사용 토글 → 바로 저장(실패 시 되돌림), 드래그 → 순서 저장 후 트리 갱신
+                list.onclick = e => {
+                    if (e.target.closest('label.toggle')) return;
+                    const li = e.target.closest('li[data-key]');
+                    if (li) openModal(li.dataset.key);
+                };
+                list.onchange = async e => {
+                    const input = e.target;
+                    const res = await common.patchSend(`/api/sitemap/menu/item/${encodeURIComponent(input.closest('li').dataset.key)}/enabler`, common.makeFormData({ enabler: input.checked }));
+                    if (!res || !res.success) input.checked = !input.checked;
+                };
+                common.bindDragSort(list, async items => {
+                    const res = await common.putSend('/api/sitemap/menu/order', common.makeFormData({ parentKey: state.parentKey ?? '', keys: items.map(li => li.dataset.key) }), { useLoading: false });
+                    if (res && res.success) loadTree();
+                    else loadList();
+                });
+
+                loadTree();
+                loadList();
+            }
+
+            // 팝업 — 등록 최신순 목록(페이지 이동·목록 크기), 추가 또는 행 클릭 → 등록/수정 모달(제목·게시 기간·게시 대상·크기·활성·본문 에디터). 저장/삭제는 api/popup
+            function wirePopupPage() {
+                const root = document.getElementById('serviceContent');
+                const list = root.querySelector('#popupList');
+                const modal = root.querySelector('#popupModal');
+                const field = name => modal.querySelector(`[name="${name}"]`);
+                const state = { page: 0, size: common.applyPageSize(root.querySelector('select[name="pageSize"]')), id: null, isNew: true, start: null, end: null, targets: [] };
+                const text = {
+                    all: @this.Js(this.Lang("AllUsers")),
+                    add: @this.Js(this.LangOf("AddOf", "Popup")),
+                    edit: @this.Js(this.LangOf("EditOf", "Popup")),
+                    target: @this.Js(this.Lang("PublishTarget")),
+                    required: @this.Js(this.LangOf("ValidRequired", "ContentTitle")),
+                    periodRequired: @this.Js(this.LangOf("ValidRequired", "PublishPeriod")),
+                    preview: @this.Js(this.Lang("Preview")),
+                    del: @this.Js(this.LangOf("DelMsg", "Popup") + " " + this.Lang("DelWarning"))
+                };
+                const areaText = JSON.parse(@this.Js(System.Text.Json.JsonSerializer.Serialize(Enum.GetNames<BitPlus.Data.Content.PopupArea>().ToDictionary(p => p, p => this.Lang("PopupArea" + p)))));
+                const periodOf = (start, end) => start || end ? `${start ? common.localTime(start, true) : ''} ~ ${end ? common.localTime(end, true) : ''}` : '';
+                let editor = null;
+
+                /** 목록을 그린다 (등록 최신순, page 는 0부터) */
+                async function loadList(page = state.page) {
+                    state.page = page;
+                    const res = await common.getSend(`/api/popup/list?page=${page + 1}&pageSize=${state.size}`, { useLoading: false });
+                    const data = (res && res.data) || { items: [], total: 0 };
+                    list.innerHTML = '';
+                    data.items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.dataset.id = item.id;
+                        li.innerHTML = `<span class="colName"></span><span class="colArea"><i class="badge sm sub"></i></span><span class="colPeriod"></span><span class="colTarget"></span><span class="colSize"></span>
+                            <span class="colFlag"><label class="toggle xs point"><input type="checkbox" name="enabler"${item.enabler ? ' checked' : ''} /><span><i></i></span></label></span><span class="colDate">${common.localTime(item.cDate)}</span>
+                            <span class="colPreview"><button type="button" class="xs" data-act="preview"><i class="fi fiEye"></i></button></span>`;
+                        li.querySelector('.colPreview > button').title = text.preview;
+                        li.querySelector('.colName').textContent = item.title;
+                        li.querySelector('.colArea > i').textContent = areaText[item.area] ?? item.area;
+                        li.querySelector('.colPeriod').textContent = periodOf(item.start, item.end);
+                        li.querySelector('.colTarget').textContent = item.targetCount > 0 ? `${text.target} ${item.targetCount}` : text.all;
+                        li.querySelector('.colSize').textContent = `${item.width} × ${item.height || 'auto'}`;
+                        list.appendChild(li);
+                    });
+                    common.syncEmpty(list);
+                    root.querySelector('#popupCounter').textContent = data.total;
+                    root.querySelector('footer > ul.pager').replaceWith(common.makePager(page, state.size, data.total).then(loadList));
+                }
+
+                /** 등록/수정 모달을 연다 (id 가 없으면 새 팝업: 에디터 이미지 소유자 키로 쓸 식별키를 미리 만든다) */
+                async function openModal(id) {
+                    let data = { id: crypto.randomUUID(), title: '', area: 'User', body: '', start: null, end: null, width: 400, height: 0, enabler: true, targets: [] };
+                    if (id) {
+                        const res = await common.getSend(`/api/popup/${id}`);
+                        if (!res || !res.success) return;
+                        data = res.data;
+                    }
+                    Object.assign(state, { id: data.id, isNew: !id, start: data.start, end: data.end, targets: data.targets });
+                    modal.querySelector(':scope > header > span').textContent = id ? text.edit : text.add;
+                    field('title').value = data.title;
+                    field('area').value = data.area;
+                    field('width').value = data.width;
+                    field('height').value = data.height;
+                    field('enabler').checked = data.enabler;
+                    syncSummary();
+                    modal.querySelector('[data-mode="delete"]').hidden = !id;
+                    modal.showModal();
+                    editor ??= await common.makeEditor(field('body'), { ownerType: 'site.popup', get ownerKey() { return state.id; }, height: '38em' });
+                    editor.setHtml(data.body ?? '');
+                }
+
+                /** 게시 기간·게시 대상 요약 글자 */
+                function syncSummary() {
+                    field('periodText').value = periodOf(state.start, state.end);
+                    field('targetText').value = state.targets.map(p => p.name).join(', ');
+                }
+
+                modal.querySelector('[data-act="period"]').onclick = async () => {
+                    const result = await common.periodEdit(state.start, state.end);
+                    if (result) { Object.assign(state, result); syncSummary(); }
+                };
+                modal.querySelector('[data-act="target"]').onclick = async () => {
+                    const result = await common.modal.append('targetEdit', { title: text.target, items: state.targets });
+                    if (result) { state.targets = result; syncSummary(); }
+                };
+                modal.querySelector('[data-mode="save"]').onclick = async () => {
+                    const title = field('title').value.trim();
+                    if (!title) { field('title').focus(); return common.alert(text.required); }
+                    if (!state.start || !state.end) return common.alert(text.periodRequired); // 팝업은 게시 기간(시작·종료) 필수
+                    const res = await common.postSend('/api/popup', common.makeFormData({
+                        id: state.id, title, area: field('area').value, body: editor.getHtml(), start: state.start ?? '', end: state.end ?? '',
+                        targets: JSON.stringify(state.targets.map(p => ({ type: p.type, key: p.key }))),
+                        width: Number(field('width').value) || 400, height: Number(field('height').value) || 0, enabler: field('enabler').checked
+                    }));
+                    if (!res || !res.success) return;
+                    modal.close();
+                    loadList(state.isNew ? 0 : state.page);
+                };
+                modal.querySelector('[data-mode="delete"]').onclick = async () => {
+                    if (!await common.confirm(text.del)) return;
+                    const res = await common.delSend(`/api/popup/${state.id}`);
+                    if (!res || !res.success) return;
+                    modal.close();
+                    loadList();
+                };
+
+                // 목록의 활성 토글: 바로 저장하고 실패하면 되돌린다
+                list.onchange = async e => {
+                    const input = e.target.closest('input[name="enabler"]');
+                    if (!input) return;
+                    const res = await common.patchSend(`/api/popup/${input.closest('li').dataset.id}/enabler`, common.makeFormData({ enabler: input.checked }), { useLoading: false });
+                    if (!res || !res.success) input.checked = !input.checked;
+                };
+                root.querySelector('#addPopupBtn').onclick = () => openModal(null);
+                list.onclick = async e => {
+                    const li = e.target.closest('li[data-id]');
+                    if (!li || e.target.closest('label.toggle')) return; // 활성 토글은 아래 onchange 가 처리
+                    if (!e.target.closest('[data-act="preview"]')) return openModal(li.dataset.id);
+                    // 미리보기: 사용자 화면과 같은 팝업 창(_SitePopup 의 showSitePopup)으로 띄우되, 닫아도 읽은 기록은 남기지 않는다 (게시 기간·활성과 상관없이)
+                    const res = await common.getSend(`/api/popup/${li.dataset.id}`);
+                    if (res && res.success) showSitePopup(res.data);
+                };
+                root.querySelector('select[name="pageSize"]').onchange = e => { state.size = Number(e.target.value); loadList(0); };
+                loadList(0);
+            }
+
+            // 탭 연결 (공용 common.bindTabView — site.js 모듈이 준비된 뒤 실행)
+            const initTab = { service: wireServicePage, menu: wireMenuPage, popup: wirePopupPage };
+            window.addEventListener('DOMContentLoaded', () => common.bindTabView(document.querySelector('.tabView'), srcMap, initTab));
+        })();
+    </script>
+}

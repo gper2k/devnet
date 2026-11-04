@@ -1,0 +1,178 @@
+@use "../Design" as design;
+
+/* 소개 띠 위젯 — band 면 테마색(main) 띠·밝은 글자·아래쪽 사선, 둥근 이미지(테두리 고리), 배경에 이미지 쪽에서 글자까지 덮으며 틀 밖으로 나가는 큰 톤 원 두 개(겹침), reverse 면 좌우 바뀜 */
+div.widgetShowcase {
+    font-size: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    align-items: center;
+    gap: 3em;
+    padding: 3em 2em 4.5em;
+    position: relative;
+    border-radius: var(--roundBox);
+    color: var(--txColor);
+    overflow: hidden;
+    isolation: isolate;
+
+    /* 배경 톤 원 두 개 — 이미지 쪽에서 틀 밖으로 나가며 서로 겹침 (겹친 곳은 톤이 한 번 더 바뀜) */
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        aspect-ratio: 1;
+        border-radius: 50%;
+    }
+
+    &::before {
+        left: -14%;
+        top: -60%;
+        width: 82%;
+        background-color: var(--main1);
+    }
+
+    &::after {
+        left: 30%;
+        top: 25%;
+        width: 56%;
+        background-color: var(--main2);
+        opacity: 0.6;
+    }
+
+    &[data-reverse]::before {
+        left: auto;
+        right: -14%;
+    }
+
+    &[data-reverse]::after {
+        left: auto;
+        right: 30%;
+    }
+
+    &[data-band] {
+        background-color: var(--main);
+        color: white;
+        clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+
+        &::before {
+            background-color: var(--main7);
+        }
+
+        &::after {
+            background-color: var(--main5);
+            opacity: 0.35;
+        }
+
+        & > div > h2 {
+            color: white;
+        }
+
+        & > div > em {
+            color: var(--point4);
+        }
+
+        & > div > p {
+            color: var(--main1);
+        }
+
+        & > div > a {
+            background: transparent;
+            border-color: white;
+            color: white;
+        }
+
+        & > figure > img,
+        & > figure > span {
+            box-shadow: 0 0 0 0.6em var(--main6);
+        }
+    }
+
+    &[data-reverse] > figure {
+        order: 2;
+    }
+
+    & > figure {
+        position: relative;
+        margin: 0 auto;
+        width: min(20em, 100%);
+        aspect-ratio: 1;
+        z-index: 0;
+
+        & > img,
+        & > span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: var(--main7);
+            box-shadow: 0 0 0 0.6em var(--main2);
+        }
+
+        & > span > i {
+            font-size: 4em;
+            color: var(--main2);
+        }
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1em;
+
+        & > em {
+            @include design.label;
+        }
+
+        & > h2 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        & > p {
+            margin: 0;
+            color: var(--txLight);
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        & > a {
+            text-decoration: none;
+        }
+    }
+
+    @media (max-width: 779.98px) {
+        grid-template-columns: 1fr;
+        gap: 2em;
+
+        &[data-reverse] > figure {
+            order: 0;
+        }
+
+        & > figure {
+            width: min(14em, 80%);
+        }
+
+        /* 톤 원은 이미지 둘레에서 글자까지 */
+        &::before,
+        &[data-reverse]::before {
+            left: 30%;
+            right: auto;
+            top: -15%;
+            width: 110%;
+        }
+
+        &::after,
+        &[data-reverse]::after {
+            left: -25%;
+            right: auto;
+            top: 38%;
+            width: 90%;
+        }
+    }
+}

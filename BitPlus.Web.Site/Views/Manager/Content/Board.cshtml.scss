@@ -1,0 +1,35 @@
+/* 관리자 게시판 설정 전용 스타일 — 사용자 화면과 같은 Manage 파샬뷰(article.contentManage)를 관리자 화면 톤에 맞춘다.
+   제목줄은 관리자 레이아웃 제목과 겹치므로 숨기고, 탭 본문만 스크롤되며 저장 버튼 줄은 다른 관리자 화면(.pageFooter)처럼 화면 아래에 붙는다. */
+div.boardSettings ::deep article.contentManage {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    & > header {
+        display: none;
+    }
+
+    & > section.tabBox {
+        min-height: 0;
+
+        & > section {
+            overflow-y: auto;
+        }
+    }
+
+    & > footer {
+        flex: 0 0 auto;
+        justify-content: flex-end;
+        padding: 0.5em;
+        border: 1px solid var(--aLight);
+        border-radius: var(--roundBox);
+        background-color: var(--aLow);
+
+        & > a,
+        & > button {
+            font-size: 0.85em;
+        }
+    }
+}

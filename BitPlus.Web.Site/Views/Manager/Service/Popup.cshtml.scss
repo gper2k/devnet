@@ -1,0 +1,115 @@
+/* 시스템 설정 > 팝업 전용 스타일. 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.popupBox > section.card {
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+
+    & > header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1em;
+        padding: 0.5em;
+
+        & > strong {
+            display: flex;
+            align-items: center;
+            padding: 0 0.5em;
+            gap: 0.4em;
+            font-size: 1.02em;
+            color: var(--txColor);
+
+            & > i.fi {
+                font-size: 1.4em;
+            }
+        }
+    }
+
+    & > div.dataList ::deep {
+        overflow-y: auto;
+
+        & > header,
+        & > ul > li {
+            & > .colName {
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            & > .colArea {
+                flex: 0 0 7em;
+                justify-content: center;
+            }
+
+            & > .colPeriod {
+                flex: 0 0 18em;
+                font-size: 0.85em;
+                justify-content: center;
+            }
+
+            & > .colTarget {
+                flex: 0 0 7em;
+                font-size: 0.85em;
+                justify-content: center;
+            }
+
+            & > .colSize {
+                flex: 0 0 7em;
+                font-size: 0.85em;
+                justify-content: center;
+            }
+
+            & > .colFlag {
+                flex: 0 0 5em;
+                justify-content: center;
+            }
+
+            & > .colDate {
+                flex: 0 0 8em;
+                font-size: 0.85em;
+                justify-content: center;
+            }
+
+            & > .colPreview {
+                flex: 0 0 3em;
+                justify-content: center;
+            }
+        }
+
+        & > ul > li {
+            padding: 0.2em 0.5em;
+            cursor: pointer;
+
+            & > .colPeriod,
+            & > .colTarget,
+            & > .colSize {
+                color: var(--txSub);
+            }
+        }
+    }
+
+    & > footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5em 0.8em;
+        border-top: 1px solid var(--lineColor);
+    }
+}
+
+/* 팝업 등록/수정 모달: 높이는 내용(입력 항목 + 에디터 38em, 스크립트에서 지정)만큼 */
+dialog#popupModal {
+    width: 48em;
+
+    & > header {
+        color: var(--main);
+    }
+
+    /* 하단: 왼쪽 끝에 활성 체크(자리 고정), 오른쪽 끝에 취소·(수정이면 삭제)·저장 */
+    & > footer > label.check {
+        width: auto;
+        margin-right: auto;
+    }
+}

@@ -1,0 +1,115 @@
+/* 설문 편집기(Survey/Editor) 전용 스타일: 소개문 입력 + 설문 항목 카드 목록 (JS 로 그린 요소라 ::deep) */
+.surveyEditor {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    width: 100%;
+
+    & ::deep section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        & > label {
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+
+        & > textarea {
+            width: 100%;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        & > header {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            padding: 0;
+
+            & > small {
+                color: var(--txLight);
+            }
+
+            & > button {
+                margin-inline-start: auto;
+            }
+        }
+
+        & > .note {
+            margin: 0;
+            font-size: 0.85em;
+            color: var(--txLight);
+        }
+        /* 설문 항목 카드 (보기 전용) */
+        & > ol {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6em;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            & > li {
+                display: flex;
+                flex-direction: column;
+                gap: 0.4em;
+                padding: 0.8em 1em;
+                border: 1px solid var(--lineColor);
+                border-radius: var(--roundBox);
+
+                & > .head {
+
+                    & > .q.empty {
+                        color: var(--txLight);
+                    }
+
+                    & > em {
+                        padding: 0 0 0 0.5em;
+                        font-style: normal;
+                        font-size: 0.8em;
+                        color: var(--txLight);
+                    }
+                }
+
+                & > ol {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.2em;
+                    margin: 0;
+                    padding: 0 0 0 1.4em;
+                    list-style: lower-alpha;
+                    color: var(--txLight);
+                }
+                /* 편집·삭제: 평소에는 글자 */
+                & > .tools {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 0.3em;
+                    font-size: 0.85em;
+
+                    & > span {
+                        padding: 0.2em 0.8em;
+                        border-radius: 2em;
+                        color: var(--txLight);
+                        cursor: pointer;
+                        user-select: none;
+
+                        &:hover {
+                            background-color: var(--aColor);
+                            color: var(--txColor);
+                        }
+
+                        &.danger:hover {
+                            color: var(--danger1);
+                        }
+                    }
+
+                    & > i.fi {
+                        color: var(--txLight);
+                    }
+                }
+            }
+        }
+    }
+}

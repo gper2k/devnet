@@ -1,0 +1,14 @@
+{
+  "key": "Split21",
+  "version": 1,
+  "order": 5,
+  "name": { "ko": "3단 2:1", "en": "Split 2:1" },
+  "description": { "ko": "3단 중 2단을 쓰는 넓은 칸과 1단 칸. 배너 + 기사 목록처럼 씁니다. 780 미만에서는 위아래로 쌓입니다.", "en": "A wide slot over two of three columns and a one-column slot, e.g. banner + article list. Below 780 they stack." },
+  "slots": ["a", "b"],
+  "layouts": {
+    "1024": ["a a b"],
+    "1023": ["a a b"],
+    "779": ["a", "b"],
+    "519": ["a", "b"]
+  }
+}

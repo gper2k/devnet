@@ -1,0 +1,8 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 히어로 위젯 설정 — title, text, image, buttonText·buttonUrl, reverse(이미지를 오른쪽에) *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_DesignFields.cshtml" model='new[] { "heading", "image", "button", "reverse" }' />
+</ul>

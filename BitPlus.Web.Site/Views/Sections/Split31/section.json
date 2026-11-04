@@ -1,0 +1,14 @@
+{
+  "key": "Split31",
+  "version": 1,
+  "order": 4,
+  "name": { "ko": "좌우 3:1", "en": "Split 3:1" },
+  "description": { "ko": "넓은 본문 칸(3×1)과 좁은 사이드 칸(1×1). 780 미만에서는 위아래로 쌓입니다.", "en": "A wide main slot (3x1) and a narrow side slot (1x1). Below 780 they stack." },
+  "slots": ["a", "b"],
+  "layouts": {
+    "1024": ["a a a b"],
+    "1023": ["a a a b"],
+    "779": ["a", "b"],
+    "519": ["a", "b"]
+  }
+}

@@ -1,0 +1,2655 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccessConfig" xml:space="preserve">
+    <value>Auth Config</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>ADD</value>
+  </data>
+  <data name="BasicInfo" xml:space="preserve">
+    <value>Basic Info</value>
+  </data>
+  <data name="BodyOf" xml:space="preserve">
+    <value>{0} Body</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ContentBodyOf" xml:space="preserve">
+    <value>{0} Body</value>
+  </data>
+  <data name="Cult" xml:space="preserve">
+    <value>Culture</value>
+  </data>
+  <data name="DataEmpty" xml:space="preserve">
+    <value>Data empty</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="DomainOf" xml:space="preserve">
+    <value>{0} domain</value>
+  </data>
+  <data name="DpName" xml:space="preserve">
+    <value>Display Name</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Enabler" xml:space="preserve">
+    <value>Enabler</value>
+  </data>
+  <data name="EssTerms" xml:space="preserve">
+    <value>Essential Terms</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="GroupName" xml:space="preserve">
+    <value>Group Name</value>
+  </data>
+  <data name="Grade" xml:space="preserve">
+    <value>Grade</value>
+  </data>
+  <data name="GroupSelect" xml:space="preserve">
+    <value>Select Group</value>
+  </data>
+  <data name="Inherit" xml:space="preserve">
+    <value>Inherit</value>
+  </data>
+  <data name="KeyOf" xml:space="preserve">
+    <value>{0} key</value>
+  </data>
+  <data name="LangInput" xml:space="preserve">
+    <value>Multilingual Input</value>
+  </data>
+  <data name="MaxSelectMsg" xml:space="preserve">
+    <value>You can select up to {0} items.</value>
+  </data>
+  <data name="Mail" xml:space="preserve">
+    <value>Mail</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Manage</value>
+  </data>
+  <data name="Manager" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="MgmtAccountInfo" xml:space="preserve">
+    <value>Account Management on the Site</value>
+  </data>
+  <data name="NameOf" xml:space="preserve">
+    <value>{0} Name</value>
+  </data>
+  <data name="ParentGroup" xml:space="preserve">
+    <value>Parent group</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Property" xml:space="preserve">
+    <value>Property</value>
+  </data>
+  <data name="PropKeyDup" xml:space="preserve">
+    <value>This property key is already in use.</value>
+  </data>
+  <data name="PropKeyInvalid" xml:space="preserve">
+    <value>A property key cannot start with '@'.</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="RoleInfoTitle" xml:space="preserve">
+    <value>Role Management for User Privilege Handling</value>
+  </data>
+  <data name="RoleSelect" xml:space="preserve">
+    <value>Select Role</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Sequence" xml:space="preserve">
+    <value>Sequence</value>
+  </data>
+  <data name="Site" xml:space="preserve">
+    <value>Site</value>
+  </data>
+  <data name="System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Template" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="TemplateInfoTitle" xml:space="preserve">
+    <value>Email Template Management</value>
+  </data>
+  <data name="TemplateMailVerf" xml:space="preserve">
+    <value>For email address verification</value>
+  </data>
+  <data name="TemplateMailVerfDetail" xml:space="preserve">
+    <value>User Email Verification Template</value>
+  </data>
+  <data name="TemplateOf" xml:space="preserve">
+    <value>{0} Template</value>
+  </data>
+  <data name="TemplateRepwMail" xml:space="preserve">
+    <value>For password reissue</value>
+  </data>
+  <data name="TemplateRepwMailDetail" xml:space="preserve">
+    <value>Email template for user password reset</value>
+  </data>
+  <data name="TemplateTokenInfo" xml:space="preserve">
+    <value>Token value passed to the template</value>
+  </data>
+  <data name="Terms" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="TermsInfoTitle" xml:space="preserve">
+    <value>Manage User Terms of Service</value>
+  </data>
+  <data name="TermsTitle" xml:space="preserve">
+    <value>Terms Title</value>
+  </data>
+  <data name="TitleOf" xml:space="preserve">
+    <value>{0} Title</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="UserSelect" xml:space="preserve">
+    <value>Select User</value>
+  </data>
+  <data name="UserID" xml:space="preserve">
+    <value>User ID</value>
+  </data>
+  <data name="UserMail" xml:space="preserve">
+    <value>User mail</value>
+  </data>
+  <data name="UserName" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="Visible" xml:space="preserve">
+    <value>Visible</value>
+  </data>
+  <data name="UserAndGroup" xml:space="preserve">
+    <value>Users &amp; Groups</value>
+  </data>
+  <data name="AccountList" xml:space="preserve">
+    <value>Account List</value>
+  </data>
+  <data name="SearchNameOrId" xml:space="preserve">
+    <value>Search name or ID...</value>
+  </data>
+  <data name="EditInfoOf" xml:space="preserve">
+    <value>Edit {0}</value>
+  </data>
+  <data name="AddOf" xml:space="preserve">
+    <value>Add {0}</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>All Users</value>
+  </data>
+  <data name="NotAssigned" xml:space="preserve">
+    <value>Not assigned</value>
+  </data>
+  <data name="TopLevel" xml:space="preserve">
+    <value>Top level</value>
+  </data>
+  <data name="SortCode" xml:space="preserve">
+    <value>Sort code (letters/digits)</value>
+  </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>Role Name</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="TermsKey" xml:space="preserve">
+    <value>Terms Key</value>
+  </data>
+  <data name="TermsBody" xml:space="preserve">
+    <value>Terms Body</value>
+  </data>
+  <data name="ConfigInfoTitle" xml:space="preserve">
+    <value>Account Configuration</value>
+  </data>
+  <data name="DefaultGroupConfig" xml:space="preserve">
+    <value>Default Group Settings</value>
+  </data>
+  <data name="JoinDefaultGroup" xml:space="preserve">
+    <value>Default Groups on Sign-up</value>
+  </data>
+  <data name="DefaultRoleConfig" xml:space="preserve">
+    <value>Default Role Settings</value>
+  </data>
+  <data name="TokenNameConfig" xml:space="preserve">
+    <value>Token Names</value>
+  </data>
+  <data name="DefaultPassword" xml:space="preserve">
+    <value>Default Password Format</value>
+  </data>
+  <data name="UidMinSize" xml:space="preserve">
+    <value>Minimum User ID Length</value>
+  </data>
+  <data name="AccessExpireMin" xml:space="preserve">
+    <value>Access Token Lifetime (min)</value>
+  </data>
+  <data name="AccessRefreshMin" xml:space="preserve">
+    <value>Refresh Signal Lead Time (min)</value>
+  </data>
+  <data name="RefreshExpireHour" xml:space="preserve">
+    <value>Refresh Token Lifetime (hours)</value>
+  </data>
+  <data name="AccessTokenName" xml:space="preserve">
+    <value>Access Token Name</value>
+  </data>
+  <data name="RefreshTokenName" xml:space="preserve">
+    <value>Refresh Token Name</value>
+  </data>
+  <data name="RefreshSignalHeaderName" xml:space="preserve">
+    <value>Refresh Signal Header</value>
+  </data>
+  <data name="PasswordRule" xml:space="preserve">
+    <value>Password Rules</value>
+  </data>
+  <data name="LockoutRule" xml:space="preserve">
+    <value>Sign-in Lockout</value>
+  </data>
+  <data name="RequiredLength" xml:space="preserve">
+    <value>Minimum Password Length</value>
+  </data>
+  <data name="RequiredUniqueChars" xml:space="preserve">
+    <value>Minimum Unique Characters</value>
+  </data>
+  <data name="RequireDigit" xml:space="preserve">
+    <value>Require digit (0-9)</value>
+  </data>
+  <data name="RequireLowercase" xml:space="preserve">
+    <value>Require lowercase (a-z)</value>
+  </data>
+  <data name="RequireUppercase" xml:space="preserve">
+    <value>Require uppercase (A-Z)</value>
+  </data>
+  <data name="RequireNonAlphanumeric" xml:space="preserve">
+    <value>Require special character</value>
+  </data>
+  <data name="MaxFailedAccessAttempts" xml:space="preserve">
+    <value>Max Failed Sign-in Attempts</value>
+  </data>
+  <data name="LockoutMinutes" xml:space="preserve">
+    <value>Lockout Duration (min)</value>
+  </data>
+  <data name="AllowedForNewUsers" xml:space="preserve">
+    <value>Apply lockout to new users</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="SignUp" xml:space="preserve">
+    <value>Sign Up</value>
+  </data>
+  <data name="FindAccount" xml:space="preserve">
+    <value>Find ID/PW</value>
+  </data>
+  <data name="CreateAccount" xml:space="preserve">
+    <value>Create Account</value>
+  </data>
+  <data name="WelcomeVisit" xml:space="preserve">
+    <value>Welcome! Thank you for visiting Bitplus.</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="UidOrEmail" xml:space="preserve">
+    <value>User ID or Email</value>
+  </data>
+  <data name="EnterUid" xml:space="preserve">
+    <value>Enter your user ID</value>
+  </data>
+  <data name="UidRule" xml:space="preserve">
+    <value>Starts with a letter; letters, digits and _ only</value>
+  </data>
+  <data name="EnterUidOrEmail" xml:space="preserve">
+    <value>Enter your user ID or email</value>
+  </data>
+  <data name="EnterPassword" xml:space="preserve">
+    <value>Enter your password</value>
+  </data>
+  <data name="CreatePassword" xml:space="preserve">
+    <value>Create a secure password</value>
+  </data>
+  <data name="SignInAgree" xml:space="preserve">
+    <value>By signing in, you agree to our {0}.</value>
+  </data>
+  <data name="SecurityTerms" xml:space="preserve">
+    <value>Security Policy &amp; Terms</value>
+  </data>
+  <data name="AgreeOf" xml:space="preserve">
+    <value>I agree to the {0}.</value>
+  </data>
+  <data name="AgreeAllTerms" xml:space="preserve">
+    <value>I agree to all terms.</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="EssTermsRequired" xml:space="preserve">
+    <value>Please agree to the required terms.</value>
+  </data>
+  <data name="EnterDpName" xml:space="preserve">
+    <value>Enter your display name</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="EnterName" xml:space="preserve">
+    <value>Enter your name</value>
+  </data>
+  <data name="PasswordConfirm" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="EnterPasswordConfirm" xml:space="preserve">
+    <value>Re-enter your password</value>
+  </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>Passwords do not match.</value>
+  </data>
+  <data name="PasswordNeeds" xml:space="preserve">
+    <value>Password must include: {0}</value>
+  </data>
+  <data name="PasswordUniqueChars" xml:space="preserve">
+    <value>Password must contain at least {0} different characters.</value>
+  </data>
+  <data name="MinCharsOf" xml:space="preserve">
+    <value>At least {0} characters</value>
+  </data>
+  <data name="MailVerify" xml:space="preserve">
+    <value>Mail Verification</value>
+  </data>
+  <data name="MailVerifyOff" xml:space="preserve">
+    <value>Off - no mail verification</value>
+  </data>
+  <data name="MailVerifyWarning" xml:space="preserve">
+    <value>Warning - sign-in allowed, warning shown until verified</value>
+  </data>
+  <data name="MailVerifyOn" xml:space="preserve">
+    <value>On - verify at sign-up, sign-in blocked until verified</value>
+  </data>
+  <data name="SmtpConfig" xml:space="preserve">
+    <value>SMTP Settings</value>
+  </data>
+  <data name="SmtpHost" xml:space="preserve">
+    <value>SMTP Server</value>
+  </data>
+  <data name="SmtpPort" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="SmtpUser" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="SmtpFrom" xml:space="preserve">
+    <value>Sender Address</value>
+  </data>
+  <data name="SmtpFromName" xml:space="preserve">
+    <value>Sender Name</value>
+  </data>
+  <data name="SmtpSsl" xml:space="preserve">
+    <value>Use SSL/TLS</value>
+  </data>
+  <data name="KeepIfEmpty" xml:space="preserve">
+    <value>Leave blank to keep the current value</value>
+  </data>
+  <data name="SystemSettings" xml:space="preserve">
+    <value>System Settings</value>
+  </data>
+  <data name="SmtpTest" xml:space="preserve">
+    <value>Send Test Mail</value>
+  </data>
+  <data name="TestMailTo" xml:space="preserve">
+    <value>Test Recipient</value>
+  </data>
+  <data name="SmtpTestNeeds" xml:space="preserve">
+    <value>Enter the SMTP server and sender address to send a test mail.</value>
+  </data>
+  <data name="SmtpTestSubject" xml:space="preserve">
+    <value>[Bitplus] SMTP test mail</value>
+  </data>
+  <data name="SmtpTestBody" xml:space="preserve">
+    <value>This is a test mail. Your SMTP settings are working. ({0})</value>
+  </data>
+  <data name="SmtpTestSent" xml:space="preserve">
+    <value>Test mail sent to {0}.</value>
+  </data>
+  <data name="SmtpTestFailed" xml:space="preserve">
+    <value>Failed to send the test mail: {0}</value>
+  </data>
+  <data name="MailAlreadyVerified" xml:space="preserve">
+    <value>This mail address is already verified.</value>
+  </data>
+  <data name="MailResendWait" xml:space="preserve">
+    <value>Please wait a moment before sending it again.</value>
+  </data>
+  <data name="MailResent" xml:space="preserve">
+    <value>The verification mail has been sent again.</value>
+  </data>
+  <data name="MailNotSent" xml:space="preserve">
+    <value>Could not send the verification mail. Please send it again later.</value>
+  </data>
+  <data name="AccountMailConfirmTitle" xml:space="preserve">
+    <value>Please verify your mail address</value>
+  </data>
+  <data name="ResendMail" xml:space="preserve">
+    <value>Resend verification mail</value>
+  </data>
+  <data name="MailVerifyNotice" xml:space="preserve">
+    <value>Your mail address is not verified yet.</value>
+  </data>
+  <data name="VerifyMailSentTitle" xml:space="preserve">
+    <value>Verification Email Sent</value>
+  </data>
+  <data name="VerifyMailSentNotice" xml:space="preserve">
+    <value>A verification link has been sent to the email address below.</value>
+  </data>
+  <data name="CheckMailVerified" xml:space="preserve">
+    <value>Confirm Verification</value>
+  </data>
+  <data name="VerifyMailFailedTitle" xml:space="preserve">
+    <value>Verification Link Expired</value>
+  </data>
+  <data name="MailNotSentTitle" xml:space="preserve">
+    <value>Failed to Send Email</value>
+  </data>
+  <data name="MailVerifySuccess" xml:space="preserve">
+    <value>Email verification is complete. Please sign in.</value>
+  </data>
+  <data name="VerifyTipsTitle" xml:space="preserve">
+    <value>Didn't receive the email?</value>
+  </data>
+  <data name="VerifyTip1" xml:space="preserve">
+    <value>Please check your spam or junk folder.</value>
+  </data>
+  <data name="VerifyTip2" xml:space="preserve">
+    <value>If it doesn't arrive within a few minutes, click resend below.</value>
+  </data>
+  <data name="GoToSignIn" xml:space="preserve">
+    <value>Go to Sign In</value>
+  </data>
+  <data name="GoToManager" xml:space="preserve">
+    <value>Go to admin pages</value>
+  </data>
+  <data name="FindId" xml:space="preserve">
+    <value>Find ID</value>
+  </data>
+  <data name="ResetPassword" xml:space="preserve">
+    <value>Reset Password</value>
+  </data>
+  <data name="FoundIdNotice" xml:space="preserve">
+    <value>Here is the User ID matching your information.</value>
+  </data>
+  <data name="AccountPwChangeTitle" xml:space="preserve">
+    <value>Password Reset Instructions</value>
+  </data>
+  <data name="ResetPwSuccess" xml:space="preserve">
+    <value>Your password has been successfully reset. Please sign in with your new password.</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="EnterNewPassword" xml:space="preserve">
+    <value>Enter a new password</value>
+  </data>
+  <data name="AccountFindIdTitle" xml:space="preserve">
+    <value>Your Account ID Information</value>
+  </data>
+  <data name="TemplateFindIdMail" xml:space="preserve">
+    <value>Find ID</value>
+  </data>
+  <data name="TemplateFindIdMailDetail" xml:space="preserve">
+    <value>Email template for finding user ID</value>
+  </data>
+  <data name="FileRule" xml:space="preserve">
+    <value>File Rule</value>
+  </data>
+  <data name="FileRules" xml:space="preserve">
+    <value>File Rules</value>
+  </data>
+  <data name="FileRuleInfoTitle" xml:space="preserve">
+    <value>File Upload &amp; Access Rules</value>
+  </data>
+  <data name="FileAccessRule" xml:space="preserve">
+    <value>Access Rule</value>
+  </data>
+  <data name="RegistWebRoot" xml:space="preserve">
+    <value>Web Root Path</value>
+  </data>
+  <data name="AllowExtensions" xml:space="preserve">
+    <value>Allowed Extensions</value>
+  </data>
+  <data name="AllowCount" xml:space="preserve">
+    <value>Allowed Count</value>
+  </data>
+  <data name="AllowSize" xml:space="preserve">
+    <value>Max File Size</value>
+  </data>
+  <data name="AllowTotalSize" xml:space="preserve">
+    <value>Total Max Size</value>
+  </data>
+  <data name="AccessMode" xml:space="preserve">
+    <value>Access Mode</value>
+  </data>
+  <data name="Upload" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="TargetSelect" xml:space="preserve">
+    <value>Select Target</value>
+  </data>
+  <data name="TargetType" xml:space="preserve">
+    <value>Target Type</value>
+  </data>
+  <data name="ContentManage" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="ContentRule" xml:space="preserve">
+    <value>Content Rule</value>
+  </data>
+  <data name="ContentRules" xml:space="preserve">
+    <value>Content Rules</value>
+  </data>
+  <data name="ContentTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="ContentType" xml:space="preserve">
+    <value>Content Type</value>
+  </data>
+  <data name="ContentCategory" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="ContentFeatures" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="ContentApprovers" xml:space="preserve">
+    <value>Approvers</value>
+  </data>
+  <data name="Groups" xml:space="preserve">
+    <value>Group (Include Subgroups)</value>
+  </data>
+  <data name="UseManagerApproved" xml:space="preserve">
+    <value>Allow Manager Approval</value>
+  </data>
+  <data name="ContentTypeDefault" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="ContentTypeNews" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="ContentTypeGallery" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="ContentTypeForum" xml:space="preserve">
+    <value>Forum</value>
+  </data>
+  <data name="ContentTypeBlog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="ContentTypeLecture" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="ContentTypeManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ContentTypeFAQ" xml:space="preserve">
+    <value>FAQ</value>
+  </data>
+  <data name="ContentTypeSurvey" xml:space="preserve">
+    <value>Survey</value>
+  </data>
+  <data name="NotUsed" xml:space="preserve">
+    <value>Not used</value>
+  </data>
+  <data name="UseOf" xml:space="preserve">
+    <value>Use {0}</value>
+  </data>
+  <data name="AllowOf" xml:space="preserve">
+    <value>Allow {0}</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Read</value>
+  </data>
+  <data name="Write" xml:space="preserve">
+    <value>Write</value>
+  </data>
+  <data name="Answer" xml:space="preserve">
+    <value>Answer</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="Like" xml:space="preserve">
+    <value>Like</value>
+  </data>
+  <data name="Notice" xml:space="preserve">
+    <value>Notice</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Change History</value>
+  </data>
+  <data name="PublishPeriod" xml:space="preserve">
+    <value>Publish Period</value>
+  </data>
+  <data name="PublishRule" xml:space="preserve">
+    <value>Access Rule Setting</value>
+  </data>
+  <data name="Approval" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="DelRuleHasContent" xml:space="preserve">
+    <value>A rule with registered contents cannot be deleted.</value>
+  </data>
+  <data name="CategoryFormat" xml:space="preserve">
+    <value>Enter as key:value; (e.g. notice:Notice; data;)</value>
+  </data>
+  <data name="CategoryKeyOmit" xml:space="preserve">
+    <value>If the key is omitted, the entry is used as both key and value.</value>
+  </data>
+  <data name="CommentLike" xml:space="preserve">
+    <value>Comment Like</value>
+  </data>
+  <data name="EditOf" xml:space="preserve">
+    <value>Edit {0}</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="SiteMenu" xml:space="preserve">
+    <value>Site Menu</value>
+  </data>
+  <data name="SubMenus" xml:space="preserve">
+    <value>Sub Menus</value>
+  </data>
+  <data name="ParentMenu" xml:space="preserve">
+    <value>Parent Menu</value>
+  </data>
+  <data name="Icon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="LinkType" xml:space="preserve">
+    <value>Link Type</value>
+  </data>
+  <data name="LinkTypeNone" xml:space="preserve">
+    <value>None (menu group)</value>
+  </data>
+  <data name="LinkTypeMove" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="LinkTypeOpen" xml:space="preserve">
+    <value>New Window</value>
+  </data>
+  <data name="LinkTypeScript" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="LinkTypeMail" xml:space="preserve">
+    <value>Mail</value>
+  </data>
+  <data name="LinkTypePhone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="LinkTypeExtend" xml:space="preserve">
+    <value>Extend</value>
+  </data>
+  <data name="MenuAction" xml:space="preserve">
+    <value>Path or Command</value>
+  </data>
+  <data name="ExtendValue" xml:space="preserve">
+    <value>Extend Value</value>
+  </data>
+  <data name="MenuKeyRule" xml:space="preserve">
+    <value>Letters, digits, _ - . only (up to 64)</value>
+  </data>
+  <data name="DelWithChildMenu" xml:space="preserve">
+    <value>Its sub menus are deleted as well.</value>
+  </data>
+  <data name="MenuAccessEmpty" xml:space="preserve">
+    <value>If no target is added, everyone can access the menu.</value>
+  </data>
+  <data name="SetupTitle" xml:space="preserve">
+    <value>Site Setup</value>
+  </data>
+  <data name="SetupLicense" xml:space="preserve">
+    <value>License Agreement</value>
+  </data>
+  <data name="SetupLicenseAgree" xml:space="preserve">
+    <value>I agree to the license terms.</value>
+  </data>
+  <data name="SetupDatabase" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="SetupDbProvider" xml:space="preserve">
+    <value>Database type</value>
+  </data>
+  <data name="DbServer" xml:space="preserve">
+    <value>Server</value>
+  </data>
+  <data name="DbPort" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="DbName" xml:space="preserve">
+    <value>Database name</value>
+  </data>
+  <data name="DbUser" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="DbTrustCertificate" xml:space="preserve">
+    <value>Trust server certificate</value>
+  </data>
+  <data name="SetupTest" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="SetupTestOk" xml:space="preserve">
+    <value>Connection succeeded: {0}</value>
+  </data>
+  <data name="SetupDbExists" xml:space="preserve">
+    <value>The database already exists. Installation may fail if it is not empty.</value>
+  </data>
+  <data name="SetupDbNew" xml:space="preserve">
+    <value>The database will be created during installation.</value>
+  </data>
+  <data name="SetupTestFailed" xml:space="preserve">
+    <value>Test failed: {0}</value>
+  </data>
+  <data name="SetupTestRequired" xml:space="preserve">
+    <value>Pass the test before continuing.</value>
+  </data>
+  <data name="SetupOptional" xml:space="preserve">
+    <value>Optional</value>
+  </data>
+  <data name="SetupSmtpInfo" xml:space="preserve">
+    <value>Used for account mail such as verification and password reset. You can skip it and set it later in System Settings.</value>
+  </data>
+  <data name="SetupRedis" xml:space="preserve">
+    <value>Redis Cache</value>
+  </data>
+  <data name="SetupRedisConnection" xml:space="preserve">
+    <value>Connection string</value>
+  </data>
+  <data name="SetupRedisInfo" xml:space="preserve">
+    <value>Shared cache for multiple servers. If skipped, the in-memory cache is used.</value>
+  </data>
+  <data name="SetupRedisOk" xml:space="preserve">
+    <value>Redis responded in {0} ms.</value>
+  </data>
+  <data name="SetupSkip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="SetupPrev" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="SetupNext" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="SetupSummary" xml:space="preserve">
+    <value>Ready to Install</value>
+  </data>
+  <data name="SetupSummaryInfo" xml:space="preserve">
+    <value>Install with the settings below. Database tables and default data are created.</value>
+  </data>
+  <data name="SetupSkipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="SetupInstall" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="SetupRetry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="SetupBackToSettings" xml:space="preserve">
+    <value>Back to settings</value>
+  </data>
+  <data name="SetupStepDatabase" xml:space="preserve">
+    <value>Prepare database</value>
+  </data>
+  <data name="SetupStepMigrate" xml:space="preserve">
+    <value>Create tables (migration)</value>
+  </data>
+  <data name="SetupStepSeed" xml:space="preserve">
+    <value>Register default data</value>
+  </data>
+  <data name="SetupStepSettings" xml:space="preserve">
+    <value>Save service settings</value>
+  </data>
+  <data name="SetupStepFinish" xml:space="preserve">
+    <value>Write configuration file</value>
+  </data>
+  <data name="SetupDbCreated" xml:space="preserve">
+    <value>Database created.</value>
+  </data>
+  <data name="SetupDbReady" xml:space="preserve">
+    <value>Using the existing database.</value>
+  </data>
+  <data name="SetupDone" xml:space="preserve">
+    <value>Installation complete. The site is restarting.</value>
+  </data>
+  <data name="SetupRestartInfo" xml:space="preserve">
+    <value>If the site does not open, start it again.</value>
+  </data>
+  <data name="RoleSystemManagerName" xml:space="preserve">
+    <value>System Administrator</value>
+  </data>
+  <data name="RoleManagerName" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="RoleMemberName" xml:space="preserve">
+    <value>Member</value>
+  </data>
+  <data name="DbTablePrefix" xml:space="preserve">
+    <value>Table prefix</value>
+  </data>
+  <data name="DbTablePrefixInfo" xml:space="preserve">
+    <value>Added in front of every table name (e.g. APP → APP_Users). Letters and digits, starting with a letter, up to 16. Leave empty for none. It cannot be changed after installation.</value>
+  </data>
+  <data name="SetupIntro" xml:space="preserve">
+    <value>Set up the site in a few steps. Connections are tested first, then the database and default data are installed.</value>
+  </data>
+  <data name="SetupLicenseInfo" xml:space="preserve">
+    <value>Read the license and agree to it to continue.</value>
+  </data>
+  <data name="SetupDatabaseInfo" xml:space="preserve">
+    <value>Choose the database and enter the connection. Test the connection before continuing.</value>
+  </data>
+  <data name="SetupInstallInfo" xml:space="preserve">
+    <value>Installing step by step. Do not close this page.</value>
+  </data>
+  <data name="SetupStepOf" xml:space="preserve">
+    <value>Step {0} of {1}</value>
+  </data>
+  <data name="SetupMigrateSlow" xml:space="preserve">
+    <value>Creating tables can take several minutes depending on the database server. Please wait without closing this page.</value>
+  </data>
+  <data name="SetupMigrateProgress" xml:space="preserve">
+    <value>{0} / {1} done · elapsed {2}</value>
+  </data>
+  <data name="PublishStart" xml:space="preserve">
+    <value>Start date</value>
+  </data>
+  <data name="PublishEnd" xml:space="preserve">
+    <value>End date</value>
+  </data>
+  <data name="PublishPeriodInfo" xml:space="preserve">
+    <value>Leave empty for no limit.</value>
+  </data>
+  <data name="PeriodInvalid" xml:space="preserve">
+    <value>The end date cannot be earlier than the start date.</value>
+  </data>
+  <data name="ReadPermission" xml:space="preserve">
+    <value>Read Permission</value>
+  </data>
+  <data name="RoleAccountManagerName" xml:space="preserve">
+    <value>Account Manager</value>
+  </data>
+  <data name="RoleContentManagerName" xml:space="preserve">
+    <value>Content Manager</value>
+  </data>
+  <data name="NoTitle" xml:space="preserve">
+    <value>No title</value>
+  </data>
+  <data name="ContentNumber" xml:space="preserve">
+    <value>No.</value>
+  </data>
+  <data name="ContentWriter" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="ContentDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="ContentViews" xml:space="preserve">
+    <value>Views</value>
+  </data>
+  <data name="ContentWrite" xml:space="preserve">
+    <value>Write</value>
+  </data>
+  <data name="ListSize" xml:space="preserve">
+    <value>List Size</value>
+  </data>
+  <data name="BoardSettings" xml:space="preserve">
+    <value>Board settings</value>
+  </data>
+  <data name="BoardDeleting" xml:space="preserve">
+    <value>Deleting</value>
+  </data>
+  <data name="BoardDeleteMove" xml:space="preserve">
+    <value>Move the posts to another board first</value>
+  </data>
+  <data name="BoardDeleteOnly" xml:space="preserve">
+    <value>Delete the posts too</value>
+  </data>
+  <data name="BoardDeleteCounts" xml:space="preserve">
+    <value>{0} posts, {1} comments, {2} files ({3}), {4} reports</value>
+  </data>
+  <data name="BoardDeleteAgree" xml:space="preserve">
+    <value>I understand this is permanent and cannot be undone.</value>
+  </data>
+  <data name="ContentPermission" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="AccessNeedOne" xml:space="preserve">
+    <value>Keep at least one permission checked for each item.</value>
+  </data>
+  <data name="RelatedLink" xml:space="preserve">
+    <value>Related links</value>
+  </data>
+  <data name="PublishTarget" xml:space="preserve">
+    <value>Publish target</value>
+  </data>
+  <data name="ContentBody" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Anonymous" xml:space="preserve">
+    <value>Anonymous</value>
+  </data>
+  <data name="PostPasswordInvalid" xml:space="preserve">
+    <value>The password does not match.</value>
+  </data>
+  <data name="PostEditDenied" xml:space="preserve">
+    <value>You cannot edit this post.</value>
+  </data>
+  <data name="PostPasswordNeeded" xml:space="preserve">
+    <value>Enter the password you set when posting.</value>
+  </data>
+  <data name="SaveDraft" xml:space="preserve">
+    <value>Save draft</value>
+  </data>
+  <data name="PostPublish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="MenuConfig" xml:space="preserve">
+    <value>Menu settings</value>
+  </data>
+  <data name="MenuPosition" xml:space="preserve">
+    <value>Menu position</value>
+  </data>
+  <data name="HideMenu" xml:space="preserve">
+    <value>Hide menu</value>
+  </data>
+  <data name="SideConfig" xml:space="preserve">
+    <value>Side panel</value>
+  </data>
+  <data name="HideSide" xml:space="preserve">
+    <value>Hide side panel</value>
+  </data>
+  <data name="SidePosition" xml:space="preserve">
+    <value>Side position</value>
+  </data>
+  <data name="Left" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="Right" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="LinkedMenu" xml:space="preserve">
+    <value>Linked menu</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="SideApplyEmpty" xml:space="preserve">
+    <value>There are no boards or pages to apply side panel settings to.</value>
+  </data>
+  <data name="ContentTypeNotSupported" xml:space="preserve">
+    <value>This content type does not support this action.</value>
+  </data>
+  <data name="ContentList" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="ContentPrevious" xml:space="preserve">
+    <value>Previous post</value>
+  </data>
+  <data name="ContentNext" xml:space="preserve">
+    <value>Next post</value>
+  </data>
+  <data name="ContentPrivate" xml:space="preserve">
+    <value>Private</value>
+  </data>
+  <data name="PostPasswordLocked" xml:space="preserve">
+    <value>Too many wrong passwords. Please try again later.</value>
+  </data>
+  <data name="ContentShare" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="ContentCopyLink" xml:space="preserve">
+    <value>Copy link</value>
+  </data>
+  <data name="ContentLinkCopied" xml:space="preserve">
+    <value>Link copied.</value>
+  </data>
+  <data name="PostDeleteDenied" xml:space="preserve">
+    <value>Deleting is not allowed.</value>
+  </data>
+  <data name="PostHasReply" xml:space="preserve">
+    <value>A post with replies cannot be deleted.</value>
+  </data>
+  <data name="ApprovalDenied" xml:space="preserve">
+    <value>You cannot approve this post now.</value>
+  </data>
+  <data name="RejectMessage" xml:space="preserve">
+    <value>Rejection reason</value>
+  </data>
+  <data name="ContentDislike" xml:space="preserve">
+    <value>Dislike</value>
+  </data>
+  <data name="ContentCurrentPost" xml:space="preserve">
+    <value>Current post</value>
+  </data>
+  <data name="ContentApprovalRecord" xml:space="preserve">
+    <value>Approval history</value>
+  </data>
+  <data name="ContentCurrentApprover" xml:space="preserve">
+    <value>Current approver</value>
+  </data>
+  <data name="DeleteCommentMsg" xml:space="preserve">
+    <value>The comment will be deleted.</value>
+  </data>
+  <data name="DeletePostMsg" xml:space="preserve">
+    <value>The post will be deleted.</value>
+  </data>
+  <data name="ContentFiles" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="ContentUseFiles" xml:space="preserve">
+    <value>Use attachments</value>
+  </data>
+  <data name="ContentRejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="ContentNormalView" xml:space="preserve">
+    <value>Normal view</value>
+  </data>
+  <data name="ContentUnapprovedCount" xml:space="preserve">
+    <value>{0} unapproved</value>
+  </data>
+  <data name="ContentPendingApproval" xml:space="preserve">
+    <value>Unapproved</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="FileSelect" xml:space="preserve">
+    <value>Select files</value>
+  </data>
+  <data name="FileUploadDone" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="FileUploadFailed" xml:space="preserve">
+    <value>Upload failed.</value>
+  </data>
+  <data name="FileUploading" xml:space="preserve">
+    <value>Files are still uploading. Please save after they finish.</value>
+  </data>
+  <data name="FileCountOver" xml:space="preserve">
+    <value>Up to {0} files can be attached.</value>
+  </data>
+  <data name="FileTotalSizeOver" xml:space="preserve">
+    <value>The total file size exceeds the allowed limit.</value>
+  </data>
+  <data name="NewTopic" xml:space="preserve">
+    <value>New Topic</value>
+  </data>
+  <data name="ContentLastActivity" xml:space="preserve">
+    <value>Last activity</value>
+  </data>
+  <data name="ContentLastComment" xml:space="preserve">
+    <value>Last comment</value>
+  </data>
+  <data name="CommentDiscardMsg" xml:space="preserve">
+    <value>Discard what you have written and close?</value>
+  </data>
+  <data name="CommentReply" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="CommentJump" xml:space="preserve">
+    <value>Jump to post</value>
+  </data>
+  <data name="CommentChildCount" xml:space="preserve">
+    <value>{0} comments</value>
+  </data>
+  <data name="CommentOnParent" xml:space="preserve">
+    <value>Comment on {0}'s post</value>
+  </data>
+  <data name="ContentJumpLatest" xml:space="preserve">
+    <value>Jump to latest comment</value>
+  </data>
+  <data name="CommentTooFast" xml:space="preserve">
+    <value>Please wait a moment before posting another comment.</value>
+  </data>
+  <data name="Report" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="ReportMessage" xml:space="preserve">
+    <value>Please describe the reason for your report</value>
+  </data>
+  <data name="ReportDone" xml:space="preserve">
+    <value>Your report has been submitted.</value>
+  </data>
+  <data name="ReportAlready" xml:space="preserve">
+    <value>You have already reported this.</value>
+  </data>
+  <data name="ReportOwn" xml:space="preserve">
+    <value>You cannot report your own post.</value>
+  </data>
+  <data name="ManualReorder" xml:space="preserve">
+    <value>Reorder pages</value>
+  </data>
+  <data name="ManualNewGroup" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="ManualNewPage" xml:space="preserve">
+    <value>New page</value>
+  </data>
+  <data name="ManualToc" xml:space="preserve">
+    <value>Contents</value>
+  </data>
+  <data name="ManualEmpty" xml:space="preserve">
+    <value>There are no pages yet.</value>
+  </data>
+  <data name="ManualOrderTitle" xml:space="preserve">
+    <value>Reorder pages</value>
+  </data>
+  <data name="ManualOrderHint" xml:space="preserve">
+    <value>Drag the pages to change their order.</value>
+  </data>
+  <data name="ManualOrderInvalid" xml:space="preserve">
+    <value>The page order does not match the pages of this group.</value>
+  </data>
+  <data name="FaqNew" xml:space="preserve">
+    <value>New FAQ</value>
+  </data>
+  <data name="FaqQuestion" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="FaqAnswer" xml:space="preserve">
+    <value>Answer</value>
+  </data>
+  <data name="FaqTagHint" xml:space="preserve">
+    <value>Separate tags with commas (used for search only)</value>
+  </data>
+  <data name="SurveyIntro" xml:space="preserve">
+    <value>Introduction</value>
+  </data>
+  <data name="SurveyItems" xml:space="preserve">
+    <value>Survey items</value>
+  </data>
+  <data name="SurveyAdd" xml:space="preserve">
+    <value>Add survey item</value>
+  </data>
+  <data name="SurveyEditItem" xml:space="preserve">
+    <value>Edit survey item</value>
+  </data>
+  <data name="SurveyQuestion" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="SurveyOptions" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="SurveyOptionAdd" xml:space="preserve">
+    <value>Add option</value>
+  </data>
+  <data name="SurveyMultiple" xml:space="preserve">
+    <value>Multiple choice</value>
+  </data>
+  <data name="SurveySingle" xml:space="preserve">
+    <value>Single choice</value>
+  </data>
+  <data name="SurveyEmptyItem" xml:space="preserve">
+    <value>Empty item. Press Edit to enter a question and options.</value>
+  </data>
+  <data name="SurveyTooManyItems" xml:space="preserve">
+    <value>A survey can have up to {0} items.</value>
+  </data>
+  <data name="SurveyNeedItem" xml:space="preserve">
+    <value>Add at least one survey item.</value>
+  </data>
+  <data name="SurveyItemInvalid" xml:space="preserve">
+    <value>Each survey item needs a question and {0}-{1} different options.</value>
+  </data>
+  <data name="SurveyParticipants" xml:space="preserve">
+    <value>{0} participants</value>
+  </data>
+  <data name="SurveyVote" xml:space="preserve">
+    <value>Take part</value>
+  </data>
+  <data name="SurveyVoted" xml:space="preserve">
+    <value>You have taken part</value>
+  </data>
+  <data name="SurveyLoginNeeded" xml:space="preserve">
+    <value>Sign in to take part in this survey.</value>
+  </data>
+  <data name="SurveyShowResults" xml:space="preserve">
+    <value>View results</value>
+  </data>
+  <data name="SurveyShowForm" xml:space="preserve">
+    <value>Take part</value>
+  </data>
+  <data name="SurveyAnswerAll" xml:space="preserve">
+    <value>Please answer every question.</value>
+  </data>
+  <data name="SurveyMine" xml:space="preserve">
+    <value>My choice</value>
+  </data>
+  <data name="SurveyVotes" xml:space="preserve">
+    <value>votes</value>
+  </data>
+  <data name="SurveyAlreadyVoted" xml:space="preserve">
+    <value>You have already taken part in this survey.</value>
+  </data>
+  <data name="SurveyVoteDone" xml:space="preserve">
+    <value>Thank you for taking part.</value>
+  </data>
+  <data name="SurveyPeriod" xml:space="preserve">
+    <value>Survey period</value>
+  </data>
+  <data name="SurveyPeriodStart" xml:space="preserve">
+    <value>Survey start</value>
+  </data>
+  <data name="SurveyPeriodEnd" xml:space="preserve">
+    <value>Survey end</value>
+  </data>
+  <data name="SurveyTarget" xml:space="preserve">
+    <value>Survey participants</value>
+  </data>
+  <data name="SurveyRunning" xml:space="preserve">
+    <value>The survey is in progress.</value>
+  </data>
+  <data name="ContentBoards" xml:space="preserve">
+    <value>Boards</value>
+  </data>
+  <data name="PageContents" xml:space="preserve">
+    <value>Page Contents</value>
+  </data>
+  <data name="ContentMoved" xml:space="preserve">
+    <value>Moved</value>
+  </data>
+  <data name="ContentMoveMsg" xml:space="preserve">
+    <value>Move this post to the '{0}' board.</value>
+  </data>
+  <data name="ContentMovedComplete" xml:space="preserve">
+    <value>The post has been moved.</value>
+  </data>
+  <data name="Popup" xml:space="preserve">
+    <value>Popup</value>
+  </data>
+  <data name="PopupSize" xml:space="preserve">
+    <value>Popup size</value>
+  </data>
+  <data name="PopupWidth" xml:space="preserve">
+    <value>Width (px)</value>
+  </data>
+  <data name="PopupHeight" xml:space="preserve">
+    <value>Height (px)</value>
+  </data>
+  <data name="PopupHeightInfo" xml:space="preserve">
+    <value>0 fits the content height</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="QrCode" xml:space="preserve">
+    <value>QR code</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="PopupArea" xml:space="preserve">
+    <value>Display area</value>
+  </data>
+  <data name="PopupAreaUser" xml:space="preserve">
+    <value>User pages</value>
+  </data>
+  <data name="PopupAreaManager" xml:space="preserve">
+    <value>Admin pages</value>
+  </data>
+  <data name="PopupAreaAccount" xml:space="preserve">
+    <value>Sign-in pages</value>
+  </data>
+  <data name="SiteInfo" xml:space="preserve">
+    <value>Site info</value>
+  </data>
+  <data name="SiteHeadInfo" xml:space="preserve">
+    <value>Page head</value>
+  </data>
+  <data name="SiteDisplayInfo" xml:space="preserve">
+    <value>Site display</value>
+  </data>
+  <data name="CompanyInfo" xml:space="preserve">
+    <value>Company info</value>
+  </data>
+  <data name="SiteTitle" xml:space="preserve">
+    <value>Site title</value>
+  </data>
+  <data name="SiteKeywords" xml:space="preserve">
+    <value>Search keywords</value>
+  </data>
+  <data name="SiteKeywordsInfo" xml:space="preserve">
+    <value>Separate with commas</value>
+  </data>
+  <data name="Favicon" xml:space="preserve">
+    <value>Favicon</value>
+  </data>
+  <data name="ShareImage" xml:space="preserve">
+    <value>Share image</value>
+  </data>
+  <data name="ShareImageInfo" xml:space="preserve">
+    <value>Preview image when shared (logo if empty)</value>
+  </data>
+  <data name="Logo" xml:space="preserve">
+    <value>Logo</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="SiteName" xml:space="preserve">
+    <value>Site name</value>
+  </data>
+  <data name="HtmlAllowedInfo" xml:space="preserve">
+    <value>Simple tags such as b and small are allowed</value>
+  </data>
+  <data name="Slogan" xml:space="preserve">
+    <value>Slogan</value>
+  </data>
+  <data name="CompanyName" xml:space="preserve">
+    <value>Company name</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+  <data name="Integration" xml:space="preserve">
+    <value>Integrations</value>
+  </data>
+  <data name="KakaoJsKey" xml:space="preserve">
+    <value>Kakao JavaScript key</value>
+  </data>
+  <data name="GaMeasurementId" xml:space="preserve">
+    <value>GA4 measurement ID</value>
+  </data>
+  <data name="SendMessage" xml:space="preserve">
+    <value>Send message</value>
+  </data>
+  <data name="ViewPosts" xml:space="preserve">
+    <value>View posts</value>
+  </data>
+  <data name="MessageTo" xml:space="preserve">
+    <value>Message to {0}</value>
+  </data>
+  <data name="MessageSent" xml:space="preserve">
+    <value>Your message has been sent.</value>
+  </data>
+  <data name="MessageSelf" xml:space="preserve">
+    <value>You cannot send a message to yourself.</value>
+  </data>
+  <data name="UserPosts" xml:space="preserve">
+    <value>Posts</value>
+  </data>
+  <data name="UserJoined" xml:space="preserve">
+    <value>Joined</value>
+  </data>
+  <data name="ChangeOf" xml:space="preserve">
+    <value>Change {0}</value>
+  </data>
+  <data name="ResetOf" xml:space="preserve">
+    <value>Reset {0}</value>
+  </data>
+  <data name="ResetImageMsg" xml:space="preserve">
+    <value>Remove the image and show the default icon.</value>
+  </data>
+  <data name="MyInfo" xml:space="preserve">
+    <value>My info</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="LastAccess" xml:space="preserve">
+    <value>Last access</value>
+  </data>
+  <data name="MailVerified" xml:space="preserve">
+    <value>Verified</value>
+  </data>
+  <data name="MailNotVerified" xml:space="preserve">
+    <value>Not verified</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="CurrentPasswordWrong" xml:space="preserve">
+    <value>The current password is incorrect.</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Your password has been changed. Other devices have been signed out.</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="MessageEmpty" xml:space="preserve">
+    <value>No messages yet.</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="ReceiveMessage" xml:space="preserve">
+    <value>Receive messages</value>
+  </data>
+  <data name="ReceiveMessageInfo" xml:space="preserve">
+    <value>When off, other members cannot send you messages.</value>
+  </data>
+  <data name="MessageRefused" xml:space="preserve">
+    <value>This member does not receive messages.</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="UnreadOf" xml:space="preserve">
+    <value>{0} unread</value>
+  </data>
+  <data name="MailChangeInfo" xml:space="preserve">
+    <value>Changing your email requires re-verification.</value>
+  </data>
+  <data name="SetActiveGroupRole" xml:space="preserve">
+    <value>Set active group/role</value>
+  </data>
+  <data name="SetDefaultGroupRole" xml:space="preserve">
+    <value>Set default group/role</value>
+  </data>
+  <data name="ActiveGroupRoleChange" xml:space="preserve">
+    <value>Change active group (role)</value>
+  </data>
+  <data name="DefaultMark" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Seen" xml:space="preserve">
+    <value>Read</value>
+  </data>
+  <data name="Unseen" xml:space="preserve">
+    <value>Unread</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>Sent</value>
+  </data>
+  <data name="DeleteMessageMsg" xml:space="preserve">
+    <value>The message will be deleted.</value>
+  </data>
+  <data name="DashHello" xml:space="preserve">
+    <value>Hello, {0}</value>
+  </data>
+  <data name="DashSubtitle" xml:space="preserve">
+    <value>See today's visits and member and board activity at a glance.</value>
+  </data>
+  <data name="DashTodayVisitors" xml:space="preserve">
+    <value>Today's visitors</value>
+  </data>
+  <data name="DashVisitors" xml:space="preserve">
+    <value>Visitors</value>
+  </data>
+  <data name="DashPageViews" xml:space="preserve">
+    <value>Page views</value>
+  </data>
+  <data name="DashVsYesterday" xml:space="preserve">
+    <value>vs yesterday</value>
+  </data>
+  <data name="DashYesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="DashThisMonth" xml:space="preserve">
+    <value>This month</value>
+  </data>
+  <data name="DashThisYear" xml:space="preserve">
+    <value>This year</value>
+  </data>
+  <data name="DashMembers" xml:space="preserve">
+    <value>Members</value>
+  </data>
+  <data name="DashTodayNew" xml:space="preserve">
+    <value>+{0} today</value>
+  </data>
+  <data name="DashMonthNew" xml:space="preserve">
+    <value>+{0} this month</value>
+  </data>
+  <data name="DashLast7Days" xml:space="preserve">
+    <value>Last 7 days</value>
+  </data>
+  <data name="DashVisitTrend" xml:space="preserve">
+    <value>Visit trend</value>
+  </data>
+  <data name="DashVisitTrendInfo" xml:space="preserve">
+    <value>Visitors and page views for the last 14 days</value>
+  </data>
+  <data name="DashMemberStatus" xml:space="preserve">
+    <value>Member status</value>
+  </data>
+  <data name="DashActiveMembers" xml:space="preserve">
+    <value>Signed in within 7 days</value>
+  </data>
+  <data name="DashEnabledMembers" xml:space="preserve">
+    <value>Enabled members</value>
+  </data>
+  <data name="DashNewMembers" xml:space="preserve">
+    <value>New members</value>
+  </data>
+  <data name="DashKind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ReportTarget" xml:space="preserve">
+    <value>Reported item</value>
+  </data>
+  <data name="ReportReporter" xml:space="preserve">
+    <value>Reporter</value>
+  </data>
+  <data name="ReportHidePost" xml:space="preserve">
+    <value>Hide post</value>
+  </data>
+  <data name="ReportShowPost" xml:space="preserve">
+    <value>Show post</value>
+  </data>
+  <data name="ReportResolve" xml:space="preserve">
+    <value>Resolve</value>
+  </data>
+  <data name="ReportResolveMsg" xml:space="preserve">
+    <value>The report status will be changed to resolved.</value>
+  </data>
+  <data name="ReportGone" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+  <data name="ReportCountOf" xml:space="preserve">
+    <value>{0} reports</value>
+  </data>
+  <data name="ReportDate" xml:space="preserve">
+    <value>Reported at</value>
+  </data>
+  <data name="ExternalServices" xml:space="preserve">
+    <value>External Services</value>
+  </data>
+  <data name="RedisDbIndex" xml:space="preserve">
+    <value>Database number</value>
+  </data>
+  <data name="RedisInstanceName" xml:space="preserve">
+    <value>Key prefix</value>
+  </data>
+  <data name="CacheInUse" xml:space="preserve">
+    <value>Cache in use</value>
+  </data>
+  <data name="MemoryCache" xml:space="preserve">
+    <value>In-memory cache</value>
+  </data>
+  <data name="RestartToApply" xml:space="preserve">
+    <value>Saved. Restart the site to apply the changes.</value>
+  </data>
+  <data name="ServerDefaultIfEmpty" xml:space="preserve">
+    <value>Server default if empty</value>
+  </data>
+  <data name="AiApi" xml:space="preserve">
+    <value>AI API</value>
+  </data>
+  <data name="AiConnection" xml:space="preserve">
+    <value>AI connection</value>
+  </data>
+  <data name="AiFormat" xml:space="preserve">
+    <value>Request format</value>
+  </data>
+  <data name="AiFormatOpenAI" xml:space="preserve">
+    <value>OpenAI compatible (Ollama)</value>
+  </data>
+  <data name="ApiEndpoint" xml:space="preserve">
+    <value>API address</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API key</value>
+  </data>
+  <data name="AiModel" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="AiOptions" xml:space="preserve">
+    <value>Generation options</value>
+  </data>
+  <data name="Temperature" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="MaxTokens" xml:space="preserve">
+    <value>Max output tokens</value>
+  </data>
+  <data name="ReasoningEffort" xml:space="preserve">
+    <value>Reasoning effort</value>
+  </data>
+  <data name="Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="ApiToken" xml:space="preserve">
+    <value>Access token</value>
+  </data>
+  <data name="ApiTokenUserInfo" xml:space="preserve">
+    <value>Requests run as this user. Empty = you.</value>
+  </data>
+  <data name="ApiTokenIssued" xml:space="preserve">
+    <value>Copy this token now. It will not be shown again.</value>
+  </data>
+  <data name="ExpireDate" xml:space="preserve">
+    <value>Expires</value>
+  </data>
+  <data name="NoExpiry" xml:space="preserve">
+    <value>No expiry</value>
+  </data>
+  <data name="DaysOf" xml:space="preserve">
+    <value>{0} days</value>
+  </data>
+  <data name="Issue" xml:space="preserve">
+    <value>Issue</value>
+  </data>
+  <data name="Expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Copied" xml:space="preserve">
+    <value>Copied.</value>
+  </data>
+  <data name="MaxCountOf" xml:space="preserve">
+    <value>Up to {1} {0} items can be registered.</value>
+  </data>
+  <data name="AiConnectInfo" xml:space="preserve">
+    <value>Connection</value>
+  </data>
+  <data name="ApiTokenDeleteMsg" xml:space="preserve">
+    <value>Delete this token? Requests using it will fail immediately.</value>
+  </data>
+  <data name="AiTestOk" xml:space="preserve">
+    <value>Response received: {0}</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="ServiceWaiting" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="ServiceRunning" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="ServiceDisabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="ServiceNoForm" xml:space="preserve">
+    <value>This service has no settings of its own.</value>
+  </data>
+  <data name="Withdraw" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
+  <data name="WithdrawConfirm" xml:space="preserve">
+    <value>Do you really want to delete your account?</value>
+  </data>
+  <data name="WithdrawDone" xml:space="preserve">
+    <value>Your account has been deleted. Thank you for using the site.</value>
+  </data>
+  <data name="ContentSummaryService" xml:space="preserve">
+    <value>Content AI (review &amp; summary)</value>
+  </data>
+  <data name="ContentSummaryPrompt" xml:space="preserve">
+    <value>Summary instructions</value>
+  </data>
+  <data name="ContentSummaryPromptInfo" xml:space="preserve">
+    <value>Default instructions if empty</value>
+  </data>
+  <data name="ContentSummaryRefresh" xml:space="preserve">
+    <value>Refresh summary</value>
+  </data>
+  <data name="ContentSummaryQueued" xml:space="preserve">
+    <value>The summary will be rebuilt shortly.</value>
+  </data>
+  <data name="ContentSummaryPlainLength" xml:space="preserve">
+    <value>Plain text length</value>
+  </data>
+  <data name="Notification" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="NoticeReadAll" xml:space="preserve">
+    <value>Mark all as read</value>
+  </data>
+  <data name="NoticeClearRead" xml:space="preserve">
+    <value>Delete read notifications</value>
+  </data>
+  <data name="NoticeComment" xml:space="preserve">
+    <value>{0} commented on '{1}'.</value>
+  </data>
+  <data name="NoticeReviewHidden" xml:space="preserve">
+    <value>The AI review flagged and hid '{0}'. Reason: {1}</value>
+  </data>
+  <data name="NoticeReviewFlagged" xml:space="preserve">
+    <value>The AI review flagged '{0}' (not hidden). Reason: {1}</value>
+  </data>
+  <data name="ErrorAlertService" xml:space="preserve">
+    <value>Error alerts</value>
+  </data>
+  <data name="ErrorAlertSubject" xml:space="preserve">
+    <value>Site error</value>
+  </data>
+  <data name="ErrorAlertSeverity" xml:space="preserve">
+    <value>Severity</value>
+  </data>
+  <data name="Critical" xml:space="preserve">
+    <value>Critical</value>
+  </data>
+  <data name="ErrorAlertTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="ErrorAlertRequest" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="ErrorAlertType" xml:space="preserve">
+    <value>Error type</value>
+  </data>
+  <data name="ErrorAlertRepeated" xml:space="preserve">
+    <value>The same error happened {0} more times since the last alert.</value>
+  </data>
+  <data name="ErrorAlertInterval" xml:space="preserve">
+    <value>Alert interval for the same error (minutes)</value>
+  </data>
+  <data name="ContentReviewNotifyOnly" xml:space="preserve">
+    <value>Notify only (do not hide)</value>
+  </data>
+  <data name="ContentReviewCriteria" xml:space="preserve">
+    <value>Additional review rules</value>
+  </data>
+  <data name="ContentReviewCriteriaInfo" xml:space="preserve">
+    <value>Added after the default rules (spam, ads, abuse, hate, sexual, illegal)</value>
+  </data>
+  <data name="ContentSummaryTitle" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="ContentReviewTitle" xml:space="preserve">
+    <value>AI post review</value>
+  </data>
+  <data name="ContentReviewUse" xml:space="preserve">
+    <value>Use AI post review</value>
+  </data>
+  <data name="NoticeReply" xml:space="preserve">
+    <value>{0} replied to your post '{1}'.</value>
+  </data>
+  <data name="NoticeCommentReply" xml:space="preserve">
+    <value>{0} replied to your comment on '{1}'.</value>
+  </data>
+  <data name="NoticeLike" xml:space="preserve">
+    <value>{0} liked your post '{1}'.</value>
+  </data>
+  <data name="NoticeCommentLike" xml:space="preserve">
+    <value>{0} liked your comment on '{1}'.</value>
+  </data>
+  <data name="ContentReviewSameAi" xml:space="preserve">
+    <value>Same as summary</value>
+  </data>
+  <data name="Key" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="LanguageData" xml:space="preserve">
+    <value>Translations</value>
+  </data>
+  <data name="ConfigData" xml:space="preserve">
+    <value>Settings data</value>
+  </data>
+  <data name="ConfigInvalidJson" xml:space="preserve">
+    <value>The value is not valid JSON.</value>
+  </data>
+  <data name="EventServices" xml:space="preserve">
+    <value>Event services</value>
+  </data>
+  <data name="DashboardInfo" xml:space="preserve">
+    <value>Site status overview</value>
+  </data>
+  <data name="AccountManageInfo" xml:space="preserve">
+    <value>Users, groups, roles and account rules</value>
+  </data>
+  <data name="ContentManageInfo" xml:space="preserve">
+    <value>Boards, page contents and reports</value>
+  </data>
+  <data name="ExternalServicesInfo" xml:space="preserve">
+    <value>Mail, cache, AI and other external services</value>
+  </data>
+  <data name="ServicesInfo" xml:space="preserve">
+    <value>Event services, site menus and popups</value>
+  </data>
+  <data name="SystemSettingsInfo" xml:space="preserve">
+    <value>Site info, languages and settings</value>
+  </data>
+  <data name="DevKitInfo" xml:space="preserve">
+    <value>UI component preview</value>
+  </data>
+  <data name="SiteHome" xml:space="preserve">
+    <value>Site home</value>
+  </data>
+  <data name="Log" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <data name="LogKind" xml:space="preserve">
+    <value>Log type</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="LogLevel" xml:space="preserve">
+    <value>Minimum level</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>Load more</value>
+  </data>
+  <data name="LogRead" xml:space="preserve">
+    <value>Read {0} of {1}</value>
+  </data>
+  <data name="IntegratedSearch" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SearchKeyword" xml:space="preserve">
+    <value>Enter a keyword</value>
+  </data>
+  <data name="SearchNoResult" xml:space="preserve">
+    <value>No results found.</value>
+  </data>
+  <data name="Pages" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="WidgetEditMode" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="WidgetEditDone" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="SectionAdd" xml:space="preserve">
+    <value>Add section</value>
+  </data>
+  <data name="WidgetAdd" xml:space="preserve">
+    <value>Add widget</value>
+  </data>
+  <data name="SlotCount" xml:space="preserve">
+    <value>Slots</value>
+  </data>
+  <data name="SlotsOf" xml:space="preserve">
+    <value>{0} slots</value>
+  </data>
+  <data name="WidgetSizeOf" xml:space="preserve">
+    <value>Min {0} · Max {1}</value>
+  </data>
+  <data name="WidgetNotFit" xml:space="preserve">
+    <value>Does not fit this slot</value>
+  </data>
+  <data name="WidgetNoSettings" xml:space="preserve">
+    <value>No settings for this widget. Save to apply it as is.</value>
+  </data>
+  <data name="WidgetSingleUsed" xml:space="preserve">
+    <value>Only one per page (already placed)</value>
+  </data>
+  <data name="SectionDeleteMsg" xml:space="preserve">
+    <value>Delete this section and its widgets?</value>
+  </data>
+  <data name="WidgetDeleteMsg" xml:space="preserve">
+    <value>Remove this widget?</value>
+  </data>
+  <data name="WidgetLayoutResetMsg" xml:space="preserve">
+    <value>Remove this menu's widget layout and use the global layout?</value>
+  </data>
+  <data name="WidgetSettings" xml:space="preserve">
+    <value>Widget settings</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="WidgetMissing" xml:space="preserve">
+    <value>Unavailable widget</value>
+  </data>
+  <data name="SectionEmpty" xml:space="preserve">
+    <value>Add a section</value>
+  </data>
+  <data name="SlotSelect" xml:space="preserve">
+    <value>Choose a slot</value>
+  </data>
+  <data name="WidgetSelect" xml:space="preserve">
+    <value>Choose a widget</value>
+  </data>
+  <data name="WidgetTitle" xml:space="preserve">
+    <value>Widget title</value>
+  </data>
+  <data name="WidgetBoards" xml:space="preserve">
+    <value>Boards (all if none)</value>
+  </data>
+  <data name="WidgetCount" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="WidgetSummary" xml:space="preserve">
+    <value>Show summary</value>
+  </data>
+  <data name="WidgetMore" xml:space="preserve">
+    <value>+more</value>
+  </data>
+  <data name="WidgetThumb" xml:space="preserve">
+    <value>Show featured image (if the post has one)</value>
+  </data>
+  <data name="WidgetColumns" xml:space="preserve">
+    <value>Columns</value>
+  </data>
+  <data name="WidgetBannerItems" xml:space="preserve">
+    <value>Banners (one per line: image URL | link | caption)</value>
+  </data>
+  <data name="WidgetInterval" xml:space="preserve">
+    <value>Slide interval (seconds, 0 = stop)</value>
+  </data>
+  <data name="WidgetLayout" xml:space="preserve">
+    <value>Widget layout</value>
+  </data>
+  <data name="GeneralLayout" xml:space="preserve">
+    <value>General Layout</value>
+  </data>
+  <data name="AccountLayout" xml:space="preserve">
+    <value>Account Layout</value>
+  </data>
+  <data name="LayoutSetting" xml:space="preserve">
+    <value>Layout Settings</value>
+  </data>
+  <data name="LayoutColorSetting" xml:space="preserve">
+    <value>Layout Theme Color Settings</value>
+  </data>
+  <data name="WidgetLayoutInvalid" xml:space="preserve">
+    <value>The layout is not valid: {0}</value>
+  </data>
+  <data name="SearchHeadline" xml:space="preserve">
+    <value>What are you looking for?</value>
+  </data>
+  <data name="SearchGuide" xml:space="preserve">
+    <value>Enter a keyword to search all of the areas above at once.</value>
+  </data>
+  <data name="SearchRecent" xml:space="preserve">
+    <value>Recent searches</value>
+  </data>
+  <data name="SearchRecentClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="WidgetHeading" xml:space="preserve">
+    <value>Heading</value>
+  </data>
+  <data name="WidgetText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="WidgetImage" xml:space="preserve">
+    <value>Image URL</value>
+  </data>
+  <data name="WidgetButtonText" xml:space="preserve">
+    <value>Button text</value>
+  </data>
+  <data name="WidgetButtonUrl" xml:space="preserve">
+    <value>Button link</value>
+  </data>
+  <data name="WidgetReverse" xml:space="preserve">
+    <value>Swap sides</value>
+  </data>
+  <data name="WidgetBand" xml:space="preserve">
+    <value>Colored band background</value>
+  </data>
+  <data name="WidgetCardItems" xml:space="preserve">
+    <value>Cards (one per line: icon | title | text)</value>
+  </data>
+  <data name="WidgetTabItems" xml:space="preserve">
+    <value>Features (one per line: title | text | image URL)</value>
+  </data>
+  <data name="WidgetBarItems" xml:space="preserve">
+    <value>Bars (one per line: name | value 0-100)</value>
+  </data>
+  <data name="WidgetLabel" xml:space="preserve">
+    <value>Label above heading</value>
+  </data>
+  <data name="FeatureOptions" xml:space="preserve">
+    <value>Feature Options</value>
+  </data>
+  <data name="TopAreaHtml" xml:space="preserve">
+    <value>Top area HTML</value>
+  </data>
+  <data name="BottomAreaHtml" xml:space="preserve">
+    <value>Bottom area HTML</value>
+  </data>
+  <data name="AccessUnlistedAllowedExceptManager" xml:space="preserve">
+    <value>Except for managers, any permission that is not registered is allowed.</value>
+  </data>
+  <data name="AccessUnlistedAllowed" xml:space="preserve">
+    <value>Any permission that is not registered is allowed.</value>
+  </data>
+  <data name="AllowExtensionsInfo" xml:space="preserve">
+    <value>Comma-separated (e.g. jpg, png, pdf, zip); all allowed if empty</value>
+  </data>
+  <data name="EmptyUnlimited" xml:space="preserve">
+    <value>Unlimited if empty</value>
+  </data>
+  <data name="Unlimited" xml:space="preserve">
+    <value>Unlimited</value>
+  </data>
+  <data name="ApprovalOptions" xml:space="preserve">
+    <value>Approval Options</value>
+  </data>
+  <data name="ManagerProxyApproval" xml:space="preserve">
+    <value>Manager proxy approval</value>
+  </data>
+  <data name="ParallelApproval" xml:space="preserve">
+    <value>Parallel approval</value>
+  </data>
+  <data name="ParallelApprovalInfo" xml:space="preserve">
+    <value>With several approvers, whether they may approve in any order</value>
+  </data>
+  <data name="SingleApproval" xml:space="preserve">
+    <value>Single approval</value>
+  </data>
+  <data name="SingleApprovalInfo" xml:space="preserve">
+    <value>With several approvers, whether one approval is enough</value>
+  </data>
+  <data name="ForumTopicOnlyInfo" xml:space="preserve">
+    <value>Topics only (comments can always be edited or deleted by the writer and managers)</value>
+  </data>
+  <data name="ContentReply" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="WriterPeriod" xml:space="preserve">
+    <value>Writer sets publish period</value>
+  </data>
+  <data name="WriterTarget" xml:space="preserve">
+    <value>Writer sets publish target</value>
+  </data>
+  <data name="FileConfig" xml:space="preserve">
+    <value>File settings</value>
+  </data>
+  <data name="FixedExtensionsOf" xml:space="preserve">
+    <value>Fixed upload extensions: {0}</value>
+  </data>
+  <data name="ExampleOf" xml:space="preserve">
+    <value>e.g. {0}</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Config" xml:space="preserve">
+    <value>Configuration</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="DevKit" xml:space="preserve">
+    <value>UI Dev Kit</value>
+  </data>
+  <data name="DevKitBasicStyle" xml:space="preserve">
+    <value>Basic Styles</value>
+  </data>
+  <data name="DevKitToolbar" xml:space="preserve">
+    <value>Toolbar</value>
+  </data>
+  <data name="DevKitTreeView" xml:space="preserve">
+    <value>Tree View</value>
+  </data>
+  <data name="DevKitInputControls" xml:space="preserve">
+    <value>Input Controls</value>
+  </data>
+  <data name="DevKitEditor" xml:space="preserve">
+    <value>Editor</value>
+  </data>
+  <data name="DevKitSampleLocation" xml:space="preserve">
+    <value>Sample file location</value>
+  </data>
+  <data name="DevKitSelectSample" xml:space="preserve">
+    <value>Select a sample</value>
+  </data>
+  <data name="OpenNewTab" xml:space="preserve">
+    <value>Open in new tab</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="WidgetFeatureCardsSample" xml:space="preserve">
+    <value>fiShield | Secure sign-in | Token rotation protects accounts.</value>
+  </data>
+  <data name="WidgetFeatureTabsSample" xml:space="preserve">
+    <value>Boards | Use several board types right away. | /img/banners/img1.jpg</value>
+  </data>
+  <data name="WidgetStatsSample" xml:space="preserve">
+    <value>Stability | 99</value>
+  </data>
+  <data name="FooterMenuName" xml:space="preserve">
+    <value>Footer</value>
+  </data>
+  <data name="TermsOfService" xml:space="preserve">
+    <value>Terms of Service</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="ContentMapName" xml:space="preserve">
+    <value>Content Map</value>
+  </data>
+  <data name="AdminMenuName" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="SiteSampleAddress" xml:space="preserve">
+    <value>123 Yeouido-dong, Yeongdeungpo-gu, Seoul</value>
+  </data>
+  <data name="OAuthConfig" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="OAuthProvider" xml:space="preserve">
+    <value>external login service</value>
+  </data>
+  <data name="OAuthKind" xml:space="preserve">
+    <value>Service type</value>
+  </data>
+  <data name="OAuthAuthority" xml:space="preserve">
+    <value>Issuer URL</value>
+  </data>
+  <data name="CallbackUrl" xml:space="preserve">
+    <value>Callback URL</value>
+  </data>
+  <data name="CallbackUrlInfo" xml:space="preserve">
+    <value>Register as the redirect URI in the service console</value>
+  </data>
+  <data name="SortOrder" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="SignInWithOf" xml:space="preserve">
+    <value>Sign in with {0}</value>
+  </data>
+  <data name="ExternalLogins" xml:space="preserve">
+    <value>Linked logins</value>
+  </data>
+  <data name="LinkAccount" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="UnlinkAccount" xml:space="preserve">
+    <value>Unlink</value>
+  </data>
+  <data name="Linked" xml:space="preserve">
+    <value>Linked</value>
+  </data>
+  <data name="ExternalExpired" xml:space="preserve">
+    <value>The external login has expired. Please sign in again.</value>
+  </data>
+  <data name="ExternalLinkedOther" xml:space="preserve">
+    <value>This external account is linked to another member.</value>
+  </data>
+  <data name="ExternalLinked" xml:space="preserve">
+    <value>External login linked.</value>
+  </data>
+  <data name="ExternalUnlinked" xml:space="preserve">
+    <value>External login unlinked.</value>
+  </data>
+  <data name="ExternalLastLogin" xml:space="preserve">
+    <value>The last login of an account without a password cannot be unlinked.</value>
+  </data>
+  <data name="ExternalFailed" xml:space="preserve">
+    <value>External login failed or was canceled.</value>
+  </data>
+  <data name="ContentNoReadPermission" xml:space="preserve">
+    <value>You do not have permission to view this post.</value>
+  </data>
+  <data name="MembersOnly" xml:space="preserve">
+    <value>Members only</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="ColorSet" xml:space="preserve">
+    <value>Color set</value>
+  </data>
+  <data name="ColorHelper" xml:space="preserve">
+    <value>Color Helper</value>
+  </data>
+  <data name="ColorHelperInfo" xml:space="preserve">
+    <value>Test the theme colors for your website in advance and get them converted to style variables automatically.</value>
+  </data>
+  <data name="ColorPreset" xml:space="preserve">
+    <value>Preset</value>
+  </data>
+  <data name="ColorCustomize" xml:space="preserve">
+    <value>Customize</value>
+  </data>
+  <data name="ColorSaveSet" xml:space="preserve">
+    <value>Save set to browser</value>
+  </data>
+  <data name="ColorUseShade" xml:space="preserve">
+    <value>Use light/dark colors</value>
+  </data>
+  <data name="ColorUseLevel" xml:space="preserve">
+    <value>Use level colors (1–9)</value>
+  </data>
+  <data name="ColorExport" xml:space="preserve">
+    <value>Export presets (preset.json)</value>
+  </data>
+  <data name="ColorImport" xml:space="preserve">
+    <value>Import presets (preset.json)</value>
+  </data>
+  <data name="ColorImported" xml:space="preserve">
+    <value>Imported {0} presets.</value>
+  </data>
+  <data name="ColorImportFailed" xml:space="preserve">
+    <value>Not a valid preset file.</value>
+  </data>
+  <data name="ColorOverwriteMsg" xml:space="preserve">
+    <value>Overwrites this preset with the current editing colors.</value>
+  </data>
+  <data name="ColorDeletePresetTip" xml:space="preserve">
+    <value>Delete this preset.</value>
+  </data>
+  <data name="ColorAddTip" xml:space="preserve">
+    <value>Add a color to the current palette.</value>
+  </data>
+  <data name="ColorAddSetTip" xml:space="preserve">
+    <value>Add current colors to presets.</value>
+  </data>
+  <data name="ColorExportTip" xml:space="preserve">
+    <value>Download preset list.</value>
+  </data>
+  <data name="ColorImportTip" xml:space="preserve">
+    <value>Upload preset list.</value>
+  </data>
+  <data name="ColorCodeTip" xml:space="preserve">
+    <value>Generate style variables for current colors.</value>
+  </data>
+  <data name="ColorPreviewInfo" xml:space="preserve">
+    <value>Check the colors on screens, components and contrast</value>
+  </data>
+  <data name="ColorTabScreen" xml:space="preserve">
+    <value>Screen</value>
+  </data>
+  <data name="ColorTabComponents" xml:space="preserve">
+    <value>Components</value>
+  </data>
+  <data name="ColorTabContrast" xml:space="preserve">
+    <value>Contrast</value>
+  </data>
+  <data name="ColorSlotInfo" xml:space="preserve">
+    <value>Pick the color each sample role uses</value>
+  </data>
+  <data name="ColorRatioRule" xml:space="preserve">
+    <value>60-30-10 rule</value>
+  </data>
+  <data name="ColorRatioInfo" xml:space="preserve">
+    <value>Recommended share of main, point and deco colors</value>
+  </data>
+  <data name="ColorContrastCheck" xml:space="preserve">
+    <value>WCAG 2.1 contrast</value>
+  </data>
+  <data name="ColorContrastInfo" xml:space="preserve">
+    <value>Against white (#FFF) and dark (#111) backgrounds</value>
+  </data>
+  <data name="ColorOnWhite" xml:space="preserve">
+    <value>On white</value>
+  </data>
+  <data name="ColorOnDark" xml:space="preserve">
+    <value>On dark</value>
+  </data>
+  <data name="ColorSampleButtons" xml:space="preserve">
+    <value>Buttons</value>
+  </data>
+  <data name="ColorSampleBadges" xml:space="preserve">
+    <value>Badges &amp; chips</value>
+  </data>
+  <data name="ColorSampleForms" xml:space="preserve">
+    <value>Form controls</value>
+  </data>
+  <data name="ColorSampleBanners" xml:space="preserve">
+    <value>Banners</value>
+  </data>
+  <data name="ColorCssCode" xml:space="preserve">
+    <value>CSS code</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ColorGuide" xml:space="preserve">
+    <value>Edit the colors on the left, specify them in the lower slot, check the changes, and export them as CSS code.</value>
+  </data>
+  <data name="ColorPageTitle" xml:space="preserve">
+    <value>CSS Color Variable Generator</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="ColorHelpLeft" xml:space="preserve">
+    <value>Left panel</value>
+  </data>
+  <data name="ColorHelpTabs" xml:space="preserve">
+    <value>PRESET lists saved color sets, CUSTOMIZE edits the current set.</value>
+  </data>
+  <data name="ColorHelpPresetRow" xml:space="preserve">
+    <value>Click a preset row to load that set into the CUSTOMIZE color list; the preview slot colors change with it.</value>
+  </data>
+  <data name="ColorHelpPresetOverwrite" xml:space="preserve">
+    <value>Left icon (shown on hover): overwrite this preset with the current CUSTOMIZE colors.</value>
+  </data>
+  <data name="ColorHelpPresetDelete" xml:space="preserve">
+    <value>Right icon (shown on hover): delete this preset.</value>
+  </data>
+  <data name="ColorHelpCard" xml:space="preserve">
+    <value>Click a color card to open the color picker (area, hue, opacity, HEX, eyedropper).</value>
+  </data>
+  <data name="ColorHelpCardShade" xml:space="preserve">
+    <value>Light/Dark are the lighter and darker colors, 1–9 are the level colors.</value>
+  </data>
+  <data name="ColorHelpCardDelete" xml:space="preserve">
+    <value>Top-right icon on hover: delete the color (at least 3 remain).</value>
+  </data>
+  <data name="ColorHelpButtons" xml:space="preserve">
+    <value>Panel buttons</value>
+  </data>
+  <data name="ColorHelpAddColor" xml:space="preserve">
+    <value>Adds one color (up to 7).</value>
+  </data>
+  <data name="ColorHelpAddPreset" xml:space="preserve">
+    <value>Saves the current CUSTOMIZE colors to the preset list in this browser.</value>
+  </data>
+  <data name="ColorHelpExport" xml:space="preserve">
+    <value>Downloads saved presets as preset.json.</value>
+  </data>
+  <data name="ColorHelpImport" xml:space="preserve">
+    <value>Imports presets from preset.json (duplicates skipped).</value>
+  </data>
+  <data name="ColorHelpCssCode" xml:space="preserve">
+    <value>Shows the CSS variable code to copy; variable names and options can be changed.</value>
+  </data>
+  <data name="ColorHelpPreviewTabs" xml:space="preserve">
+    <value>Switch the sample between Screen, Components and Contrast.</value>
+  </data>
+  <data name="ColorHelpPreviewTheme" xml:space="preserve">
+    <value>Toggles only the sample between light and dark.</value>
+  </data>
+  <data name="ColorHelpSlots" xml:space="preserve">
+    <value>Click a slot circle under the preview and pick one of the CUSTOMIZE colors to change that role.</value>
+  </data>
+  <data name="ColorHelpCodeOptions" xml:space="preserve">
+    <value>Choose whether light/dark and level (1–9) variables go into the code.</value>
+  </data>
+  <data name="ColorHelpCodeNames" xml:space="preserve">
+    <value>Renaming a color changes its --name in the code right away.</value>
+  </data>
+  <data name="ColorHelpCodeCopy" xml:space="preserve">
+    <value>Copy the whole code with the copy icon and paste it inside :root of your site CSS.</value>
+  </data>
+  <data name="IconPageTitle" xml:space="preserve">
+    <value>Fluent Icons</value>
+  </data>
+  <data name="IconPageInfo" xml:space="preserve">
+    <value>Search the site icon pack, copy the code, or download the whole pack.</value>
+  </data>
+  <data name="IconCountOf" xml:space="preserve">
+    <value>{0} icons</value>
+  </data>
+  <data name="IconFilled" xml:space="preserve">
+    <value>Filled</value>
+  </data>
+  <data name="IconOutline" xml:space="preserve">
+    <value>Outline</value>
+  </data>
+  <data name="IconSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="IconDownloadPack" xml:space="preserve">
+    <value>Download pack (.zip)</value>
+  </data>
+  <data name="IconUsage" xml:space="preserve">
+    <value>Click an icon to copy its code. Aliases are searchable too.</value>
+  </data>
+  <data name="IconPackNote" xml:space="preserve">
+    <value>A version of the public Fluent icon pack with optimized styles applied for easier direct use.</value>
+  </data>
+  <data name="IconLicenseNote" xml:space="preserve">
+    <value>Icons are based on Microsoft Fluent UI System Icons — Copyright (c) 2020 Microsoft Corporation, MIT License. Modified by BitPlus.</value>
+  </data>
+  <data name="Original" xml:space="preserve">
+    <value>Original</value>
+  </data>
+  <data name="Translation" xml:space="preserve">
+    <value>Translation</value>
+  </data>
+  <data name="TranslationMachine" xml:space="preserve">
+    <value>AI translation</value>
+  </data>
+  <data name="TranslationOutdated" xml:space="preserve">
+    <value>The original has changed since this translation.</value>
+  </data>
+  <data name="CultureSettings" xml:space="preserve">
+    <value>Languages</value>
+  </data>
+  <data name="DefaultLanguage" xml:space="preserve">
+    <value>Default language</value>
+  </data>
+  <data name="MainEditor" xml:space="preserve">
+    <value>Main editor</value>
+  </data>
+  <data name="MainEditorInfo" xml:space="preserve">
+    <value>Editor used on every writing screen</value>
+  </data>
+  <data name="SupportedLanguages" xml:space="preserve">
+    <value>Supported languages</value>
+  </data>
+  <data name="SupportedLanguagesInfo" xml:space="preserve">
+    <value>Shown in this order in the language menu. The default language cannot be removed.</value>
+  </data>
+  <data name="WelcomePage" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="LogExclude" xml:space="preserve">
+    <value>Log exclusion rules</value>
+  </data>
+  <data name="LogExcludeLevel" xml:space="preserve">
+    <value>Up to level</value>
+  </data>
+  <data name="LogContains" xml:space="preserve">
+    <value>Contains text (optional)</value>
+  </data>
+  <data name="LogExcludeCurrent" xml:space="preserve">
+    <value>Exclude selected log</value>
+  </data>
+  <data name="DiskSpaceLow" xml:space="preserve">
+    <value>There is not enough storage space on the server.</value>
+  </data>
+  <data name="FileUploadIncomplete" xml:space="preserve">
+    <value>The file has not been fully uploaded.</value>
+  </data>
+  <data name="Policy" xml:space="preserve">
+    <value>Policy</value>
+  </data>
+  <data name="PolicyName" xml:space="preserve">
+    <value>Policy Name</value>
+  </data>
+  <data name="Override" xml:space="preserve">
+    <value>Override</value>
+  </data>
+  <data name="PolicyFallback" xml:space="preserve">
+    <value>The override is disabled, so the config file policy applies.</value>
+  </data>
+  <data name="AllowTarget" xml:space="preserve">
+    <value>Allowed Targets</value>
+  </data>
+  <data name="ValidPeriod" xml:space="preserve">
+    <value>Valid Period</value>
+  </data>
+  <data name="ConfigPolicy" xml:space="preserve">
+    <value>Config File Policy</value>
+  </data>
+  <data name="PolicyConfigInfo" xml:space="preserve">
+    <value>Read-only, overridden by a DB policy of the same name</value>
+  </data>
+</root>

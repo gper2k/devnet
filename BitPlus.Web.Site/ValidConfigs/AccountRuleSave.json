@@ -1,0 +1,167 @@
+[
+  {
+    "name": "defaultPassword",
+    "displayName": "@DefaultPassword",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        64
+      ],
+      "regex": [
+        "[{]0[}]"
+      ]
+    }
+  },
+  {
+    "name": "uidMinSize",
+    "displayName": "@UidMinSize",
+    "filters": {
+      "required": [],
+      "minValue": [
+        2
+      ],
+      "maxValue": [
+        32
+      ]
+    }
+  },
+  {
+    "name": "accessExpireMin",
+    "displayName": "@AccessExpireMin",
+    "filters": {
+      "required": [],
+      "minValue": [
+        1
+      ],
+      "maxValue": [
+        1440
+      ]
+    }
+  },
+  {
+    "name": "accessRefreshMin",
+    "displayName": "@AccessRefreshMin",
+    "filters": {
+      "required": [],
+      "minValue": [
+        0
+      ],
+      "maxValue": [
+        1440
+      ]
+    }
+  },
+  {
+    "name": "refreshExpireHour",
+    "displayName": "@RefreshExpireHour",
+    "filters": {
+      "required": [],
+      "minValue": [
+        1
+      ],
+      "maxValue": [
+        8760
+      ]
+    }
+  },
+  {
+    "name": "accessTokenName",
+    "displayName": "@AccessTokenName",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        64
+      ],
+      "regex": [
+        "^[A-Za-z][A-Za-z0-9_-]*$"
+      ]
+    }
+  },
+  {
+    "name": "refreshTokenName",
+    "displayName": "@RefreshTokenName",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        64
+      ],
+      "regex": [
+        "^[A-Za-z][A-Za-z0-9_-]*$"
+      ]
+    }
+  },
+  {
+    "name": "refreshSignalHeaderName",
+    "displayName": "@RefreshSignalHeaderName",
+    "filters": {
+      "required": [],
+      "maxLength": [
+        64
+      ],
+      "regex": [
+        "^[A-Za-z][A-Za-z0-9_-]*$"
+      ]
+    }
+  },
+  {
+    "name": "requiredLength",
+    "displayName": "@RequiredLength",
+    "filters": {
+      "required": [],
+      "minValue": [
+        1
+      ],
+      "maxValue": [
+        128
+      ]
+    }
+  },
+  {
+    "name": "requiredUniqueChars",
+    "displayName": "@RequiredUniqueChars",
+    "filters": {
+      "required": [],
+      "minValue": [
+        0
+      ],
+      "maxValue": [
+        128
+      ]
+    }
+  },
+  {
+    "name": "maxFailedAccessAttempts",
+    "displayName": "@MaxFailedAccessAttempts",
+    "filters": {
+      "required": [],
+      "minValue": [
+        1
+      ],
+      "maxValue": [
+        100
+      ]
+    }
+  },
+  {
+    "name": "lockoutMinutes",
+    "displayName": "@LockoutMinutes",
+    "filters": {
+      "required": [],
+      "minValue": [
+        1
+      ],
+      "maxValue": [
+        525600
+      ]
+    }
+  },
+  {
+    "name": "mailVerify",
+    "displayName": "@MailVerify",
+    "filters": {
+      "regex": [
+        "^(On|Warning|Off)$"
+      ]
+    }
+  }
+]

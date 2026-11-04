@@ -1,0 +1,96 @@
+@charset "UTF-8";
+/* 시스템 설정 > 팝업 전용 스타일. 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.popupBox > section.card {
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+div.popupBox > section.card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.5em;
+}
+div.popupBox > section.card > header > strong {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5em;
+  gap: 0.4em;
+  font-size: 1.02em;
+  color: var(--txColor);
+}
+div.popupBox > section.card > header > strong > i.fi {
+  font-size: 1.4em;
+}
+div.popupBox > section.card > div.dataList ::deep {
+  overflow-y: auto;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colName, div.popupBox > section.card > div.dataList ::deep > ul > li > .colName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colArea, div.popupBox > section.card > div.dataList ::deep > ul > li > .colArea {
+  flex: 0 0 7em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colPeriod, div.popupBox > section.card > div.dataList ::deep > ul > li > .colPeriod {
+  flex: 0 0 18em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colTarget, div.popupBox > section.card > div.dataList ::deep > ul > li > .colTarget {
+  flex: 0 0 7em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colSize, div.popupBox > section.card > div.dataList ::deep > ul > li > .colSize {
+  flex: 0 0 7em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colFlag, div.popupBox > section.card > div.dataList ::deep > ul > li > .colFlag {
+  flex: 0 0 5em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colDate, div.popupBox > section.card > div.dataList ::deep > ul > li > .colDate {
+  flex: 0 0 8em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > header > .colPreview, div.popupBox > section.card > div.dataList ::deep > ul > li > .colPreview {
+  flex: 0 0 3em;
+  justify-content: center;
+}
+div.popupBox > section.card > div.dataList ::deep > ul > li {
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+}
+div.popupBox > section.card > div.dataList ::deep > ul > li > .colPeriod, div.popupBox > section.card > div.dataList ::deep > ul > li > .colTarget, div.popupBox > section.card > div.dataList ::deep > ul > li > .colSize {
+  color: var(--txSub);
+}
+div.popupBox > section.card > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em 0.8em;
+  border-top: 1px solid var(--lineColor);
+}
+
+/* 팝업 등록/수정 모달: 높이는 내용(입력 항목 + 에디터 38em, 스크립트에서 지정)만큼 */
+dialog#popupModal {
+  width: 48em;
+}
+dialog#popupModal > header {
+  color: var(--main);
+}
+dialog#popupModal {
+  /* 하단: 왼쪽 끝에 활성 체크(자리 고정), 오른쪽 끝에 취소·(수정이면 삭제)·저장 */
+}
+dialog#popupModal > footer > label.check {
+  width: auto;
+  margin-right: auto;
+}

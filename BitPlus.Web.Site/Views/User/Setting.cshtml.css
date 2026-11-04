@@ -1,0 +1,14 @@
+﻿@charset "UTF-8";
+/* 내 환경설정: 머리·탭 아래 설정 카드 한 장 */
+.userSetting {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.userSetting > div {
+  max-width: 36em;
+  padding: 0;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/User/Setting.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA%22%7D */

@@ -1,0 +1,8 @@
+{
+  "key": "Horizontal",
+  "version": 1,
+  "order": 2,
+  "name": { "ko": "가로형", "en": "Horizontal" },
+  "description": { "ko": "같은 크기의 칸을 가로로 늘어놓습니다. 칸 수(2~6)를 고르면 화면이 좁아질 때 2칸, 1칸씩 다음 줄로 넘어갑니다.", "en": "Equal slots side by side. Pick 2-6 slots; on narrow screens they wrap to 2 and then 1 per row." },
+  "repeat": { "min": 2, "max": 6, "default": 3 }
+}

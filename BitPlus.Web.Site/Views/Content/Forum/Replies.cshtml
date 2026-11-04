@@ -1,0 +1,255 @@
+@model ContentPageModel
+
+@* 포럼 토픽 보기의 댓글 영역(Default/View.cshtml 이 포럼 토픽일 때 넣음). 댓글(깊이 제한 없음)을 한 흐름으로 10개씩 api/content/comments 에서 받아 최신순으로 그린다.
+   모든 댓글에 [댓글 달기]와, 그 댓글에 바로 답한 댓글을 접어 둔 "N개의 댓글"(펼친 목록은 한 단계만, 읽기 전용, 각 항목에 "Jump to post")이 있고, 부모가 있는 댓글은 흐름 안에서 부모 댓글에 대한 댓글임을 함께 표시한다.
+   쓰기·수정은 별도 모달(forumComment), 본문은 서버가 정제해 저장한 HTML 을 그대로 넣는다. 주소 쿼리 jump=댓글 글번호 면 그 댓글이 있는 페이지를 열고 그 댓글로 이동한다.
+   블로그 피드 안(InFeed)에서는 여러 글이 한 화면에 이어지므로 접힌 상태(folded — 제목줄의 댓글 수만)로 시작하고, 제목줄을 누르면 펼치면서 처음 한 번 댓글을 불러온다.
+   피드에서는 제목줄 오른쪽에 댓글 달기·글 편집·글 삭제 버튼을 접힘과 상관없이 항상 보인다(편집·삭제는 글 보기 화면 스크립트가 #postEdit·#postDelete 로 처리, 글 보기 아래 버튼줄에서는 뺌). *@
+@{
+    var post = Model.Post!;
+    var canAdd = this.IsAuthenticated && Model.Permission.CanComment && post.IsPublished && post.IsApproved; // 서버의 댓글 등록 조건과 같음 (불러온 뒤에는 응답의 canWrite)
+}
+<article class="forumReplies @(Model.InFeed ? "folded" : null)" id="forumReplies" hidden="@(!Model.InFeed)">
+    <header>
+        @if (Model.InFeed)
+        {
+            <span role="button" tabindex="0"><i class="fi fiComment"></i> @this.Lang("Comment"). <b>@Model.CommentCount</b> <i class="fi fiChevronDown"></i></span>
+            <div>
+                <button type="button" class="deco xs" id="forumReplyAdd" hidden="@(!canAdd)"><i class="fi fiAdd"></i> @this.Lang("CommentReply")</button>
+                @if (post.CanEdit)
+                {
+                    <button type="button" class="info xs" id="postEdit" data-href="/content/@Model.RuleNo/write?no=@post.ContentNo"><i class="fi fiEdit"></i> @this.Lang("Edit")</button>
+                }
+                @if (post.CanDelete)
+                {
+                    <button type="button" class="danger xs" id="postDelete"><i class="fi fiTrash"></i> @this.Lang("Delete")</button>
+                }
+            </div>
+        }
+        else
+        {
+            <span><i class="fi fiComment"></i> @this.Lang("Comment"). <b>0</b></span>
+            <button type="button" class="deco xs" id="forumReplyAdd" hidden><i class="fi fiAdd"></i> @this.Lang("CommentReply")</button>
+        }
+    </header>
+    <ul></ul>
+    <ul class="pager" id="forumRepliesPager"></ul>
+</article>
+<script>
+{ // 블록으로 감싸 한 페이지에 이 화면이 여러 개(블로그 피드)여도 상수 이름이 겹치지 않게
+    const forumRepliesBox = document.currentScript.previousElementSibling; // 이 댓글 영역 (블로그 피드는 한 페이지에 글마다 하나씩)
+    window.addEventListener('DOMContentLoaded', () => {
+        // ── 화면 요소와 값 ──────────────────────────────────────────────
+        const box = forumRepliesBox;
+        const list = box.querySelector(':scope > ul:not(.pager)');
+        const countEl = box.querySelector('header b');
+        const addBtn = box.querySelector('#forumReplyAdd');
+        const ruleNo = @Model.RuleNo, topicNo = @Model.Post!.ContentNo;
+        const ownerType = '@BitPlus.Web.Data.Content.DefaultContentHandler.PostOwnerType';
+        const isMember = @(this.IsAuthenticated ? "true" : "false");
+        const quiet = { useLoading: false };
+        const text = { // 화면 글자 (다국어)
+            jump: @this.Js(this.Lang("CommentJump")), childCount: @this.Js(this.Lang("CommentChildCount")), onParent: @this.Js(this.Lang("CommentOnParent")), reply: @this.Js(this.Lang("CommentReply")),
+            files: @this.Js(this.Lang("ContentFiles")), edit: @this.Js(this.Lang("Edit")), report: @this.Js(this.Lang("Report")), remove: @this.Js(this.Lang("Delete")), history: @this.Js(this.Lang("History")),
+            current: @this.Js(this.Lang("ContentCurrentPost")), previous: @this.Js(this.Lang("ContentPrevious")),
+            deleteMsg: @this.Js(this.Lang("DeleteCommentMsg") + " " + this.Lang("DelWarning")), empty: @this.Js(this.Lang("DataEmpty"))
+        };
+
+        // ── 상태 ─────────────────────────────────────────────────────────
+        let data = null;            // 마지막으로 받은 댓글 응답 (api/content/comments)
+        let page = 1;               // 지금 보이는 쪽
+        let scrolled = false;       // 처음 그린 뒤인지 (이후 쪽 이동은 댓글 영역 위로 스크롤)
+        const opened = new Set();   // 펼쳐 둔 부모 댓글의 글번호 (다시 그려도 유지)
+        const byNo = new Map();     // 글번호 → 댓글 (화면의 data-no 로 데이터를 찾음)
+
+        // ── 그리기: 댓글 한 장의 HTML (common.html: ${값} 은 자동 이스케이프) ──
+        /** 댓글 도구 하나. 버튼이 아니라 span: 평소에는 글자, 마우스를 올리면 알약 모양 배경 (비활성은 disabled 클래스) */
+        const tool = (act, icon, label = '', cls = '') => common.html`<span role="button" tabindex="0" class="${cls}" data-act="${act}"><i class="fi ${icon}"></i>${label ? ' ' + label : ''}</span>`;
+
+        const filesOf = c => c.files.length === 0 ? '' : common.html`
+            <div class="files">
+                <label><i class="fi fiAttach"></i> ${text.files}</label>
+                ${c.files.map(f => common.html`<a class="badge sm" href="/system/down/${f.id}" download>${f.name} (${common.fileSizeText(f.size)}) <i class="fi fiDownload"></i> ${f.downCount}</a>`)}
+            </div>`;
+
+        const votesOf = c => !data.useLike ? '' : common.html`
+            <span role="button" tabindex="0" class="deco ${c.vote === 1 ? 'voted' : ''} ${isMember ? '' : 'disabled'}" data-act="like" data-liked="true"><i class="fi fiThumbLike"></i></span>
+            <b>${c.likePoint}</b>
+            <span role="button" tabindex="0" class="danger ${c.vote === -1 ? 'voted' : ''} ${isMember ? '' : 'disabled'}" data-act="like" data-liked="false"><i class="fi fiThumbDislike"></i></span>`;
+
+        const actionsOf = c => common.html`
+            ${c.canEdit ? tool('edit', 'fiEdit', text.edit) : ''}
+            ${c.canDelete ? tool('remove', 'fiTrash', text.remove, 'danger') : ''}
+            ${c.canReply ? tool('reply', 'fiArrReply', text.reply, 'primary') : ''}
+            ${isMember && !c.mine ? tool('report', 'fiFlag', text.report) : ''}`; // 댓글 달기는 모든 댓글에, 신고는 본인 댓글을 뺀 맨 끝
+
+        /** 좋아요 옆의 "N개의 댓글" (이 댓글에 바로 답한 댓글이 있을 때): 누르면 아래 목록을 펼치고 접음 */
+        const foldOf = c => c.children.length === 0 ? '' : common.html`
+            <span role="button" tabindex="0" class="fold ${opened.has(c.contentNo) ? 'expanded' : ''}" data-act="fold">${text.childCount.replace('{0}', c.children.length)} <i class="fi fiChevronDown"></i></span>`;
+
+        /** 이 댓글에 바로 답한 댓글 목록 (접어 둔 상태가 기본, 최신순, 한 단계만 — 읽기 전용) */
+        const childrenOf = c => c.children.length === 0 ? '' : common.html`
+            <ul class="children" ${opened.has(c.contentNo) ? '' : 'hidden'}>${c.children.map(k => cardOf(k, true))}</ul>`;
+
+        /** 댓글 카드 (child: 부모 아래 펼친 목록 안의 항목 — 읽기 전용: 아래줄 오른쪽에 "게시물로 이동"만, id 는 k 로 시작) */
+        const cardOf = (c, child) => common.html`
+            <li id="${child ? 'k' : 'c'}${c.contentNo}" data-no="${c.contentNo}">
+                <header>
+                    <strong data-act="${c.writerId && window.userMenu ? 'user' : ''}">${c.writerPhoto ? common.html`<img src="${c.writerPhoto}" alt="" />` : c.writerId ? common.html`<i class="fi fiPerson fiFill"></i>` : ''}${c.writer}${c.writerGroup || c.writerRole ? common.html`<small>${[c.writerGroup, c.writerRole].filter(Boolean).join(' · ')}</small>` : ''}</strong>
+                    ${c.parentNo > 0 && !child ? common.html`<a class="to" data-act="parent"><i class="fi fiArrReply"></i> ${text.onParent.replace('{0}', c.parentWriter ?? '')}</a>` : ''}
+                    <span class="meta">
+                        ${c.hasHistory && data.useHistory && !child ? tool('history', 'fiHistory', text.history) : ''}
+                        <span class="ip"><i class="fi fiGlobe"></i> ${c.ip}</span>
+                        <time title="${common.localTime(c.cDate, true)}"><i class="fi fiClock"></i> ${common.ago(c.cDate)}</time>
+                    </span>
+                </header>
+                <i class="badge sm warning" hidden></i>
+                <div class="body"></div>
+                ${filesOf(c)}
+                ${child ? common.html`
+                <footer>
+                    <div></div>
+                    <div>${tool('jump', 'fiArrRight', text.jump)}</div>
+                </footer>` : common.html`
+                <footer>
+                    <div>${votesOf(c)}${foldOf(c)}</div>
+                    <div>${actionsOf(c)}</div>
+                </footer>
+                ${childrenOf(c)}`}
+            </li>`;
+
+        /** 그린 뒤 본문을 채운다: 본문은 서버가 정제해 저장한 HTML 이라 템플릿(글자로 이스케이프)이 아니라 요소에 직접 넣는다 */
+        const fillBodies = () => list.querySelectorAll('li[data-no]').forEach(li => { li.querySelector(':scope > .body').innerHTML = byNo.get(Number(li.dataset.no)).body; });
+
+        // ── 동작: data-act 별 처리 (이벤트는 목록 하나에서 위임으로 받음) ──────
+        const modal = args => common.modal.append('forumComment', { ruleNo, topicNo, ownerType, ...args });
+        const guestPw = () => window.contentGuestPassword ? { password: window.contentGuestPassword } : {}; // 비회원 글을 비밀번호로 연 경우 요청마다 함께 보냄
+        const form = values => common.makeFormData({ ruleNo, ...guestPw(), ...values });
+
+        const actions = {
+            /** 작성자 이름: 작성자 메뉴(메시지 보내기·글 보기 — 레이아웃의 userMenu, 로그인 사용자만) */
+            user(c, el) { window.userMenu(el, c.writerId, c.writer); },
+            /** 좋아요(+1)·싫어요(-1): 합산 숫자와 내 표시만 그 자리에서 바꾼다 */
+            async like(c, el, li) {
+                const r = await common.postSend('/api/content/post/like', form({ contentNo: c.contentNo, liked: el.dataset.liked }), quiet);
+                if (!r?.success) return;
+                const [up, down] = li.querySelectorAll(':scope > footer [data-act="like"]');
+                up.classList.toggle('voted', r.data.vote === 1);
+                down.classList.toggle('voted', r.data.vote === -1);
+                li.querySelector(':scope > footer b').textContent = r.data.likePoint;
+            },
+            /** 변경 기록: 시각 목록을 메뉴로 보여 주고, 고르면 그 시점의 본문으로 바꿔 보여 준다 ("현재 글"로 되돌릴 수 있음) */
+            async history(c, el, li) {
+                const r = await common.postSend('/api/content/post/history', form({ contentNo: c.contentNo }), quiet);
+                if (!r?.success) return;
+                const body = li.querySelector(':scope > .body'), badge = li.querySelector(':scope > .badge');
+                const show = (html, label) => { body.innerHTML = html; badge.hidden = !label; badge.textContent = label ? `${text.previous} · ${label}` : ''; };
+                const items = r.data.items.map(v => ({ text: common.localTime(v.cDate, true), icon: 'fi fiHistory', action: async () => {
+                    const one = await common.postSend('/api/content/post/history', form({ contentNo: c.contentNo, versionNo: v.versionNo }), quiet);
+                    if (one?.success) show(one.data.body, common.localTime(v.cDate, true));
+                } }));
+                if (!badge.hidden) items.unshift({ text: text.current, icon: 'fi fiArrReply', action: () => show(c.body, '') }, { divider: true });
+                common.popMenu(el, items, 'right', true);
+            },
+            /** 수정: 댓글 입력 모달을 수정 모드로 연다 */
+            async edit(c, el, li) {
+                if (await modal({ commentNo: c.contentNo, id: c.id, body: c.body, files: c.files, parentNo: c.parentNo })) load({ page, focus: li.id });
+            },
+            /** 삭제: 확인 후 그 댓글 하나만 지움 */
+            async remove(c) {
+                if (!await common.confirm(text.deleteMsg)) return;
+                const r = await common.netSend('/api/content/comment', { method: 'DELETE', body: form({ contentNo: topicNo, commentNo: c.contentNo }) });
+                if (r?.success) load({ page });
+            },
+            /** 댓글에 댓글 달기: 새 댓글은 맨 위(최신)에 생기므로 그 댓글로 이동해 보여 준다 */
+            async reply(c) {
+                const no = await modal({ parentNo: c.contentNo, parentWriter: c.writer });
+                if (no) load({ jump: no, focus: 'c' + no });
+            },
+            /** 신고: 큰 입력 모달로 신고 내용을 받아 접수한다 */
+            report(c) { common.reportContent({ ruleNo, contentNo: c.contentNo }); },
+            /** "N개의 댓글": 바로 아래 댓글 목록을 펼치고 접는다 */
+            fold(c, el, li) {
+                const children = li.querySelector(':scope > ul.children');
+                children.hidden = !children.hidden;
+                el.classList.toggle('expanded', !children.hidden);
+                children.hidden ? opened.delete(c.contentNo) : opened.add(c.contentNo);
+            },
+            /** 접힌 목록의 항목: 흐름 안의 그 댓글 위치로 */
+            jump(c) { load({ jump: c.contentNo, focus: 'c' + c.contentNo }); },
+            /** 흐름 안의 부모가 있는 댓글: 부모 댓글로 */
+            parent(c) { load({ jump: c.parentNo, focus: 'c' + c.parentNo }); }
+        };
+
+        list.addEventListener('click', e => {
+            const el = e.target.closest('[data-act]');
+            if (!el || el.classList.contains('disabled') || !list.contains(el)) return;
+            const li = el.closest('li[data-no]');
+            actions[el.dataset.act]?.(byNo.get(Number(li.dataset.no)), el, li);
+        });
+        list.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-act]')) e.target.click(); });
+
+        // ── 불러오기 ─────────────────────────────────────────────────────
+        /** 요소로 이동하고 잠깐 강조한다 */
+        const flash = el => { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 2000); };
+
+        /** 댓글 흐름을 불러와 그린다 (page: 쪽, jump: 이 글번호의 댓글이 있는 쪽, focus: 다 그린 뒤 이동해서 강조할 요소 id) */
+        const load = async ({ page: want = 1, jump = 0, focus = '' } = {}) => {
+            const res = await common.getSend(`/api/content/comments?${new URLSearchParams({ ruleNo, contentNo: topicNo, page: want, jump, ...guestPw() })}`, quiet);
+            if (!res?.success || !res.data.enabled) return;
+            data = res.data;
+            page = data.page;
+            byNo.clear();
+            data.items.forEach(c => { byNo.set(c.contentNo, c); c.children.forEach(k => byNo.set(k.contentNo, k)); });
+            if (focus.startsWith('k')) { // 접힌 목록 안의 댓글로 가려면 그 부모를 펼쳐 둔다
+                const parent = data.items.find(p => p.children.some(k => 'k' + k.contentNo === focus));
+                if (parent) opened.add(parent.contentNo);
+            }
+
+            box.hidden = false;
+            addBtn.hidden = !data.canWrite;
+            countEl.textContent = data.total;
+            common.bindList(list, data.items, c => cardOf(c, false), common.html`<li class="empty">${text.empty}</li>`);
+            fillBodies();
+            const pager = box.querySelector('ul.pager');
+            pager.replaceWith(common.makePager(data.page - 1, data.pageSize, data.pageCount * data.pageSize).then(p => load({ page: p + 1 })));
+            const newPager = box.querySelector('ul.pager');
+            newPager.id = 'forumRepliesPager';
+            newPager.hidden = data.pageCount < 2 || box.classList.contains('folded'); // 한 쪽뿐이면 번호를 아예 보이지 않음
+
+            const target = focus && box.querySelector(`[id="${focus}"]`); // 댓글 요소 id 는 글마다 겹칠 수 있어 이 영역 안에서 찾음
+            if (target) flash(target);
+            else if (want > 1 || scrolled) box.scrollIntoView();
+            scrolled = true;
+        };
+
+        let loaded = false; // 블로그 피드: 접힌 채로 시작해 처음 펼칠 때(또는 댓글을 달았을 때) 불러옴
+        addBtn.onclick = async () => {
+            const no = await modal({});
+            if (!no) return;
+            box.classList.remove('folded');
+            loaded = true;
+            load({ jump: no, focus: 'c' + no });
+        };
+        box.addEventListener('forum:latest', async () => { // 토픽 상단의 "최신 댓글로 이동": 가장 최근 댓글(첫 쪽 맨 위)
+            box.classList.remove('folded');
+            loaded = true;
+            await load({ page: 1 });
+            if (list.firstElementChild) flash(list.firstElementChild);
+        });
+
+        const jumpNo = @(Model.InFeed && !Model.SinglePost ? "0" : "Number(new URLSearchParams(location.search).get('jump')) || 0"); // 주소 ?jump=댓글번호: 그 댓글 쪽을 열고 이동 (여러 글 피드에서는 쓰지 않음, 글 하나만 보이는 블로그 피드는 펼쳐서 이동)
+        const toggle = box.querySelector(':scope > header > span[role="button"]'); // 블로그 피드: 접기·펼치기 (처음 펼칠 때 불러옴)
+        if (!toggle) load(jumpNo ? { jump: jumpNo, focus: 'c' + jumpNo } : {});
+        else {
+            toggle.onclick = async () => {
+                const folded = box.classList.toggle('folded');
+                if (!folded && !loaded) { loaded = true; await load(jumpNo ? { jump: jumpNo, focus: 'c' + jumpNo } : {}); }
+                if (data) box.querySelector(':scope > ul.pager').hidden = folded || data.pageCount < 2; // 페이저는 스크립트가 만든 요소라 격리 스타일(.folded)이 닿지 않음
+            };
+            toggle.onkeydown = e => { if (e.key === 'Enter') toggle.click(); };
+            if (jumpNo) toggle.click();
+        }
+    });
+}
+</script>

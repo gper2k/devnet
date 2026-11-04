@@ -1,0 +1,67 @@
+@charset "UTF-8";
+/* 컨텐츠맵 위젯(사이드 패널 전용, 틀 없음): 머리줄(제목 + 신규 게시판 + · 게시판 설정 톱니) + 메뉴 트리 상자 — 이전 SidePanel 의 머리줄·트리 모양 그대로 */
+div.widgetContentMap {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+div.widgetContentMap > header {
+  color: var(--deco);
+  padding: 0 0.5em;
+  display: flex;
+  flex-direction: column;
+}
+div.widgetContentMap > header > label {
+  flex: 0 0 auto;
+  font-size: 1em;
+  font-weight: bold;
+  text-transform: uppercase;
+  /* 설정 아이콘(i.fi)과 추가 드롭박스(.dropMenu: 아이콘 + ul.dropBox)를 오른쪽 끝부터 나란히 */
+}
+div.widgetContentMap > header > label > i.fi, div.widgetContentMap > header > label > .dropMenu {
+  float: right;
+}
+div.widgetContentMap > header > label > i.fi + .dropMenu {
+  margin-right: 0.4em;
+}
+div.widgetContentMap > header > label {
+  /* 너비는 떠 있는 목록(ul.dropBox, absolute)에만 준다 — .dropMenu(float 아이콘 자리)에 주면 헤더 한 줄에 들어가지 않아 아래 줄로 밀려남 */
+}
+div.widgetContentMap > header > label > .dropMenu {
+  position: relative;
+}
+div.widgetContentMap > header > label > .dropMenu > ul.dropBox {
+  min-width: 8em;
+  font-weight: normal;
+  text-transform: none;
+}
+div.widgetContentMap > header > label > .dropMenu > ul.dropBox a {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  color: inherit;
+  text-decoration: none;
+}
+div.widgetContentMap > header > label > i.fi, div.widgetContentMap > header > label > .dropMenu > i.fi {
+  cursor: pointer;
+  transition: transform 0.2s color 0.2s;
+  font-size: 1.2em;
+  margin-top: 0.16em;
+  cursor: pointer;
+}
+div.widgetContentMap > header > label > i.fi:hover, div.widgetContentMap > header > label > .dropMenu > i.fi:hover {
+  transform: scale(1.1);
+  color: var(--decoDark);
+}
+div.widgetContentMap > header > label > i.fi:active, div.widgetContentMap > header > label > .dropMenu > i.fi:active {
+  transform: scale(1);
+  color: var(--decoLight);
+}
+div.widgetContentMap > nav {
+  overflow: auto;
+  background-color: var(--deco1);
+  border: 0.1em solid var(--deco2);
+  border-radius: var(--roundBox);
+  padding: 0.5em;
+}

@@ -1,0 +1,117 @@
+@use "../Design" as design;
+
+/* 기능 탭 위젯 — 가운데 제목·설명, 아래 왼쪽 기능 목록(고른 것은 main 배경·밝은 글자) + 오른쪽 이미지, 780 미만은 위아래 */
+div.widgetTabs {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8em;
+    padding: 2em 0.5em;
+
+    & > em {
+        @include design.label;
+    }
+
+    & > h2 {
+        margin: 0;
+        font-size: 2em;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        text-align: center;
+        color: var(--txColor);
+        @include design.underline(var(--point5));
+    }
+
+    & > p {
+        margin: 0;
+        max-width: 40em;
+        text-align: center;
+        color: var(--txLight);
+        line-height: 1.7;
+        white-space: pre-line;
+    }
+
+    & > div {
+        width: 100%;
+        margin-top: 1.2em;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 1.5em;
+        align-items: stretch;
+
+        @media (max-width: 779.98px) {
+            grid-template-columns: 1fr;
+        }
+
+        & > ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6em;
+
+            & > li {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3em;
+                padding: 1em 1.2em;
+                border-radius: var(--roundBox);
+                border: 1px solid var(--lineColor);
+                cursor: pointer;
+                transition: background-color 0.2s, color 0.2s;
+
+                & > strong {
+                    color: var(--txColor);
+                }
+
+                & > span {
+                    font-size: 0.88em;
+                    color: var(--txLight);
+                    line-height: 1.6;
+                }
+
+                &.active {
+                    background-color: var(--main);
+                    border-color: var(--main);
+
+                    & > strong {
+                        color: white;
+                    }
+
+                    & > span {
+                        color: var(--main1);
+                    }
+                }
+            }
+        }
+
+        & > figure {
+            margin: 0;
+            aspect-ratio: 16 / 9; /* 이미지 크기와 상관없이 같은 비율 상자 */
+            align-self: start;
+            border-radius: var(--roundBox);
+            background-color: var(--main1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+
+            & > img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            & > i {
+                font-size: 4em;
+                color: var(--main3);
+            }
+
+            & > [hidden] {
+                display: none;
+            }
+        }
+    }
+}

@@ -1,0 +1,524 @@
+@model ContentPageModel
+@using BitPlus.Data.Content
+@{
+    var isSurvey = Model.Type == ContentTypes.Survey; // 설문: 파일 탭, 답글·변경 기록·게시 기간/대상(설문 기간·대상자는 항상 켜짐) 항목, 답변 권한은 쓰지 않음(서버가 정함: SurveyContentHandler)
+    var isFaq = Model.Type == ContentTypes.FAQ; // FAQ: 승인자·파일 탭과 답글·댓글·좋아요·연관 링크·공지·게시 기간/대상·SNS 공유·변경 기록·비공개·익명 옵션, 목록·답변·댓글 권한은 쓰지 않음(서버가 정함: FaqContentHandler)
+    var isManual = Model.Type == ContentTypes.Manual; // 메뉴얼: 목록·답변 권한과 좋아요·댓글 좋아요·공지·비공개·익명·답글 허용은 쓰지 않음(서버가 정함: ManualContentHandler)
+    var isForum = BitPlus.Web.Data.Content.ForumContentHandler.UsesTopicComments(Model.Type); // 포럼·블로그(포럼형 댓글): 답글 권한·답글 허용·댓글 좋아요·비공개·익명은 쓰지 않고(서버가 정함: ForumContentHandler), 수정·삭제 허용은 토픽에만 적용
+    var isGallery = Model.Type == ContentTypes.Gallery; // 갤러리: 첨부가 기본이라 첨부 사용·허용 확장자·업로드/다운로드 권한 입력과 답변 권한·답글 허용·글 변경 기록·비공개·익명 옵션은 숨기고 서버가 정한다(GalleryContentHandler)
+}
+
+@* 일반(Default) 형식 게시판 설정(/content/manage/{규칙}) 및 신규 등록(/content/manage, 규칙 번호 0) — 관리자 전용(컨트롤러 검사). 탭: 기본 사항(제목·파일 규칙·활성화) / 권한(통합 목록). 값은 공통 설정 API api/content/settings(조회 GET ?ruleNo=, 저장 POST — 컨텐츠 매니저가 유형별로 처리)로 불러오고 저장한다. 형식마다 설정 항목이 달라 각 형식 폴더에 자기 Manage 뷰를 둔다. *@
+<article class="contentManage">
+    <header>
+        <span>
+            @this.Lang("BoardSettings") 
+            <i class="badge point">@(Model.RuleNo == 0 ? this.LangOf("AddOf", "ContentRule") : "Rule No. " + Model.RuleNo)</i>
+            <small></small>
+        </span>
+    </header>
+    <section class="tabBox">
+        <header>
+            <span data-for="#boardTabBasic" class="active">@this.Lang("BasicInfo")</span>
+            <span data-for="#boardTabAccess">@this.Lang("ContentPermission")</span>
+            @if (!isGallery && !isFaq && !isSurvey)
+            {
+                <span data-for="#boardTabFile">@this.Lang("ContentFiles")</span>
+            }
+            @if (!isFaq)
+            {
+                <span data-for="#boardTabApprove">@this.Lang("ContentApprovers")</span>
+            }
+            <span data-for="#boardTabOption">@this.Lang("FeatureOptions")</span>
+        </header>
+        <section>
+            <div id="boardTabBasic" class="active">
+                <ul class="form">
+                    <li>
+                        <header>@this.Lang("ContentTitle") <small class="txDanger">*</small></header>
+                        <div class="inputGroup">
+                            <input type="text" name="title" data-lang="{}" data-title="@this.Lang("ContentTitle")" />
+                            <button type="button" title="@this.Lang("LangInput")"><i class="fi fiTranslate"></i></button>
+                        </div>
+                    </li>
+                    <li>
+                        <header>
+                            @this.Lang("ContentCategory")
+                            <small>@this.Lang("CategoryFormat")</small>
+                        </header>
+                        <input type="text" name="category" maxlength="2000" autocomplete="off" placeholder="ex. key1: text1; text2; text3;" />
+                    </li>
+                    <li>
+                        <header>@this.Lang("TopAreaHtml")</header>
+                        <textarea name="topHtml" rows="5"></textarea>
+                    </li>
+                    <li>
+                        <header>@this.Lang("BottomAreaHtml")</header>
+                        <textarea name="bottomHtml" rows="5"></textarea>
+                    </li>
+                    <li class="tx">
+                        <div>
+                            <label class="check main"><input type="checkbox" name="enabler" checked /><span>@this.Lang("Enabler")</span></label>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="boardTabAccess">
+                <ul class="form">
+                    <li data-access class="auto">
+                        <header>
+                            <div>
+                                @this.Lang("ContentPermission")
+                            </div>
+                            <div class="tools">
+                                <label>ADD</label>
+                                <span data-type="User"><i class="fi fiUser"></i> User</span>
+                                <span data-type="Group"><i class="fi fiUsers"></i> Group</span>
+                                <span data-type="Groups"><i class="fi fiUsersGroup"></i> Group<small>& child</small></span>
+                                <span data-type="Role"><i class="fi fiShieldAlt"></i>Role</span>
+                            </div>
+                        </header>
+                        <ul class="managedList"></ul>
+                        <span class="infoMsg">※ @this.Lang("AccessUnlistedAllowedExceptManager")</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="boardTabFile">
+                <ul class="form">
+                    @* 파일 규칙의 이름·저장 경로는 게시판 번호로 자동 정해지므로 입력하지 않는다. 사용을 끄면 이 게시판은 첨부를 쓰지 않는다. *@
+                    <li class="tx" style="@(isGallery ? "display: none" : null)">
+                        <div>
+                            <label class="check main"><input type="checkbox" name="fileEnabled" /><span>@this.Lang("ContentUseFiles")</span></label>
+                        </div>
+                    </li>
+                    <li style="@(isGallery ? "display: none" : null)">
+                        <header>@this.Lang("AllowExtensions") <small>@this.Lang("AllowExtensionsInfo")</small></header>
+                        <input type="text" name="fileExtensions" maxlength="512" autocomplete="off" placeholder="jpg, png, gif, pdf, zip" />
+                    </li>
+                    @if (!isGallery)
+                    {
+                        <li class="col3">
+                            <div>
+                                <header>@this.Lang("AllowCount") <small>@this.Lang("EmptyUnlimited")</small></header>
+                                <input type="number" name="fileCount" min="0" step="1" />
+                            </div>
+                            <div>
+                                <header>@this.Lang("AllowSize") <small>MB, @this.Lang("EmptyUnlimited")</small></header>
+                                <input type="number" name="fileSize" min="0" step="any" />
+                            </div>
+                            <div>
+                                <header>@this.Lang("AllowTotalSize") <small>MB, @this.Lang("EmptyUnlimited")</small></header>
+                                <input type="number" name="fileTotalSize" min="0" step="any" />
+                            </div>
+                        </li>
+                    }
+                    <li data-file-access class="auto" style="@(isGallery ? "display: none" : null)">
+                        <header>
+                            <div>
+                                @this.Lang("Upload") / @this.Lang("Download") @this.Lang("ContentPermission")
+                            </div>
+                            <div class="tools">
+                                <label>ADD</label>
+                                <span data-type="User"><i class="fi fiUser"></i> User</span>
+                                <span data-type="Group"><i class="fi fiUsers"></i> Group</span>
+                                <span data-type="Groups"><i class="fi fiUsersGroup"></i> Group<small>& child</small></span>
+                                <span data-type="Role"><i class="fi fiShieldAlt"></i>Role</span>
+                            </div>
+                        </header>
+                        <ul class="managedList"></ul>
+                        <span class="infoMsg">※ @this.Lang("AccessUnlistedAllowed")</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="boardTabApprove">
+                <ul class="form">
+                    <li data-approver class="auto">
+                        <header>
+                            <div>
+                                @this.Lang("ContentApprovers")
+                            </div>
+                            <div class="tools">
+                                <label>ADD</label>
+                                <span data-type="User"><i class="fi fiUser"></i> User</span>
+                            </div>
+                        </header>
+                        <ul class="managedList"></ul>
+                    </li>
+                    <li class="subTitle">@this.Lang("ApprovalOptions")</li>
+                    <li class="flexRow">
+                        <label class="check"><input type="checkbox" data-opt="ManagerProxyApproval" /><span title="@this.Lang("ManagerProxyApprovalInfo")">@this.Lang("ManagerProxyApproval") <i class="fi fiInfoCircle"></i></span></label>
+                        <label class="check"><input type="checkbox" data-opt="ParallelApproval" /><span title="@this.Lang("ParallelApprovalInfo")">@this.Lang("ParallelApproval") <i class="fi fiInfoCircle"></i></span></label>
+                        <label class="check"><input type="checkbox" data-opt="SingleApproval" /><span title="@this.Lang("SingleApprovalInfo")">@this.Lang("SingleApproval") <i class="fi fiInfoCircle"></i></span></label>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="boardTabOption">
+                <ul class="form">
+                    <li class="flexRow">
+                        <label class="check"><input type="checkbox" checked data-opt="AllowDelete" /><span title="@(isForum ? this.Lang("ForumTopicOnlyInfo") : null)">@this.LangOf("AllowOf", "Delete")</span></label>
+                        <label class="check"><input type="checkbox" checked data-opt="AllowEdit" /><span title="@(isForum ? this.Lang("ForumTopicOnlyInfo") : null)">@this.LangOf("AllowOf", "Edit")</span></label>
+                        @if (!isForum && !isManual && !isFaq && !isSurvey && !isGallery)
+                        {
+                            <label class="check"><input type="checkbox" checked data-opt="AllowAnswer" /><span>@this.LangOf("AllowOf", "ContentReply")</span></label>
+                        }
+                        @if (!isFaq)
+                        {
+                            <label class="check"><input type="checkbox" checked data-opt="AllowComment" /><span>@this.LangOf("AllowOf", "Comment")</span></label>
+                        }
+                        <label class="check"><input type="checkbox" checked data-opt="UseTags" /><span>@this.LangOf("UseOf", "Tag")</span></label>
+                        @if (!isManual && !isFaq)
+                        {
+                            <label class="check"><input type="checkbox" checked data-opt="UseLike" /><span>@this.LangOf("UseOf", "Like")</span></label>
+                        }
+                        @if (!isForum && !isManual && !isFaq)
+                        {
+                            <label class="check"><input type="checkbox" checked data-opt="UseCommentLike" /><span>@this.LangOf("UseOf", "CommentLike")</span></label>
+                        }
+                        @if (!isFaq)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="UseRelatedLinks" /><span>@this.LangOf("UseOf", "RelatedLink")</span></label>
+                        }
+                        @if (!isManual && !isFaq)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="UseNotice" /><span>@this.LangOf("UseOf", "Notice")</span></label>
+                        }
+                        @if (!isFaq && !isSurvey)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="WriterPeriod" /><span>@this.Lang("WriterPeriod")</span></label>
+                            <label class="check"><input type="checkbox" data-opt="WriterTarget" /><span>@this.Lang("WriterTarget")</span></label>
+                        }
+                        @if (!isGallery && !isFaq && !isSurvey)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="UseHistory" /><span>@this.Lang("History")</span></label>
+                        }
+                        @if (!isFaq && !isSurvey)
+                        {
+                            @* 다국어: 글마다 언어별 번역을 붙임 (글쓰기 언어 탭, 글 보기 언어 선택, 목록·검색의 번역 제목) *@
+                            <label class="check"><input type="checkbox" data-opt="UseTranslation" /><span>@this.LangOf("UseOf", "Translation")</span></label>
+                        }
+                        @if (!isFaq)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="UseSnsShare" /><span>SNS @this.Lang("ContentShare")</span></label>
+                        }
+                        @if (Model.Type is ContentTypes.Default or ContentTypes.Forum)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="ShowSummary" /><span title="@this.Lang("ShowSummaryInfo")">@this.Lang("WidgetSummary") <i class="fi fiInfoCircle"></i></span></label>
+                        }
+                        @if (!isGallery && !isForum && !isManual && !isFaq)
+                        {
+                            <label class="check"><input type="checkbox" data-opt="UsePrivate" /><span title="@this.Lang("UsePrivateInfo")">@this.LangOf("UseOf", "ContentPrivate") <i class="fi fiInfoCircle"></i></span></label>
+                            <label class="check"><input type="checkbox" data-opt="UseAnonymous" /><span>@this.LangOf("UseOf", "Anonymous")</span></label>
+                        }
+                    </li>
+                    <li class="subTitle">
+                        <span>
+                            @this.Lang("MenuConfig")
+                            <label class="check"><input type="checkbox" name="menuHidden" /><span>@this.Lang("HideMenu")</span></label>
+                        </span>
+                    </li>
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("MenuPosition")</header>
+                            <select name="menuParentKey"></select>
+                        </div>
+                        <div>
+                            <header>@this.Lang("Icon")</header>
+                            <input type="text" name="menuIcon" placeholder="&lt;i class=&quot;fi fiDocOnePage&quot;&gt;&lt;/i&gt;" autocomplete="off" />
+                        </div>
+                    </li>
+                    @* 사이드 구성: 게시판 화면의 사이드 패널 감춤·위치·연결 메뉴(자동 = 컨텐츠맵 트리, 사용자 메뉴를 고르면 그 메뉴 이름을 제목에, 하위 메뉴를 트리에) *@
+                    <li class="subTitle">
+                        <span>
+                            @this.Lang("SideConfig")
+                            <label class="check"><input type="checkbox" name="sideHidden" /><span>@this.Lang("HideSide")</span></label>
+                        </span>
+                    </li>
+                    <li class="col2">
+                        <div>
+                            <header>@this.Lang("SidePosition")</header>
+                            <select name="sidePosition">
+                                <option value="Left">@this.Lang("Left")</option>
+                                <option value="Right">@this.Lang("Right")</option>
+                            </select>
+                        </div>
+                        <div>
+                            <header>@this.Lang("LinkedMenu")</header>
+                            <select name="sideMenuKey">
+                                <option value="">@this.Lang("Auto")</option>
+                            </select>
+                        </div>
+                    </li>
+                    @if (isGallery)
+                    {
+                        @* 갤러리는 이미지 첨부가 기본이라 파일 탭 대신 여기서 개수·용량만 정한다 (허용 확장자·업로드/다운로드 권한은 저장할 때 자동) *@
+                        <li class="subTitle">
+                            <span>@this.Lang("FileConfig")</span>
+                        </li>
+                        <li class="col3">
+                            <div>
+                                <header>@this.Lang("AllowCount")</header>
+                                <input type="number" name="fileCount" min="0" step="1" />
+                            </div>
+                            <div>
+                                <header>@this.Lang("AllowSize")</header>
+                                <input type="number" name="fileSize" min="0" step="any" />
+                            </div>
+                            <div>
+                                <header>@this.Lang("AllowTotalSize")</header>
+                                <input type="number" name="fileTotalSize" min="0" step="any" />
+                            </div>
+                        </li>
+                        <li>
+                            <span class="infoMsg">※ @this.Lang("FixedExtensionsOf").Formats("jpg, jpeg, png, gif, webp, avif, bmp")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <a class="btn" href="javascript:history.back()"><i class="fi fiBan"></i> @this.Lang("Cancel")</a>
+        <button type="button" class="main" id="boardSaveBtn"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</article>
+
+@* 이 뷰는 페이지 틀 안의 파샬뷰라 섹션을 쓸 수 없어 스크립트를 본문에 둔다 *@
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const root = document.querySelector('article.contentManage');
+        const ruleNo = @Model.RuleNo; // 0 = 신규 등록
+        const isNew = ruleNo === 0;
+        const api = '/api/content/settings'; // 설정 조회·저장은 유형 상관없이 한 API (컨텐츠 매니저가 유형별로 처리: 규칙 번호 0 = 신규)
+        const titleInput = root.querySelector('[name="title"]');
+        // 대상별 체크 권한 목록(권한 탭·파일 탭 공통): 항목 하나 = 대상 하나, 체크 상자 = flags 의 권한(항목마다 1개 이상 체크 유지). 저장할 때 체크마다 모드별 권한 행으로 풀어 보낸다.
+        // 하단 종류(사용자/그룹/그룹(자식 포함)/역할)를 누르면 선택 모달이 열리고 고른 대상이 addFlags 체크 상태로 추가되며, 체크 변경은 항목에 반영, 끝 삭제 버튼은 항목 제거.
+        const typeNames = JSON.parse(@this.Js(System.Text.Json.JsonSerializer.Serialize(new[] { "Role", "Group", "Groups", "User" }.ToDictionary(p => p, p => this.Lang(p)))));
+        const modalOf = { User: 'userSelect', Group: 'groupSelect', Groups: 'groupSelect', Role: 'roleSelect' };
+        const accessEditor = (box, flags, flagNames, addFlags) => {
+            const items = []; // [{ type, key, name, flags: { 권한: true/false } }]
+            const list = box.querySelector('ul.managedList');
+            const render = () => list.replaceChildren(...items.map((p, index) => {
+                const li = document.createElement('li');
+                li.dataset.index = index;
+                li.innerHTML = '<span class="authType"><i class="badge sm deco"></i></span><span class="authName auto"></span>'
+                    + flags.map(f => `<label class="check sm"><input type="checkbox" data-flag="${f}" /><span></span></label>`).join('')
+                    + '<button type="button" class="danger"><i class="fi fiDismiss"></i></button>';
+                li.querySelector('span.authType > .badge').textContent = typeNames[p.type] ?? p.type;
+                li.querySelector('span.authName').textContent = p.name;
+                li.querySelectorAll('input[data-flag]').forEach(input => {
+                    input.checked = p.flags[input.dataset.flag];
+                    input.nextElementSibling.textContent = flagNames[input.dataset.flag];
+                });
+                return li;
+            }));
+            const blank = () => Object.fromEntries(flags.map(f => [f, false]));
+            box.querySelectorAll('.tools span[data-type]').forEach(span => span.onclick = async () => {
+                const type = span.dataset.type;
+                const result = await common.modal.append(modalOf[type], { max: 0 });
+                if (!result || typeof result !== 'object') return;
+                Object.entries(result).forEach(([key, name]) => {
+                    if (!items.some(p => p.type === type && p.key === key)) items.push({ type, key, name, flags: { ...blank(), ...addFlags } });
+                });
+                render();
+            });
+            list.onchange = e => {
+                const input = e.target.closest('input[data-flag]');
+                if (!input) return;
+                const item = items[Number(input.closest('li').dataset.index)];
+                // 항목마다 1개 이상 체크를 유지: 마지막 체크를 끄려 하면 되돌린다 (권한이 하나도 없으면 등록할 의미가 없음)
+                if (!input.checked && !flags.some(f => f !== input.dataset.flag && item.flags[f])) {
+                    input.checked = true;
+                    return common.alert(@this.Js(this.Lang("AccessNeedOne")));
+                }
+                item.flags[input.dataset.flag] = input.checked;
+            };
+            list.onclick = e => {
+                const li = e.target.closest('li');
+                if (!e.target.closest('button') || !li) return;
+                items.splice(Number(li.dataset.index), 1);
+                render();
+            };
+            return {
+                /** 서버가 준 권한 행([{ mode, type, key, name }])으로 목록을 채운다 */
+                load: rows => {
+                    items.length = 0;
+                    rows.forEach(p => {
+                        let item = items.find(q => q.type === p.type && q.key === p.key);
+                        if (!item) items.push(item = { type: p.type, key: p.key, name: p.name, flags: blank() });
+                        if (p.mode in item.flags) item.flags[p.mode] = true;
+                    });
+                    render();
+                },
+                /** 저장용 권한 행([{ mode, type, key }]): 체크마다 한 행 */
+                rows: () => items.flatMap(p => flags.filter(f => p.flags[f]).map(mode => ({ mode, type: p.type, key: p.key })))
+            };
+        };
+        const accessFlags = @Html.Raw(isForum ? "['Manager', 'List', 'Read', 'Write', 'Comment']" : isManual ? "['Manager', 'Read', 'Write', 'Comment']" : isFaq ? "['Manager', 'Read', 'Write']" : isSurvey || isGallery ? "['Manager', 'List', 'Read', 'Write', 'Comment']" : "['Manager', 'List', 'Read', 'Write', 'Answer', 'Comment']"); // 표시 순서: 담당자, 목록, 읽기, 쓰기, 답글(포럼 제외), 댓글
+        const access = accessEditor(root.querySelector('#boardTabAccess [data-access]'), accessFlags,
+            JSON.parse(@this.Js(System.Text.Json.JsonSerializer.Serialize(new[] { "Manager", "List", "Read", "Write", "Answer", "Comment" }.ToDictionary(p => p, p => this.Lang(p == "List" ? "ContentList" : p))))),
+            { List: true, Read: true, Write: true, Answer: !@(isForum || isManual || isFaq || isSurvey || isGallery ? "true" : "false"), Comment: true }); // 새 대상은 담당자만 빼고 모두 체크
+        const fileFlags = ['Upload', 'Download'];
+        const fileAccess = accessEditor(root.querySelector('#boardTabFile [data-file-access]'), fileFlags,
+            JSON.parse(@this.Js(System.Text.Json.JsonSerializer.Serialize(new[] { "Upload", "Download" }.ToDictionary(p => p, p => this.Lang(p))))),
+            { Upload: true, Download: true }); // 새 대상은 업로드·다운로드 모두 체크
+
+        // 승인자 탭: 게시 승인자(사용자)와 승인 순서(추가한 순서). 하단 User 를 누르면 사용자 찾기 모달, 항목 끝 삭제 버튼으로 제거
+        const approvers = []; // [{ key, name }]
+        const approveBox = root.querySelector('#boardTabApprove [data-approver]');
+        const approveList = approveBox.querySelector('ul.managedList');
+        const renderApprovers = () => {
+            approveList.replaceChildren(...approvers.map((p, index) => {
+                const li = document.createElement('li');
+                li.dataset.index = index;
+                li.dataset.key = p.key;
+                li.draggable = true; // 드래그 앤 드롭으로 승인 순서 조정
+                li.innerHTML = '<span class="authDrag"><i class="fi fiReOrderDotsVert"></i></span><span class="authType"><i class="badge sm deco"></i></span><span class="authName auto"></span><button type="button" class="danger"><i class="fi fiDismiss"></i></button>';
+                li.querySelector('span.authType > .badge').textContent = index + 1;
+                li.querySelector('span.authName').textContent = p.name;
+                return li;
+            }));
+        };
+
+        const isGallery = @(isGallery ? "true" : "false");
+        const res = await common.getSend(`${api}?ruleNo=${ruleNo}&type=@Model.Type`);
+        if (!res || !res.success) return;
+        const data = res.data;
+        common.setLang(titleInput, data.title ?? {});
+        // 파일 탭: 이 게시판 전용 파일 규칙의 값 (없으면 첨부 사용 꺼짐 + 기본 허용값). 용량은 서버가 Byte 로 보관하므로 화면에서는 MB 로 보여 준다(-1/비움 = 무제한).
+        const mb = 1024 * 1024;
+        const unlimited = value => value == null || value < 0;
+        const fileInput = name => root.querySelector(`[name="${name}"]`);
+        const file = data.file; // 이 게시판 전용 파일 규칙이 있으면 그 값(첨부를 꺼 둔 상태의 이전 값 포함), 없으면 기본값: 확장자 비움(모두 허용), 개수 5, 파일 3MB, 전체 10MB
+        fileInput('fileEnabled').checked = isGallery || !!file?.enabled;
+        fileInput('fileExtensions').value = file ? (file.extensions ?? '') : '';
+        fileInput('fileCount').value = file ? (unlimited(file.count) ? '' : file.count) : isGallery ? 30 : 5;
+        fileInput('fileSize').value = file ? (unlimited(file.size) ? '' : file.size / mb) : isGallery ? 10 : 3;
+        fileInput('fileTotalSize').value = file ? (unlimited(file.totalSize) ? '' : file.totalSize / mb) : isGallery ? 200 : 10;
+        fileAccess.load(file?.accessRules ?? []);
+        // "첨부 파일 사용"을 끄면 파일 탭의 다른 입력(확장자·개수·용량·권한 목록)은 모두 비활성
+        const fileTab = root.querySelector('#boardTabFile');
+        const syncFileEnabled = () => {
+            const on = fileInput('fileEnabled').checked;
+            fileTab.querySelectorAll('input:not([name="fileEnabled"])').forEach(input => input.disabled = !on);
+            fileTab.querySelectorAll('[data-file-access]').forEach(box => box.inert = !on); // 권한 목록의 추가·삭제 버튼 포함 클릭 불가
+            fileTab.classList.toggle('off', !on);
+        };
+        fileInput('fileEnabled').addEventListener('change', syncFileEnabled);
+        syncFileEnabled();
+        root.querySelector('[name="enabler"]').checked = data.enabler;
+        // 상단/하단 영역 HTML: 에디터 바인딩 (이미지 소유자 = content.rule / 규칙 식별키, 신규는 임시 키). 규칙 관리자가 쓰는 영역이라 걸러내기는 기본(엄격) 그대로 둔다.
+        const ownerKey = data.id ?? crypto.randomUUID();
+        const htmlEditors = {};
+        for (const name of ['topHtml', 'bottomHtml']) {
+            htmlEditors[name] = await common.makeEditor(root.querySelector(`[name="${name}"]`), { ownerType: 'content.rule', ownerKey, height: '16em' });
+            htmlEditors[name].setHtml(data[name] ?? '');
+        }
+        root.querySelector('[name="category"]').value = data.category ?? '';
+        // 메뉴 구성: 게시판 메뉴(Content_{규칙번호})의 위치(컨텐츠맵과 그 하위 메뉴 중 선택, 단계별로 들여쓰기)·아이콘·감춤
+        const menuParent = root.querySelector('[name="menuParentKey"]');
+        (data.menuParents ?? []).forEach(p => menuParent.add(new Option('  '.repeat(p.depth) + p.text, p.key)));
+        menuParent.value = data.menuParentKey ?? '';
+        root.querySelector('[name="menuIcon"]').value = data.menuIcon ?? '';
+        root.querySelector('[name="menuHidden"]').checked = !!data.menuHidden;
+        // 사이드 구성: 위치(좌측/우측)·연결 메뉴(맨 위 자동, 아래로 사용자 메뉴 트리를 단계별로 들여쓰기)·감춤
+        const sideMenu = root.querySelector('[name="sideMenuKey"]');
+        (data.sideMenus ?? []).forEach(p => sideMenu.add(new Option('  '.repeat(p.depth) + p.text, p.key)));
+        sideMenu.value = data.sideMenuKey ?? '';
+        if (sideMenu.selectedIndex < 0) sideMenu.value = ''; // 저장된 메뉴가 지워졌으면 자동
+        root.querySelector('[name="sidePosition"]').value = data.sidePosition ?? 'Left';
+        root.querySelector('[name="sideHidden"]').checked = !!data.sideHidden;
+        // 승인/기능 옵션: 저장된 키만 반영하고 저장된 적 없는 키는 화면의 기본 체크를 유지한다
+        root.querySelectorAll('[data-opt]').forEach(input => { if (data.options && input.dataset.opt in data.options) input.checked = !!data.options[input.dataset.opt]; });
+        access.load(data.accessRules);
+        approvers.push(...(data.approvers ?? []));
+        renderApprovers();
+
+        approveBox.querySelector('.tools span[data-type="User"]').onclick = async () => {
+            const result = await common.modal.append('userSelect', { max: 0 });
+            if (!result || typeof result !== 'object') return;
+            Object.entries(result).forEach(([key, name]) => {
+                if (!approvers.some(p => p.key === key)) approvers.push({ key, name });
+            });
+            renderApprovers();
+        };
+        // 드래그 앤 드롭: 놓는 동안 목록 위치를 바꿔 보여 주고, 끝나면 그 위치 순서대로 승인 순서(저장 시 위치값)를 다시 매긴다
+        let dragged = null;
+        approveList.ondragstart = e => {
+            dragged = e.target.closest('li[data-key]');
+            if (!dragged) return;
+            e.dataTransfer.effectAllowed = 'move';
+            dragged.classList.add('dragging');
+        };
+        approveList.ondragover = e => {
+            if (!dragged) return;
+            e.preventDefault();
+            const over = e.target.closest('li[data-key]');
+            if (!over || over === dragged) return;
+            const rect = over.getBoundingClientRect();
+            approveList.insertBefore(dragged, e.clientY < rect.top + rect.height / 2 ? over : over.nextSibling);
+        };
+        approveList.ondrop = e => e.preventDefault();
+        approveList.ondragend = () => {
+            if (!dragged) return;
+            dragged.classList.remove('dragging');
+            dragged = null;
+            const order = [...approveList.querySelectorAll(':scope > li[data-key]')].map(li => li.dataset.key);
+            approvers.splice(0, approvers.length, ...order.map(key => approvers.find(p => p.key === key)));
+            renderApprovers();
+        };
+        approveList.onclick = e => {
+            const li = e.target.closest('li');
+            if (!e.target.closest('button') || !li) return;
+            approvers.splice(Number(li.dataset.index), 1);
+            renderApprovers();
+        };
+
+        // 에디터의 빈 본문(<p><br></p> 등)은 빈 값으로 본다
+        const htmlOf = editor => {
+            const html = editor.getHtml();
+            return /<img|[^\s]/i.test(html.replace(/<(?!img)[^>]*>|&nbsp;/gi, '')) ? html : '';
+        };
+
+        root.querySelector('#boardSaveBtn').onclick = async () => {
+            const title = common.getLang(titleInput);
+            if (!Object.values(title).some(v => v && v.trim())) {
+                root.querySelector('.tabBox > header > :first-child').click();
+                titleInput.focus();
+                return common.alert(@this.Js(this.LangOf("ValidRequired", "ContentTitle")));
+            }
+            const body = common.makeFormData({
+                title,
+                fileEnabled: fileInput('fileEnabled').checked,
+                fileExtensions: fileInput('fileExtensions').value.trim(),
+                fileCount: fileInput('fileCount').value === '' ? -1 : Math.round(Number(fileInput('fileCount').value)),
+                fileSize: fileInput('fileSize').value === '' ? -1 : Math.round(Number(fileInput('fileSize').value) * mb),
+                fileTotalSize: fileInput('fileTotalSize').value === '' ? -1 : Math.round(Number(fileInput('fileTotalSize').value) * mb),
+                fileAccess: JSON.stringify(fileAccess.rows()),
+                enabler: root.querySelector('[name="enabler"]').checked,
+                approvers: JSON.stringify(approvers.map(p => p.key)),
+                category: root.querySelector('[name="category"]').value.trim(),
+                topHtml: htmlOf(htmlEditors.topHtml),
+                bottomHtml: htmlOf(htmlEditors.bottomHtml),
+                menuParentKey: menuParent.value,
+                menuIcon: root.querySelector('[name="menuIcon"]').value.trim(),
+                menuHidden: root.querySelector('[name="menuHidden"]').checked,
+                sideHidden: root.querySelector('[name="sideHidden"]').checked,
+                sidePosition: root.querySelector('[name="sidePosition"]').value,
+                sideMenuKey: sideMenu.value,
+                // 승인 옵션과 기능 옵션을 {키: 불리언} 사전 하나로 묶어 보낸다 (서버는 JSON 한 개로 저장)
+                options: JSON.stringify(Object.fromEntries([...root.querySelectorAll('[data-opt]')].map(input => [input.dataset.opt, input.checked]))),
+                accessRules: JSON.stringify(access.rows())
+            });
+            body.append('ruleNo', ruleNo);
+            body.append('type', '@Model.Type');
+            if (isNew) body.append('draftKey', ownerKey);
+            const saved = await common.postSend(api, body);
+            // 관리자 콘솔에서 열었으면(ViewData ReturnUrl) 그 화면으로, 아니면 그 게시판 목록으로 이동
+            if (saved && saved.success) location.href = @this.Js(ViewData["ReturnUrl"] as string ?? string.Empty) || `/content/${isNew ? saved.data.ruleNo : ruleNo}`;
+        };
+    });
+</script>

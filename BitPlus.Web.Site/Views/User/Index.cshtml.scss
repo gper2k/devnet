@@ -1,0 +1,439 @@
+/* 내 정보(/user): 머리·탭 아래 2단 반응형 레이아웃(좌측: 기본 정보·그룹/역할·외부 로그인 / 우측: 활동 요약·최근 작성글) */
+.userInfo {
+    height: 100%;
+    flex: 1 1 auto;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    & > * {
+        flex: 0 0 auto;
+    }
+
+    & > div {
+        flex: 1 1 auto;
+        display: grid;
+        grid-template-columns: minmax(21em, 24.5em) minmax(0, 1fr);
+        align-content: start;
+        align-items: start;
+        gap: 1.2em;
+        padding: 0;
+
+        /* 좌측 컬럼: 개인 정보, 소속 그룹·역할, 외부 로그인 연결 */
+        & > aside {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            min-width: 0;
+
+            & > ul {
+                margin: 0;
+
+                &[hidden] {
+                    display: none;
+                }
+
+                & > li {
+                    &[hidden] {
+                        display: none;
+                    }
+
+                    & > h4 {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.45em;
+                        margin: 0;
+                        color: var(--txColor);
+
+                        & > i.fi {
+                            color: var(--main);
+                        }
+                    }
+
+                    & > span {
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 0.4em;
+                        min-height: 1.6em;
+                        white-space: pre-line;
+                        word-break: break-word;
+                    }
+
+                    & > p {
+                        margin: 0;
+                        font-size: 0.85em;
+                        color: var(--txLight);
+                    }
+
+                    & > footer {
+                        display: flex;
+                        flex-wrap: nowrap;
+                        justify-content: flex-end;
+                        gap: 0.35em;
+                        padding-top: 0.3em;
+
+                        & > button {
+                            padding: 0 0.65em;
+                            font-size: 0.8em;
+                            white-space: nowrap;
+                        }
+
+                        /* 회원 탈퇴는 왼쪽 끝으로 떼어 둔다 */
+                        & > button.danger {
+                            margin-right: auto;
+                        }
+                    }
+                }
+
+                /* 외부 로그인 연결 행: 브랜드 로고 + 서비스 이름 | 연결됨 뱃지 ... 연결/연결 해제 텍스트 링크(오른쪽 끝) */
+                &[data-logins] > li.row {
+                    align-items: center;
+                    gap: 0.8em;
+                    min-height: 2.2em;
+                    padding-top: 0.6em;
+                    border-top: 1px dashed var(--lineColor);
+
+                    & > header {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.65em;
+                        min-width: 8.5em;
+                        line-height: 1;
+                        font-weight: 500;
+                        color: var(--txColor);
+
+                        & > img,
+                        & > i.fi {
+                            flex: 0 0 auto;
+                            width: 1.3em;
+                            height: 1.3em;
+                        }
+
+                        & > img {
+                            display: block;
+                            object-fit: contain;
+                        }
+
+                        & > i.fi {
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.3em;
+                            width: 1em;
+                            height: 1em;
+                            color: var(--txLight);
+                        }
+                    }
+
+                    & > span {
+                        flex: 1 1 auto;
+                        flex-wrap: nowrap;
+                        min-height: 0;
+                        line-height: 1;
+
+                        & > a {
+                            cursor: pointer;
+                            white-space: nowrap;
+                        }
+
+                        /* 미연결: "계정 연결" 뱃지(누르면 연결) */
+                        & > a.badge:hover {
+                            background-color: var(--mainDark);
+                        }
+
+                        /* 연결됨: "연결 해제" 는 오른쪽 끝 작은 글자 */
+                        & > a:not(.badge) {
+                            margin-left: auto;
+                            font-size: 0.75em;
+                            color: var(--txLight);
+
+                            &:hover {
+                                color: var(--danger);
+                                text-decoration: underline;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /* 우측 컬럼: 활동 요약 지표 카드 + 최근 작성 게시물/댓글 피드 */
+        & > section {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            min-width: 0;
+
+            /* 상단 4열 활동 지표 요약 (중간 폭 이하에서는 2x2 대칭 격자로 전환) */
+            & > nav {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 0.8em;
+
+                & > a {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.85em;
+                    padding: 1em 1.1em;
+                    background: var(--bgColor);
+                    border: 1px solid var(--lineColor);
+                    border-radius: var(--roundBox);
+                    color: var(--txColor);
+                    transition: border-color 0.15s, box-shadow 0.15s;
+
+                    &:hover {
+                        border-color: var(--main4);
+                        box-shadow: 0 0.25em 0.75em var(--aDark);
+                    }
+
+                    & > i.fi {
+                        flex: 0 0 auto;
+                        font-size: 1.75em;
+                        color: var(--main);
+                    }
+
+                    &:nth-child(2) > i.fi {
+                        color: var(--sub);
+                    }
+
+                    &:nth-child(3) > i.fi {
+                        color: var(--warningDark);
+                    }
+
+                    &:nth-child(4) > i.fi {
+                        color: var(--info);
+                    }
+
+                    & > span {
+                        flex: 0 0 auto;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 2.7em;
+                        height: 2.7em;
+                        border-radius: 50%;
+                        background: var(--main1);
+                        color: var(--main);
+
+                        & > i.fi {
+                            font-size: 1.3em;
+                        }
+                    }
+
+                    &:nth-child(2) > span {
+                        background: var(--sub1);
+                        color: var(--sub);
+                    }
+
+                    &:nth-child(3) > span {
+                        background: var(--warning1);
+                        color: var(--warningDark);
+                    }
+
+                    &:nth-child(4) > span {
+                        background: var(--info1);
+                        color: var(--info);
+                    }
+
+                    & > div {
+                        display: flex;
+                        flex-direction: column;
+                        min-width: 0;
+                        gap: 0.15em;
+
+                        & > strong {
+                            font-size: 1.35em;
+                            line-height: 1.1;
+                            color: var(--txColor);
+                        }
+
+                        & > span {
+                            font-size: 0.82em;
+                            color: var(--txLight);
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+                }
+            }
+
+            /* 최근 작성글/댓글 카드 */
+            & > article {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8em;
+                padding: 1.2em;
+
+                & > header {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 0.6em;
+                    padding-bottom: 0.75em;
+                    border-bottom: 1px solid var(--lineColor);
+
+                    & > h4 {
+                        margin: 0;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.45em;
+                        color: var(--txColor);
+
+                        & > i.fi {
+                            color: var(--main);
+                        }
+                    }
+
+                    & > nav {
+                        display: flex;
+                        flex-wrap: wrap;
+                        align-items: center;
+                        gap: 0.4em;
+
+                        & > a {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.35em;
+                            padding: 0.35em 0.85em;
+                            font-size: 0.88em;
+                            cursor: pointer;
+                            color: var(--txSub);
+                            border: 1px solid var(--lineColor);
+                            border-radius: var(--roundBtn);
+
+                            &:hover {
+                                color: var(--main);
+                                border-color: var(--main4);
+                            }
+
+                            &.active {
+                                color: var(--bgColor);
+                                background: var(--main);
+                                border-color: var(--main);
+                            }
+
+                            & > b {
+                                font-size: 0.85em;
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
+
+                & > ul {
+                    display: flex;
+                    flex-direction: column;
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+
+                    & > li {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.3em;
+                        padding: 0.75em 0.4em;
+                        border-bottom: 1px dashed var(--lineColor);
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        &[data-empty] {
+                            padding: 2.2em 0.5em;
+                            text-align: center;
+                            color: var(--txLight);
+                        }
+
+                        & > header {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            gap: 0.8em;
+                            font-size: 0.82em;
+                            color: var(--txLight);
+
+                            & > span {
+                                padding: 0.22em 0.65em;
+                                border-radius: var(--roundBtn);
+                                background: var(--main1);
+                                color: var(--main7);
+                                border: 1px solid var(--main2);
+                                font-weight: 500;
+                                line-height: 1.2;
+                            }
+                        }
+
+                        & > a {
+                            font-weight: 500;
+                            color: var(--txColor);
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+
+                            &:hover {
+                                color: var(--main);
+                            }
+                        }
+
+                        & > p {
+                            margin: 0;
+                            font-size: 0.88em;
+                            color: var(--txSub);
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    & > dialog {
+        width: 26em;
+        max-width: calc(100vw - 2em);
+
+        & > header {
+            color: var(--main);
+        }
+
+        & textarea {
+            width: 100%;
+        }
+    }
+}
+
+/* 중간 데스크톱/태블릿 (~ 1080px): 4개 활동 요약 카드를 3+1 대신 2x2 대칭 격자로 배치 */
+@media (width <= 1080px) {
+    .userInfo > div > section > nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* 태블릿 (~ 780px): 좌/우 2단 컬럼을 상/하 1단으로 전환 */
+@media (width <= 780px) {
+    .userInfo > div {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 모바일 (~ 520px): 활동 요약 카드를 2x2 격자로 전환 */
+@media (width <= 520px) {
+    .userInfo > div > section > nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.6em;
+
+        & > a {
+            padding: 0.85em;
+            gap: 0.65em;
+        }
+    }
+
+    .userInfo > div > section > article {
+        padding: 0.9em;
+    }
+}

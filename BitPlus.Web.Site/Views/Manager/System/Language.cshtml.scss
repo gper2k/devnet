@@ -1,0 +1,92 @@
+/* 시스템 설정 > 다국어 관리 — 컨텐츠 관리 목록 카드와 같은 모양(제목·검색 한 줄, 아래 목록, 바닥 목록 크기·페이저). 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.languageBox > section.card {
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+}
+
+div.languageBox > section.card > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    padding: 0.5em;
+}
+
+div.languageBox > section.card > header > strong {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5em;
+    gap: 0.4em;
+    font-size: 1.02em;
+    color: var(--txColor);
+}
+
+div.languageBox > section.card > header > strong > i.fi {
+    font-size: 1.4em;
+}
+
+div.languageBox > section.card > header .inputGroup {
+    width: 14em;
+}
+
+div.languageBox > section.card > div.dataList {
+    overflow-y: auto;
+}
+
+div.languageBox > section.card > div.dataList ::deep > header > .colCategory, div.languageBox > section.card > div.dataList ::deep > ul > li > .colCategory {
+    flex: 0 0 8em;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+div.languageBox > section.card > div.dataList ::deep > header > .colKey, div.languageBox > section.card > div.dataList ::deep > ul > li > .colKey {
+    flex: 0 0 14em;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+div.languageBox > section.card > div.dataList ::deep > header > .colValue, div.languageBox > section.card > div.dataList ::deep > ul > li > .colValue {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+div.languageBox > section.card > div.dataList ::deep > header > .colDate, div.languageBox > section.card > div.dataList ::deep > ul > li > .colDate {
+    flex: 0 0 9em;
+    justify-content: center;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+div.languageBox > section.card > div.dataList ::deep > ul > li {
+    padding: 0.2em 0.5em;
+    cursor: pointer;
+}
+
+div.languageBox > section.card > footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5em 0.8em;
+    border-top: 1px solid var(--lineColor);
+}
+
+dialog#languageModal {
+    width: 44em;
+}
+
+dialog#languageModal > header {
+    color: var(--main);
+}
+
+dialog#languageModal textarea {
+    width: 100%;
+}

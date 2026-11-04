@@ -1,0 +1,117 @@
+﻿@charset "UTF-8";
+/* 시스템 설정 > 설정 관리 — 컨텐츠 관리 목록 카드와 같은 모양(제목·검색 한 줄, 아래 목록, 바닥 목록 크기·페이저). 목록 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.configBox > section.card {
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+
+div.configBox > section.card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.5em;
+}
+
+div.configBox > section.card > header > strong {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5em;
+  gap: 0.4em;
+  font-size: 1.02em;
+  color: var(--txColor);
+}
+
+div.configBox > section.card > header > strong > i.fi {
+  font-size: 1.4em;
+}
+
+div.configBox > section.card > header .inputGroup {
+  width: 14em;
+}
+
+div.configBox > section.card > div.dataList {
+  overflow-y: auto;
+}
+
+div.configBox > section.card > div.dataList ::deep > header > .colCategory, div.configBox > section.card > div.dataList ::deep > ul > li > .colCategory {
+  flex: 0 0 8em;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+div.configBox > section.card > div.dataList ::deep > header > .colKey, div.configBox > section.card > div.dataList ::deep > ul > li > .colKey {
+  flex: 0 0 14em;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+div.configBox > section.card > div.dataList ::deep > header > .colValue, div.configBox > section.card > div.dataList ::deep > ul > li > .colValue {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+div.configBox > section.card > div.dataList ::deep > header > .colFlag, div.configBox > section.card > div.dataList ::deep > ul > li > .colFlag {
+  flex: 0 0 6em;
+  justify-content: center;
+}
+
+div.configBox > section.card > div.dataList ::deep > header > .colDate, div.configBox > section.card > div.dataList ::deep > ul > li > .colDate {
+  flex: 0 0 9em;
+  justify-content: center;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+div.configBox > section.card > div.dataList ::deep > ul > li {
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+}
+
+div.configBox > section.card > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em 0.8em;
+  border-top: 1px solid var(--lineColor);
+}
+
+dialog#configModal {
+  width: 44em;
+}
+
+dialog#configModal > header {
+  color: var(--main);
+}
+
+dialog#configModal textarea {
+  width: 100%;
+}
+
+dialog#configModal textarea[name=value] {
+  height: 21em;
+  resize: none;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+dialog#configModal > footer > label.check {
+  width: auto;
+  margin-right: auto;
+}
+
+dialog#configModal .tabBox > section {
+  height: 22em;
+  overflow-y: auto;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Manager/System/Config.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;;AAGJ;EACI;;;AAGJ;EACI;;;AAGJ;EACI;;;AAGJ;EACI;EACA;EACA;EACA;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;;AAGJ;EACI;EACA;;;AAGJ;EACI;EACA;EACA;EACA;;;AAGJ;EACI;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;;;AAGJ;EACI;;;AAGJ;EACI;;;AAGJ;EACI;;;AAGJ;EACI;EACA;EACA;EACA;;;AAGJ;EACI;EACA;;;AAGJ;EACI;EACA%22%7D */

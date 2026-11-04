@@ -1,0 +1,98 @@
+@charset "UTF-8";
+/* 시스템 설정 > 사이트 메뉴 전용 스타일.
+   좌측 메뉴 트리 / 우측 하위 메뉴 목록은 각각 독립된 .card 박스이며 내용이 넘치면 박스 안에서만 스크롤된다.
+   목록 행과 접근 권한 행은 스크립트로 만들어지므로 ::deep 으로 스타일을 건다. */
+div.pageBox > div.flexRow {
+  gap: 1em;
+}
+div.pageBox > div.flexRow > aside {
+  flex: 0 0 18em;
+  overflow: hidden;
+  padding: 0.5em;
+}
+div.pageBox > div.flexRow > aside > div.treeBox {
+  overflow-y: auto;
+}
+div.pageBox > div.flexRow > section {
+  flex: 1 1 auto;
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+div.pageBox > div.flexRow > section > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.5em;
+}
+div.pageBox > div.flexRow > section > header > strong {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5em;
+  gap: 0.4em;
+  font-size: 1.02em;
+  color: var(--txColor);
+}
+div.pageBox > div.flexRow > section > header > strong > i.fi {
+  font-size: 1.4em;
+}
+div.pageBox > div.flexRow > section > div ::deep {
+  overflow-y: auto;
+}
+div.pageBox > div.flexRow > section > div ::deep > header > .colName, div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName {
+  flex: 0 0 24em; /* 표시명 + 키 · SYS 표시가 잘리지 않을 폭 */
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.pageBox > div.flexRow > section > div ::deep > header > .colType, div.pageBox > div.flexRow > section > div ::deep > ul > li > .colType {
+  flex: 0 0 8em;
+  justify-content: center;
+}
+div.pageBox > div.flexRow > section > div ::deep > header > .colAction, div.pageBox > div.flexRow > section > div ::deep > ul > li > .colAction {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85em;
+}
+div.pageBox > div.flexRow > section > div ::deep > header > .colFlag, div.pageBox > div.flexRow > section > div ::deep > ul > li > .colFlag {
+  flex: 0 0 5em;
+  justify-content: center;
+}
+div.pageBox > div.flexRow > section > div ::deep > header > .colDate, div.pageBox > div.flexRow > section > div ::deep > ul > li > .colDate {
+  flex: 0 0 8em;
+  font-size: 0.85em;
+  justify-content: center;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li {
+  padding: 0.2em 0.5em;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li[draggable=true] {
+  cursor: grab;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName {
+  cursor: pointer;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName > i.fiReOrderDotsVert {
+  color: var(--txLight);
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName > i:not(.fiReOrderDotsVert) {
+  font-size: 1.3em;
+  color: var(--main);
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colName > small {
+  color: var(--txLight);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+div.pageBox > div.flexRow > section > div ::deep > ul > li > .colAction {
+  color: var(--txSub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

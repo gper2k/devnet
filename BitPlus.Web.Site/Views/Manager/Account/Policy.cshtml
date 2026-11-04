@@ -1,0 +1,80 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("Policy"));
+}
+
+@* 권한 정책 — 구성 파일(appsettings.json) 정책과 DB 정책을 이름별로 병합한 목록(행 클릭 = 편집, DB 정책은 활성 토글), 하단 추가 버튼 = DB 정책 등록 모달. 구성 파일 정책은 읽기 전용이며 같은 이름의 DB 정책으로 덮어씀 *@
+<div class="pageBox policyBox">
+    <div class="inform">
+        <header><i class="fi fiShieldKeyhole"></i> @this.Lang("Policy")</header>
+        <p>@this.Lang("PolicyInfoContent")</p>
+    </div>
+
+    <article class="auto flexCol gapMd">
+        <section class="card line flexCol auto">
+            <div class="dataList auto">
+                <header>
+                    <span class="colName"><span>NAME</span></span>
+                    <span class="colSource"><span>SOURCE</span></span>
+                    <span class="colTarget"><span>TARGET</span></span>
+                    <span class="colPeriod"><span>PERIOD</span></span>
+                    <span class="colFlag"><span>ENABLER</span></span>
+                </header>
+                <ul></ul>
+            </div>
+        </section>
+
+        <footer class="pageFooter">
+            <span></span>
+            <button type="button" class="main" data-mode="add"><i class="fi fiPlus"></i> @this.LangOf("AddOf", "Policy")</button>
+        </footer>
+    </article>
+</div>
+
+<!-- 정책 등록/수정 모달: 정책명(생성 후 변경 불가)·설명·유효 기간(periodEdit)·허용 대상(targetEdit, 비우면 모든 사용자), 구성 파일 정책이 있으면 읽기 전용 요약, 하단 활성 체크와 삭제(DB 정책 편집일 때만)·취소·저장 -->
+<dialog id="policyModal">
+    <header><i class="fi fiShieldKeyhole fiFill"></i> <span></span> <i class="badge sm" hidden></i></header>
+    <section>
+        <ul class="form">
+            <li>
+                <header>@this.Lang("PolicyName") <small class="txDanger">*</small></header>
+                <input type="text" name="name" maxlength="64" autocomplete="off" />
+            </li>
+            <li>
+                <header>@this.Lang("Description")</header>
+                <input type="text" name="description" maxlength="256" autocomplete="off" />
+            </li>
+            <li class="col2">
+                <div>
+                    <header>@this.Lang("ValidPeriod")</header>
+                    <div class="inputGroup">
+                        <input type="text" name="periodText" readonly />
+                        <button type="button" data-act="period"><i class="fi fiCalClock"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <header>@this.Lang("AllowTarget")</header>
+                    <div class="inputGroup">
+                        <input type="text" name="targetText" readonly placeholder="@this.Lang("AllUsers")" />
+                        <button type="button" data-act="target"><i class="fi fiShieldKeyhole"></i></button>
+                    </div>
+                </div>
+            </li>
+            <li data-config>
+                <header>@this.Lang("ConfigPolicy") <small>@this.Lang("PolicyConfigInfo")</small></header>
+                <div class="inform"><p></p></div>
+            </li>
+        </ul>
+    </section>
+    <footer>
+        <label class="check main"><input type="checkbox" name="enabler" /><span>@this.Lang("Enabler")</span></label>
+        <button type="button" class="danger" data-mode="delete" hidden><i class="fi fiDelete"></i> @this.Lang("Delete")</button>
+        <button type="button" onclick="this.closest('dialog').close()"><i class="fi fiBan"></i> @this.Lang("Cancel")</button>
+        <button type="button" class="main" data-mode="save"><i class="fi fiSave"></i> @this.Lang("Save")</button>
+    </footer>
+</dialog>
+
+<!--
+    주의: 이 뷰는 Account.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다. 초기화 로직은 Account.cshtml 의 wirePolicyPage() 가 담당한다.
+-->

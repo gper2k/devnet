@@ -1,0 +1,30 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@using BitPlus.Web.Site.OAuth
+@{
+    // 관리 화면 "계정 관리 > OAuth 구성" 에서 사용 중인 외부 로그인 서비스 (없으면 아무것도 그리지 않음)
+    var providers = OAuthProvider.EnabledOf(this.Config);
+    var returnUrl = this.Context.Request.Query["ReturnUrl"].ToString();
+    var returnQuery = string.IsNullOrEmpty(returnUrl) ? null : "&returnUrl=" + Uri.EscapeDataString(returnUrl);
+}
+@if (providers.Count > 0)
+{
+    @* 외부 로그인 버튼 — 누르면 서비스 인증 화면으로(/Account/ExternalLogin), 돌아오면 로그인 또는 가입 *@
+    <nav class="externalLogin">
+        <span>@this.Lang("Or")</span>
+        @foreach (var provider in providers)
+        {
+            var preset = provider.Preset();
+            <a href="/Account/ExternalLogin?provider=@provider.Id@returnQuery">
+                @if (!string.IsNullOrEmpty(preset.BrandIcon))
+                {
+                    <img src="@preset.BrandIcon" alt="@provider.Name" class="brandIcon" />
+                }
+                else
+                {
+                    <i class="fi @preset.Icon"></i>
+                }
+                <span>@this.Lang("SignInWithOf").Formats(provider.Name)</span>
+            </a>
+        }
+    </nav>
+}

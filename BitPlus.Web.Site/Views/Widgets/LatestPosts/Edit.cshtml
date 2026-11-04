@@ -1,0 +1,22 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+}
+@* 최신 글 위젯 설정 — ruleNos(게시판, 비우면 전체), count(개수), summary(요약 보이기), image(대표 이미지 보이기) *@
+<ul class="form">
+    <partial name="~/Views/Widgets/_BoardSelect.cshtml" model="(BitPlus.Data.Content.ContentTypes[]?)null" />
+    <li class="col2">
+        <div>
+            <header>@this.Lang("WidgetCount")</header>
+            <input type="number" name="count" min="1" max="20" />
+        </div>
+        <div>
+            <header>@this.Lang("WidgetSummary")</header>
+            <label class="check main"><input type="checkbox" name="summary" /><span>@this.Lang("WidgetSummary")</span></label>
+        </div>
+    </li>
+    <li>
+        <header>@this.Lang("WidgetThumb")</header>
+        <label class="check main"><input type="checkbox" name="image" /><span>@this.Lang("WidgetThumb")</span></label>
+    </li>
+</ul>

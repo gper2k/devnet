@@ -1,0 +1,15 @@
+{
+  "key": "FeatureCards",
+  "version": 2,
+  "name": { "ko": "강점 카드", "en": "Feature cards" },
+  "description": { "ko": "가운데 제목·설명 아래에 아이콘·제목·설명 카드를 나란히 놓습니다. 한 줄에 '아이콘 | 제목 | 설명'.", "en": "A centered heading over cards with an icon, title and text. One per line: icon | title | text." },
+  "categories": ["design"],
+  "size": { "min": [2, 1], "max": [4, 2] },
+  "settings": [
+    { "key": "label", "type": "text", "default": "" },
+    { "key": "title", "type": "text", "default": "" },
+    { "key": "text", "type": "lines", "default": "" },
+    { "key": "items", "type": "lines", "default": "" },
+    { "key": "columns", "type": "number", "default": 4, "min": 1, "max": 6 }
+  ]
+}

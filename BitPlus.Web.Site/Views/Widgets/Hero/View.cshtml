@@ -1,0 +1,36 @@
+@model BitPlus.Web.Site.Widgets.SlotView
+@using BitPlus.Web.Site.Widgets
+@{
+    var image = SlotView.SafeUrl(Model.Text("image"));
+    var url = SlotView.SafeUrl(Model.Text("buttonUrl"));
+}
+@* 히어로 위젯 — 노트북 그림(화면 = image 설정)과 그 뒤 붓칠 장식, 옆에 머리말·형광펜 제목·설명·버튼. 좁은 화면에서는 위아래로 *@
+<div class="widgetHero" data-reverse="@(Model.Bool("reverse", false) ? "true" : null)">
+    <figure>
+        <div>
+            <div>
+                @if (image is not null)
+                {
+                    <img src="@image" alt="" />
+                }
+                else
+                {
+                    <span><i class="fi fiImage"></i></span>
+                }
+            </div>
+            <span></span>
+        </div>
+    </figure>
+    <div>
+        @if (Model.Text("label").Length > 0)
+        {
+            <em>@Model.Text("label")</em>
+        }
+        <h2><span>@Model.Text("title")</span></h2>
+        <p>@Model.Text("text")</p>
+        @if (url is not null && Model.Text("buttonText").Length > 0)
+        {
+            <a class="btn main" href="@url">@Model.Text("buttonText")</a>
+        }
+    </div>
+</div>

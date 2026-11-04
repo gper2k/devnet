@@ -1,0 +1,23 @@
+<Project>
+  <!-- 솔루션 모든 프로젝트 공통 속성 (각 csproj 에 버전을 따로 적지 않는다) -->
+  <PropertyGroup>
+    <EnableSourceLink>false</EnableSourceLink>
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+    <Company>BitPlus</Company>
+    <Authors>BitPlus</Authors>
+    <Product>DevNet CMS</Product>
+    <Copyright>Copyright (c) 2026 BitPlus</Copyright>
+  </PropertyGroup>
+
+  <!-- 버전: MinVer 가 git 태그(v1.2.3)에서 계산. 태그가 없으면 1.0.0-alpha.0.{커밋 수}, 태그 뒤 커밋은 다음 패치의 미리보기 버전 -->
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- BitPlus·BitPlus.Web 은 이 솔루션에 없으므로 libs 의 dll 로 참조 (원본 빌드 결과 자동 동기화) -->
+  <Import Project="libs\BitPlus.Libs.props" />
+</Project>

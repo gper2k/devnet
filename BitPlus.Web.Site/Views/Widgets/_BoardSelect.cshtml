@@ -1,0 +1,18 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<BitPlus.Data.Content.ContentTypes[]?>
+@using BitPlus.Data.Content
+@using Microsoft.EntityFrameworkCore
+@{
+    // 위젯 설정 양식의 게시판 고르기(여러 개, 비우면 전체) — 모델 = 고를 수 있는 형식 (null 이면 모든 게시판 형식)
+    var types = Model ?? BitPlus.Web.Site.Data.BoardAccess.BoardTypes;
+    var rules = await ((DbContext)this.DbContext!).Set<ContentRule>().AsNoTracking().Include(p => p.Title)
+        .Where(p => p.Enabler && !p.OnlyView && types.Contains(p.Type)).OrderBy(p => p.RuleNo).ToListAsync();
+}
+<li>
+    <header>@this.Lang("WidgetBoards")</header>
+    <select name="ruleNos" multiple size="5">
+        @foreach (var rule in rules)
+        {
+            <option value="@rule.RuleNo">@this.Context.Request.DisplayName(rule.Title, $"#{rule.RuleNo}")</option>
+        }
+    </select>
+</li>

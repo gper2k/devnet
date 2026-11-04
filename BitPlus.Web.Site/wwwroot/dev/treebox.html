@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TreeBox — BitPlus DevKit</title>
+    <link rel="stylesheet" href="/lib/fluenticons/fluenticons.min.css" />
+    <link rel="stylesheet" href="/css/site.min.css" />
+    <link rel="stylesheet" href="/dev/devkit.css" />
+    <script defer src="/dev/devkit.js"></script>
+</head>
+<body>
+    <div class="devPage">
+        <!-- ═══ 기본 사용법 ═══ -->
+        <section class="devSection">
+            <!-- 1. 기본 데이터 바인딩 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>1. 기본 데이터 바인딩 <span class="tag js">JS</span></h3>
+                    <p><code>common.makeTree()</code>로 트리 인스턴스를 생성하고 <code>render(selector, data)</code>로 바인딩합니다. 폴더 아이콘 클릭으로 열기/닫기, 텍스트 클릭으로 선택/해제(토글)합니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div style="display:flex;gap:0.5em;margin-bottom:0.8em;flex-wrap:wrap;">
+                        <button type="button" class="btn sm" onclick="tree1.openAll()"><i class="fi fiFolderOpened"></i> 전체 펼치기</button>
+                        <button type="button" class="btn sm" onclick="tree1.closeAll()"><i class="fi fiFolderAlt"></i> 전체 접기</button>
+                        <button type="button" class="btn sm point" onclick="tree1.clearSelect()"><i class="fi fiTimes"></i> 선택 해제</button>
+                    </div>
+                    <div style="border:1px solid var(--lineColor);border-radius:var(--roundSm);padding:0.6em;background:var(--bgColor);max-width:24em;">
+                        <div id="tree1" class="treeBox"></div>
+                    </div>
+                    <div class="infoBox" id="selInfo1">선택된 노드: <b>없음</b></div>
+                </div>
+                <div class="blockCode">
+                    <button type="button" class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>// 트리 생성
+const tree = common.makeTree({
+    onSelect: (mode, key, node) =&gt; {
+        console.log(mode, key, node.text);
+    }
+});
+
+// 데이터 바인딩
+tree.render('#tree1', [
+    { key: 'root', text: '전체 사용자', child: [
+        { key: 'hq', text: '본사 (HQ)', child: [
+            { key: 'mgmt', text: '경영기획본부', child: [
+                { key: 'strategy', text: '경영전략팀' },
+                { key: 'finance', text: '재무관리팀' }
+            ]},
+            { key: 'rd', text: '연구개발본부 (R&amp;D)', child: [
+                { key: 'platform', text: '플랫폼개발팀' },
+                { key: 'service', text: '서비스운영팀' }
+            ]},
+            { key: 'audit', text: '감사실' }
+        ]}
+    ]}
+]);</code></pre>
+                </div>
+            </div>
+
+            <!-- 2. 확장 메뉴 (moreBtn) -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>2. 확장 메뉴 (Context Menu) <span class="tag js">JS</span></h3>
+                    <p><code>menus</code> 옵션에 메뉴 항목을 정의하면 각 행 우측에 <code>⋯</code> 아이콘이 표시됩니다. 호버 시 나타나며, 클릭 시 드롭 메뉴가 오버레이로 열립니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div style="border:1px solid var(--lineColor);border-radius:var(--roundSm);padding:0.6em;background:var(--bgColor);max-width:24em;">
+                        <div id="tree2" class="treeBox"></div>
+                    </div>
+                    <div class="infoBox" id="selInfo2">선택된 노드: <b>없음</b></div>
+                </div>
+                <div class="blockCode">
+                    <button type="button" class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>const tree = common.makeTree({
+    menus: [
+        { text: '하위 부서 추가', icon: 'fi fiFolderAdd',
+          action: (node, el, tree) =&gt; { /* 추가 로직 */ }},
+        { text: '이름 변경', icon: 'fi fiEdit',
+          action: (node, el, tree) =&gt; { /* 수정 로직 */ }},
+        { divider: true },
+        { text: '삭제', icon: 'fi fiDelete', danger: true,
+          action: (node, el, tree) =&gt; { /* 삭제 로직 */ }}
+    ],
+    onSelect: (mode, key, node) =&gt; {
+        console.log(mode, key, node.text);
+    }
+});
+
+tree.render('#tree2', data);</code></pre>
+                </div>
+            </div>
+
+            <!-- 3. 옵션 설정 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>3. 옵션 설정 (전체 열기 / 세션 저장 / 체크박스) <span class="tag js">JS</span></h3>
+                    <p><code>useAllOpen</code>으로 초기 전체 열기, <code>openSaveKey</code>로 세션 스토리지에 열림 상태 자동 저장/복원, <code>useCheck</code>로 체크박스 모드를 활성화합니다.</p>
+                </div>
+                <div class="blockDemo">
+                    <div style="display:flex;gap:1.5em;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:16em;">
+                            <div style="font-size:0.82em;color:var(--txSub);font-weight:700;margin-bottom:0.5em;">전체 열기 + 세션 저장</div>
+                            <div style="border:1px solid var(--lineColor);border-radius:var(--roundSm);padding:0.6em;background:var(--bgColor);">
+                                <div id="tree3" class="treeBox"></div>
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:16em;">
+                            <div style="font-size:0.82em;color:var(--txSub);font-weight:700;margin-bottom:0.5em;">체크박스 모드</div>
+                            <div style="border:1px solid var(--lineColor);border-radius:var(--roundSm);padding:0.6em;background:var(--bgColor);">
+                                <div id="tree4" class="treeBox"></div>
+                            </div>
+                            <div style="margin-top:0.5em;">
+                                <button type="button" class="btn sm success" onclick="showChecked()"><i class="fi fiCheck"></i> 체크 항목 확인</button>
+                            </div>
+                            <div class="infoBox" id="checkInfo">체크된 항목: <b>없음</b></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="blockCode">
+                    <button type="button" class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>// 전체 열기 + 세션 저장
+const tree = common.makeTree({
+    useAllOpen: true,
+    openSaveKey: 'myTree_opens'
+});
+tree.render('#el', data);
+
+// 체크박스 모드
+const checkTree = common.makeTree({
+    useCheck: true,
+    useOpenEvent: false
+});
+checkTree.render('#el', data);
+const checked = checkTree.getChecked(); // ['key1', 'key2']</code></pre>
+                </div>
+            </div>
+
+            <!-- 4. API 메서드 -->
+            <div class="devBlock">
+                <div class="blockHead">
+                    <h3>4. API 메서드 <span class="tag js">JS</span></h3>
+                    <p>프로그래밍 방식으로 열기/닫기/선택 제어 및 이벤트 수신.</p>
+                </div>
+                <div class="blockCode">
+                    <button type="button" class="copyBtn" onclick="copyCode(this)">복사</button>
+                    <pre><code>// 트리 인스턴스 메서드
+tree.openAll();            // 전체 펼치기
+tree.closeAll();           // 전체 접기
+tree.setOpen('key', true); // 특정 노드 열기
+tree.setOpen('key', false);// 특정 노드 닫기
+tree.clearSelect();        // 선택 해제
+tree.getSelect();          // 선택된 키 반환
+tree.getSelectNode();      // 선택된 노드 데이터 반환
+tree.getChecked();         // 체크된 키 배열 반환
+
+// CustomEvent 수신
+document.querySelector('#tree')
+    .addEventListener('selected', e =&gt; console.log(e.detail.target));
+document.querySelector('#tree')
+    .addEventListener('unselected', e =&gt; console.log(e.detail.target));
+document.querySelector('#tree')
+    .addEventListener('opened', e =&gt; console.log(e.detail.target));
+document.querySelector('#tree')
+    .addEventListener('closed', e =&gt; console.log(e.detail.target));</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ 참조 테이블 ═══ -->
+        <section class="devSection">
+            <h2>API 참조</h2>
+            <div class="refTable">
+                <table>
+                    <thead>
+                        <tr><th>API / 속성</th><th>타입</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>common.makeTree(option?)</td><td>factory</td><td>TreeBox 인스턴스 생성 팩토리</td></tr>
+                        <tr><td>new TreeBox(option?)</td><td>constructor</td><td>직접 생성 (import 필요)</td></tr>
+                        <tr><td>option.onSelect</td><td>callback</td><td><code>(mode, key, node) => void</code> — 선택/해제 콜백</td></tr>
+                        <tr><td>option.menus</td><td>ITreeMenu[]</td><td>확장 메뉴 항목 배열 (⋯ 아이콘 활성화)</td></tr>
+                        <tr><td>option.useAllOpen</td><td>boolean</td><td>초기 전체 열기 (기본: false)</td></tr>
+                        <tr><td>option.useCheck</td><td>boolean</td><td>체크박스 모드 (기본: false)</td></tr>
+                        <tr><td>option.useOpenEvent</td><td>boolean</td><td>폴더 아이콘 클릭 열기/닫기 (기본: true)</td></tr>
+                        <tr><td>option.openSaveKey</td><td>string</td><td>열림 상태 sessionStorage 저장 키</td></tr>
+                        <tr><td>option.selectedKeys</td><td>string[]</td><td>초기 선택 키 목록</td></tr>
+                        <tr><td>option.openKeys</td><td>string[]</td><td>초기 열기 키 목록 (null이면 세션에서 복원)</td></tr>
+                        <tr><td>tree.render(target, data)</td><td>method</td><td>대상에 트리 렌더링</td></tr>
+                        <tr><td>tree.openAll()</td><td>method</td><td>전체 펼치기</td></tr>
+                        <tr><td>tree.closeAll()</td><td>method</td><td>전체 접기</td></tr>
+                        <tr><td>tree.setOpen(key, bool)</td><td>method</td><td>특정 노드 열기/닫기</td></tr>
+                        <tr><td>tree.clearSelect()</td><td>method</td><td>선택 해제</td></tr>
+                        <tr><td>tree.getSelect()</td><td>method</td><td>선택된 키 반환</td></tr>
+                        <tr><td>tree.getSelectNode()</td><td>method</td><td>선택된 노드 데이터 반환</td></tr>
+                        <tr><td>tree.getChecked()</td><td>method</td><td>체크된 키 배열 반환</td></tr>
+                        <tr><td>ITreeNode.key</td><td>string</td><td>고유 식별 키</td></tr>
+                        <tr><td>ITreeNode.text</td><td>string</td><td>표시 텍스트</td></tr>
+                        <tr><td>ITreeNode.child</td><td>ITreeNode[]</td><td>자식 노드 배열</td></tr>
+                        <tr><td>ITreeNode.disabled</td><td>boolean</td><td>비활성화</td></tr>
+                        <tr><td>ITreeMenu.text</td><td>string</td><td>메뉴 항목 텍스트</td></tr>
+                        <tr><td>ITreeMenu.icon</td><td>string</td><td>아이콘 CSS 클래스</td></tr>
+                        <tr><td>ITreeMenu.danger</td><td>boolean</td><td>위험 색상 표시</td></tr>
+                        <tr><td>ITreeMenu.divider</td><td>boolean</td><td>구분선</td></tr>
+                        <tr><td>ITreeMenu.action</td><td>callback</td><td><code>(node, el, tree) => void</code></td></tr>
+                        <tr><td>.treeBox</td><td>CSS</td><td>트리 래퍼 클래스</td></tr>
+                        <tr><td>.treeMenu</td><td>CSS</td><td>확장 메뉴 오버레이</td></tr>
+                        <tr><td>selected (event)</td><td>CustomEvent</td><td>노드 선택 시 <code>detail.target = key</code></td></tr>
+                        <tr><td>unselected (event)</td><td>CustomEvent</td><td>노드 해제 시 <code>detail.target = key</code></td></tr>
+                        <tr><td>opened (event)</td><td>CustomEvent</td><td>노드 열기 시 <code>detail.target = key</code></td></tr>
+                        <tr><td>closed (event)</td><td>CustomEvent</td><td>노드 닫기 시 <code>detail.target = key</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script type="module">
+        import { Site } from "/js/site.js";
+        const common = new Site();
+            // ── 조직도 데이터
+            const orgData = [
+                {
+                    key: 'all', text: '전체 사용자 (All Users)', child: [
+                        {
+                            key: 'hq', text: '본사 (HQ)', child: [
+                                {
+                                    key: 'mgmt', text: '경영기획본부', child: [
+                                        { key: 'strategy', text: '경영전략팀' },
+                                        { key: 'finance', text: '재무관리팀' }
+                                    ]
+                                },
+                                {
+                                    key: 'rd', text: '연구개발본부 (R&D)', child: [
+                                        { key: 'platform', text: '플랫폼개발팀' },
+                                        { key: 'service', text: '서비스운영팀' }
+                                    ]
+                                },
+                                {
+                                    key: 'sales', text: '영업마케팅본부', child: [
+                                        { key: 'sales1', text: '영업기획팀' },
+                                        { key: 'marketing', text: '마케팅팀' }
+                                    ]
+                                },
+                                { key: 'audit', text: '감사실' }
+                            ]
+                        }
+                    ]
+                }
+            ];
+
+            // ── Tree 1: 기본 바인딩
+            window.tree1 = common.makeTree({
+                selectedKeys: ['all'],
+                openKeys: ['all', 'hq'],
+                onSelect: (mode, key, node) => {
+                    document.getElementById('selInfo1').innerHTML = mode === 'select'
+                        ? `선택된 노드: <b>${node.text}</b> (key: ${key})`
+                        : '선택된 노드: <b>없음</b>';
+                }
+            });
+            tree1.render('#tree1', orgData);
+
+            // ── Tree 2: 확장 메뉴
+            window.tree2 = common.makeTree({
+                openKeys: ['all', 'hq'],
+                menus: [
+                    {
+                        text: '하위 부서 추가', icon: 'fi fiFolderPlus', action: (node) => {
+                            alert(`"${node.text}" 아래에 새 부서를 추가합니다.`);
+                        }
+                    },
+                    {
+                        text: '이름 변경', icon: 'fi fiTextEditStyleGa', action: (node) => {
+                            const name = prompt('변경할 이름:', node.text);
+                            if (name) alert(`"${node.text}" → "${name}" 변경`);
+                        }
+                    },
+                    { divider: true },
+                    {
+                        text: '삭제', icon: 'fi fiTimes', danger: true, action: (node) => {
+                            if (confirm(`"${node.text}" 부서를 삭제하시겠습니까?`))
+                                alert(`"${node.text}" 삭제됨`);
+                        }
+                    }
+                ],
+                onSelect: (mode, key, node) => {
+                    document.getElementById('selInfo2').innerHTML = mode === 'select'
+                        ? `선택된 노드: <b>${node.text}</b> (key: ${key})`
+                        : '선택된 노드: <b>없음</b>';
+                }
+            });
+            tree2.render('#tree2', orgData);
+
+            // ── 문서함 데이터
+            const docsData = [
+                {
+                    key: 'docs', text: '문서함', child: [
+                        {
+                            key: 'personal', text: '개인 문서', child: [
+                                { key: 'notes', text: '업무 노트' },
+                                { key: 'reports', text: '보고서' }
+                            ]
+                        },
+                        {
+                            key: 'shared', text: '공유 문서', child: [
+                                { key: 'projects', text: '프로젝트 자료' },
+                                { key: 'templates', text: '양식 및 템플릿' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    key: 'archive', text: '아카이브', child: [
+                        { key: 'arch2023', text: '2023년' },
+                        { key: 'arch2024', text: '2024년' }
+                    ]
+                }
+            ];
+
+            // ── Tree 3: 전체 열기 + 세션 저장
+            window.tree3 = common.makeTree({
+                useAllOpen: true,
+                openSaveKey: 'devkit_tree3'
+            });
+            tree3.render('#tree3', docsData);
+
+            // ── Tree 4: 체크박스 모드
+            window.tree4 = common.makeTree({
+                useCheck: true,
+                useAllOpen: true,
+                useOpenEvent: false
+            });
+            tree4.render('#tree4', docsData);
+
+            window.showChecked = () => {
+                const checked = tree4.getChecked();
+                document.getElementById('checkInfo').innerHTML = checked.length > 0
+                    ? `체크된 항목: <b>${checked.join(', ')}</b>`
+                    : '체크된 항목: <b>없음</b>';
+            };
+
+            // ── 코드 복사 기능
+            window.copyCode = (btn) => {
+                const code = btn.parentElement.querySelector('code');
+                if (!code) return;
+                navigator.clipboard.writeText(code.textContent || '').then(() => {
+                    btn.textContent = '✓ 완료';
+                    setTimeout(() => btn.textContent = '복사', 1500);
+                });
+            };
+    </script>
+</body>
+</html>

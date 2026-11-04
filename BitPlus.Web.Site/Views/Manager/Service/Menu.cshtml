@@ -1,0 +1,42 @@
+@inherits BitPlus.Web.HTTP.View.ViewBase<dynamic>
+@{
+    Layout = null;
+    this.SetTitle(this.Lang("SiteMenu"));
+}
+
+<div class="pageBox">
+    <div class="flexRow alignStretch auto">
+        <!-- 좌측: 메뉴 트리 (확장 메뉴: 하위 메뉴 추가 / 편집 / 삭제) -->
+        <aside class="card line flexCol">
+            <div id="menuTree" class="treeBox auto"></div>
+        </aside>
+
+        <!-- 우측: 선택 메뉴(없으면 최상위)의 하위 메뉴 목록, 드래그로 순서 변경 -->
+        <section class="card line flexCol">
+            <header class="fix">
+                <strong>
+                    <i class="fi fiMenu"></i>
+                    <span id="menuListTitle">@this.Lang("TopLevel")</span>
+                    <i id="menuCounter" class="badge deco">0</i>
+                </strong>
+                <button type="button" class="sub sm" id="addMenuBtn"><i class="fi fiAdd"></i> @this.Lang("Add")</button>
+            </header>
+
+            <div class="dataList auto">
+                <header>
+                    <span class="colName"><span>NAME</span></span>
+                    <span class="colType"><span>TYPE</span></span>
+                    <span class="colAction"><span>ACTION</span></span>
+                    <span class="colFlag"><span>ENABLER</span></span>
+                    <span class="colDate"><span>CREATE</span></span>
+                </header>
+                <ul id="menuList"></ul>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!--
+    주의: 이 뷰는 Service.cshtml 에서 fetch 로 받아 innerHTML 로 삽입되는 조각(fragment)이다.
+    초기화 로직은 Service.cshtml 의 wireMenuPage() 가 담당하고, 메뉴 등록/수정 모달은 공용 모달(modals/menuEdit.ts)이다.
+-->
