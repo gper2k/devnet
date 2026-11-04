@@ -238,7 +238,7 @@
             if (list.firstElementChild) flash(list.firstElementChild);
         });
 
-        const jumpNo = @(Model.InFeed && !Model.SinglePost ? "0" : "Number(new URLSearchParams(location.search).get('jump')) || 0"); // 주소 ?jump=댓글번호: 그 댓글 쪽을 열고 이동 (여러 글 피드에서는 쓰지 않음, 글 하나만 보이는 블로그 피드는 펼쳐서 이동)
+        const jumpNo = @(Model.InFeed && !Model.SinglePost ? "false" : "true") ? Number(new URLSearchParams(location.search).get('jump')) || 0 : 0; // 주소 ?jump=댓글번호: 그 댓글 쪽을 열고 이동 (여러 글 피드에서는 쓰지 않음, 글 하나만 보이는 블로그 피드는 펼쳐서 이동)
         const toggle = box.querySelector(':scope > header > span[role="button"]'); // 블로그 피드: 접기·펼치기 (처음 펼칠 때 불러옴)
         if (!toggle) load(jumpNo ? { jump: jumpNo, focus: 'c' + jumpNo } : {});
         else {
