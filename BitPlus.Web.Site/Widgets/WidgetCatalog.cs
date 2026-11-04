@@ -40,7 +40,10 @@ public static partial class WidgetCatalog
             try
             {
                 var file = Path.Combine(contentRoot, WidgetFolder, k, "widget.json");
-                if (!File.Exists(file) || JsonNode.Parse(File.ReadAllText(file)) is not JsonObject json) return (false, true);
+                JsonObject? json = null;
+                if (File.Exists(file)) json = JsonNode.Parse(File.ReadAllText(file)) as JsonObject;
+                try { json ??= Plugins.PluginManager.Instance.GetWidgetJson(k); } catch { }
+                if (json is null) return (false, true);
                 return (json["single"] is JsonValue s && s.TryGetValue<bool>(out var single) && single, json["frame"] is not JsonValue f || !f.TryGetValue<bool>(out var frame) || frame);
             }
             catch (Exception ex) when (ex is System.Text.Json.JsonException or IOException)
@@ -61,6 +64,16 @@ public static partial class WidgetCatalog
     {
         var widgets = ReadFolder(Path.Combine(contentRoot, WidgetFolder), "widget.json", logger);
         var sections = ReadFolder(Path.Combine(contentRoot, SectionFolder), "section.json", logger);
+
+        try
+        {
+            foreach (var (key, json) in Plugins.PluginManager.Instance.GetPluginWidgets())
+                if (!widgets.ContainsKey(key)) widgets[key] = json;
+
+            foreach (var (key, json) in Plugins.PluginManager.Instance.GetPluginSections())
+                if (!sections.ContainsKey(key)) sections[key] = json;
+        }
+        catch { }
         var widgetRows = await db.WidgetTypes.ToDictionaryAsync(p => p.Key, cancellationToken);
         var sectionRows = await db.SectionTypes.ToDictionaryAsync(p => p.Key, cancellationToken);
         var now = DateTime.UtcNow;

@@ -92,11 +92,25 @@ public class SiteInfo
     {
         try
         {
-            var items = new Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemLoader()
-                .LoadItems(typeof(SiteInfo).Assembly);
-            return new HashSet<string>(
-                items.Select(p => p.Identifier?.TrimStart('~') ?? string.Empty).Where(p => !string.IsNullOrEmpty(p)),
-                StringComparer.OrdinalIgnoreCase);
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var loader = new Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemLoader();
+            IEnumerable<System.Reflection.Assembly> assemblies;
+            try { assemblies = Plugins.PluginManager.Instance.AllAssemblies; }
+            catch { assemblies = [typeof(SiteInfo).Assembly]; }
+
+            foreach (var asm in assemblies)
+            {
+                try
+                {
+                    foreach (var item in loader.LoadItems(asm))
+                    {
+                        var id = item.Identifier?.TrimStart('~') ?? string.Empty;
+                        if (!string.IsNullOrEmpty(id)) set.Add(id);
+                    }
+                }
+                catch { }
+            }
+            return set;
         }
         catch
         {

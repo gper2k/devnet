@@ -15,8 +15,19 @@ public static class WidgetServiceExtend
     public static IServiceCollection AddWidgets(this IServiceCollection services)
     {
         services.AddScoped<PageSectionReader>();
-        foreach (var type in typeof(WidgetServiceExtend).Assembly.GetTypes().Where(p => p.IsClass && !p.IsAbstract && typeof(IWidgetLoader).IsAssignableFrom(p)))
-            services.AddScoped(typeof(IWidgetLoader), type);
+        IEnumerable<System.Reflection.Assembly> assemblies;
+        try { assemblies = Plugins.PluginManager.Instance.AllAssemblies; }
+        catch { assemblies = [typeof(WidgetServiceExtend).Assembly]; }
+
+        foreach (var asm in assemblies)
+        {
+            try
+            {
+                foreach (var type in asm.GetTypes().Where(p => p.IsClass && !p.IsAbstract && typeof(IWidgetLoader).IsAssignableFrom(p)))
+                    services.AddScoped(typeof(IWidgetLoader), type);
+            }
+            catch { }
+        }
         return services;
     }
 

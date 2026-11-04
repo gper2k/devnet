@@ -41,7 +41,9 @@ public static partial class PageLayouts
         page = parts[0];
         if (!WidgetCatalog.KeyPattern().IsMatch(page)) return null;
         var file = Path.Combine(contentRoot, PageFolder, $"{page}.json");
-        return File.Exists(file) ? JsonNode.Parse(File.ReadAllText(file)) as JsonObject : null;
+        if (File.Exists(file) && JsonNode.Parse(File.ReadAllText(file)) is JsonObject json) return json;
+        try { return Plugins.PluginManager.Instance.GetPageDefinitionJson(page); }
+        catch { return null; }
     }
 
     /// <summary>페이지가 쓸 수 있는 위젯 카테고리 (<c>*</c> 면 모두)</summary>
@@ -126,7 +128,23 @@ public static partial class PageLayouts
     public static async Task SyncAsync(Data.SiteDbContext db, WebConfig config, string contentRoot, Microsoft.Extensions.Logging.ILogger? logger, CancellationToken cancellationToken = default)
     {
         var folder = Path.Combine(contentRoot, PageFolder);
-        if (!Directory.Exists(folder)) return;
+        var pageFiles = new Dictionary<string, JsonObject>(StringComparer.OrdinalIgnoreCase);
+        if (Directory.Exists(folder))
+        {
+            foreach (var file in Directory.GetFiles(folder, "*.json"))
+            {
+                var page = Path.GetFileNameWithoutExtension(file);
+                if (Definition(contentRoot, page) is { } def) pageFiles[page] = def;
+            }
+        }
+        try
+        {
+            foreach (var (page, def) in Plugins.PluginManager.Instance.GetPluginPageDefinitions())
+                if (!pageFiles.ContainsKey(page)) pageFiles[page] = def;
+        }
+        catch { }
+
+        if (pageFiles.Count == 0) return;
 
         var defaultBoard = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
             Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.AsNoTracking(db.ContentRules),
@@ -138,11 +156,9 @@ public static partial class PageLayouts
         if (defaultBoard is not null) ruleNos["free"] = defaultBoard.RuleNo;
         if (galleryBoard is not null) ruleNos["gallery"] = galleryBoard.RuleNo;
 
-        foreach (var file in Directory.GetFiles(folder, "*.json"))
+        foreach (var (page, def) in pageFiles)
         {
-            var page = Path.GetFileNameWithoutExtension(file);
-            var def = Definition(contentRoot, page);
-            if (def?["layout"]?.DeepClone() is not JsonObject layout) continue;
+            if (def["layout"]?.DeepClone() is not JsonObject layout) continue;
 
             var defVersion = def["version"]?.GetValue<int>() ?? layout["version"]?.GetValue<int>() ?? 1;
             var saved = await config.GetAsync(ConfigPrefix + page);

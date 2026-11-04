@@ -295,7 +295,10 @@ public class ManagerController : ViewControllerBase
         if (this.HttpContext.GetService<ServiceManager>()?.Find(name) is not { } service) return this.NotFound();
         var view = $"Service/Forms/{service.Name}"; // 등록된 서비스 이름만 뷰 경로로 씀
         var engine = this.HttpContext.GetService<ICompositeViewEngine>()!;
-        return engine.FindView(this.ControllerContext, view, false).Success ? this.View(view, service) : this.Content(string.Empty, "text/html");
+        if (engine.FindView(this.ControllerContext, view, false).Success) return this.View(view, service);
+        var directPath = $"~/Views/Manager/Service/Forms/{service.Name}.cshtml";
+        if (engine.GetView(null, directPath, false).Success) return this.View(directPath, service);
+        return this.Content(string.Empty, "text/html");
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using BitPlus.Web;
 using BitPlus.Web.Site.Data;
 using BitPlus.Web.Site.Middlewares;
 using BitPlus.Web.Site.OAuth;
+using BitPlus.Web.Site.Plugins;
 using BitPlus.Web.Site.Widgets;
 using Scalar.AspNetCore;
 
@@ -14,12 +15,16 @@ builder.Configuration.AddSetupSettings();
 builder.Configuration.AddEnvironmentVariables().AddCommandLine(args);
 var installed = SetupSettings.IsInstalled(builder.Configuration);
 
-// 1. MVC Razor 뷰 및 Web API 컨트롤러 일괄 구성 (BitPlus.Web 확장)
+// 0-1. 외부 플러그인 어셈블리 탐색 (Plugins/*.dll)
+var plugins = PluginManager.Init(builder.Environment.ContentRootPath);
+
+// 1. MVC Razor 뷰 및 Web API 컨트롤러 일괄 구성 (BitPlus.Web 확장 + 플러그인)
 // - 전역 환경(App.DevMode, App.Config) 초기화 및 IHttpContextAccessor 등록
 // - System.Text.Json 일괄 포맷팅(CamelCase, DateFormatter 등)
 // - ModelState 유효성 검사 실패 시 표준 Result.Fail 반환 및 에러 자동 로깅
-// - BitPlus.Web 어셈블리 내장 컨트롤러(SystemController 등) 자동 탐색 등록
-builder.AddControllersWithViews();
+// - BitPlus.Web 어셈블리 내장 컨트롤러(SystemController 등) 및 외부 플러그인 컨트롤러/뷰 자동 등록
+var mvc = builder.AddControllersWithViews();
+foreach (var plugin in plugins.Plugins) mvc.AddApplicationPart(plugin);
 
 // 2. 핵심 인프라 서비스 등록 (로깅 및 개발용 CORS)
 builder.Services.AddLogger(builder.Configuration);
@@ -44,8 +49,8 @@ builder.Services.AddIdentity();
 // 5. 동적 권한 정책 인가(Policy Authorization) 등록
 builder.Services.AddPolicyAuthorization();
 
-// 6. 사이트 전용 다국어 리소스 매니저 등록
-builder.Services.AddLangResource(BitPlus.Web.Site.Properties.Resources.ResourceManager);
+// 6. 사이트 전용 다국어 리소스 매니저 등록 (+ 외부 플러그인 내장 리소스)
+builder.Services.AddLangResource([BitPlus.Web.Site.Properties.Resources.ResourceManager, .. plugins.ResourceManagers]);
 
 // 7. OpenAPI 서비스 등록
 builder.Services.AddOpenApi();
@@ -53,8 +58,26 @@ builder.Services.AddOpenApi();
 // 7-1. 일간 방문 집계(페이지 요청 수·방문자 수, 업로드 폴더/Counter 파일)
 builder.Services.AddVisitCounter();
 
-// 7-2. 서비스 매니저: 시스템 이벤트(회원·컨텐츠·방문·오류)를 구독하는 서비스들(사이트 어셈블리 + Plugins/Services/*.dll) — 설정을 DB 에서 읽으므로 설치 후에만
-if (installed) builder.AddServiceManager();
+// 7-2. 서비스 매니저: 시스템 이벤트(회원·컨텐츠·방문·오류)를 구독하는 서비스들(사이트 어셈블리 + 외부 플러그인 DLL) — 설정을 DB 에서 읽으므로 설치 후에만
+if (installed)
+{
+    builder.AddServiceManager();
+    var registered = builder.Services.Where(p => p.ServiceType == typeof(BitPlus.Web.Services.IService)).Select(p => p.ImplementationType).ToHashSet();
+    foreach (var plugin in plugins.Plugins)
+    {
+        try
+        {
+            foreach (var type in plugin.GetTypes().Where(p => p.IsClass && !p.IsAbstract))
+            {
+                if (typeof(BitPlus.Web.Services.IService).IsAssignableFrom(type) && registered.Add(type))
+                    builder.Services.AddSingleton(typeof(BitPlus.Web.Services.IService), type);
+                if (typeof(BitPlus.Web.Search.ISearchProvider).IsAssignableFrom(type))
+                    builder.Services.AddScoped(typeof(BitPlus.Web.Search.ISearchProvider), type);
+            }
+        }
+        catch { }
+    }
+}
 
 // 7-3. 위젯: 페이지 영역 읽기 서비스 + 위젯 데이터 로더 — 설치 후에만
 if (installed) builder.Services.AddWidgets();
@@ -97,9 +120,9 @@ else
     app.UseHTTPS();
 }
 
-// 11. 응답 압축(정적 파일보다 앞) → 정적 파일(버전 쿼리 1년·/lib 운영 7일 캐시 헤더) 및 라우팅 파이프라인 구성
+// 11. 응답 압축(정적 파일보다 앞) → 정적 파일(웹 루트 + 외부 플러그인 wwwroot 임베디드 리소스 통합 서빙) 및 라우팅 파이프라인 구성
 app.UseResponseCompress();
-app.UseStaticFilesCached();
+app.UsePluginStaticFiles(plugins);
 app.UseRouting();
 
 // 12. 동적 다국어 문화권 해석 미들웨어 (Query -> Cookie -> Header -> Browser -> Default)
