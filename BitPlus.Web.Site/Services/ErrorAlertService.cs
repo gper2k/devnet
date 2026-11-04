@@ -57,7 +57,7 @@ public class ErrorAlertService : ServiceBase
     /// <param name="token">앱 종료 토큰</param>
     protected override async Task HandleAsync(ServiceEvent e, IServiceProvider services, CancellationToken token)
     {
-        var key = $"{e.Values.GetValueOrDefault("type")}|{e.Values.GetValueOrDefault("path")}";
+        var key = $"{e.Values.GetValueOrDefault("type")}|{KeyPath(e.Values.GetValueOrDefault("path"))}";
         var skipped = this.history.TryGetValue(key, out var last) ? last.Skipped : 0;
         if (last.Sent != default && e.Time - last.Sent < this.Interval)
         {
@@ -91,6 +91,10 @@ public class ErrorAlertService : ServiceBase
             .Select(p => (p.Mail, p.Culture is { } culture && cultures.Contains(culture) ? culture : this.config.Culture))];
     }
 
+    /// <summary>중복 알림 키용 경로 정규화: 경로 조각 중 GUID·숫자 식별자를 <c>*</c> 로 묶어 파일·글 번호마다 알림이 따로 나가지 않게 합니다.</summary>
+    private static string KeyPath(string? path) => string.IsNullOrEmpty(path) ? string.Empty
+        : string.Join('/', path.Split('/').Select(p => Guid.TryParse(p, out _) || long.TryParse(p, out _) ? "*" : p));
+
     /// <summary>
     /// 오류 형식으로 심각도 리소스 키를 정합니다: DB·캐시·메모리·시간 초과 등 기반 오류는 치명(Critical), 입력·형식 오류는 보통(Medium), 그 밖은 높음(High).
     /// </summary>
@@ -99,7 +103,7 @@ public class ErrorAlertService : ServiceBase
     {
         null => "High",
         _ when new[] { "Sql", "DbUpdate", "Redis", "OutOfMemory", "Timeout", "IOException", "Socket", "Cryptographic" }.Any(type.Contains) => "Critical",
-        _ when new[] { "Argument", "Format", "Json", "BadHttpRequest", "OperationCanceled" }.Any(type.Contains) => "Medium",
+        _ when new[] { "Argument", "Format", "Json", "BadHttpRequest", "OperationCanceled", "TaskCanceled" }.Any(type.Contains) => "Medium",
         _ => "High"
     };
 
