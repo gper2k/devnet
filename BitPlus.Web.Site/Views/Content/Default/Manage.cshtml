@@ -6,15 +6,17 @@
     var isManual = Model.Type == ContentTypes.Manual; // 메뉴얼: 목록·답변 권한과 좋아요·댓글 좋아요·공지·비공개·익명·답글 허용은 쓰지 않음(서버가 정함: ManualContentHandler)
     var isForum = BitPlus.Web.Data.Content.ForumContentHandler.UsesTopicComments(Model.Type); // 포럼·블로그(포럼형 댓글): 답글 권한·답글 허용·댓글 좋아요·비공개·익명은 쓰지 않고(서버가 정함: ForumContentHandler), 수정·삭제 허용은 토픽에만 적용
     var isGallery = Model.Type == ContentTypes.Gallery; // 갤러리: 첨부가 기본이라 첨부 사용·허용 확장자·업로드/다운로드 권한 입력과 답변 권한·답글 허용·글 변경 기록·비공개·익명 옵션은 숨기고 서버가 정한다(GalleryContentHandler)
+    var typeName = this.Lang("ContentType" + Model.Type);
+    var pageTitle = $"{typeName} {this.Lang("BoardSettings")}";
 }
 
 @* 일반(Default) 형식 게시판 설정(/content/manage/{규칙}) 및 신규 등록(/content/manage, 규칙 번호 0) — 관리자 전용(컨트롤러 검사). 탭: 기본 사항(제목·파일 규칙·활성화) / 권한(통합 목록). 값은 공통 설정 API api/content/settings(조회 GET ?ruleNo=, 저장 POST — 컨텐츠 매니저가 유형별로 처리)로 불러오고 저장한다. 형식마다 설정 항목이 달라 각 형식 폴더에 자기 Manage 뷰를 둔다. *@
 <article class="contentManage">
     <header>
         <span>
-            @this.Lang("BoardSettings") 
+            @pageTitle 
             <i class="badge point">@(Model.RuleNo == 0 ? this.LangOf("AddOf", "ContentRule") : "Rule No. " + Model.RuleNo)</i>
-            <small></small>
+            <small>@(Model.RuleNo > 0 && !string.IsNullOrEmpty(Model.Title) ? $"({Model.Title})" : null)</small>
         </span>
     </header>
     <section class="tabBox">

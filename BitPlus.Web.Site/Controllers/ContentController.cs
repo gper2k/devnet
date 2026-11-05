@@ -96,7 +96,6 @@ public partial class ContentController : ViewControllerBase
         var allowed = model.View == WriteView ? (editing ? model.Permission.CanWrite || model.Permission.CanAnswer : replying ? model.Permission.CanAnswer : model.Permission.CanWrite) : model.View is ContentPageModel.IndexView or ListView ? model.Permission.CanList : model.Permission.CanRead;
         if (!allowed) return this.Denied();
         if (rule.Type == ContentTypes.Blog && model.View is ContentPageModel.IndexView or ListView) await this.FillFeedAsync(rule, model); // 블로그: 목록 없이 글 보기를 이어서 보이는 피드
-        if (rule.Type == ContentTypes.Manual && model.View is ContentPageModel.IndexView or ListView && await this.FirstManualNoAsync(rule, model) is { } firstNo) return this.Redirect($"/content/{rule.RuleNo}/view/{firstNo}"); // 메뉴얼은 목록과 보기가 한 화면: 선택한 카테고리(없으면 첫 카테고리)의 첫 글로 이동
         if (model.View == WriteView)
         {
             model.EditNo = int.TryParse(this.Request.Query["no"], out var no) && no > 0 ? no : 0; // 글 번호가 있으면 수정 (기존 글은 화면에서 API 로 불러와 채움: 본인 글 확인 포함)

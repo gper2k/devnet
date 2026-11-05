@@ -144,6 +144,14 @@
     "sourceMap": true
   },
   {
+    "outputFile": "Views/Content/Manual/Index.cshtml.css",
+    "inputFile": "Views/Content/Manual/Index.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
     "outputFile": "Views/Content/Manual/View.cshtml.css",
     "inputFile": "Views/Content/Manual/View.cshtml.scss",
     "minify": {

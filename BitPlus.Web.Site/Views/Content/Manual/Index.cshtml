@@ -1,4 +1,233 @@
 @model ContentPageModel
+@{
+    var queryCategory = this.Context.Request.Query["category"].ToString();
+    var category = Model.Categories.Count == 0 ? string.Empty
+        : Model.Categories.Any(p => p.Key == queryCategory) ? queryCategory : Model.Categories[0].Key;
+    var categoryName = Model.Categories.FirstOrDefault(p => p.Key == category).Value ?? string.Empty;
+}
 
-@* 메뉴얼형 첫 화면(/content/{규칙}) — 글이 있으면 컨트롤러가 첫 글 보기로 보내므로 여기는 글이 하나도 없을 때만 열린다. 목차와 빈 안내를 보여 주는 Manual/View 를 그대로 쓴다. *@
-<partial name="~/Views/Content/Manual/View.cshtml" model="Model" />
+@* 메뉴얼형 목차 화면 (/content/{규칙}, /content/{규칙}/list)
+   일반 게시판 헤더/툴바(하단 라인 포함), 서적 챕터형 1열 계층 목록 *@
+<article class="contentManualIndex">
+    @if (string.IsNullOrEmpty(Model.TopHtml))
+    {
+    <header>
+        <span>@Model.Title</span>
+    </header>
+    }
+    <div class="manualBody">
+        <header class="manualToolbar">
+            <div class="leftAction">
+                @if (Model.Permission.CanWrite)
+                {
+                    <button type="button" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiAdd"></i> 페이지 그룹 추가</button>
+                }
+            </div>
+            <div class="rightSearch">
+                @if (Model.Categories.Count > 0)
+                {
+                    <div class="dropDown" id="manualCategory" data-val="@category">
+                        <header>@categoryName</header>
+                        <ul class="dropBox">
+                            @foreach (var item in Model.Categories)
+                            {
+                                <li data-val="@item.Key" class="@(item.Key == category ? "active" : null)">@item.Value</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="inputGroup inline sm">
+                    <input type="search" id="manualSearchInput" maxlength="100" autocomplete="off" placeholder="@this.Lang("Search")" />
+                    <button type="button" class="deco" id="manualSearchBtn"><i class="fi fiSearch"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <div class="manualListContainer" id="manualChapters">
+            <div class="manualLoading">
+                <i class="fi fiSpinner fiSpin"></i>
+                <span>목차를 불러오는 중입니다...</span>
+            </div>
+        </div>
+    </div>
+</article>
+
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const root = document.querySelector('article.contentManualIndex');
+        if (!root) return;
+        const ruleNo = @Model.RuleNo;
+        const categoryBox = root.querySelector('#manualCategory');
+        const searchInput = root.querySelector('#manualSearchInput');
+        const searchBtn = root.querySelector('#manualSearchBtn');
+        const container = root.querySelector('#manualChapters');
+        let allGroups = [];
+
+        categoryBox?.addEventListener('change', () => {
+            location.href = `/content/${ruleNo}?category=${encodeURIComponent(categoryBox.dataset.val)}`;
+        });
+
+        const escapeHtml = str => (str || '').replace(/[&<>"']/g, m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[m]));
+
+        const badge = (cls, label) => `<i class="badge sm ${cls}">${escapeHtml(label)}</i> `;
+        const formatTitle = i => {
+            let html = '';
+            if (i.published === false) html += badge('danger', @this.Js(this.Lang("SaveDraft")));
+            if (!i.approved) html += badge(i.state === 'rejected' ? 'danger' : 'warning', i.state === 'rejected' ? @this.Js(this.Lang("ContentRejected")) : @this.Js(this.Lang("ContentPendingApproval")));
+            if (i.gate) html += '<i class="fi fiLock"></i> ';
+            html += escapeHtml(i.title);
+            return html;
+        };
+
+        const render = (groups, query) => {
+            const q = (query || '').trim();
+            if (!groups || groups.length === 0) {
+                container.innerHTML = `
+                    <div class="manualEmpty">
+                        <i class="fi ${q ? 'fiSearch' : 'fiBook'}"></i>
+                        <p>${q ? '검색어와 일치하는 내용이 없습니다.' : '등록된 매뉴얼 목차가 없습니다.'}</p>
+                    </div>`;
+                return;
+            }
+
+            const groupsHtml = groups.map((g, gIdx) => {
+                const chNum = gIdx + 1;
+                const headTitle = g.head
+                    ? (g.head.locked
+                        ? `<span class="locked" title="@this.Lang("ContentNoReadPermission")">${formatTitle(g.head)}</span>`
+                        : `<a href="/content/${ruleNo}/view/${g.head.contentNo}">${formatTitle(g.head)}</a>`)
+                    : `<span class="untitled">(제목 없음)</span>`;
+
+                const subPagesHtml = (g.pages || []).map((p, pIdx) => {
+                    const pSeq = String(pIdx + 1).padStart(2, '0') + '. ';
+                    const linkHtml = p.locked
+                        ? `<span class="locked" title="@this.Lang("ContentNoReadPermission")"><span class="pageSeq">${pSeq}</span>${formatTitle(p)}</span>`
+                        : `<a href="/content/${ruleNo}/view/${p.contentNo}"><span class="pageSeq">${pSeq}</span>${formatTitle(p)}</a>`;
+                    return `<li class="subPageItem">${linkHtml}</li>`;
+                }).join('');
+
+                return `
+                    <section class="groupSection">
+                        <span class="chapterLabel">Chapter ${chNum}.</span>
+                        <span class="groupTitle">${headTitle}</span>
+                        ${(g.pages && g.pages.length > 0) ? `<ul class="subPageList">${subPagesHtml}</ul>` : ''}
+                    </section>`;
+            }).join('');
+
+            container.innerHTML = groupsHtml;
+        };
+
+        const categoryVal = categoryBox?.dataset.val || @this.Js(category);
+
+        const buildGroups = items => {
+            const list = [];
+            (items || []).forEach(i => {
+                if (i.level === 0) list.push({ head: i, pages: [] });
+                else {
+                    if (list.length === 0) list.push({ head: null, pages: [] });
+                    list.at(-1).pages.push(i);
+                }
+            });
+            return list;
+        };
+
+        // 최초 전체 목차 로드
+        const initLoad = async () => {
+            const queryParams = new URLSearchParams({ ruleNo, size: 100000 });
+            if (categoryVal) queryParams.set('category', categoryVal);
+
+            const res = await common.getSend(`/api/content/list?${queryParams}`, { useLoading: false });
+            if (!res?.success) {
+                container.innerHTML = '<div class="manualEmpty"><i class="fi fiErrorCircle"></i><p>목차를 불러오지 못했습니다.</p></div>';
+                return;
+            }
+
+            allGroups = buildGroups(res.data.items);
+            render(allGroups, '');
+        };
+
+        // 본문(내용) 및 제목 백엔드 검색
+        const doSearch = async () => {
+            const q = (searchInput?.value || '').trim();
+            if (!q) {
+                render(allGroups, '');
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="manualLoading">
+                    <i class="fi fiSpinner fiSpin"></i>
+                    <span>내용을 검색하는 중입니다...</span>
+                </div>`;
+
+            const queryParams = new URLSearchParams({ ruleNo, size: 100000, q });
+            if (categoryVal) queryParams.set('category', categoryVal);
+
+            const res = await common.getSend(`/api/content/list?${queryParams}`, { useLoading: false });
+            if (!res?.success) {
+                container.innerHTML = '<div class="manualEmpty"><i class="fi fiErrorCircle"></i><p>검색 중 오류가 발생했습니다.</p></div>';
+                return;
+            }
+
+            const items = res.data.items || [];
+            if (items.length === 0) {
+                render([], q);
+                return;
+            }
+
+            const matchedSet = new Set(items.map(x => x.contentNo));
+            let matchedGroups = allGroups.map(g => {
+                const headMatched = g.head && matchedSet.has(g.head.contentNo);
+                const matchingPages = (g.pages || []).filter(p => matchedSet.has(p.contentNo));
+                if (headMatched || matchingPages.length > 0) {
+                    return {
+                        head: g.head,
+                        pages: matchingPages
+                    };
+                }
+                return null;
+            }).filter(Boolean);
+
+            if (matchedGroups.length === 0 && items.length > 0) {
+                matchedGroups = buildGroups(items);
+            }
+
+            render(matchedGroups, q);
+        };
+
+        await initLoad();
+
+        let searchTimer = null;
+        searchBtn?.addEventListener('click', () => {
+            clearTimeout(searchTimer);
+            doSearch();
+        });
+        searchInput?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(searchTimer);
+                doSearch();
+            }
+        });
+        searchInput?.addEventListener('input', e => {
+            const val = e.target.value.trim();
+            clearTimeout(searchTimer);
+            if (!val) {
+                render(allGroups, '');
+                return;
+            }
+            searchTimer = setTimeout(() => doSearch(), 300);
+        });
+        searchInput?.addEventListener('search', () => {
+            clearTimeout(searchTimer);
+            if (!searchInput.value.trim()) render(allGroups, '');
+            else doSearch();
+        });
+    });
+</script>

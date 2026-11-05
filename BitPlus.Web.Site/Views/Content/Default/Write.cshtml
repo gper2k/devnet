@@ -1,4 +1,4 @@
-﻿@model ContentPageModel
+@model ContentPageModel
 @{
     // 규칙 설정(게시판 설정)의 카테고리·기능 옵션에 맞춰 화면 구성이 달라진다
     var isSurvey = Model.Type == BitPlus.Data.Content.ContentTypes.Survey; // 설문: 에디터 대신 설문 편집기, 게시 기간·대상은 "설문 기간"·"설문 대상자"
@@ -16,6 +16,8 @@
 
 @* 일반 형식의 글쓰기(/content/{규칙}/write) — 쓰기 권한이 있는 사용자만 열린다(컨트롤러 검사). 구성은 규칙 설정에 따라 달라지며(카테고리 선택, 공지 체크, 제목 옆 더보기 메뉴: 연관 링크 입력줄 추가·게시 기간 모달·게시 대상 모달, 태그 입력), 저장은 api/content/post 로 한다(글 번호 ?no= 가 있으면 수정: 기존 글을 불러와 채움, 비회원은 비밀번호로 본인 확인). *@
 <article class="contentWrite flexCol">
+    @if (string.IsNullOrEmpty(Model.TopHtml))
+    {
     <header>
         <span>
             @Model.Title
@@ -24,6 +26,7 @@
             </small>
         </span>
     </header>
+    }
     @if (isEdit && Model.NeedPassword)
     {
         <section class="gate">

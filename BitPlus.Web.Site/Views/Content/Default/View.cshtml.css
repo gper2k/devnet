@@ -1,4 +1,4 @@
-﻿@charset "UTF-8";
+@charset "UTF-8";
 /* 일반 형식 글 보기(View) 전용 스타일 */
 .contentPost {
   flex: 1 1 auto;
@@ -37,16 +37,125 @@
   display: flex;
   flex-direction: column;
   border-top: 2px solid var(--deco);
-  border-bottom: 1px solid var(--lineColor);
+  padding: 0.5em 0 0 0;
+  gap: 0.4em;
+}
+.contentPost > div.contentWrap > header > div.userRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.2em 0;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95em;
+  color: var(--txColor);
+  white-space: nowrap;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--txColor);
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer > strong > img {
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer > strong > i.fi {
+  font-size: 1.6em;
+  color: var(--txLight);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer > strong > span {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1em;
+  line-height: 1.2;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer > strong > span > span.name, .contentPost > div.contentWrap > header > div.userRow > div.writer > strong > span > span {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--txColor);
+  font-size: 0.95em;
+  line-height: 1.2;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.writer > strong > span > small.role, .contentPost > div.contentWrap > header > div.userRow > div.writer > strong > span > small {
+  font-weight: normal;
+  font-size: 0.82em;
+  color: var(--txLight);
+  line-height: 1.2;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup {
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.8em;
+  margin-left: auto;
+  align-self: flex-end;
+  white-space: nowrap;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup > div.titleMeta {
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.85em;
+  color: var(--txLight);
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup > div.titleMeta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  white-space: nowrap;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup > div.titleMeta > span > i.fi {
+  font-size: 1.2em;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup > span.postMore {
+  flex: 0 0 auto;
+  padding: 0.25em 0.35em;
+  font-size: 1.2em;
+  line-height: 1;
+  color: var(--txSub);
+  border-radius: var(--roundBtn);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  user-select: none;
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup > span.postMore:hover {
+  color: var(--txColor);
+  background-color: var(--aLow);
+}
+.contentPost > div.contentWrap > header > div.userRow > div.metaGroup > span.postMore:active {
+  transform: scale(0.98);
 }
 .contentPost > div.contentWrap > header > div.title {
   display: flex;
   flex-direction: row;
-  padding: 0.5em 0;
+  flex-wrap: wrap;
   align-items: center;
+  padding: 0 0 1em 0;
   gap: 0.5em;
 }
-.contentPost > div.contentWrap > header > div.title > div {
+.contentPost > div.contentWrap > header > div.title > div.badges {
   flex: 0 0 auto;
   display: inline-flex;
   flex-direction: row;
@@ -56,21 +165,22 @@
   gap: 0.5em;
   /* 보이는 배지가 하나도 없으면(숨긴 "이전 글" 배지뿐) 칸 자체를 없애 제목 앞에 간격(gap)이 남지 않게 */
 }
-.contentPost > div.contentWrap > header > div.title > div > i[hidden] {
+.contentPost > div.contentWrap > header > div.title > div.badges > i[hidden] {
   display: none;
 }
-.contentPost > div.contentWrap > header > div.title > div:not(:has(> i:not([hidden]))) {
+.contentPost > div.contentWrap > header > div.title > div.badges:not(:has(> i:not([hidden]))) {
   display: none;
 }
-.contentPost > div.contentWrap > header > div.title > div > i.badge {
+.contentPost > div.contentWrap > header > div.title > div.badges > i.badge {
   white-space: nowrap;
 }
-.contentPost > div.contentWrap > header > div.title > span {
-  flex: 1 1 auto;
+.contentPost > div.contentWrap > header > div.title > span.subject {
+  flex: 0 1 auto;
   margin: 0;
-  font-size: 1.2em;
+  font-size: 1.4em;
   font-weight: bold;
   overflow-wrap: anywhere;
+  padding: 0.2em 0.2em;
 }
 .contentPost > div.contentWrap div.contentInfo {
   flex: 0 0 auto;
@@ -78,10 +188,11 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
   padding: 0.3em;
+  gap: 0.8em;
 }
 .contentPost > div.contentWrap div.contentInfo > ul {
-  flex: 1 1 auto;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -90,41 +201,18 @@
   padding: 0;
   line-height: 1em;
   color: var(--txLight);
-  justify-content: flex-end;
   align-items: center;
   gap: 1em;
-  /* 변경 기록 버튼 (변경 기록이 있을 때만) */
 }
 .contentPost > div.contentWrap div.contentInfo > ul:first-child {
   justify-content: flex-start;
 }
+.contentPost > div.contentWrap div.contentInfo > ul:last-child {
+  margin-left: auto;
+  justify-content: flex-end;
+}
 .contentPost > div.contentWrap div.contentInfo > ul > li {
   font-size: 0.85em;
-  /* 글쓴이: 댓글 작성자와 같은 모양 (이미지 + 굵은 이름 + 활성 그룹·역할) */
-  /* 클릭하는 항목(변경 기록, 승인 기록) */
-}
-.contentPost > div.contentWrap div.contentInfo > ul > li.writer {
-  font-size: 1em;
-  color: var(--main);
-}
-.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-}
-.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong > small {
-  font-weight: normal;
-  color: var(--txLight);
-}
-.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong > img {
-  width: 1.6em;
-  height: 1.6em;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.contentPost > div.contentWrap div.contentInfo > ul > li.writer > strong > i.fi {
-  font-size: 1.3em;
-  color: var(--txLight);
 }
 .contentPost > div.contentWrap div.contentInfo > ul > li[id] {
   cursor: pointer;
@@ -132,14 +220,6 @@
 .contentPost > div.contentWrap div.contentInfo > ul > li > i.fi {
   vertical-align: middle;
   font-size: 1.3em;
-}
-.contentPost > div.contentWrap div.contentInfo > ul button {
-  height: auto;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  cursor: pointer;
 }
 .contentPost > div.contentWrap > nav {
   flex: 0 0 auto;
@@ -177,7 +257,7 @@
 .contentPost > div.contentWrap > section {
   flex: 1 1 auto;
   min-height: 12em;
-  padding: 1em;
+  padding: 2em 1em;
   font-size: 0.9em; /* 본문 이미지 높이 제한은 공용 .contentBody(_Editor.scss) — 스크립트로 넣는 본문이라 이 격리 스타일은 닿지 않음 */
 }
 .contentPost > div.contentWrap > footer {
@@ -482,6 +562,7 @@
   color: var(--deco);
   font-size: 1em;
   font-weight: bold;
+  min-width: 0;
 }
 .contentPost > nav.manualNav > a:hover {
   background-color: transparent;
@@ -499,8 +580,14 @@
 }
 .contentPost > nav.manualNav > a > span {
   padding-left: 1em;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .contentPost > nav.manualNav > a.next > span {
+  padding-left: 0;
   padding-right: 1em;
 }
 .contentPost > nav.manualNav > a:not([href]) {
@@ -537,21 +624,69 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  align-items: center;
   gap: 0.5em;
 }
-.contentPost > footer > div > button, .contentPost > footer > div > .btn {
+.contentPost > footer > div > button, .contentPost > footer > div > .btn, .contentPost > footer > div > input {
   font-size: 0.9rem;
-  padding: 0.65em 0.8em;
   height: auto;
+  padding: 0.5em 0.6em;
+  line-height: 1.2;
+  box-sizing: border-box;
+}
+.contentPost > footer > div > div.dropDown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-size: inherit;
+}
+.contentPost > footer > div > div.dropDown > button {
+  font-size: 0.9rem;
+  height: auto;
+  padding: 0.55em 0.9em;
+  line-height: 1.2;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.contentPost > footer > div > div.dropDown > button > i.fiCaretDown {
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+.contentPost > footer > div > div.dropDown > ul.dropBox {
+  min-width: 7.5em;
+}
+.contentPost > footer > div > div.dropDown > ul.dropBox > li {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.8em;
+  font-size: 0.9em;
+}
+.contentPost > footer > div > div.dropDown > ul.dropBox > li:hover {
+  background-color: var(--aLow);
+}
+.contentPost > footer > div > div.dropDown > ul.dropBox > li.danger {
+  color: var(--danger);
+}
+.contentPost > footer > div > div.dropDown > ul.dropBox > li.danger:hover {
+  background-color: var(--aLow);
+  color: var(--danger);
 }
 
 /* 타블렛 W 이하 (~ 1024px) */
 @media (width <= 1024px) {
   .contentPost > div.contentWrap > header > div.title {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5em;
   }
-  .contentPost > div.contentWrap > header > div.title > div {
-    margin-right: 0.5em;
+  .contentPost > div.contentWrap > header > div.title > div.userGroup {
+    margin-left: auto;
+    align-self: flex-end;
   }
 }
 /* 타블렛 H 이하 (~ 780px) */
@@ -561,4 +696,4 @@
   cursor: pointer;
 }
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/GeminiBaseDotNet/BitPlus.Web.Site/Views/Content/Default/View.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;AACA;AAgBA;AA4SA;AA8JA;AA4CA;AAmDA;;AAxjBA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;AA6HA;AA4BA;AAUA;;AAjKA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAKA;;AAHA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AA8CA;;AA5CA;EACI;;AAGJ;EACI;AACA;AA4BA;;AA3BA;EACI;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;AACA;AA0BA;AAwCA;AAwBA;;AAzFA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EAEI;EACA;EAEA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AA+CA;;AA7CA;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;AACA;;AACA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AASA;;AAPA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAOpB;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AASA;;AAPA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EAEI;EACA;EACA;;;AAMhB;AACA;EAIgB;IACI;;EAEA;IACI;;;AAQxB;AAOA;AAOA;AACA;EACI%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/devnet/BitPlus.Web.Site/Views/Content/Default/View.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;EACA;AACA;AAgBA;AA2YA;AA8JA;AA4CA;AAmDA;;AAvpBA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;AA4NA;AA4BA;AAUA;;AAhQA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EAEI;EACA;EACA;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAMhB;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAKA;;AAHA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;AACA;AA0BA;AAwCA;AAwBA;;AAzFA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EAEI;EACA;EAEA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EAEI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAKZ;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;;AAMhB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AA+CA;;AA7CA;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;AACA;;AACA;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;AASA;;AAPA;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAEA;EACI;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAOpB;EACI;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;;AAKZ;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;AASA;;AAPA;EACI;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAEA;EACI;;AAIR;EACI;EACA;EACA;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;AAGJ;EACI;;AAKZ;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EAGI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAIR;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAEA;EACI;EACA;;;AAUhC;AACA;EAIgB;IACI;IACA;IACA;IACA;;EAEA;IACI;IACA;;;AAQxB;AAOA;AAOA;AACA;EACI;;;AAGJ;AACA;AAAA;EAEI;EACA;;AAEA;AAAA;AAAA;EAEI;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;AAAA;AAAA;EACI;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;;AAGJ;AAAA;AAAA;EACI;EACA;EACA;EACA;;AAKZ;AAAA;EACI;;AAEA;AAAA;EACI;;AAGJ;AAAA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;AAAA;EACI;;AAIR;AAAA;EACI;EACA;EACA;EACA;EACA;EACA%22%7D */

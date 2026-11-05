@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 /* 일반 형식 목록(Index/List) 전용 스타일 */
 .contentDefault {
   overflow: visible;
@@ -84,6 +84,8 @@
   flex-direction: row;
   gap: 0.5em;
   /* 목록 줄의 제목칸: 위에 제목줄(뱃지·제목·첨부·댓글 수), 아래에 요약글 */
+  /* 요약글 줄의 본문 첫 이미지: 제목·요약글 왼쪽에 두 줄 높이로, 넓이는 최대 6em 까지(넘치면 가운데를 잘라 보임) */
+  /* 요약글 (게시판 옵션 "요약글 표시", 공지 제외): 제목 아래 두 줄까지 */
 }
 .contentDefault > div > div ::deep > header > span.title > span, .contentDefault > div > div ::deep > ul > li > span.title > span {
   display: flex;
@@ -91,21 +93,17 @@
   align-items: center;
   gap: 0.5em;
   min-width: 0;
+  /* 열 수 없는 글 (잠금): 링크가 없는 제목 */
+  /* 제목 뒤 첨부 파일 수 */
 }
 .contentDefault > div > div ::deep > header > span.title > span > a, .contentDefault > div > div ::deep > ul > li > span.title > span > a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.contentDefault > div > div ::deep > header > span.title > span, .contentDefault > div > div ::deep > ul > li > span.title > span {
-  /* 열 수 없는 글 (잠금): 링크가 없는 제목 */
-}
 .contentDefault > div > div ::deep > header > span.title > span > a:not([href]), .contentDefault > div > div ::deep > ul > li > span.title > span > a:not([href]) {
   color: var(--txLight);
   cursor: default;
-}
-.contentDefault > div > div ::deep > header > span.title > span, .contentDefault > div > div ::deep > ul > li > span.title > span {
-  /* 제목 뒤 첨부 파일 수 */
 }
 .contentDefault > div > div ::deep > header > span.title > span > em, .contentDefault > div > div ::deep > ul > li > span.title > span > em {
   flex: 0 0 auto;
@@ -123,9 +121,6 @@
 .contentDefault > div > div ::deep > header > span.title > span > i.fiArrReply, .contentDefault > div > div ::deep > ul > li > span.title > span > i.fiArrReply {
   transform: rotate(180deg);
 }
-.contentDefault > div > div ::deep > header > span.title, .contentDefault > div > div ::deep > ul > li > span.title {
-  /* 요약글 줄의 본문 첫 이미지: 제목·요약글 왼쪽에 두 줄 높이로, 넓이는 최대 6em 까지(넘치면 가운데를 잘라 보임) */
-}
 .contentDefault > div > div ::deep > header > span.title > img, .contentDefault > div > div ::deep > ul > li > span.title > img {
   grid-row: 1/span 2;
   height: 4em;
@@ -133,9 +128,6 @@
   max-width: 6em;
   object-fit: cover;
   border-radius: var(--roundBox);
-}
-.contentDefault > div > div ::deep > header > span.title, .contentDefault > div > div ::deep > ul > li > span.title {
-  /* 요약글 (게시판 옵션 "요약글 표시", 공지 제외): 제목 아래 두 줄까지 */
 }
 .contentDefault > div > div ::deep > header > span.title > small, .contentDefault > div > div ::deep > ul > li > span.title > small {
   display: -webkit-box;
@@ -255,4 +247,4 @@
 }
 /* 모바일 (~ 520px) */
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22Index.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;;AAMhB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EAEI;;AAEA;EACI;EACA;;AAGJ;EAEI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;;AACA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAVR;AAYI;;AACA;EACI;EACA;;AAfR;AAiBI;;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;AA5CZ;AA+CI;;AACA;EACI;EACA;EACA;EACA;EACA;EACA;;AAtDR;AAwDI;;AACA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAKJ;EACI;;AAKZ;EACI;EACA;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;EACA;;AAQxB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAMpB;AACA;EAGY;IACI;;EAEA;IACI;IACA;IACA;;EAEJ;IACI;;EAEI;IAAY;;EACZ;IAAe;;;AAQvC;AACA;EAIgB;IACI;;EAGI;IACI;;EAGJ;IACI;;EAEA;IACI;;;AAUhC%22,%22file%22:%22Index.cshtml.css%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///D:/Source%2520Code/devnet/BitPlus.Web.Site/Views/Content/Default/Index.cshtml.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22;AAAA;AACA;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;EACA;EACA;;AAIR;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAEA;EACI;EACA;EACA;;AAGJ;EACI;;AAMhB;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EAEI;;AAEA;EACI;EACA;;AAGJ;EAEI;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;AAEA;AAsCA;AASA;;AA9CA;EACI;EACA;EACA;EACA;EACA;AAOA;AAKA;;AAVA;EACI;EACA;EACA;;AAGJ;EACI;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;;AAGJ;EACI;;AAIR;EACI;EACA;EACA;EACA;EACA;EACA;;AAGJ;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAKJ;EACI;;AAKZ;EACI;EACA;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;AAGJ;EACI;;AAGJ;EACI;EACA;EACA;EACA;AACA;;AACA;EACI;EACA;EACA;EACA;;AAQxB;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;AAEA;EACI;EACA;EACA;EACA;EACA;;AAEA;EACI;;AAGJ;EACI;;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAMpB;AACA;EAGY;IACI;;EAEA;IACI;IACA;IACA;;EAEJ;IACI;;EAEI;IAAY;;EACZ;IAAe;;;AAQvC;AACA;EAIgB;IACI;;EAGI;IACI;;EAGJ;IACI;;EAEA;IACI;;;AAUhC%22%7D */

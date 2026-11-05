@@ -1,7 +1,9 @@
 @model ContentPageModel
 @{
     Layout = "_AdminLayout";
-    this.SetTitle(this.Lang("BoardSettings"));
+    var typeName = this.Lang("ContentType" + Model.Type);
+    var pageTitle = $"{typeName} {this.Lang("BoardSettings")}";
+    this.SetTitle(pageTitle);
     this.SetPageKey("Content");
     this.SetDescription(this.Lang("ContentManageInfo"));
     ViewData["ReturnUrl"] = "/Manager/Content"; // 저장하면 관리자 컨텐츠 화면(게시판 탭)으로 돌아간다 (형식별 Manage 파샬뷰가 읽음)

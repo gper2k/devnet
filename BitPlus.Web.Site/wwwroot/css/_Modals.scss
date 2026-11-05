@@ -930,3 +930,199 @@ dialog {
         }
     }
 }
+
+/* 승인/결재 기록 모달 (Content Post Approval) */
+dialog.approvalModal {
+    width: 28em;
+    min-width: 22em;
+    max-width: 34em;
+    min-height: 14em;
+    max-height: 85vh;
+
+    & > header {
+        color: var(--main);
+
+        & > i.fi {
+            font-size: 1.2em;
+        }
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6em;
+        padding: 0.6em 1em;
+        overflow: hidden;
+    }
+
+    & ul.approvalList {
+        list-style: none;
+        margin: 0;
+        padding: 0.2em 0.2em 0.2em 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.45em;
+        max-height: 18em;
+        overflow-y: auto;
+
+        & > li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6em 0.85em;
+            border-radius: var(--roundBtn);
+            background-color: var(--aLow);
+            border: 1px solid var(--aColor);
+            gap: 0.8em;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+
+            &:hover {
+                background-color: var(--aLight);
+            }
+
+            /* 좌측: 순번 + 이름 */
+            & > div:first-child {
+                display: flex;
+                align-items: center;
+                gap: 0.65em;
+                min-width: 0;
+                flex: 1 1 auto;
+
+                & > span.stepIdx {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 1.6em;
+                    height: 1.6em;
+                    border-radius: 50%;
+                    background-color: var(--aColor);
+                    color: var(--txColor);
+                    font-size: 0.85em;
+                    font-weight: 700;
+                    flex-shrink: 0;
+                }
+
+                & > strong.name {
+                    font-size: 0.95em;
+                    font-weight: 600;
+                    color: var(--txColor);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+
+            /* 우측: 현 승인권자 배지 또는 결재 완료 시간 */
+            & > div:last-child {
+                display: flex;
+                align-items: center;
+                gap: 0.5em;
+                flex-shrink: 0;
+                justify-content: flex-end;
+
+                & > span.badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35em;
+                    font-size: 0.8em;
+                    padding: 0.3em 0.65em;
+                    white-space: nowrap;
+                }
+            }
+
+            /* 현 승인권자 항목 강조 */
+            &.current {
+                border-color: var(--main3);
+                background-color: var(--main1);
+
+                & > div:first-child > span.stepIdx {
+                    background-color: var(--main);
+                    color: white;
+                }
+
+                & > div:first-child > strong.name {
+                    color: var(--txColor);
+                    font-weight: 700;
+                }
+            }
+        }
+    }
+
+    & div.rejectBox {
+        padding: 0.65em 0.9em;
+        border-radius: var(--roundBtn);
+        background-color: var(--dangerLight);
+        color: var(--danger);
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    & > footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.6em;
+        padding: 0.6em 1em 1em 1em;
+
+        & > button {
+            font-size: 0.9rem;
+            height: auto;
+            padding: 0.45em 0.9em;
+        }
+    }
+}
+
+/* 변경 기록 모달 (Content Post History) */
+dialog.historyModal {
+    width: 28em;
+    min-width: 20em;
+    max-width: 32em;
+    min-height: 14em;
+    max-height: 85vh;
+
+    & > header {
+        color: var(--main);
+    }
+
+    & ul.historyList {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.45em;
+        max-height: 18em;
+        overflow-y: auto;
+
+        & > li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6em 0.8em;
+            border-radius: var(--roundBtn);
+            background-color: var(--aLow);
+            gap: 0.8em;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: var(--aLight);
+            }
+
+            &.revertCurrent {
+                background-color: var(--pointLight);
+                color: var(--point);
+                font-weight: 600;
+            }
+
+            &.empty {
+                justify-content: center;
+                color: var(--txLight);
+                cursor: default;
+                background-color: transparent;
+            }
+        }
+    }
+}

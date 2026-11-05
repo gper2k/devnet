@@ -6,6 +6,8 @@
 @* 일반 형식 목록(/content/{규칙}, /content/{규칙}/list): 읽기 권한과 상관없이 누구에게나 보인다. 글 목록은 페이지가 아니라 API(api/content/list)로 불러와 .dataList 의 ul 에 채운다.
    검색은 제목·내용·글쓴이·태그에서 동시에, 카테고리가 있는 게시판은 검색창 앞의 선택 상자(맨 위 "전체")로 한 카테고리만 볼 수 있다. 목록 크기는 바꾸면 세션 스토리지(공용 listPageSize)에 보관되어 다음에 열 때 기본이 된다. *@
 <article class="contentDefault">
+    @if (string.IsNullOrEmpty(Model.TopHtml))
+    {
     <header>
         <span>
             @Model.Title
@@ -13,6 +15,7 @@
             <small></small>
         </span>
     </header>
+    }
     <div>
         <header>
             <div>
@@ -161,9 +164,13 @@
             const data = res.data;
             listQuery = queryOf(data.page, data.pageSize, form.q.value.trim(), categoryBox?.dataset.val); // 서버가 맞춘 실제 페이지로 쿼리를 만들고 주소에 반영
             history.replaceState(null, '', location.pathname + listQuery);
-            root.querySelector('#contentTotal').textContent = data.total;
-            root.querySelector('#contentCount').classList.toggle('warning', data.pending); // 승인 목록 모드면 건수 뱃지를 포인트 색에서 경고 색으로
-            root.querySelector('#contentCount').classList.toggle('point', !data.pending);
+            const totalEl = root.querySelector('#contentTotal');
+            if (totalEl) totalEl.textContent = data.total;
+            const countEl = root.querySelector('#contentCount');
+            if (countEl) {
+                countEl.classList.toggle('warning', data.pending); // 승인 목록 모드면 건수 뱃지를 포인트 색에서 경고 색으로
+                countEl.classList.toggle('point', !data.pending);
+            }
             const toggle = root.querySelector('#contentPendingView'); // 승인 목록 모드면 "일반 보기", 아니면 미승인 글이 있을 때만 "미승인 N건"
             toggle.hidden = !data.pending && !data.pendingCount;
             toggle.querySelector('span').textContent = data.pending ? normalViewText : unapprovedText.replace('{0}', data.pendingCount);

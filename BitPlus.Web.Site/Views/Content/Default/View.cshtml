@@ -23,11 +23,11 @@
    접근 검사(PostAccessRule)와 조회수 처리는 컨트롤러가 하고, 좋아요·승인·변경 기록·댓글·삭제는 api/content 로 처리한다. 규칙의 기능 옵션(좋아요, SNS 공유, 댓글, 댓글 좋아요, 글 변경 기록, 삭제·답글 허용)이 꺼져 있으면 해당 영역은 그려지지 않는다. *@
 <script>window.contentGuestPassword = @this.Js(ViewData["GuestPassword"] as string ?? "");</script> @* 비밀번호 화면에서 확인한 비회원 글 비밀번호 (댓글 등 다른 부분 화면도 함께 보냄) *@
 <article class="contentPost flexCol">
-    @if (!Model.InFeed) @* 블로그 피드 안에서는 게시판 제목줄이 피드 위에 한 번만 있음 *@
+    @if (!Model.InFeed && string.IsNullOrEmpty(Model.TopHtml))
     {
     <header class="@(isManual ? "withToc" : null)">
         <span>
-        @if (!isManual) {<a href="@listUrl"> @Model.Title</a>}
+            <a href="@listUrl">@Model.Title</a>
         </span>
         @if (isManual)
         {
@@ -36,72 +36,106 @@
         }
     </header>
     }
+    else if (isManual && !Model.InFeed)
+    {
+    <header class="withToc">
+        <span>
+            <a href="@listUrl">@Model.Title</a>
+        </span>
+        <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
+    </header>
+    }
     <div class="contentWrap">
         <header>
-            <div class="title">
-                <div>
-                        @if (post.IsNotice)
+            @{
+                var hasMoreMenu = (useShare && post.IsApproved)
+                    || post.CanHistory
+                    || post.HasApprovals
+                    || post.MoveTargets.Count > 0
+                    || post.CanReorder
+                    || (Model.Permission.IsAdmin && BitPlus.Web.Data.Content.DefaultContentHandler.UsesSummary(Model.Type) && this.Context.CanHandleEvent(BitPlus.Web.Services.ServiceEvents.ContentSummary))
+                    || post.CanReport;
+                var writerName = !string.IsNullOrEmpty(post.Writer) ? post.Writer : this.Lang("Admin");
+            }
+            <div class="userRow">
+                @if (!string.IsNullOrEmpty(writerName))
+                {
+                    @* 회원 글이면 로그인 사용자에게 작성자 메뉴(메시지 보내기·글 보기, 레이아웃의 userMenu) *@
+                    <div class="writer">
+                        <strong data-user="@(this.IsAuthenticated ? post.WriterId : null)" data-name="@writerName">
+                            @if (!string.IsNullOrEmpty(post.WriterPhoto))
+                            {
+                                <img src="@post.WriterPhoto" alt="" />
+                            }
+                            else
+                            {
+                                <i class="fi fiPerson fiFill"></i>
+                            }
+                            <span>
+                                <span class="name">@writerName</span>
+                                @if (!string.IsNullOrEmpty(post.WriterGroup) || !string.IsNullOrEmpty(post.WriterRole))
+                                {
+                                    <small class="role">@string.Join(" · ", new[] { post.WriterGroup, post.WriterRole }.Where(s => !string.IsNullOrEmpty(s)))</small>
+                                }
+                            </span>
+                        </strong>
+                    </div>
+                }
+                <div class="metaGroup">
+                    <div class="titleMeta">
+                        @if (!isForumTopic)
                         {
-                            <i class="badge sm main">@this.Lang("Notice")</i>
+                            <span><i class="fi fiEye"></i> @post.ReadCount</span>
                         }
-                        @if (!string.IsNullOrEmpty(post.Category))
+                        <span><i class="fi fiClock"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.CDate, DateTimeKind.Utc).ToString("o")">@post.CDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></span>
+                        @if (isForumTopic)
                         {
-                            <i class="badge sm deco">@post.Category</i>
+                            <span title="@this.Lang("ContentLastActivity")"><i class="fi fiArrSync"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.UDate, DateTimeKind.Utc).ToString("o")">@post.UDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></span>
                         }
-                        @if (!post.IsPublished)
+                        else if (post.UDate > post.CDate.AddMinutes(1))
                         {
-                            <i class="badge sm danger">@this.Lang("SaveDraft")</i>
+                            <span class="updated" title="@this.Lang("ContentLastActivity") (@post.UDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC)"><i class="fi fiEdit"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.UDate, DateTimeKind.Utc).ToString("o")">@post.UDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></span>
                         }
-                        @if (post.IsRejected)
-                        {
-                            <i class="badge sm danger">@this.Lang("ContentRejected")</i>
-                        }
-                        else if (!post.IsApproved)
-                        {
-                            <i class="badge sm warning">@this.Lang("ContentPendingApproval")</i>
-                        }
-                        <i class="badge sm warning" id="postOldBadge" hidden></i>
-                        @if (shownTranslation.Found && shownTranslation.IsMachine)
-                        {
-                            <i class="badge sm info"><i class="fi fiSparkle"></i> @this.Lang("TranslationMachine")</i>
-                        }
-                        @if (shownTranslation.Found && shownTranslation.Outdated)
-                        {
-                            <i class="badge sm warning" title="@this.Lang("TranslationOutdated")"><i class="fi fiWarning"></i> @this.Lang("Translation")</i>
-                        }
+                    </div>
+                    @if (hasMoreMenu)
+                    {
+                        <span class="postMore" id="postMoreBtn" role="button" tabindex="0" title="@this.Lang("More")"><i class="fi fiEllipsisV"></i></span>
+                    }
                 </div>
-                <span>@post.Title</span>
             </div>
-            <div class="contentInfo">
-                <ul>
-                    @if (!string.IsNullOrEmpty(post.Writer))
+            <div class="title">
+                <div class="badges">
+                    @if (post.IsNotice)
                     {
-                        @* 회원 글이면 로그인 사용자에게 작성자 메뉴(메시지 보내기·글 보기, 레이아웃의 userMenu) *@
-                        @* 댓글 작성자와 같은 모양: 이미지가 있으면 이름 앞에 작은 둥근 이미지, 이름 뒤에 활성 그룹·역할 *@
-                        <li class="writer"><strong data-user="@(this.IsAuthenticated ? post.WriterId : null)" data-name="@post.Writer">@if (!string.IsNullOrEmpty(post.WriterPhoto)) { <img src="@post.WriterPhoto" alt="" /> } else if (post.WriterId != null) { <i class="fi fiPerson fiFill"></i> }@post.Writer@if (post.WriterGroup is not null || post.WriterRole is not null) { <small>@string.Join(" · ", new[] { post.WriterGroup, post.WriterRole }.OfType<string>())</small> }</strong></li>
+                        <i class="badge sm main">@this.Lang("Notice")</i>
                     }
-                </ul>
-                <ul>
-                    @if (!isForumTopic)
+                    @if (!string.IsNullOrEmpty(post.Category))
                     {
-                        <li><i class="fi fiEye"></i> @post.ReadCount</li>
+                        <i class="badge sm deco">@post.Category</i>
                     }
-                    <li><i class="fi fiClock"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.CDate, DateTimeKind.Utc).ToString("o")">@post.CDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></li>
-                    @if (isForumTopic)
+                    @if (!post.IsPublished)
                     {
-                        <li title="@this.Lang("ContentLastActivity")"><i class="fi fiArrSync"></i> <time data-local="ago" datetime="@DateTime.SpecifyKind(post.UDate, DateTimeKind.Utc).ToString("o")">@post.UDate.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time></li>
+                        <i class="badge sm danger">@this.Lang("SaveDraft")</i>
                     }
-                    @* 공유 *@
-                    @if (useShare && post.IsApproved)
+                    @if (post.IsRejected)
                     {
-                        <li id="postShare"><i class="fi fiShare"></i> @this.Lang("ContentShare")</li>
+                        <i class="badge sm danger">@this.Lang("ContentRejected")</i>
                     }
-                    @* 컨텐츠 변경 기록 *@
-                    @if (post.CanHistory)
+                    else if (!post.IsApproved)
                     {
-                        <li id="postHistory"><i class="fi fiHistory"></i> @this.Lang("History")</li>
+                        <i class="badge sm warning">@this.Lang("ContentPendingApproval")</i>
                     }
-                </ul>
+                    <i class="badge sm warning" id="postOldBadge" hidden></i>
+                    @if (shownTranslation.Found && shownTranslation.IsMachine)
+                    {
+                        <i class="badge sm info"><i class="fi fiSparkle"></i> @this.Lang("TranslationMachine")</i>
+                    }
+                    @if (shownTranslation.Found && shownTranslation.Outdated)
+                    {
+                        <i class="badge sm warning" title="@this.Lang("TranslationOutdated")"><i class="fi fiWarning"></i> @this.Lang("Translation")</i>
+                    }
+                </div>
+                <span class="subject">@post.Title</span>
             </div>
         </header>
         @if (post.Translations.Count > 0)
@@ -188,67 +222,30 @@
                 }
             </div>
         </footer>
-        <div class="contentInfo">
-            <ul>
-                @* 게시 기간 *@
-                @if (post.Start is not null || post.End is not null)
-                {
-                    <li class="period">
-                        <i class="fi fiCalClock"></i>
-                        @if (post.Start is { } start)
-                        {
-                            <time data-local="datetime" datetime="@DateTime.SpecifyKind(start, DateTimeKind.Utc).ToString("o")">@start.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time>
-                        }
-                        ~
-                        @if (post.End is { } end)
-                        {
-                            <time data-local="datetime" datetime="@DateTime.SpecifyKind(end, DateTimeKind.Utc).ToString("o")">@end.ToString("yyyy-MM-dd HH:mm", cultureOf) UTC</time>
-                        }
-                    </li>
-                }
-                @* 승인 및 기록 *@
-                @if (post.HasApprovals)
-                {
-                    <li id="postApprovers"><i class="fi fiTasksApp"></i> @this.Lang("ContentApprovalRecord")</li>
-                }
-            </ul>
-            <ul>
-                @* 작성자 IP 정보를 중간 3문자를 마스킹 해서 출력한다.  *@
-                @if (!string.IsNullOrEmpty(post.WriterIp))
-                {
-                    <li class="ip"><i class="fi fiGlobe"></i> @post.WriterIp</li>
-                }
-                @* 순서 변경 *@
-                @if (post.CanReorder)
-                {
-                    <li id="postReorder"><i class="fi fiSort"></i> @this.Lang("ManualReorder")</li>
-                }
-                @* 게시물 이동 *@
-                @if (post.MoveTargets.Count > 0)
-                {
-                    @* 같은 형식의 다른 게시판으로 이동 (관리자·글쓴이, 쓰기 권한이 있는 게시판만): 공용 드롭박스(.open/.active), 고르면 확인 후 이동 *@
-                    <li id="postMove">
-                        <i class="fi fiArrMove"></i> @this.Lang("Move")
-                        <ul class="dropBox right">
-                            @foreach (var target in post.MoveTargets)
-                            {
-                                <li data-rule="@target.RuleNo">@target.Title</li>
-                            }
-                        </ul>
-                    </li>
-                }
-                @* 요약글 다시 만들기 *@
-                @if (Model.Permission.IsAdmin && BitPlus.Web.Data.Content.DefaultContentHandler.UsesSummary(Model.Type) && this.Context.CanHandleEvent(BitPlus.Web.Services.ServiceEvents.ContentSummary))
-                {
-                    <li id="postSummary"><i class="fi fiArrSync"></i> @this.Lang("ContentSummaryRefresh")</li>
-                }
-                @* 신고 *@
-                @if (post.CanReport)
-                {
-                    <li id="postReport"><i class="fi fiFlag"></i> @this.Lang("Report")</li>
-                }
-            </ul>
-        </div>
+        @{
+            var hasPeriod = post.Start is not null || post.End is not null;
+            var pText = hasPeriod ? ((post.Start?.ToString("yyyy-MM-dd", cultureOf) ?? "") + " ~ " + (post.End?.ToString("yyyy-MM-dd", cultureOf) ?? "")) : null;
+            var hasIp = !string.IsNullOrEmpty(post.WriterIp);
+        }
+        @if (hasPeriod || hasIp)
+        {
+            <div class="contentInfo">
+                <ul>
+                    @* 게시 기간 *@
+                    @if (hasPeriod)
+                    {
+                        <li class="period"><i class="fi fiCalClock"></i> @pText</li>
+                    }
+                </ul>
+                <ul>
+                    @* 작성자 IP 정보를 중간 3문자를 마스킹 해서 출력한다.  *@
+                    @if (hasIp)
+                    {
+                        <li class="ip"><i class="fi fiGlobe"></i> @post.WriterIp</li>
+                    }
+                </ul>
+            </div>
+        }
     </div>
     @if (isManual)
     {
@@ -256,7 +253,7 @@
         <nav class="manualNav">
             @if (post.PreviousNo > 0)
             {
-                <a class="prev" href="@(post.PreviousLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.PreviousNo}")" @(post.PreviousLocked ? "data-locked=\"true\"" : null)><b><i class="fi fiChevronLeft"></i> @this.Lang("ContentPrevious")</b><span>@post.PreviousTitle</span></a>
+                <a class="prev" href="@(post.PreviousLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.PreviousNo}")" @(post.PreviousLocked ? "data-locked=\"true\"" : null) title="@post.PreviousTitle"><b><i class="fi fiChevronLeft"></i> @this.Lang("ContentPrevious")</b><span>@post.PreviousTitle</span></a>
             }
             else
             {
@@ -265,7 +262,7 @@
             }
             @if (post.NextNo > 0)
             {
-                <a class="next" href="@(post.NextLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.NextNo}")" @(post.NextLocked ? "data-locked=\"true\"" : null)><b>@this.Lang("ContentNext") <i class="fi fiChevronRight"></i></b><span>@post.NextTitle</span></a>
+                <a class="next" href="@(post.NextLocked ? "#" : $"/content/{Model.RuleNo}/view/{post.NextNo}")" @(post.NextLocked ? "data-locked=\"true\"" : null) title="@post.NextTitle"><b>@this.Lang("ContentNext") <i class="fi fiChevronRight"></i></b><span>@post.NextTitle</span></a>
             }
         </nav>
     }
@@ -302,34 +299,84 @@
     </nav>
     }
 
-    @if (!postButtonsInReplies || (post.NeedPassword && post.CanDelete)) @* 블로그 피드: 버튼이 모두 댓글 제목줄로 가 비면 버튼줄(과 그 구분선)을 그리지 않음 *@
+    @{
+        var isForum = Model.Type == BitPlus.Data.Content.ContentTypes.Forum || isForumTopic;
+        var canWritePost = Model.Permission.CanWrite && !Model.InFeed;
+        var canReplyPost = !isForum && (isManual ? post.AddPageToNo > 0 : post.CanReply);
+        var canEditPost = post.CanEdit && !postButtonsInReplies;
+        var canDeletePost = post.CanDelete && !postButtonsInReplies;
+        var writeBtnText = this.Lang("Write");
+        var editBtnText = this.Lang("Edit");
+        var newPostText = this.Lang(isForum ? "NewTopic" : "NewPost");
+        if (newPostText == "NewPost") newPostText = "새글";
+        var replyText = this.Lang("Answer");
+        var manualSubPageText = "하위 페이지";
+        var manualGroupText = "페이지 그룹";
+        var modifyText = this.Lang("Modify");
+        if (modifyText == "Modify") modifyText = "수정";
+        var writeUrl = $"/content/{Model.RuleNo}/write";
+        var replyUrl = $"/content/{Model.RuleNo}/write?reply={(isManual ? post.AddPageToNo : post.ContentNo)}";
+        var editUrl = $"/content/{Model.RuleNo}/write?no={post.ContentNo}";
+        var hasRightButtons = canWritePost || canReplyPost || canEditPost || canDeletePost;
+    }
+    @if (!postButtonsInReplies || (post.NeedPassword && (canEditPost || canDeletePost)) || !isManual && !Model.InFeed || hasRightButtons)
     {
     <footer>
         <div>
-            @if (!isManual && !Model.InFeed)
+            @if (!Model.InFeed)
             {
                 <button type="button" onclick="location.href='@listUrl'"><i class="fi fiList"></i> @this.Lang("ContentList")</button>
             }
-            @if (post.NeedPassword && post.CanDelete)
+            @if (post.NeedPassword && (canEditPost || canDeletePost))
             {
                 <input type="password" id="postPassword" maxlength="64" autocomplete="off" placeholder="@this.Lang("Password")" />
             }
         </div>
         <div>
-            @if (Model.Permission.CanWrite && !Model.InFeed)
+            @* 쓰기 버튼 그룹 *@
+            @if (canWritePost && canReplyPost)
             {
-                <button type="button" class="deco" onclick="location.href='/content/@Model.RuleNo/write'"><i class="fi fiAdd"></i> @this.Lang(Model.Type == BitPlus.Data.Content.ContentTypes.Forum ? "NewTopic" : isManual ? "ManualNewGroup" : "ContentWrite")</button>
+                <div class="dropDown btnDropDown">
+                    <button type="button" class="deco dropTrigger"><i class="fi fiAdd"></i> @writeBtnText <i class="fi fiCaretDown"></i></button>
+                    <ul class="dropBox up right">
+                        @if (isManual)
+                        {
+                            <li onclick="location.href='@replyUrl'"><i class="fi fiArrReply"></i> @manualSubPageText</li>
+                            <li onclick="location.href='@writeUrl'"><i class="fi fiAdd"></i> @manualGroupText</li>
+                        }
+                        else
+                        {
+                            <li onclick="location.href='@writeUrl'"><i class="fi fiAdd"></i> @newPostText</li>
+                            <li onclick="location.href='@replyUrl'"><i class="fi fiArrReply"></i> @replyText</li>
+                        }
+                    </ul>
+                </div>
             }
-            @if (isManual ? post.AddPageToNo > 0 : post.CanReply)
+            else if (canWritePost)
             {
-                @* 메뉴얼: 그룹에서도, 그 그룹의 페이지에서도 같은 그룹에 새 페이지를 쓰는 화면으로 *@
-                <button type="button" class="primary" onclick="location.href='/content/@Model.RuleNo/write?reply=@(isManual ? post.AddPageToNo : post.ContentNo)'"><i class="fi fiArrReply"></i> @this.Lang(isManual ? "ManualNewPage" : "Answer")</button>
+                <button type="button" class="deco" onclick="location.href='@writeUrl'"><i class="fi fiAdd"></i> @(isManual ? manualGroupText : newPostText)</button>
             }
-            @if (post.CanEdit && !postButtonsInReplies)
+            else if (canReplyPost)
             {
-                <button type="button" class="info" id="postEdit" data-href="/content/@Model.RuleNo/write?no=@post.ContentNo"><i class="fi fiEdit"></i> @this.Lang("Edit")</button>
+                <button type="button" class="primary" onclick="location.href='@replyUrl'"><i class="fi fiArrReply"></i> @(isManual ? manualSubPageText : replyText)</button>
             }
-            @if (post.CanDelete && !postButtonsInReplies)
+
+            @* 편집 버튼 그룹 *@
+            @if (canEditPost && canDeletePost)
+            {
+                <div class="dropDown btnDropDown">
+                    <button type="button" class="info dropTrigger"><i class="fi fiEdit"></i> @editBtnText <i class="fi fiCaretDown"></i></button>
+                    <ul class="dropBox up right">
+                        <li id="postEditAction"><i class="fi fiEdit"></i> @modifyText</li>
+                        <li id="postDeleteAction" class="danger"><i class="fi fiTrash"></i> @this.Lang("Delete")</li>
+                    </ul>
+                </div>
+            }
+            else if (canEditPost)
+            {
+                <button type="button" class="info" id="postEdit" data-href="@editUrl"><i class="fi fiEdit"></i> @modifyText</button>
+            }
+            else if (canDeletePost)
             {
                 <button type="button" class="danger" id="postDelete"><i class="fi fiTrash"></i> @this.Lang("Delete")</button>
             }
@@ -375,12 +422,8 @@
         if (likeBtn) { likeBtn.onclick = () => vote(true); dislikeBtn.onclick = () => vote(false); }
 
         // 작성자 이름: 작성자 메뉴(메시지 보내기·글 보기) — 로그인 사용자에게만 data-user 가 있음
-        const writerItem = root.querySelector('li.writer > strong[data-user]');
+        const writerItem = root.querySelector('header .writer > strong[data-user]');
         if (writerItem && window.userMenu) writerItem.onclick = () => window.userMenu(writerItem, writerItem.dataset.user, writerItem.dataset.name || @this.Js(post.Writer));
-
-        // 요약 갱신 (게시판 관리자만 보임): 요약 서비스에 다시 만들기 요청, 결과 안내는 공용 처리
-        const summaryItem = root.querySelector('#postSummary');
-        if (summaryItem) summaryItem.onclick = () => send('/api/content/post/summary', {});
 
         // 카카오톡 공유: 처음 누를 때 카카오 SDK 를 불러와 키로 초기화하고, 글 주소의 미리보기(Open Graph)를 스크랩해 보낸다 (키의 앱에 사이트 도메인이 등록돼 있어야 함)
         const kakaoKey = @this.Js(kakaoKey);
@@ -399,112 +442,284 @@
             Kakao.Share.sendScrap({ requestUrl: url });
         };
 
-        // SNS 공유: 브라우저 공유(지원하면), X, 페이스북, 카카오톡(키가 있으면), QR 코드
-        const shareBtn = root.querySelector('#postShare');
-        if (shareBtn) shareBtn.onclick = e => {
-            const url = location.origin + `/content/${ruleNo}/view/${contentNo}`, title = document.title;
-            const open = target => window.open(target, '_blank', 'noopener,noreferrer');
-            const items = [];
-            if (navigator.share) items.push({ text: @this.Js(this.Lang("ContentShare")), icon: 'fi fiShare', action: () => navigator.share({ title, url }).catch(() => { }) });
-            items.push({ text: 'X', icon: 'fi fiBrandX', action: () => open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`) });
-            items.push({ text: 'Facebook', icon: 'fi fiBrandFacebook', iconColor: 'info', action: () => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`) });
-            if (kakaoKey) items.push({ text: 'KakaoTalk', icon: 'fi fiChat', iconColor: 'warning', action: () => shareKakao(url, title) });
-            items.push({ text: @this.Js(this.Lang("QrCode")), icon: 'fi fiQrcode', action: () => window.showPageQr?.() }); // QR 코드 창 (사이트 레이아웃 _PageLayout 의 showPageQr — 주소 복사 버튼도 그 창에 있음)
-            common.popMenu(e.currentTarget, items, 'right', true); // 정보줄 오른쪽 항목이라 우측 끝 기준으로 펼침, 페이지 스크롤 영역과 함께 움직임
-        };
-
-        // 이동: 항목을 누르면 대상 게시판 드롭박스를 열고 닫는다(열 때 open + active — 공용 body 클릭 처리가 active 만 떼고, 다음 바깥 클릭에 닫음). 게시판을 고르면 확인 후 옮기고 옮긴 글로 간다
-        const moveBtn = root.querySelector('#postMove');
-        if (moveBtn) moveBtn.onclick = async e => {
-            const item = e.target.closest('ul.dropBox > li[data-rule]');
-            if (!item) {
-                const open = !moveBtn.classList.contains('open');
-                moveBtn.classList.toggle('open', open);
-                moveBtn.classList.toggle('active', open);
-                return;
-            }
-            moveBtn.classList.remove('open', 'active');
-            const moveMsg = @this.Js(this.Lang("ContentMoveMsg"));
-            if (!await common.confirm(moveMsg.replace('{0}', item.textContent.trim()))) return;
-            const res = await send('/api/content/post/move', { targetRuleNo: item.dataset.rule });
-            if (res && res.success) location.href = res.data.url;
-        };
-
         // 수정: 비회원 글을 비밀번호로 열었다면 그 비밀번호를 수정 화면으로 한 번만 넘겨(sessionStorage) 다시 묻지 않게 한다
-        const editBtn = root.querySelector('#postEdit');
-        if (editBtn) editBtn.onclick = () => {
+        const doEdit = () => {
             if (guestPassword) { try { sessionStorage.setItem(`contentPw_${ruleNo}_${contentNo}`, guestPassword); } catch { } }
-            location.href = editBtn.dataset.href;
+            location.href = `/content/${ruleNo}/write?no=${contentNo}`;
         };
+        root.querySelector('#postEdit')?.addEventListener('click', doEdit);
+        root.querySelector('#postEditAction')?.addEventListener('click', doEdit);
         if (guestPassword && passwordInput) passwordInput.hidden = true; // 이미 확인했으니 삭제용 비밀번호 입력은 숨김
 
         // 삭제: 확인 후 삭제하고 목록으로 (비회원 글은 비밀번호도 함께 보냄)
-        const deleteBtn = root.querySelector('#postDelete');
-        if (deleteBtn) deleteBtn.onclick = async () => {
+        const doDelete = async () => {
+            root.querySelectorAll('footer .dropDown.open').forEach(d => d.classList.remove('open', 'active'));
             if (!await common.confirm(@this.Js(this.Lang("DeletePostMsg") + " " + this.Lang("DelWarning")))) return; // 게시물을 삭제합니다. 삭제된 정보는 복구할 수 없습니다.
             const res = await common.netSend('/api/content/post', { method: 'DELETE', body: common.makeFormData({ ...base, password: passwordInput?.value || guestPassword || '' }) });
             if (res && res.success) inFeed ? location.reload() : location.href = res.data.url;
         };
+        root.querySelector('#postDelete')?.addEventListener('click', doDelete);
+        root.querySelector('#postDeleteAction')?.addEventListener('click', doDelete);
 
-        // 승인 기록(관리자·승인자·글쓴이에게만, 승인 대기·반려 글이거나 승인된 기록이 있을 때 정보줄에 나옴): 누르면 드롭다운으로
-        // 승인한 승인자와 승인 시간, 지금 승인할 차례인 승인 대상자, 반려 사유를 보여 주고, 현재 사용자가 승인 대상자면 승인·반려 항목도 함께 나온다 (관리자 대리 승인은 규칙 옵션에 따름)
-        const approversBtn = root.querySelector('#postApprovers');
-        if (approversBtn) approversBtn.onclick = async () => {
-            const res = await common.getSend(`/api/content/post/approval?${new URLSearchParams(base)}`, { useLoading: false });
-            if (!res || !res.success) return;
-            const d = res.data, items = [];
-            d.steps.forEach(s => {
-                if (s.approved) items.push({ cols: s.at ? [s.name, common.localTime(s.at, true)] : [s.name], icon: 'fi fiCheckmark', muted: true }); // 이미 승인한 정보는 옅게
-                else if (s.target) items.push({ cols: [s.name, @this.Js(this.Lang("ContentCurrentApprover"))], icon: 'fi fiArrRight', iconColor: 'danger' }); // 지금 승인할 차례인 승인자 (이름·시간 열이 줄 사이에 정렬됨)
+        // 하단부 쓰기/편집 드롭다운 토글
+        root.querySelectorAll('footer .dropTrigger').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const drop = btn.closest('.dropDown');
+                const wasOpen = drop.classList.contains('open');
+                root.querySelectorAll('footer .dropDown.open').forEach(d => d.classList.remove('open', 'active'));
+                if (!wasOpen) drop.classList.add('open');
             });
-            if (d.rejected) items.push({ text: `${@this.Js(this.Lang("ContentRejected"))} · ${d.rejectMessage ?? ''}`, icon: 'fi fiDismiss', danger: true });
-            if (d.canApprove) {
-                if (items.length) items.push({ divider: true });
-                items.push({ text: @this.Js(this.Lang("Approval")), icon: 'fi fiCheckmark', action: async () => {
-                    const r = await send('/api/content/post/approve');
-                    if (r && r.success) location.reload();
-                } });
-                items.push({ text: @this.Js(this.Lang("ContentRejected")), icon: 'fi fiDismiss', danger: true, action: async () => { // 반려는 모달에서 반려 의견(사유)을 입력받아 등록
-                    const message = await common.textInput('', { title: @this.Js(this.Lang("ContentRejected")), placeholder: @this.Js(this.Lang("RejectMessage")), required: true, danger: true, icon: 'fiDismiss' });
-                    if (message === null) return;
-                    const r = await send('/api/content/post/reject', { message });
-                    if (r && r.success) location.reload();
-                } });
-            }
-            common.popMenu(approversBtn, items, 'left', true);
-        };
-
-        // 변경 기록(변경 기록이 있을 때만 버튼이 그려짐): 누르면 변경 시각 목록이 드롭박스로 나오고, 고르면 지금 글을 그 시점의 이전 글로 바꿔 보여 준다 ("현재 글"로 되돌릴 수 있음)
-        root.querySelector('#postJumpLatest')?.addEventListener('click', () => root.querySelector('.forumReplies')?.dispatchEvent(new CustomEvent('forum:latest'))); // 포럼: 최신 댓글로 이동 (댓글 영역 Forum/Replies.cshtml 이 처리)
-        root.querySelector('#postReport')?.addEventListener('click', () => common.reportContent({ ruleNo, contentNo })); // 글 신고: 큰 입력 모달 → 신고 접수
-        root.querySelector('#postReorder')?.addEventListener('click', async () => { // 메뉴얼: 이 그룹의 페이지 순서 변경 모달 → 저장하면 새로고침
-            if (await common.modal.append('manualOrder', { ruleNo, groupNo: @post.GroupNo, category: @this.Js(Model.Categories.FirstOrDefault(p => p.Key == post.Category || p.Value == post.Category).Key ?? "") })) location.reload();
         });
-        const historyBtn = root.querySelector('#postHistory');
-        if (historyBtn) {
-            const titleEl = root.querySelector('div.contentWrap > header > div.title > span:last-child'), badge = root.querySelector('#postOldBadge');
-            const currentTitle = titleEl.textContent, currentBody = @this.Js(post.Body);
-            let viewingOld = false;
-            const show = (title, body, label) => { // label 이 있으면 이전 글 표시
-                titleEl.textContent = title;
-                common.renderContent(root.querySelector('#contentPostBody'), body);
+        root.querySelectorAll('footer .dropBox').forEach(box => {
+            box.addEventListener('click', e => {
+                if (e.target.closest('li')) box.closest('.dropDown')?.classList.remove('open', 'active');
+            });
+        });
+
+        // 세로 점 3개 메뉴: 일반 기능들(공유, 변경 기록, 승인 기록, 이동, 순서 변경, 요약글 갱신 등)
+        const titleEl = root.querySelector('header span.subject') || root.querySelector('header > div.title > span');
+        const badge = root.querySelector('#postOldBadge');
+        const currentTitle = titleEl?.textContent ?? '', currentBody = @this.Js(post.Body);
+        let viewingOld = false;
+        const showHistoryPost = (title, body, label) => { // label 이 있으면 이전 글 표시
+            if (titleEl) titleEl.textContent = title;
+            common.renderContent(root.querySelector('#contentPostBody'), body);
+            if (badge) {
                 badge.hidden = !label;
                 badge.textContent = label ? `${@this.Js(this.Lang("ContentPrevious"))} · ${label}` : '';
-                viewingOld = !!label;
+            }
+            viewingOld = !!label;
+        };
+
+        const moreBtn = root.querySelector('#postMoreBtn');
+        if (moreBtn) {
+            const doShare = async () => {
+                const url = location.origin + `/content/${ruleNo}/view/${contentNo}`, title = document.title;
+                if (navigator.share) {
+                    try { await navigator.share({ title, url }); } catch { }
+                } else if (navigator.clipboard) {
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        common.alert(@this.Js(this.Lang("ContentUrlCopied") ?? "URL이 클립보드에 복사되었습니다."));
+                    } catch { }
+                }
             };
-            historyBtn.onclick = async () => {
+
+            const openHistory = async () => {
                 const res = await send('/api/content/post/history');
                 if (!res || !res.success) return;
-                const items = res.data.items.map(v => ({
-                    text: common.localTime(v.cDate, true) + (v.culture ? ` · ${v.culture}` : ''), icon: 'fi fiHistory', action: async () => { // 번역 기록이면 그 언어 표시
+                const items = res.data.items || [];
+                const diag = document.createElement('dialog');
+                diag.className = 'historyModal';
+                const header = document.createElement('header');
+                header.innerHTML = `<i class="fi fiHistory"></i> <span>${@this.Js(this.Lang("History"))}</span>`;
+                const body = document.createElement('div');
+                const list = document.createElement('ul');
+                list.className = 'historyList';
+                const closeDiag = () => {
+                    diag.classList.add('closing');
+                    setTimeout(() => { diag.close(); diag.remove(); }, 200);
+                };
+                if (viewingOld) {
+                    const revertLi = document.createElement('li');
+                    revertLi.className = 'revertCurrent';
+                    revertLi.innerHTML = `<i class="fi fiArrReply"></i> <span>${@this.Js(this.Lang("ContentCurrentPost"))}</span>`;
+                    revertLi.onclick = () => {
+                        showHistoryPost(currentTitle, currentBody, '');
+                        closeDiag();
+                    };
+                    list.appendChild(revertLi);
+                }
+                items.forEach(v => {
+                    const li = document.createElement('li');
+                    const timeStr = common.localTime(v.cDate, true) + (v.culture ? ` · ${v.culture}` : '');
+                    li.innerHTML = `<span><i class="fi fiHistory"></i> ${timeStr}</span><span class="badge sm"><i class="fi fiEye"></i> ${@this.Js(this.Lang("View"))}</span>`;
+                    li.onclick = async () => {
                         const one = await send('/api/content/post/history', { versionNo: v.versionNo });
-                        if (one && one.success) show(one.data.title, one.data.body, common.localTime(v.cDate, true));
+                        if (one && one.success) {
+                            showHistoryPost(one.data.title, one.data.body, common.localTime(v.cDate, true));
+                            closeDiag();
+                        }
+                    };
+                    list.appendChild(li);
+                });
+                if (items.length === 0 && !viewingOld) {
+                    const emptyLi = document.createElement('li');
+                    emptyLi.className = 'empty';
+                    emptyLi.innerHTML = `<i class="fi fiInfo"></i> ${@this.Js(this.Lang("DataEmpty"))}`;
+                    list.appendChild(emptyLi);
+                }
+                body.appendChild(list);
+                const footer = document.createElement('footer');
+                const closeBtn = document.createElement('button');
+                closeBtn.type = 'button';
+                closeBtn.innerHTML = `<i class="fi fiDismiss"></i> ${@this.Js(this.Lang("Close"))}`;
+                closeBtn.onclick = closeDiag;
+                footer.appendChild(closeBtn);
+                diag.append(header, body, footer);
+                document.body.appendChild(diag);
+                diag.addEventListener('cancel', closeDiag);
+                diag.showModal();
+            };
+
+            const openApprovers = async () => {
+                const res = await common.getSend(`/api/content/post/approval?${new URLSearchParams(base)}`, { useLoading: false });
+                if (!res || !res.success) return;
+                const d = res.data;
+                const diag = document.createElement('dialog');
+                diag.className = 'approvalModal';
+                const header = document.createElement('header');
+                header.innerHTML = `<i class="fi fiTasksApp"></i> <span>${@this.Js(this.Lang("ContentApprovalRecord"))}</span>`;
+                const body = document.createElement('div');
+                const list = document.createElement('ul');
+                list.className = 'approvalList';
+                const closeDiag = () => {
+                    diag.classList.add('closing');
+                    setTimeout(() => { diag.close(); diag.remove(); }, 200);
+                };
+                (d.steps || []).forEach((s, idx) => {
+                    const li = document.createElement('li');
+                    let iconCls = 'fiClock', stateText = '', badgeCls = 'silver';
+                    if (s.approved) {
+                        iconCls = 'fiCheckmark';
+                        stateText = s.at ? common.localTime(s.at, true) : @this.Js(this.Lang("Approval"));
+                        badgeCls = 'success';
+                        li.classList.add('approved');
+                    } else if (s.target) {
+                        iconCls = 'fiArrRight';
+                        stateText = @this.Js(this.Lang("ContentCurrentApprover"));
+                        badgeCls = 'point';
+                        li.classList.add('current');
+                    } else {
+                        stateText = @this.Js(this.Lang("ServiceWaiting"));
                     }
-                }));
-                if (viewingOld) items.unshift({ text: @this.Js(this.Lang("ContentCurrentPost")), icon: 'fi fiArrReply', action: () => show(currentTitle, currentBody, '') }, { divider: true });
-                common.popMenu(historyBtn, items, 'left', true); // 정보줄 왼쪽에 있는 항목이라 메뉴를 왼쪽 끝 기준으로 펼침(화면 밖으로 나가지 않게)
+                    if (s.mine) li.classList.add('mine');
+
+                    li.innerHTML = `<div><span class="stepIdx">${idx + 1}</span><strong class="name">${s.name}</strong></div><div><span class="badge sm ${badgeCls}"><i class="fi ${iconCls}"></i> <span>${stateText}</span></span></div>`;
+                    list.appendChild(li);
+                });
+                body.appendChild(list);
+                if (d.rejected) {
+                    const rejMsg = document.createElement('div');
+                    rejMsg.className = 'rejectBox';
+                    rejMsg.innerHTML = `<i class="fi fiDismiss"></i> <strong>${@this.Js(this.Lang("ContentRejected"))}</strong>: ${d.rejectMessage ?? ''}`;
+                    body.appendChild(rejMsg);
+                }
+                const footer = document.createElement('footer');
+                if (d.canApprove) {
+                    const approveBtn = document.createElement('button');
+                    approveBtn.type = 'button';
+                    approveBtn.className = 'main';
+                    approveBtn.innerHTML = `<i class="fi fiCheckmark"></i> ${@this.Js(this.Lang("Approval"))}`;
+                    approveBtn.onclick = async () => {
+                        closeDiag();
+                        const r = await send('/api/content/post/approve');
+                        if (r && r.success) location.reload();
+                    };
+                    const rejectBtn = document.createElement('button');
+                    rejectBtn.type = 'button';
+                    rejectBtn.className = 'danger';
+                    rejectBtn.innerHTML = `<i class="fi fiDismiss"></i> ${@this.Js(this.Lang("ContentRejected"))}`;
+                    rejectBtn.onclick = async () => {
+                        closeDiag();
+                        const message = await common.textInput('', { title: @this.Js(this.Lang("ContentRejected")), placeholder: @this.Js(this.Lang("RejectMessage")), required: true, danger: true, icon: 'fiDismiss' });
+                        if (message === null) return;
+                        const r = await send('/api/content/post/reject', { message });
+                        if (r && r.success) location.reload();
+                    };
+                    footer.appendChild(approveBtn);
+                    footer.appendChild(rejectBtn);
+                }
+                const closeBtn = document.createElement('button');
+                closeBtn.type = 'button';
+                closeBtn.innerHTML = `<i class="fi fiDismiss"></i> ${@this.Js(this.Lang("Cancel"))}`;
+                closeBtn.onclick = closeDiag;
+                footer.appendChild(closeBtn);
+                diag.append(header, body, footer);
+                document.body.appendChild(diag);
+                diag.addEventListener('cancel', closeDiag);
+                diag.showModal();
+
+                const targetItem = list.querySelector('li.mine') || list.querySelector('li.current');
+                if (targetItem) {
+                    requestAnimationFrame(() => {
+                        targetItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    });
+                }
+            };
+
+            const openMove = async anchor => {
+                const targets = [
+                    @foreach (var target in post.MoveTargets)
+                    {
+                        <text>{ ruleNo: @target.RuleNo, title: @this.Js(target.Title) },</text>
+                    }
+                ];
+                if (targets.length === 0) return;
+                const movePost = async (targetRuleNo, targetTitle) => {
+                    const moveMsg = @this.Js(this.Lang("ContentMoveMsg"));
+                    if (!await common.confirm(moveMsg.replace('{0}', targetTitle))) return;
+                    const res = await send('/api/content/post/move', { targetRuleNo });
+                    if (res && res.success) location.href = res.data.url;
+                };
+                if (targets.length === 1) {
+                    movePost(targets[0].ruleNo, targets[0].title);
+                } else {
+                    const moveItems = targets.map(t => ({
+                        text: t.title,
+                        icon: 'fi fiArrMove',
+                        action: () => movePost(t.ruleNo, t.title)
+                    }));
+                    common.popMenu(anchor, moveItems, 'right', true);
+                }
+            };
+
+            moreBtn.onclick = e => {
+                e.stopPropagation();
+                const menuItems = [];
+                @if (useShare && post.IsApproved)
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("ContentShare")), icon: 'fi fiShare', action: doShare });</text>
+                }
+                @if (post.CanHistory)
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("History")), icon: 'fi fiHistory', action: openHistory });</text>
+                }
+                @if (post.HasApprovals)
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("ContentApprovalRecord")), icon: 'fi fiTasksApp', action: openApprovers });</text>
+                }
+                @if (post.MoveTargets.Count > 0)
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("Move")), icon: 'fi fiArrMove', action: () => openMove(moreBtn) });</text>
+                }
+                @if (post.CanReorder)
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("ManualReorder")), icon: 'fi fiSort', action: async () => {
+                        if (await common.modal.append('manualOrder', { ruleNo, groupNo: @post.GroupNo, category: @this.Js(Model.Categories.FirstOrDefault(p => p.Key == post.Category || p.Value == post.Category).Key ?? "") })) location.reload();
+                    } });</text>
+                }
+                @if (Model.Permission.IsAdmin && BitPlus.Web.Data.Content.DefaultContentHandler.UsesSummary(Model.Type) && this.Context.CanHandleEvent(BitPlus.Web.Services.ServiceEvents.ContentSummary))
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("ContentSummaryRefresh")), icon: 'fi fiArrSync', action: () => send('/api/content/post/summary', {}) });</text>
+                }
+                @if (post.CanReport)
+                {
+                    <text>menuItems.push({ text: @this.Js(this.Lang("Report")), icon: 'fi fiFlag', action: () => common.reportContent({ ruleNo, contentNo }) });</text>
+                }
+                common.popMenu(moreBtn, menuItems, 'right', true);
+            };
+            moreBtn.onkeydown = e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    moreBtn.click();
+                }
             };
         }
+
+        // 포럼: 최신 댓글로 이동
+        root.querySelector('#postJumpLatest')?.addEventListener('click', () => root.querySelector('.forumReplies')?.dispatchEvent(new CustomEvent('forum:latest')));
 
         // 댓글: 목록·등록·수정·삭제·좋아요 (글쓰기는 로그인 + 댓글 권한이 있는 사람만 입력창이 보임)
         const box = root.querySelector('#postComments');

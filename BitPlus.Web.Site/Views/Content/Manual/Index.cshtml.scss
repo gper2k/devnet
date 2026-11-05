@@ -1,0 +1,255 @@
+/* 메뉴얼형 목차(Index) 전용 스타일 */
+.contentManualIndex {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    font-size: 1rem;
+    overflow: visible;
+
+    /* 상단 헤더: 전체 페이지수 배지 없이 제목만 노출 */
+    & > header {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0;
+        margin-bottom: 0.8em;
+
+        & > span {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--txColor);
+        }
+    }
+
+    & > div.manualBody {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: visible;
+
+        /* 툴바: 좌측 글쓰기/추가 버튼, 우측 카테고리+검색창, 하단 2px 구분선(이미지 2의 deco 라인) */
+        & > header.manualToolbar {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0 0.8em 0;
+            gap: 0.6em;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--deco);
+
+            & > div.leftAction {
+                display: flex;
+                align-items: center;
+                gap: 0.5em;
+
+                & > button {
+                    font-size: 0.9rem;
+                    padding: 0.55em 0.9em;
+                    height: auto;
+                    background-color: var(--bgColor);
+                    border: 1px solid var(--aColor);
+                    border-radius: var(--roundBtn);
+                    color: var(--txColor);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.4em;
+                    cursor: pointer;
+                    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+                    &:hover {
+                        background-color: var(--aLow);
+                        box-shadow: 0 0.1em 0.4em var(--aLight);
+                    }
+
+                    &:active {
+                        transform: scale(0.98);
+                        box-shadow: inset 0 0.1em 0.3em var(--aHigh);
+                    }
+                }
+            }
+
+            & > div.rightSearch {
+                display: flex;
+                align-items: center;
+                gap: 0.4em;
+
+                & > .dropDown > header {
+                    height: 2.6em;
+                    min-height: 2.6em;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+
+        /* 1열 서적형 목차 리스트: flex 1 1 auto 로 부모 높이를 자동 채움 */
+        & > div.manualListContainer {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: visible;
+            padding: 1.5em 1em;
+            gap: 1.8em; /* 챕터 그룹 간 여백 */
+
+            & ::deep > section.groupSection {
+                display: flex;
+                flex-direction: column;
+                gap: 0.4em;
+
+                /* 챕터 라벨: 1.2em, bold, 줄바꿈 */
+                & > span.chapterLabel {
+                    display: block;
+                    font-size: 1.2em;
+                    font-weight: 800;
+                    color: var(--txLight);
+                    line-height: 1.4;
+                }
+
+                /* 그룹 페이지 제목: 챕터 라벨 다음 줄에 표시, 인라인 줄바꿈 */
+                & > span.groupTitle {
+                    display: block;
+                    font-size: 1.05em;
+                    font-weight: 600;
+                    line-height: 1.4;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+
+                    & > a {
+                        color: var(--txColor);
+                        text-decoration: none;
+                        display: inline;
+                        transition: color 0.15s ease;
+
+                        &:hover {
+                            color: var(--main);
+                        }
+
+                        & > i.badge {
+                            vertical-align: 0.1em;
+                            margin-right: 0.35em;
+                        }
+                    }
+
+                    & > span.locked {
+                        color: var(--txLight);
+                        display: inline;
+
+                        & > i.badge {
+                            vertical-align: 0.1em;
+                            margin-right: 0.35em;
+                        }
+                    }
+
+                    & > span.untitled {
+                        color: var(--txLight);
+                        font-style: italic;
+                        display: inline;
+                    }
+                }
+
+                /* 하위 페이지: 0.9em, normal, 숫자 다음에 제목 */
+                & > ul.subPageList {
+                    list-style: none;
+                    margin: 0;
+                    padding: 0.2em 0 1em 1.2em; /* 들여쓰기 */
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.4em;
+
+                    & > li.subPageItem {
+                        font-size: 0.95em;
+                        font-weight: 400;
+                        line-height: 1.5;
+                        word-break: break-word;
+                        overflow-wrap: break-word;
+
+                        & > a {
+                            color: var(--txSub);
+                            text-decoration: none;
+                            display: inline;
+                            transition: color 0.15s ease;
+
+                            &:hover {
+                                color: var(--main);
+                            }
+
+                            & > span.pageSeq {
+                                margin-right: 0.35em;
+                                color: var(--txLight);
+                                font-weight: 500;
+                            }
+
+                            & > i.badge {
+                                vertical-align: 0.1em;
+                                margin-right: 0.35em;
+                            }
+                        }
+
+                        & > span.locked {
+                            color: var(--txLight);
+                            display: inline;
+                            font-size: 0.9em;
+                            font-weight: 400;
+
+                            & > span.pageSeq {
+                                margin-right: 0.35em;
+                            }
+
+                            & > i.badge {
+                                vertical-align: 0.1em;
+                                margin-right: 0.35em;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* 빈 상태 안내: flex 1 1 auto 로 전체 남는 높이를 채워 정중앙 배치 */
+            & ::deep > div.manualEmpty,
+            & > div.manualEmpty {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                min-height: 0;
+                padding: 3em 1em;
+                color: var(--txLight);
+                gap: 1em;
+
+                & > i.fi {
+                    font-size: 3.5em;
+                    opacity: 0.5;
+                    line-height: 1;
+                }
+
+                & > p {
+                    margin: 0;
+                    font-size: 1.05em;
+                    color: var(--txSub);
+                }
+            }
+
+            /* 로딩 중: flex 1 1 auto 로 전체 남는 높이를 채워 정중앙 배치 */
+            & ::deep > div.manualLoading,
+            & > div.manualLoading {
+                flex: 1 1 auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.6em;
+                min-height: 0;
+                padding: 3em 1em;
+                color: var(--txLight);
+                font-size: 1em;
+            }
+        }
+    }
+}

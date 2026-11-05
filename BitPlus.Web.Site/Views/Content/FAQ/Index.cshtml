@@ -5,7 +5,10 @@
    답변은 서버가 글자를 HTML 로 바꿔 저장한 값(HTML 기호는 글자, 줄바꿈은 br)이라 카드 안에 그대로 넣는다. *@
 <article class="contentFaq">
     <header>
-        <h1>@Model.Title</h1>
+        @if (string.IsNullOrEmpty(Model.TopHtml))
+        {
+            <h1>@Model.Title</h1>
+        }
         <form id="faqSearch">
             <div class="inputGroup inline">
                 <input type="search" name="q" maxlength="100" autocomplete="off" placeholder="@this.Lang("Search")" />

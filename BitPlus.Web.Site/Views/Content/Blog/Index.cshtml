@@ -6,6 +6,8 @@
    글 주소(/content/{규칙}/view/{번호} — 통합 검색·알림 등)로 들어오면 그 글 하나만 담은 피드(SinglePost, 목록 버튼으로 전체 피드)를 보이고, 주소의 ?jump=댓글번호 면 댓글을 펼쳐 그 댓글로 이동한다.
    열 수 없는 글은 제목과 잠금 표시만, 비회원 글은 비밀번호 확인 화면(글 보기 주소)으로 가는 제목 링크만 보인다. 검색·카테고리·페이지·미승인 보기는 주소 쿼리(page, q, category, pending)로 다시 읽는다. *@
 <article class="contentBlog">
+    @if (string.IsNullOrEmpty(Model.TopHtml))
+    {
     <header>
         <span>
             @Model.Title
@@ -13,6 +15,7 @@
             <small></small>
         </span>
     </header>
+    }
     <div>
         <header>
             <div>
