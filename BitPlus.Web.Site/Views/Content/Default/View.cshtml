@@ -23,27 +23,28 @@
    접근 검사(PostAccessRule)와 조회수 처리는 컨트롤러가 하고, 좋아요·승인·변경 기록·댓글·삭제는 api/content 로 처리한다. 규칙의 기능 옵션(좋아요, SNS 공유, 댓글, 댓글 좋아요, 글 변경 기록, 삭제·답글 허용)이 꺼져 있으면 해당 영역은 그려지지 않는다. *@
 <script>window.contentGuestPassword = @this.Js(ViewData["GuestPassword"] as string ?? "");</script> @* 비밀번호 화면에서 확인한 비회원 글 비밀번호 (댓글 등 다른 부분 화면도 함께 보냄) *@
 <article class="contentPost flexCol">
-    @if (!Model.InFeed && string.IsNullOrEmpty(Model.TopHtml))
+    @if (!Model.InFeed)
     {
-    <header class="@(isManual ? "withToc" : null)">
-        <span>
-            <a href="@listUrl">@Model.Title</a>
-        </span>
-        @if (isManual)
+        if (string.IsNullOrEmpty(Model.TopHtml))
         {
-            @* 메뉴얼: 제목은 크고 굵게 왼쪽, 목차 메뉴는 반대편 끝 *@
-            <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
+            <header class="@(isManual ? "withToc" : null)">
+                <span>
+                    <a href="@listUrl">@Model.Title</a>
+                </span>
+                @if (isManual)
+                {
+                    @* 메뉴얼: 제목은 크고 굵게 왼쪽, 목차 메뉴는 반대편 끝 *@
+                    <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
+                }
+            </header>
         }
-    </header>
-    }
-    else if (isManual && !Model.InFeed)
-    {
-    <header class="withToc">
-        <span>
-            <a href="@listUrl">@Model.Title</a>
-        </span>
-        <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
-    </header>
+        else if (isManual)
+        {
+            @* 상단 HTML이 있을 때: 제목은 숨기고 목차 메뉴만 우측에 노출 *@
+            <header class="withToc onlyToc">
+                <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
+            </header>
+        }
     }
     <div class="contentWrap">
         <header>

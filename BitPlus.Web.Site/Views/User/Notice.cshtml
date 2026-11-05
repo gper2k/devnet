@@ -3,7 +3,6 @@
 @* 내 알림(/user/notice): 시스템이 보낸 일방 알림 목록(최신순, api/user/notice) — 따로 보기 화면 없이 목록에서 확인·삭제.
    확인하지 않은 알림은 강조, 문구에 주소가 있으면 누를 때 확인 처리 후 이동. 위쪽 버튼은 모두 확인 / 확인한 알림 지우기. *@
 <div class="userNotice">
-    <partial name="_UserHead" model="Model" />
     <article>
         <nav>
             <button type="button" class="sm" data-mode="readAll"><i class="fi fiCheckmark"></i> @this.Lang("NoticeReadAll")</button>

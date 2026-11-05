@@ -1,0 +1,83 @@
+@model UserPageModel
+@{
+    Layout = ViewData["SiteLayout"] as string;
+}
+@* 회원 페이지 레이아웃(Views/User/_ViewStart 가 씌움). 다른 사용자 페이지는 본문만.
+   내 페이지면 왼쪽 어두운 사이드 메뉴 카드(이미지·이름·ID·가입일·활성 소속, 탭 메뉴) + 오른쪽 본문. 카드는 data-theme="dark" 로 그 안의 테마 변수만 어두운 값을 쓴다.
+   사이드 메뉴는 aside#pageMenu — 좁은 화면(~1024px)에서는 사이트 레이아웃의 우측 서랍(우상단 ⋮ #pageMore)으로 열린다.
+   이미지를 누르면 등록/교체(POST api/user/photo, 서버가 긴 변 256px WebP 로 줄여 저장), 등록된 이미지가 있으면 이미지 안의 작은 초기화 버튼. *@
+@if (!Model.IsMe)
+{
+    @RenderBody()
+}
+else
+{
+    <div class="userPage">
+        <aside id="pageMenu" data-theme="dark">
+            <header>
+                <span title="@this.LangOf("ChangeOf", "Image")">
+                    @if (string.IsNullOrEmpty(Model.Photo))
+                    {
+                        <i class="fi fiPerson fiFill"></i>
+                    }
+                    else
+                    {
+                        <img src="@Model.Photo" alt="" />
+                        <span data-mode="resetPhoto"><i class="fi fiArrowsRotate"></i></span>
+                    }
+                </span>
+                <h3>@Model.Name</h3>
+                <small>@@@Model.UserName</small>
+                <p><i class="fi fiCalPerson"></i> @this.Lang("UserJoined") <time data-local="date" datetime="@DateTime.SpecifyKind(Model.Joined, DateTimeKind.Utc).ToString("o")">@Model.Joined.ToString("yyyy-MM-dd")</time></p>
+            </header>
+            <nav>
+                <a href="/user" class="@(Model.Tab == "info" ? "active" : null)"><i class="fi fiPerson"></i> @this.Lang("MyInfo")</a>
+                <a href="/user/notice" class="@(Model.Tab == "notice" ? "active" : null)"><i class="fi fiAlert"></i> @this.Lang("Notification") @if (Model.UnreadNotice > 0) { <b>@Model.UnreadNotice</b> }</a>
+                <a href="/user/message" class="@(Model.Tab == "message" ? "active" : null)"><i class="fi fiMail"></i> @this.Lang("Message") @if (Model.Unread > 0) { <b>@Model.Unread</b> }</a>
+                <a href="/user/posts" class="@(Model.Tab == "posts" ? "active" : null)"><i class="fi fiDocText"></i> @this.Lang("ViewPosts")</a>
+                <a href="/user/setting" class="@(Model.Tab == "setting" ? "active" : null)"><i class="fi fiSettings"></i> @this.Lang("Settings")</a>
+            </nav>
+            @if (Model.Groups.Any(p => p.Active) || Model.Roles.Any(p => p.Active))
+            {
+                <ul>
+                    @foreach (var group in Model.Groups.Where(p => p.Active))
+                    {
+                        <li><i class="fi fiPeopleTeam"></i> @group.Name</li>
+                    }
+                    @foreach (var role in Model.Roles.Where(p => p.Active))
+                    {
+                        <li><i class="fi fiShield"></i> @role.Name</li>
+                    }
+                </ul>
+            }
+        </aside>
+        <div>
+            @* 본문 제목 = 지금 탭 이름 *@
+            <h2>@this.Lang(Model.Tab switch { "notice" => "Notification", "message" => "Message", "posts" => "ViewPosts", "setting" => "Settings", _ => "MyInfo" })</h2>
+            @RenderBody()
+        </div>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const photo = document.querySelector('div.userPage > aside > header > span');
+            // 이미지: 누르면 파일 선택 → api/user/photo 로 올림 → 새로 고침
+            photo.onclick = () => {
+                const picker = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*' });
+                picker.onchange = async () => {
+                    if (!picker.files.length) return;
+                    const res = await common.postSend('/api/user/photo', common.makeFormData({ file: [picker.files[0]] }));
+                    if (res && res.success) location.reload();
+                };
+                picker.click();
+            };
+            // 이미지 초기화: 이미지 안의 작은 버튼 — 이미지 클릭(파일 선택)으로 전파되지 않게 막음
+            const reset = photo.querySelector('[data-mode="resetPhoto"]');
+            if (reset) reset.onclick = async e => {
+                e.stopPropagation();
+                if (!await common.confirm(@this.Js(this.Lang("ResetImageMsg")))) return;
+                const res = await common.delSend('/api/user/photo');
+                if (res && res.success) location.reload();
+            };
+        });
+    </script>
+}

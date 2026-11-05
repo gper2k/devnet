@@ -1,22 +1,22 @@
 @model UserPageModel
 
-@* 내 정보(/user): 머리(_UserHead — 커버 배너·이미지 등록/교체·초기화)·탭, 좌측(기본 정보·그룹/역할·외부 로그인 연결), 우측(활동 요약 카운터·최근 작성 게시물/댓글).
-   정보 편집은 api/account/profile, 암호 변경은 api/account/password, 이미지는 POST api/user/photo(서버가 긴 변 256px WebP 로 줄여 저장). 저장하면 새로 고침. *@
+@* 내 정보(/user): 회원 레이아웃(_UserLayout — 사이드 메뉴 카드: 이미지 등록/교체·초기화·탭) 오른쪽 본문.
+   좌측(기본 정보 — 항목은 이름 위·값 아래 세로형, 버튼은 세로로 쌓음 · 그룹/역할), 우측(활동 요약 카운터·최근 작성 게시물/댓글·외부 로그인 연결). 넓지 않으면 1단.
+   정보 편집은 api/account/profile, 암호 변경은 api/account/password. 저장하면 새로 고침. *@
 <div class="userInfo">
-    <partial name="_UserHead" model="Model" />
     <div>
         <aside>
             <ul class="form card line">
-                <li><h4><i class="fi fiPerson"></i> @this.Lang("MyInfo")</h4></li>
-                <li class="row"><header class="fix">@this.Lang("UserID")</header><span>@Model.UserName</span></li>
-                <li class="row"><header class="fix">@this.Lang("DpName")</header><span>@Model.Name</span></li>
-                <li class="row">
-                    <header class="fix">@this.Lang("Email")</header>
+                <li><h4><i class="fi fiPerson"></i> @this.Lang("BasicInfo")</h4></li>
+                <li><header>@this.Lang("UserID")</header><span>@Model.UserName</span></li>
+                <li><header>@this.Lang("DpName")</header><span>@Model.Name</span></li>
+                <li>
+                    <header>@this.Lang("Email")</header>
                     <span>@Model.Email <i class="badge sm @(Model.EmailConfirmed ? "success" : "warning")">@this.Lang(Model.EmailConfirmed ? "MailVerified" : "MailNotVerified")</i></span>
                 </li>
-                <li class="row"><header class="fix">@this.Lang("Phone")</header><span>@Model.Phone</span></li>
-                <li class="row">
-                    <header class="fix">@this.Lang("LastAccess")</header>
+                <li><header>@this.Lang("Phone")</header><span>@Model.Phone</span></li>
+                <li>
+                    <header>@this.Lang("LastAccess")</header>
                     <span>
                         @if (Model.LastAccess is { } last)
                         {
@@ -26,16 +26,16 @@
                 </li>
                 <li>
                     <footer>
-                        <button type="button" data-mode="withdraw" class="danger sm"><i class="fi fiPersonDelete"></i> @this.Lang("Withdraw")</button>
-                        <button type="button" data-mode="password" class="sm"><i class="fi fiKey"></i> @this.LangOf("ChangeOf", "Password")</button>
-                        <button type="button" class="main sm" data-mode="profile"><i class="fi fiEdit"></i> @this.LangOf("EditInfoOf", "User")</button>
+                        <button type="button" class="main" data-mode="profile"><i class="fi fiEdit"></i> @this.LangOf("EditInfoOf", "User")</button>
+                        <button type="button" data-mode="password"><i class="fi fiKey"></i> @this.LangOf("ChangeOf", "Password")</button>
+                        <button type="button" data-mode="withdraw"><i class="fi fiPersonDelete"></i> @this.Lang("Withdraw")</button>
                     </footer>
                 </li>
             </ul>
             <ul class="form card line">
                 <li><h4><i class="fi fiPeopleTeam"></i> @this.Lang("Group") · @this.Lang("Role")</h4></li>
-                <li class="row">
-                    <header class="fix">@this.Lang("Group")</header>
+                <li>
+                    <header>@this.Lang("Group")</header>
                     <span>
                         @foreach (var group in Model.Groups)
                         {
@@ -43,8 +43,8 @@
                         }
                     </span>
                 </li>
-                <li class="row">
-                    <header class="fix">@this.Lang("Role")</header>
+                <li>
+                    <header>@this.Lang("Role")</header>
                     <span>
                         @foreach (var role in Model.Roles)
                         {
@@ -58,15 +58,10 @@
                     @* 기본 그룹/역할 지정 (주 소속, Default) — 창은 레이아웃(_PageLayout)의 groupDialog, default 모드 *@
                     <li>
                         <footer>
-                            <button type="button" class="main sm" onclick="window.openGroupDialog?.('default')"><i class="fi fiStar"></i> @this.Lang("SetDefaultGroupRole")</button>
+                            <button type="button" class="main" onclick="window.openGroupDialog?.('default')"><i class="fi fiStar"></i> @this.Lang("SetDefaultGroupRole")</button>
                         </footer>
                     </li>
                 }
-            </ul>
-            @* 외부 로그인 연결: 사용 중인 서비스마다 연결·해제 (api/account/logins, 연결은 /Account/ExternalLogin 으로 다녀옴). 서비스가 없으면 숨김 *@
-            <ul class="form card line" data-logins hidden>
-                <li><h4><i class="fi fiKey"></i> @this.Lang("ExternalLogins")</h4></li>
-                <li hidden><p>@this.Lang("NoPasswordInfo")</p></li>
             </ul>
         </aside>
         <section>
@@ -111,6 +106,11 @@
                 </header>
                 <ul data-activity></ul>
             </article>
+            @* 외부 로그인 연결: 사용 중인 서비스마다 연결·해제 (api/account/logins, 연결은 /Account/ExternalLogin 으로 다녀옴). 서비스가 없으면 숨김 *@
+            <ul class="form card line" data-logins hidden>
+                <li><h4><i class="fi fiKey"></i> @this.Lang("ExternalLogins")</h4></li>
+                <li hidden><p>@this.Lang("NoPasswordInfo")</p></li>
+            </ul>
         </section>
     </div>
 

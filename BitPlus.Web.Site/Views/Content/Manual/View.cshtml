@@ -12,7 +12,10 @@
     {
         <div class="manualEmpty">
             <header>
-                <h2>@Model.Title</h2>
+                @if (string.IsNullOrEmpty(Model.TopHtml))
+                {
+                    <h2>@Model.Title</h2>
+                }
                 <partial name="~/Views/Content/Manual/TocMenu.cshtml" model="Model" />
             </header>
             <p>@this.Lang("ManualEmpty")</p>

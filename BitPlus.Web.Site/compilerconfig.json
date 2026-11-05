@@ -256,6 +256,14 @@
     "sourceMap": true
   },
   {
+    "outputFile": "Views/User/_UserLayout.cshtml.css",
+    "inputFile": "Views/User/_UserLayout.cshtml.scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": true
+  },
+  {
     "outputFile": "Views/User/Setting.cshtml.css",
     "inputFile": "Views/User/Setting.cshtml.scss",
     "minify": {

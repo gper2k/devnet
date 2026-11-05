@@ -3,7 +3,10 @@
 @* 작성글 보기: 내 작성글(/user/posts)과 다른 사용자의 작성글(/user/{식별키}, 게시판 작성자 메뉴) — 머리(_UserHead) 아래 게시물/댓글 탭.
    목록은 api/user/{식별키}/activity 로 불러오며 지금 사용자가 열 수 있는 글과 그 글에 단 댓글만 담긴다(익명 게시판 제외). *@
 <div class="userPosts">
-    <partial name="_UserHead" model="Model" />
+    @if (!Model.IsMe)
+    {
+        <partial name="_UserHead" model="Model" />
+    }
     <article>
         <nav>
             <a data-kind="posts" class="active"><i class="fi fiDocText"></i> @this.Lang("UserPosts") <b>0</b></a>

@@ -1,0 +1,209 @@
+@charset "UTF-8";
+/* 회원 페이지 레이아웃(내 페이지): 왼쪽 어두운 사이드 메뉴 카드(data-theme="dark" — 안쪽 변수는 어두운 테마 값) + 오른쪽 본문 */
+.userPage {
+  flex: 1 1 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: stretch;
+  gap: 1.5em;
+  /* 사이드 메뉴 카드: 화면 높이 안에 머물고(sticky) 넘치면 카드 안 스크롤 */
+}
+.userPage > aside {
+  flex: 0 0 16em;
+  align-self: flex-start;
+  position: sticky;
+  top: 0.5em;
+  max-height: calc(100vh - 6em);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  padding: 2em 1.25em 1.5em;
+  color: var(--txColor);
+  background: var(--bgColor);
+  border: 1px solid var(--lineColor);
+  border-radius: calc(var(--roundBox) * 2);
+  box-shadow: 0 0.4em 1.2em var(--aDark);
+  /* 프로필: 이미지(눌러서 등록/교체) · 이름 · ID · 가입일 */
+}
+.userPage > aside > header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35em;
+  text-align: center;
+}
+.userPage > aside > header > span {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.5em;
+  height: 5.5em;
+  margin-bottom: 0.5em;
+  border-radius: 50%;
+  color: var(--txSub);
+  background: var(--bgSub);
+  border: 0.2em solid var(--lineColor);
+  cursor: pointer;
+}
+.userPage > aside > header > span:hover {
+  border-color: var(--txLight);
+}
+.userPage > aside > header > span > i.fi {
+  font-size: 2.8em;
+}
+.userPage > aside > header > span > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.userPage > aside > header > span {
+  /* 이미지 초기화 버튼 */
+}
+.userPage > aside > header > span > span {
+  position: absolute;
+  bottom: 0;
+  right: -0.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  color: var(--txColor);
+  background: var(--main);
+  border: 0.15em solid var(--main1);
+}
+.userPage > aside > header > span > span:hover {
+  background: var(--mainLight);
+}
+.userPage > aside > header > h3 {
+  margin: 0;
+  font-size: 1.2em;
+  line-height: 1.3;
+  word-break: break-word;
+  color: var(--txColor);
+}
+.userPage > aside > header > small {
+  color: var(--txLight);
+}
+.userPage > aside > header > p {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  margin: 0.4em 0 0;
+  font-size: 0.8em;
+  color: var(--txSub);
+}
+.userPage > aside {
+  /* 탭 메뉴: 세로로 넉넉하게, 지금 탭은 주색 바탕 */
+}
+.userPage > aside > nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  padding-top: 1.25em;
+  border-top: 1px solid var(--lineColor);
+}
+.userPage > aside > nav > a {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  padding: 0.8em 1em;
+  border-radius: var(--roundBtn);
+  color: var(--txSub);
+  transition: background-color 0.15s, color 0.15s;
+}
+.userPage > aside > nav > a > i.fi {
+  font-size: 1.15em;
+}
+.userPage > aside > nav > a:hover {
+  color: var(--txColor);
+  background: var(--aColor);
+}
+.userPage > aside > nav > a.active {
+  font-weight: bold;
+  color: var(--txColor);
+  background: var(--aColor);
+}
+.userPage > aside > nav > a.active > i.fi {
+  color: var(--point);
+}
+.userPage > aside > nav > a {
+  /* 확인하지 않은 알림·안 읽은 메시지 수 */
+}
+.userPage > aside > nav > a > b {
+  margin-left: auto;
+  padding: 0.1em 0.55em;
+  font-size: 0.75em;
+  border-radius: var(--roundBtn);
+  color: var(--txColor);
+  background: var(--danger);
+}
+.userPage > aside {
+  /* 활성 그룹·역할 */
+}
+.userPage > aside > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin: 0;
+  padding: 1.25em 0 0;
+  list-style: none;
+  border-top: 1px solid var(--lineColor);
+}
+.userPage > aside > ul > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.25em 0.7em;
+  font-size: 0.78em;
+  border-radius: var(--roundBtn);
+  color: var(--txSub);
+  background: var(--aLight);
+  border: 1px solid var(--lineColor);
+}
+.userPage {
+  /* 본문: 위 제목(지금 탭 이름) 아래로 각 탭 뷰(userInfo·userNotice …)가 세로로 채움 */
+}
+.userPage > div {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25em;
+  padding: 0;
+}
+.userPage > div > h2 {
+  flex: 0 0 auto;
+  margin: 0.4em 0 0;
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--txColor);
+}
+
+/* 타블렛 W 이하 (~ 1024px): 사이드 메뉴를 우측 서랍으로 (우상단 ⋮ #pageMore — 사이트 레이아웃이 #app.open 이면 margin-right: 0) */
+@media (width <= 1024px) {
+  .userPage > aside {
+    position: fixed;
+    top: 4.8em;
+    right: 0.5em;
+    bottom: 0.5em;
+    width: 17em;
+    max-width: calc(100vw - 1em);
+    max-height: none;
+    margin-right: -18em;
+    z-index: 9999;
+    border: 1px solid var(--aDark);
+    box-shadow: 0 0 0.6em 0.2em var(--aDark);
+    transition: margin-right 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+/* 타블렛 H 이하 (~ 780px) */
+@media (width <= 780px) {
+  .userPage > aside {
+    top: 4em;
+  }
+}

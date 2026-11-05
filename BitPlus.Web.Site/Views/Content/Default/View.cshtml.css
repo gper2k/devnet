@@ -16,6 +16,9 @@
   justify-content: space-between;
   gap: 1em;
 }
+.contentPost > header.withToc.onlyToc {
+  justify-content: flex-end;
+}
 .contentPost > header.withToc > span {
   font-size: 1.2em;
   font-weight: bold;

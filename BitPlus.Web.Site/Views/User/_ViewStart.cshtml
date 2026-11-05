@@ -1,0 +1,5 @@
+@{
+    // 회원 페이지는 사이트 레이아웃 안에 회원 레이아웃(_UserLayout — 내 페이지면 사이드 메뉴)을 한 겹 더 씌운다. 사이트 레이아웃 경로는 상위 _ViewStart 가 정한 값을 넘겨 받는다
+    ViewData["SiteLayout"] = Layout;
+    Layout = "_UserLayout";
+}

@@ -9,6 +9,10 @@
         justify-content: space-between;
         gap: 1em;
 
+        &.onlyToc {
+            justify-content: flex-end;
+        }
+
         & > span {
             font-size: 1.2em;
             font-weight: bold;

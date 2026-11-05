@@ -1,9 +1,9 @@
 @model UserPageModel
 
-@* 회원 페이지 머리: 이미지(없으면 사람 아이콘)·이름(내 페이지면 ID)·가입일. 내 페이지면 아래에 탭(정보·메시지·작성글 보기·환경설정), 다른 사용자면 메시지 보내기 버튼.
-   내 페이지(모든 탭)에서는 이미지를 누르면 이미지 등록/교체(서버가 작게 줄여 저장), 등록된 이미지가 있으면 이미지 안의 작은 초기화 버튼. *@
+@* 다른 사용자 페이지 머리(작성글 보기 /user/{식별키}): 이미지(없으면 사람 아이콘)·이름·가입일, 메시지 보내기 버튼.
+   내 페이지는 머리 대신 회원 레이아웃(_UserLayout)의 사이드 메뉴 카드가 이미지·이름·탭을 보여 준다. *@
 <header class="userHead">
-    <span title="@(Model.IsMe ? this.LangOf("ChangeOf", "Image") : null)" data-editable="@(Model.IsMe ? "true" : null)">
+    <span>
         @if (string.IsNullOrEmpty(Model.Photo))
         {
             <i class="fi fiPerson fiFill"></i>
@@ -12,91 +12,20 @@
         {
             <img src="@Model.Photo" alt="" />
         }
-        @if (Model.IsMe && !string.IsNullOrEmpty(Model.Photo))
-        {
-            <span data-mode="resetPhoto"><i class="fi fiArrowsRotate"></i></span>
-        }
     </span>
     <div>
-        <h2>
-            @Model.Name
-            @if (Model.IsMe)
-            {
-                <small>@@@Model.UserName</small>
-            }
-        </h2>
+        <h2>@Model.Name</h2>
         <p>
             <span><i class="fi fiCalPerson"></i> @this.Lang("UserJoined") <time data-local="date" datetime="@DateTime.SpecifyKind(Model.Joined, DateTimeKind.Utc).ToString("o")">@Model.Joined.ToString("yyyy-MM-dd")</time></span>
-            @if (Model.IsMe && Model.LastAccess is { } lastAccess)
-            {
-                <span><i class="fi fiClock"></i> @this.Lang("LastAccess") <time data-local="datetime" datetime="@DateTime.SpecifyKind(lastAccess, DateTimeKind.Utc).ToString("o")">@lastAccess.ToString("yyyy-MM-dd HH:mm")</time></span>
-            }
         </p>
-        @if (Model.IsMe && (Model.Groups.Count > 0 || Model.Roles.Count > 0))
-        {
-            <ul>
-                @foreach (var group in Model.Groups.Where(p => p.Active))
-                {
-                    <li><i class="fi fiPeopleTeam"></i> @group.Name</li>
-                }
-                @foreach (var role in Model.Roles.Where(p => p.Active))
-                {
-                    <li><i class="fi fiShield"></i> @role.Name</li>
-                }
-            </ul>
-        }
     </div>
-    @if (!Model.IsMe)
-    {
-        <div class="btns">
-            <button type="button" class="main" data-mode="message"><i class="fi fiSend"></i> @this.Lang("SendMessage")</button>
-        </div>
-    }
+    <div class="btns">
+        <button type="button" class="main" data-mode="message"><i class="fi fiSend"></i> @this.Lang("SendMessage")</button>
+    </div>
 </header>
-@if (Model.IsMe)
-{
-    <nav class="userTabs">
-        <a href="/user" class="@(Model.Tab == "info" ? "active" : null)"><i class="fi fiPerson"></i> @this.Lang("MyInfo")</a>
-        <a href="/user/notice" class="@(Model.Tab == "notice" ? "active" : null)"><i class="fi fiAlert"></i> @this.Lang("Notification") @if (Model.UnreadNotice > 0) { <b>@Model.UnreadNotice</b> }</a>
-        <a href="/user/message" class="@(Model.Tab == "message" ? "active" : null)"><i class="fi fiMail"></i> @this.Lang("Message") @if (Model.Unread > 0) { <b>@Model.Unread</b> }</a>
-        <a href="/user/posts" class="@(Model.Tab == "posts" ? "active" : null)"><i class="fi fiDocText"></i> @this.Lang("ViewPosts")</a>
-        <a href="/user/setting" class="@(Model.Tab == "setting" ? "active" : null)"><i class="fi fiSettings"></i> @this.Lang("Settings")</a>
-    </nav>
-}
-else
-{
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const btn = document.querySelector('header.userHead button[data-mode="message"]');
-            if (btn) btn.onclick = () => window.sendUserMessage?.('@Model.UserId', @this.Js(Model.Name));
-        });
-    </script>
-}
-@if (Model.IsMe)
-{
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const head = document.querySelector('header.userHead');
-            // 이미지: 누르면 파일 선택 → api/user/photo 로 올림(서버가 긴 변 256px WebP 로 줄여 저장) → 새로 고침
-            head.querySelector(':scope > span[data-editable]').onclick = () => {
-                const picker = document.createElement('input');
-                picker.type = 'file';
-                picker.accept = 'image/*';
-                picker.onchange = async () => {
-                    if (!picker.files.length) return;
-                    const res = await common.postSend('/api/user/photo', common.makeFormData({ file: [picker.files[0]] }));
-                    if (res && res.success) location.reload();
-                };
-                picker.click();
-            };
-            // 이미지 초기화: 이미지 안의 작은 버튼 — 이미지 클릭(파일 선택)으로 전파되지 않게 막음
-            const reset = head.querySelector('[data-mode="resetPhoto"]');
-            if (reset) reset.onclick = async e => {
-                e.stopPropagation();
-                if (!await common.confirm(@this.Js(this.Lang("ResetImageMsg")))) return;
-                const res = await common.delSend('/api/user/photo');
-                if (res && res.success) location.reload();
-            };
-        });
-    </script>
-}
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const btn = document.querySelector('header.userHead button[data-mode="message"]');
+        if (btn) btn.onclick = () => window.sendUserMessage?.('@Model.UserId', @this.Js(Model.Name));
+    });
+</script>

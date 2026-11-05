@@ -1,11 +1,11 @@
-/* 내 정보(/user): 머리·탭 아래 2단 반응형 레이아웃(좌측: 기본 정보·그룹/역할·외부 로그인 / 우측: 활동 요약·최근 작성글) */
+/* 내 정보(/user): 회원 레이아웃 본문 — 2단 반응형(좌측: 기본 정보·그룹/역할 / 우측: 활동 요약·최근 작성글·외부 로그인), 넓지 않으면 1단 */
 .userInfo {
     height: 100%;
     flex: 1 1 auto;
     font-size: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 1.5em;
 
     & > * {
         flex: 0 0 auto;
@@ -14,27 +14,45 @@
     & > div {
         flex: 1 1 auto;
         display: grid;
-        grid-template-columns: minmax(21em, 24.5em) minmax(0, 1fr);
+        grid-template-columns: minmax(20em, 26em) minmax(0, 1fr);
         align-content: start;
         align-items: start;
-        gap: 1.2em;
+        gap: 1.5em;
         padding: 0;
 
-        /* 좌측 컬럼: 개인 정보, 소속 그룹·역할, 외부 로그인 연결 */
-        & > aside {
+        /* 카드 목록(좌측: 개인 정보·소속 그룹/역할, 우측 아래: 외부 로그인 연결) — 항목은 이름(작게) 위 · 값 아래, 줄마다 구분선 */
+        & > aside,
+        & > section {
             display: flex;
             flex-direction: column;
-            gap: 1em;
+            gap: 1.5em;
             min-width: 0;
 
             & > ul {
                 margin: 0;
+                padding: 1.5em 1.5em 1.25em;
+                gap: 0;
+                border-radius: calc(var(--roundBox) * 2);
+                box-shadow: 0 0.3em 1em var(--shwColor);
 
                 &[hidden] {
                     display: none;
                 }
 
                 & > li {
+                    gap: 0.35em;
+                    padding: 0.9em 0;
+                    border-bottom: 1px solid var(--lineColor);
+
+                    &:first-child {
+                        padding-top: 0;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                        padding-bottom: 0;
+                    }
+
                     &[hidden] {
                         display: none;
                     }
@@ -42,13 +60,19 @@
                     & > h4 {
                         display: flex;
                         align-items: center;
-                        gap: 0.45em;
+                        gap: 0.5em;
                         margin: 0;
+                        font-size: 1.1em;
                         color: var(--txColor);
 
                         & > i.fi {
                             color: var(--main);
                         }
+                    }
+
+                    & > header {
+                        font-size: 0.8em;
+                        color: var(--txLight);
                     }
 
                     & > span {
@@ -59,30 +83,34 @@
                         min-height: 1.6em;
                         white-space: pre-line;
                         word-break: break-word;
+                        color: var(--txColor);
                     }
 
                     & > p {
                         margin: 0;
                         font-size: 0.85em;
+                        line-height: 1.6;
                         color: var(--txLight);
                     }
 
+                    /* 버튼은 세로로 쌓아 넓게 (정보 편집 · 암호 변경 · 회원 탈퇴는 구분선 아래로 떼어 둠) */
                     & > footer {
                         display: flex;
-                        flex-wrap: nowrap;
-                        justify-content: flex-end;
-                        gap: 0.35em;
-                        padding-top: 0.3em;
+                        flex-direction: column;
+                        gap: 0.6em;
+                        padding-top: 0.4em;
 
                         & > button {
-                            padding: 0 0.65em;
-                            font-size: 0.8em;
-                            white-space: nowrap;
+                            width: 100%;
+                            justify-content: center;
                         }
 
-                        /* 회원 탈퇴는 왼쪽 끝으로 떼어 둔다 */
-                        & > button.danger {
-                            margin-right: auto;
+                        /* 회원 탈퇴: 눈에 덜 띄게 — 테두리 없는 위험색 글자 */
+                        & > button:not(:first-child):last-child {
+                            margin-top: 0.4em;
+                            color: var(--danger);
+                            background: none;
+                            border-color: transparent;
                         }
                     }
                 }
@@ -92,10 +120,9 @@
                     align-items: center;
                     gap: 0.8em;
                     min-height: 2.2em;
-                    padding-top: 0.6em;
-                    border-top: 1px dashed var(--lineColor);
 
                     & > header {
+                        font-size: 1em;
                         display: flex;
                         align-items: center;
                         gap: 0.65em;
@@ -163,23 +190,24 @@
         & > section {
             display: flex;
             flex-direction: column;
-            gap: 1em;
+            gap: 1.5em;
             min-width: 0;
 
             /* 상단 4열 활동 지표 요약 (중간 폭 이하에서는 2x2 대칭 격자로 전환) */
             & > nav {
                 display: grid;
                 grid-template-columns: repeat(4, minmax(0, 1fr));
-                gap: 0.8em;
+                gap: 1em;
 
                 & > a {
                     display: flex;
                     align-items: center;
-                    gap: 0.85em;
-                    padding: 1em 1.1em;
+                    gap: 0.9em;
+                    padding: 1.25em;
                     background: var(--bgColor);
                     border: 1px solid var(--lineColor);
-                    border-radius: var(--roundBox);
+                    border-radius: calc(var(--roundBox) * 2);
+                    box-shadow: 0 0.3em 1em var(--shwColor);
                     color: var(--txColor);
                     transition: border-color 0.15s, box-shadow 0.15s;
 
@@ -265,7 +293,9 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0.8em;
-                padding: 1.2em;
+                padding: 1.5em;
+                border-radius: calc(var(--roundBox) * 2);
+                box-shadow: 0 0.3em 1em var(--shwColor);
 
                 & > header {
                     display: flex;
@@ -407,15 +437,15 @@
     }
 }
 
-/* 중간 데스크톱/태블릿 (~ 1080px): 4개 활동 요약 카드를 3+1 대신 2x2 대칭 격자로 배치 */
-@media (width <= 1080px) {
+/* 사이드 메뉴 옆이라 우측 컬럼이 좁은 폭 (~ 1440px): 4개 활동 요약 카드를 2x2 대칭 격자로 배치 */
+@media (width <= 1440px) {
     .userInfo > div > section > nav {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* 태블릿 (~ 780px): 좌/우 2단 컬럼을 상/하 1단으로 전환 */
-@media (width <= 780px) {
+/* 좌/우 2단 컬럼을 상/하 1단으로: 사이드 메뉴가 옆에 있는 좁은 데스크톱(1025 ~ 1200px)과 태블릿 이하(~ 780px) — 그 사이는 사이드 메뉴가 서랍이라 본문이 넓음 */
+@media (1024px < width <= 1200px), (width <= 780px) {
     .userInfo > div {
         grid-template-columns: 1fr;
     }

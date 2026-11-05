@@ -6,7 +6,6 @@
 
 @* 내 환경설정(/user/setting): 화면 언어(Culture 쿠키, common.setCulture), 테마(Theme 쿠키 — 레이아웃이 data-theme 로 적용), 메시지 받기. 바꾸면 바로 적용하고 모두 사용자 속성으로 저장(api/user/setting — 로그인하면 언어·테마 쿠키로 다시 적용) *@
 <div class="userSetting">
-    <partial name="_UserHead" model="Model" />
     <div>
         <ul class="form card line">
             <li><h4><i class="fi fiSettings"></i> @this.Lang("Settings")</h4></li>

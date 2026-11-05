@@ -1,4 +1,4 @@
-﻿@model UserPageModel
+@model UserPageModel
 @{
     this.AppClass = "fit"; // 레이아웃을 창 높이에 맞춤 — 창이 줄면 대화 목록(ul)이 먼저 줄고 스크롤됨
 }
@@ -6,7 +6,6 @@
 @* 내 메시지(/user/message): 왼쪽은 주고받은 상대별 목록(이미지·이름·기본 그룹/역할·메시지 수·안 읽은 수, 마지막 메시지 최근순, 10명씩 페이지), 오른쪽은 고른 상대와의 대화(메신저처럼 내 메시지는 오른쪽).
    대화는 처음에 최근 30개, 맨 위로 올리면 이전 30개씩 더. 말풍선 옆에 보낸 사람 이미지(상대 왼쪽, 나 오른쪽). 대화를 열면 받은 메시지는 읽음 처리. 메시지마다 작은 삭제 버튼(내 쪽에서만 지움, 양쪽 모두 지우면 완전히 삭제). 아래 입력창으로 그 상대에게 보냄. 데이터는 api/user/message/... *@
 <div class="userMessage">
-    <partial name="_UserHead" model="Model" />
     <div>
         <aside>
             <ul></ul>
